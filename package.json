@@ -1,0 +1,35 @@
+{
+  "name": "simulation_app",
+  "version": "0.0.1",
+  "description": "Simulation App",
+  "main": "app.js",
+  "devDependencies": {
+    "autocomplete-vue": "^1.0.3",
+    "css-loader": "^0.28.0",
+    "file-loader": "^0.11.1",
+    "hellojs": "^1.14.1",
+    "json-loader": "^0.5.4",
+    "url-loader": "^0.5.8",
+    "vis": "^4.19.1",
+    "vue": "^2.2.6",
+    "vue-loader": "^11.3.4",
+    "vue-resource": "^1.2.1",
+    "vue-router": "^2.3.1",
+    "vue-template-compiler": "^2.2.6",
+    "webpack": "^2.3.3",
+    "webpack-dev-server": "^2.4.2"
+  },
+  "scripts": {
+    "serve:webpack": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --port 8005 --host bbpsrvc63.cscs.ch --compress",
+    "dev": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --port 8088",
+    "serve": "python -m SimpleHTTPServer 8005",
+    "watch": "./node_modules/webpack/bin/webpack.js --watch",
+    "build": "./node_modules/webpack/bin/webpack.js --define process.env.NODE_ENV='\"production\"'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://bbpgb019.epfl.ch:/home/git/ProductionEntityApp"
+  },
+  "author": "",
+  "license": "ISC"
+}

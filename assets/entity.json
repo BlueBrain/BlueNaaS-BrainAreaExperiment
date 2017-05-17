@@ -1,0 +1,73 @@
+{
+  "Stimulus": {
+    "subthresh": {
+      "Delay": 0.0,
+      "Pattern": "RelativeLinear",
+      "Duration": 1000.0,
+      "Mode": "Current",
+      "PercentStart": 95.0
+    },
+    "poisson1": {
+      "AmpStart": 0.0,
+      "Weight": 0.5,
+      "Pattern": "NPoisson",
+      "NumOfSynapses": 5,
+      "Delay": 0.0,
+      "Mode": "Current",
+      "Duration": 1000.0,
+      "Lambda": 20.0
+    },
+    "hypamp": {
+      "Delay": 0.0,
+      "Pattern": "Hyperpolarizing",
+      "Duration": 1000.0,
+      "Mode": "Current"
+    }
+  },
+  "Report": {
+    "voltage": {
+      "Target": "Column",
+      "Format": "Bin",
+      "StartTime": 0.0,
+      "ReportOn": "v",
+      "Dt": 0.1,
+      "EndTime": 1000.0,
+      "Type": "compartment",
+      "Unit": "mV"
+    }
+  },
+  "Run": {
+    "Default": {
+      "MorphologyPath": "/homec/bp0/bp000024/proj30/pcp31k/morphologies",
+      "METypePath": "/homec/bp0/bp000024/proj30/pcp31k/CCells",
+      "CurrentDir": "/homec/bp0/bp000024/proj30/pcp31k/mike_sim/launch_script",
+      "CircuitPath": "/homec/bp0/bp000024/proj30/pcp31k/circuits",
+      "Duration": 100.0,
+      "nrnPath": "/homec/bp0/bp000024/proj30/pcp31k/circuits/ncsFunctionalAllRecipePathways",
+      "TargetFile": "/homec/bp0/bp000024/proj30/pcp31k/mike_sim/launch_script/user.target",
+      "Note": "Sample configuration file.",
+      "RunMode": "LoadBalance",
+      "Version": "HEAD",
+      "Time": "12:27:21",
+      "Date": "15:2:16",
+      "gitPath": "ssh://bbpgit.epfl.ch/sim/neurodamus/bbp",
+      "CircuitTarget": "selection",
+      "Dt": 0.025,
+      "OutputRoot": "/homec/bp0/bp000024/proj30/pcp31k/mike_sim/launch_script"
+    }
+  },
+  "StimulusInject": {
+    "hypampIntoColumn": {
+      "Stimulus": "hypamp",
+      "Target": "Column"
+    },
+    "subthreshIntoColumn": {
+      "Stimulus": "subthresh",
+      "Target": "Column"
+    },
+    "pInj": {
+      "Stimulus": "poisson1",
+      "Target": "Layer4"
+    }
+  }
+}

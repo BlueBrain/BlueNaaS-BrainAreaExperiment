@@ -4,7 +4,6 @@ import collabAuthentication from './collabAuthentication.js';
 const BLUEPY_CONFIG_V0 = 'https://services.humanbrainproject.eu/bluepy/v0/api/blueconfig/';
 // const STORAGE_ENTITY = 'https://services.humanbrainproject.eu/storage/v1/api/entity/';
 const UNICORE_URL = 'https://hbp-unic.fz-juelich.de:7112/HBP_JUQUEEN/rest/core/';
-const UNICORE_TOKEN = 'Bearer ..';
 
 export default {
   'data' () {
@@ -67,7 +66,7 @@ export default {
       let that = this;
       return new Promise(function (resolve, reject) {
         let header = {headers: {
-          'Authorization': UNICORE_TOKEN,
+          'Authorization': that.header.headers.Authorization,
           'Accept': 'application/json'
         }};
         let config = {
@@ -99,7 +98,7 @@ export default {
       let that = this;
       return new Promise(function (resolve, reject) {
         let header = {headers: {
-          'Authorization': UNICORE_TOKEN,
+          'Authorization': that.header.headers.Authorization,
           'Content-Type': 'application/octet-stream'
         }};
         let url = UNICORE_URL + 'storages/' + 'files/' + fileName;
@@ -118,7 +117,7 @@ export default {
       let that = this;
       return new Promise(function (resolve, reject) {
         let header = {headers: {
-          'Authorization': UNICORE_TOKEN,
+          'Authorization': that.header.headers.Authorization,
           'Accept': 'application/json'
         }};
         that.$http.get(UNICORE_URL + 'jobs/' + location, header)

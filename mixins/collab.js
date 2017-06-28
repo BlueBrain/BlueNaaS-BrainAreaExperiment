@@ -4,7 +4,7 @@ import collabAuthentication from './collabAuthentication.js';
 const BLUEPY_CONFIG_V0 = 'https://services.humanbrainproject.eu/bluepy/v0/api/blueconfig/';
 // const STORAGE_ENTITY = 'https://services.humanbrainproject.eu/storage/v1/api/entity/';
 const UNICORE_URL = 'https://hbp-unic.fz-juelich.de:7112/HBP_JUQUEEN/rest/core/';
-const UNICORE_TOKEN = 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImJicC1vaWRjIn0.eyJleHAiOjE0OTgyMDYxNDgsInN1YiI6IjI0MDM5NSIsImF1ZCI6WyJrYW1hamktcHl0aG9uLWNsaWVudCJdLCJpc3MiOiJodHRwczpcL1wvc2VydmljZXMuaHVtYW5icmFpbnByb2plY3QuZXVcL29pZGNcLyIsImp0aSI6IjFiNmJlYjUzLTVjYTQtNDM0YS1iNzVkLWFkZGRkM2RiNmQ2ZiIsImlhdCI6MTQ5ODExOTc0OCwiaGJwX2tleSI6ImFhNTU0ZTVkOGFkNWUwODg4MThmZTE5YTczMThkMDZiMGI5YWIyNzYifQ.bsyVy7MArN-Esqy3rovrnyvhuKBgcss5boYJiyrKWEXjUzU6rkUf6k8UqMKyFOlvlRZ98ZPCZEoWk8a8A4Gczg3NNHb-r3TfmkuVpP55yBvrH36BwICm7ZDCeaYlnDsI4DKCGdM6Jhb7TqgBpwloPNtBZpngiPUORYijb12VaTY';
+const UNICORE_TOKEN = 'Bearer ..';
 
 export default {
   'data' () {

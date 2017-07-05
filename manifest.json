@@ -1,6 +1,6 @@
 {
-  "name": "Simulation GUI",
-  "short_name": "simulation_gui",
+  "name": "Simulationapp",
+  "short_name": "simulationapp",
   "theme_color": "#2196f3",
   "background_color": "#2196f3",
   "display": "standalone",

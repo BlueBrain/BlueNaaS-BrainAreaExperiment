@@ -2,7 +2,7 @@
     <div class="simulation">
         <transition name="fade">
             <div class="app-content" v-if="!loading">
-                <div class="title">Run Simulation in Cineca</div>
+                <div class="title">Run Simulation</div>
                 <div class="duration-skip">
                     <span title="Duration">Duration(ms):</span>
                     <input v-model="endTime" type="number" placeholder="Duration" class="form-control">

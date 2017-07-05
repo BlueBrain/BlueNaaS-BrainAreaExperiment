@@ -1,8 +1,5 @@
-// import uuid from 'uuid4'
-// import typesCollabsApps from '../assets/config_files/types_collabs_apps.json'
 import collabAuthentication from './collabAuthentication.js';
 const BLUEPY_CONFIG_V0 = 'https://services.humanbrainproject.eu/bluepy/v0/api/blueconfig/';
-// const STORAGE_ENTITY = 'https://services.humanbrainproject.eu/storage/v1/api/entity/';
 const UNICORE_URL = 'https://hbp-unic.fz-juelich.de:7112/HBP_JUQUEEN/rest/core/';
 
 export default {
@@ -45,7 +42,6 @@ export default {
     'loadCompleteConfig': function () {
       let that = this;
       return new Promise(function (resolve, reject) {
-        // let url = STORAGE_ENTITY + '?uuid=41c6c0f6-a590-4a99-bb8c-30b6668b49bd';
         let url = BLUEPY_CONFIG_V0 + '41c6c0f6-a590-4a99-bb8c-30b6668b49bd';
         that.$http.get(url, that.header)
         .then(function (response) {

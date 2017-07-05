@@ -1,9 +1,11 @@
-# INSTALLATION
+# Simulationapp
+
+## INSTALLATION
 ``` npm install ```
 
-# Run as dev
+## Run as dev
 ``` npm run dev ```
 
-# Compile and serve in production
+## Compile and serve in production
 ``` npm run build ```
 ``` npm run serve ```

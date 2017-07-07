@@ -1,5 +1,10 @@
 import vis from 'vis';
 export default {
+    'data' () {
+        return {
+            header: {}
+        };
+    },
     'methods': {
         'toggleModal': function (value) {
             this.showModal = value;
@@ -222,6 +227,7 @@ export default {
             this.timeline.on('rangechange', this.createCustomTimeLabel);
 
             setTimeout(this.createCustomTimeLabel, 100); // waits until timeline draws
+            this.changeCustomTimeLabelOnResize();
         },
         'showTooltip': function (event, output) {
             // comes from the timeline.on('itemover')
@@ -236,8 +242,20 @@ export default {
             // this redraw the label for indicate the end of simulation
             let customTime = this.$el.querySelector('.vis-custom-time');
             let customLabel = this.$el.querySelector('.custom-time-label');
-            let left = parseFloat(customTime.style.left);
-            customLabel.style.left = (left + 71) + 'px';
+            if (customTime && customLabel) {
+                let left = parseFloat(customTime.style.left);
+                customLabel.style.left = (left + 71) + 'px';
+            }
+        },
+        'changeCustomTimeLabelOnResize': function () {
+            let timeout = false; // holder for timeout id
+            let delay = 250; // delay after event is "complete" to run callback
+            let that = this;
+            window.addEventListener('resize', function() {
+              clearTimeout(timeout);
+              // start timing for event "completion"
+              timeout = setTimeout(that.createCustomTimeLabel, delay);
+            });
         }
     }
 };

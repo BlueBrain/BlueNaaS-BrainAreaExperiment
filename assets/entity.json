@@ -53,6 +53,7 @@
       "gitPath": "ssh://bbpgit.epfl.ch/sim/neurodamus/bbp",
       "CircuitTarget": "selection",
       "Dt": 0.025,
+      "ForwardSkip": 1000,
       "OutputRoot": "/homec/bp0/bp000024/proj30/pcp31k/mike_sim/launch_script"
     }
   },

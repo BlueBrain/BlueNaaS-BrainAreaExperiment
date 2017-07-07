@@ -43,16 +43,19 @@ import StimulationTimeline from 'components/stimulation/stimulation-timeline.vue
 import ReportTimeline from 'components/report/report-timeline.vue';
 // import blueConfig from 'assets/entity.json';
 import CollabAuthentication from 'mixins/collabAuthentication.js';
-import Collab from 'mixins/collab.js';
+import Unicore from 'mixins/unicore.js';
+const BLUEPY_CONFIG_V0 = 'https://services.humanbrainproject.eu/bluepy/v0/api/blueconfig/';
 export default {
     'name': 'simulation',
-    'mixins': [CollabAuthentication, Collab],
+    'mixins': [CollabAuthentication],
     'data': function() {
         return {
             endTime: 50,
-            forwardSkip: 1000,
-            blueConfig: undefined,
-            loading: true
+            forwardSkip: null,
+            blueConfig: null,
+            loading: true,
+            unicore: Unicore,
+            header: {}
         };
     },
     'components': {
@@ -63,32 +66,78 @@ export default {
         'saveConfig': function () {
             this.saveCompleteConfig(this.blueConfig)
             .then(function (message) {
-                swal(
-                  'Great!',
-                  'Configuration was saved',
-                  'success'
-                );
+                swal('Great!', 'Configuration was saved', 'success');
             }, function (error) {
-                swal(
-                    'Opss',
-                    'Configuration was not saved',
-                    'error'
-                );
+                swal('Opss', 'Configuration was not saved. ' + error, 'error');
             });
         },
         'runSimulation': function () {
-            // this.simpleQuery();
-            this.getLocation('a71a1f41-9fc0-4b16-8ed1-d36804e6f400');
-            // this.reserveJob().then(function (reservation) {
-            //     debugger
-            // }, function (e) {
-            //     console.error(e);
-            // });
+            this.unicore.submitJob(
+                'JUQUEEN',
+                this.unicore.jobSpec,
+                this.unicore.inputs
+            )
+            .then(function (message) {
+                swal('Great!', 'Simulation was started', 'success');
+            }, function (error) {
+                swal('Opss', 'An error occurred. ' + error, 'error');
+            });
+        },
+        'fillToken': function (renew) {
+            let that = this;
+            this.getToken(renew).then(function (token) {
+                that.header = {headers: {'Authorization': token}};
+            }); // from collabAuthentication
+        },
+        'saveCompleteConfig': function (config) {
+            let that = this;
+            return new Promise(function (resolve, reject) {
+                that.$http.post(BLUEPY_CONFIG_V0 + 'txt/', config, that.header)
+                .then(function (response) {
+                    if (response.ok) {
+                        return resolve('Configuration saved');
+                    }
+                }, function (error) {
+                    if (error.status === 401) {
+                        window.localStorage.setItem('blupyconfig', JSON.stringify(config));
+                        that.login('none').then(function () {
+                            // login in the background
+                            that.fillToken();
+                        });
+                    }
+                    let errorBodyParsed = JSON.parse(error.body)
+                    if(error.body && errorBodyParsed) {
+                        reject('Error saving bluepyconfig: ' + errorBodyParsed.message);
+                    } else {
+                        reject('Error saving bluepyconfig: ' + error);
+                    }
+                });
+            });
+        },
+        'loadCompleteConfig': function () {
+            let that = this;
+            return new Promise(function (resolve, reject) {
+                let url = BLUEPY_CONFIG_V0 + '41c6c0f6-a590-4a99-bb8c-30b6668b49bd';
+                that.$http.get(url, that.header)
+                .then(function (response) {
+                    return resolve(response.body);
+                }, function (error) {
+                    if (error.status === 401) {
+                        that.fillToken(true);
+                    }
+                    console.log(error);
+                    reject('Error loading bluepyconfig: ' + error);
+                });
+            });
+        },
+        'loadLocalConfig': function () {
+            return Promise.resolve(require('assets/entity.json'));
         }
     },
     'mounted': function() {
         let that = this;
         this.login().then(function () {  // from CollabAuthentication
+            that.fillToken();
             that.loadLocalConfig().then(function (bluepyConfig) {
                 that.blueConfig = bluepyConfig;
                 document.querySelector('#loading-component').remove();

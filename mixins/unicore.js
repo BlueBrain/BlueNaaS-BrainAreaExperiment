@@ -23,30 +23,52 @@
                         'url': "https://unicore.data.kit.edu:8080/HBP-KIT/rest/core" };
         return sites;
     };
-    let getAuthenticationToken = async function(){
-        hello.init({
-            hbp: '7a9b6bb2-2f6d-4624-9045-d1f12d9dedaa'
+    let getAuthenticationToken = function(){
+        return new Promise((resolve, reject) => {
+            hello.init({
+                hbp: '7a9b6bb2-2f6d-4624-9045-d1f12d9dedaa'
+            });
+
+            hello.login('hbp', {display: 'page', force: false})
+            .then(data => {
+                resolve(data.authResponse.access_token);
+            }, reject);
         });
-        try {
-            let data = await hello.login('hbp', {display: 'page', force: false});
-            return data.authResponse.access_token;
-        } catch (e) {
-            let error = (e && e.error && e.error.message) ? e.error.message : e;
-            throw new Error(error);
-        }
     };
     let createHeaders = function(token){
         return {
             'Authorization': 'Bearer ' + token,
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
         };
+    };
+    let handleErrors = function (response){
+        if (!response.ok) {
+            response.json().then(err => {
+                console.error(err.errorMessage)
+            });
+            throw Error(response.statusText + ' - check console for more details');
+        }
+        return response;
+
+    };
+    let createJob = function(url, jobDefinition, token){
+        let headers = createHeaders(token);
+        return fetch(url + '/jobs', {
+            method: 'POST',
+            body: JSON.stringify(jobDefinition),
+            headers: headers
+        }).then(handleErrors);
     };
     let getJobProperties = function(jobURL, token){
         let headers = createHeaders(token);
-        headers['Content-Type'] = 'application/json';
         return fetch(jobURL, {
             method: 'GET',
             headers: headers
+        })
+        .then(handleErrors)
+        .then(response => {
+            return response.json();
         });
     };
     let uploadData = function(dataToUpload, uploadURL, token){
@@ -58,60 +80,47 @@
             method: 'PUT',
             body: data,
             headers: headers
-        });
+        }).then(handleErrors);
     };
     let startJob = function(actionURL, token){
         let headers = createHeaders(token);
-        headers['Content-Type'] = 'application/json';
         return fetch(actionURL, {
             method: 'POST',
-            body: {},
+            body: JSON.stringify({}),
             headers: headers
-        });
+        }).then(handleErrors);
     };
-    let submitJob = async function(site, jobDefinition, inputs){
-        try {
+    let submitJob = function(site, jobDefinition, inputs){
+        return new Promise((resolve, reject) => {
             let unicoreURL = getSites()[site.toUpperCase()]['url'];
-            let token, workingDirectory, jobURL, actionStartURL;
-            token = await getAuthenticationToken();
-
-            let headers = createHeaders(token);
-            headers['Content-Type'] = 'application/json';
-            console.log('creating job...');
-            let response = await fetch(unicoreURL + '/jobs', {
-                method: 'POST',
-                body: JSON.stringify(jobDefinition),
-                headers: headers
-            });
-            if (!response.ok) {
-                let res = await response.json();
-                throw new Error(res.errorMessage);
-            }
-
-            jobURL = response.headers.location;
-            if (jobURL) {
+            this.token = this.jobURL = this.actionStartURL = '';
+            getAuthenticationToken()
+            .then(token => {
+                this.token = token;
+                console.log('creating job...');
+                return createJob(unicoreURL, jobDefinition, this.token);
+            }, reject)
+            .then(job => {
+                this.jobURL = job.headers.get("location");
                 console.log('getting job properties...');
-                response = await getJobProperties(jobURL, token);
-            } else {
-                response = await response.json()
-                throw new Error(response.errorMessage);
-            }
-            workingDirectory = response.data._links.workingDirectory.href;
-            actionStartURL = response.data._links['action:start'].href;
-            await Promise.all(inputs.map(input => {
-                console.log('uploading files...');
-                return uploadData(input, workingDirectory + '/files', token);
-            }));
-
-            console.log('starting job...');
-            await startJob(actionStartURL, token);
-
-            return jobURL;
-        } catch (error) {
-            console.error('error submiting job');
-            let message = (error && error.message) ? error.message : error;
-            throw new Error(message);
-        }
+                return getJobProperties(this.jobURL, this.token);
+            }, reject)
+            .then(properties => {
+                let workingDirectory = properties._links.workingDirectory.href;
+                this.actionStartURL = properties._links['action:start'].href;
+                return Promise.all(inputs.map(input => {
+                    console.log('uploading files...');
+                    return uploadData(input, workingDirectory + '/files', this.token);
+                }));
+            }, reject)
+            .then(() => {
+                console.log('starting job...');
+                return startJob(this.actionStartURL, this.token);
+            }, reject)
+            .then(started => {
+                resolve(this.jobURL);
+            }, reject);
+        });
     };
 
     let jobSpec = {

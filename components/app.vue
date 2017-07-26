@@ -55,7 +55,8 @@ export default {
             blueConfig: null,
             loading: true,
             unicore: Unicore,
-            header: {}
+            header: {},
+            computer: 'JUQUEEN'
         };
     },
     'components': {
@@ -72,16 +73,43 @@ export default {
             });
         },
         'runSimulation': function () {
-            this.unicore.submitJob(
-                'JUQUEEN',
-                this.unicore.jobSpec,
-                this.unicore.inputs
-            )
-            .then(function (message) {
-                swal('Great!', 'Simulation was started', 'success');
-            }, function (error) {
-                swal('Opss', 'An error occurred. ' + error, 'error');
+            let that = this;
+            swal({
+              title: 'Are you sure?',
+              html: that.showSimulationParameters(),
+              showCancelButton: true,
+              confirmButtonText: 'Submit',
+              confirmButtonColor: '#548d68',
+              cancelButtonColor: '#ac6067',
+              showLoaderOnConfirm: true,
+              allowOutsideClick: true,
+              preConfirm: function () {
+                return that.unicore.submitJob(
+                    that.computer,
+                    that.unicore.jobSpec,
+                    that.unicore.inputs
+                )
+              }
+            }).then(function (url) {
+                swal('Great!', 'Simulation was started at: ' + url, 'success');
             });
+        },
+        'showSimulationParameters': function () {
+            let config = this.unicore.jobSpec;
+            return `<table>
+                <tr>
+                    <th>Supercomputer: </th>
+                    <th>${this.computer}</th>
+                </tr>
+                <tr>
+                    <th>Application Name: </th>
+                    <th>${config.ApplicationName}</th>
+                </tr>
+                <tr>
+                    <th>Nodes: </th>
+                    <th>${config.Resources.Nodes}</th>
+                </tr>
+            </table>`;
         },
         'fillToken': function (renew) {
             let that = this;
@@ -217,7 +245,6 @@ a.button-with-icon {
     background-color: rgba(172,96,103,.95);
     padding: 20px;
     font-size: 24px;
-    width: 100%;
     margin-bottom: 20px;
 }
 </style>
@@ -245,5 +272,13 @@ a.button-with-icon {
             -webkit-transform: scale(1);
             transform: scale(1);
         }
+    }
+    .swal2-content td, .swal2-content th {
+        /*border: 1px solid #dddddd;*/
+        text-align: left;
+        padding: 8px;
+    }
+    .swal2-content table {
+        margin: 0 auto;
     }
 </style>

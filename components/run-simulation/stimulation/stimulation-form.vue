@@ -177,85 +177,85 @@ import targetList from 'assets/targetList.json';
 import {autocompleteBus} from 'autocomplete-vue';
 
 export default {
-   'name': 'stimulation-form',
-   'props': ['stimulusEditableObject'],
-   'data': function () {
-      return {
-         processedTargetList: undefined,
-         stimulus: this.stimulusEditableObject.stimulusInfo,
-         item: this.stimulusEditableObject.item,
-         form: undefined
-      };
-   },
-   'components': {
-      'autocomplete-vue': AutocompleteVue
-   },
-   'methods': {
-      'processTargetList': function () {
-         let list = [];
-         for(let i=0; i<targetList.length; i++) {
-            list.push({'name': targetList[i]});
-         }
-         this.processedTargetList = list;
-      },
-      'closeForm': function () {
-        this.$emit('changeModalVisibility', false);
-      },
-      'convertToNumbers': function () {
+    'name': 'stimulation-form',
+    'props': ['stimulusEditableObject'],
+    'data': function() {
+        return {
+            'processedTargetList': undefined,
+            'stimulus': this.stimulusEditableObject.stimulusInfo,
+            'item': this.stimulusEditableObject.item,
+            'form': undefined,
+        };
+    },
+    'components': {
+        'autocomplete-vue': AutocompleteVue,
+    },
+    'methods': {
+        'processTargetList': function() {
+            let list = [];
+            for (let i=0; i<targetList.length; i++) {
+                list.push({'name': targetList[i]});
+            }
+            this.processedTargetList = list;
+        },
+        'closeForm': function() {
+            this.$emit('changeModalVisibility', false);
+        },
+        'convertToNumbers': function() {
         // this converts the number inputs in floats
-        let n = this.$el.querySelectorAll('input[type=number]');
-        for(let i = 0; i < n.length; i++) {
-            let input = n[i];
-            this.stimulus[input.id] = parseFloat(input.value);
-        }
-      },
-      'editItem': function () {
-        this.checkTimeValues(this.form);
-        if(this.form.checkValidity()) {
-            this.convertToNumbers();
-            this.$emit('editItem', {
-                'item': this.item,
-                'stimulus': this.stimulus,
-                'callback': this.stimulusEditableObject.callback
-            });
-        }
-      },
-      'checkTimeValues': function (form) {
-        let start = parseFloat(this.stimulus.Delay);
-        let end = parseFloat(this.stimulus.Duration);
-        if (start > end) {
-            form.elements.Delay.setCustomValidity('Delay should be smaller than duration');
-        } else {
-            form.elements.Delay.setCustomValidity('');
-        }
-      }
+            let n = this.$el.querySelectorAll('input[type=number]');
+            for (let i = 0; i < n.length; i++) {
+                let input = n[i];
+                this.stimulus[input.id] = parseFloat(input.value);
+            }
+        },
+        'editItem': function() {
+            this.checkTimeValues(this.form);
+            if (this.form.checkValidity()) {
+                this.convertToNumbers();
+                this.$emit('editItem', {
+                    'item': this.item,
+                    'stimulus': this.stimulus,
+                    'callback': this.stimulusEditableObject.callback,
+                });
+            }
+        },
+        'checkTimeValues': function(form) {
+            let start = parseFloat(this.stimulus.Delay);
+            let end = parseFloat(this.stimulus.Duration);
+            if (start > end) {
+                form.elements.Delay.setCustomValidity('Delay should be smaller than duration');
+            } else {
+                form.elements.Delay.setCustomValidity('');
+            }
+        },
     },
-    'created': function () {
-      this.processTargetList();
-      let that = this;
-      autocompleteBus.$on('autocomplete-select', function (selectedValue) {
-        that.item.group = selectedValue;
-        that.stimulus.Target = selectedValue;
-      });
+    'created': function() {
+        this.processTargetList();
+        let that = this;
+        autocompleteBus.$on('autocomplete-select', function(selectedValue) {
+            that.item.group = selectedValue;
+            that.stimulus.Target = selectedValue;
+        });
     },
-    'mounted': function () {
+    'mounted': function() {
         this.form = this.$el.querySelector('form');
     },
     'watch': {
-        'stimulus.Delay': function (newVal) {
+        'stimulus.Delay': function(newVal) {
             this.item.start = parseFloat(newVal);
             this.form.elements.Delay.setCustomValidity(''); // clears errors
         },
-        'stimulus.Duration': function (newVal) {
+        'stimulus.Duration': function(newVal) {
             this.item.end = parseFloat(newVal);
         },
-        'stimulus.Pattern': function (newVal) {
+        'stimulus.Pattern': function(newVal) {
             this.item.content = newVal;
         },
-        'stimulus.Target': function (newVal) {
+        'stimulus.Target': function(newVal) {
             this.item.group = newVal;
-        }
-    }
+        },
+    },
 };
 </script>
 

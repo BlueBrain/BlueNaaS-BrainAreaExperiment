@@ -35,11 +35,15 @@
       <div class="sk-cube3 sk-cube"></div>
     </div>
     <!-- end spinner -->
-
-    <app-init></app-init>
+    <frame-template title="">
+      <div slot="element">
+          <router-view></router-view>
+      </div>
+    </frame-template>
   </div>
 
-  <script src="dist/main.bundle.js" ></script>
+  <script src="dist/vendor.bundle.js"></script>
+  <script src="dist/app.bundle.js"></script>
   <script src="https://cdn.jsdelivr.net/sweetalert2/6.6.2/sweetalert2.min.js"></script>
 </body>
 </html>

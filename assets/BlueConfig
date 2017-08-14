@@ -1,0 +1,91 @@
+Run Default
+{
+	Date    15:2:16 
+	Time    12:27:21 
+          gitPath ssh://bbpgit.epfl.ch/sim/neurodamus/bbp 
+	  Version HEAD 
+
+      MorphologyPath /homec/bp0/bp000024/proj30/pcp31k/morphologies
+        METypePath /homec/bp0/bp000024/proj30/pcp31k/CCells
+      CircuitPath /homec/bp0/bp000024/proj30/pcp31k/circuits
+          nrnPath /homec/bp0/bp000024/proj30/pcp31k/circuits/ncsFunctionalAllRecipePathways 
+   
+
+	     CurrentDir /homec/bp0/bp000024/proj30/pcp31k/mike_sim/launch_script
+       OutputRoot /gpfs/bbp.cscs.ch/home/gevaert/private/src/SampleTask/simulation_launch_viz/data/out
+       TargetFile /gpfs/bbp.cscs.ch/home/gevaert/private/src/SampleTask/simulation_launch_viz/data/out/user.target 
+
+#   CircuitTarget Column
+    CircuitTarget selection 
+#         RunMode LoadBalance
+         Duration 1
+               Dt 0.025 
+             Note Sample configuration file. 
+}
+
+
+Stimulus subthresh
+{
+          Mode Current 
+       Pattern RelativeLinear 
+  PercentStart 95 
+         Delay 0.000000 
+      Duration 10.000000 
+}
+
+
+StimulusInject subthreshIntoColumn
+{
+        Target Column 
+      Stimulus subthresh 
+}
+
+
+Stimulus hypamp
+{             
+          Mode Current 
+       Pattern Hyperpolarizing 
+         Delay 0.000000 
+      Duration 10.000000 
+}
+
+
+StimulusInject hypampIntoColumn
+{
+        Target Column 
+      Stimulus hypamp 
+}
+
+
+Stimulus poisson1
+{
+          Mode Current 
+       Pattern NPoisson 
+      AmpStart 0.000000 
+        Lambda 20.000000 
+        Weight 0.500000 
+    NumOfSynapses 5 
+         Delay 0.000000 
+      Duration 10.000000 
+}
+
+
+StimulusInject pInj
+{
+  Stimulus   poisson1 
+    Target   Layer4 
+}
+
+
+Report voltage
+{
+        Target Column 
+          Type compartment 
+      ReportOn v 
+          Unit mV 
+        Format Bin 
+            Dt 0.1 
+     StartTime 0 
+       EndTime 10 
+}
+

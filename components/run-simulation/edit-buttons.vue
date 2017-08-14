@@ -10,17 +10,17 @@
 	export default {
     'name': 'edit-buttons',
     'methods': {
-      'itemAdd': function () {
-        this.$emit('itemAdd');
-      },
-      'itemEdit': function () {
-        this.$emit('itemEdit');
-      },
-      'itemDelete': function () {
-        this.$emit('itemDelete');
-      }
-    }
-  };
+        'itemAdd': function() {
+            this.$emit('itemAdd');
+        },
+        'itemEdit': function() {
+            this.$emit('itemEdit');
+        },
+        'itemDelete': function() {
+            this.$emit('itemDelete');
+        },
+    },
+};
 </script>
 
 <style scoped>

@@ -44,7 +44,7 @@
       "CircuitPath": "/homec/bp0/bp000024/proj30/pcp31k/circuits",
       "Duration": 100.0,
       "nrnPath": "/homec/bp0/bp000024/proj30/pcp31k/circuits/ncsFunctionalAllRecipePathways",
-      "TargetFile": "/homec/bp0/bp000024/proj30/pcp31k/mike_sim/launch_script/user.target",
+      "TargetFile": "/gpfs/bbp.cscs.ch/home/gevaert/private/src/SampleTask/simulation_launch_viz/data/out/user.target",
       "Note": "Sample configuration file.",
       "RunMode": "LoadBalance",
       "Version": "HEAD",
@@ -54,7 +54,7 @@
       "CircuitTarget": "selection",
       "Dt": 0.025,
       "ForwardSkip": 1000,
-      "OutputRoot": "/homec/bp0/bp000024/proj30/pcp31k/mike_sim/launch_script"
+      "OutputRoot": "/gpfs/bbp.cscs.ch/home/gevaert/private/src/SampleTask/simulation_launch_viz/data/out"
     }
   },
   "StimulusInject": {

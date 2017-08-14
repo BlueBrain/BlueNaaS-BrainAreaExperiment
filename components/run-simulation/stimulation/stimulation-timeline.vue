@@ -22,31 +22,31 @@
 
 <script>
 import modal from 'components/modal-component.vue';
-import StimulationForm from 'components/stimulation/stimulation-form.vue';
+import StimulationForm from 'components/run-simulation/stimulation/stimulation-form.vue';
 import mixin from 'mixins/simulation.js';
-import EditButtons from 'components/edit-buttons.vue';
+import EditButtons from 'components/run-simulation/edit-buttons.vue';
 export default {
     'name': 'stimulation-timeline',
     'props': ['endTime', 'forwardSkip', 'blueConfig'],
     'mixins': [mixin],
     'data': function() {
         return {
-            timeline: undefined,
-            config: this.blueConfig,
-            groups: [],
-            items: [],
-            showModal: false,
-            stimulusEditableObject: {},
-            tooltipElem: undefined
+            'timeline': undefined,
+            'config': this.blueConfig,
+            'groups': [],
+            'items': [],
+            'showModal': false,
+            'stimulusEditableObject': {},
+            'tooltipElem': undefined,
         };
     },
     'components': {
         'modal': modal,
         'stimulation-form': StimulationForm,
-        'edit-buttons': EditButtons
+        'edit-buttons': EditButtons,
     },
     'methods': {
-        'onUpdate': function (item, callback) {
+        'onUpdate': function(item, callback) {
             let a = {};
             let stimInjObj = this.config.StimulusInject[item.stimulusInjectName];
             if (stimInjObj) {
@@ -58,17 +58,10 @@ export default {
                 this.showModal = true;
             }
         },
-        'updateTimes': function (item) {
+        'updateTimes': function(item) {
             // this will change the item and config with the delay and duration in (ms)
-            let start = item.start.getMilliseconds();
-            let end = item.end.getMilliseconds();
-            if (item.start.getHours() === 0) { // go to negatives
-                start = start - 1000;
-            }
-            if (item.end.getHours() === 0) { // go to negatives
-                end = end - 1000;
-            }
-
+            let start = item.start.getTime();
+            let end = item.end.getTime();
             let connectionObj = this.config.StimulusInject[item.stimulusInjectName];
             if (connectionObj) {
                 let itemStimName = connectionObj.Stimulus;
@@ -78,7 +71,7 @@ export default {
             }
             this.updateOrAdd(this.items, item);
         },
-        'changeContentAndGroup': function (editedItem) {
+        'changeContentAndGroup': function(editedItem) {
             let newPattern = editedItem.stimulus.Pattern;
             // let oldPattern = editedItem.item.content;
             let newTarget = editedItem.item.group;
@@ -108,7 +101,7 @@ export default {
                 delete this.config.StimulusInject[oldStimInjName];
             }
         },
-        'cloneAndCreateItem': function (newItem) {
+        'cloneAndCreateItem': function(newItem) {
             let stimInfo = undefined;
             let stimName = undefined;
             let connectionKey = undefined;
@@ -122,7 +115,7 @@ export default {
                 connectionKey = 'L5_TTPC1_stimulusinject_0';
                 stimInjectObj = {
                     'Stimulus': connectionKey,
-                    'Target': newItem.group
+                    'Target': newItem.group,
                 };
             } else {
                 stimInjectObj = Object.assign({}, this.config.StimulusInject[newItem.stimulusInjectName]);
@@ -144,7 +137,7 @@ export default {
                 stimInfo.Pattern,
                 stimInfo.Delay,
                 stimInfo.Duration,
-                 // this will transform for example "Linear_stimulus_0" to "Noise_stimulus_1"
+                // this will transform for example "Linear_stimulus_0" to "Noise_stimulus_1"
                 this.changeConnectionName(stimInfo.Pattern, 'stimulus', this.items.length),
                 this.changeConnectionName(newItem.group, 'stimulusinject', this.items.length)
             );
@@ -153,7 +146,7 @@ export default {
 
             this.config.StimulusInject[newObj.stimulusInjectName] = {
                 'Stimulus': newObj.stimulusName,
-                'Target': newItem.group
+                'Target': newItem.group,
             };
 
             let a = {};
@@ -167,7 +160,7 @@ export default {
                 this.showModal = true;
             }
         },
-        'createNewItem': function (id, group, content, start, end, stimulusName, stimulusInjectName) {
+        'createNewItem': function(id, group, content, start, end, stimulusName, stimulusInjectName) {
             return {
                 'id': id,
                 'group': group,
@@ -176,14 +169,14 @@ export default {
                 'end': end,
                 'stimulusName': stimulusName,
                 'stimulusInjectName': stimulusInjectName,
-                'className': content
+                'className': content,
             };
         },
-        'removeFromConfig': function (item) {
+        'removeFromConfig': function(item) {
             delete this.config.Stimulus[item.stimulusName];
             delete this.config.StimulusInject[item.stimulusInjectName];
         },
-        'createNewStimulus': function () {
+        'createNewStimulus': function() {
             let stim = {};
             stim.Pattern = 'Linear';
             stim.AmpStart = 0;
@@ -194,19 +187,19 @@ export default {
             stim.Mode = 'Current';
             return stim;
         },
-        'createTooltip': function (event) {
+        'createTooltip': function(event) {
             // comes from the timeline.on('itemover')
             let item = this.timeline.itemsData.get(event.item);
             let stimInfo = this.config.Stimulus[item.stimulusName];
             let output = 'AmpStart(mv): ' + stimInfo.AmpStart + '\n AmpEnd(mv): ' + stimInfo.AmpEnd;
             this.showTooltip(event, output);
-        }
+        },
     },
     'mounted': function() {
         // create a dataset with items
 
         let stimulusApplied = Object.keys(this.config.StimulusInject);
-        for(let i=0; i<stimulusApplied.length; i++) {
+        for (let i=0; i<stimulusApplied.length; i++) {
             let stimulusInjectName = stimulusApplied[i];
             let stimulusInjectObj = this.config.StimulusInject[stimulusInjectName];
             let stimulusInfo = this.config.Stimulus[stimulusInjectObj.Stimulus];
@@ -228,12 +221,12 @@ export default {
         this.createTimeline(); // from the simulation.js
     },
     'watch': {
-      'endTime': function (newVal, oldVal) {
+        'endTime': function(newVal, oldVal) {
             let newValInt = parseInt(newVal);
             this.timeline.setCustomTime(newValInt, 'end');
             this.createCustomTimeLabel(); // from the simulation.js
-        }
-    }
+        },
+    },
 };
 </script>
 

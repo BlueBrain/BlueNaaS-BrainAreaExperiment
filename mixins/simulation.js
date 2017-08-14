@@ -1,72 +1,72 @@
 import vis from 'vis';
 export default {
-    'data' () {
+    'data'() {
         return {
-            header: {}
+            'header': {},
         };
     },
     'methods': {
-        'toggleModal': function (value) {
+        'toggleModal': function(value) {
             this.showModal = value;
         },
-        'setupGroups': function (target) {
+        'setupGroups': function(target) {
             let i = 0;
-            for(i; i<this.groups.length; i++) {
+            for (i; i<this.groups.length; i++) {
                 let group = this.groups[i];
                 if (group.id === target) {
                     return;
                 }
             }
-            let newGroup = {id: target, content: target, value: i};
+            let newGroup = {'id': target, 'content': target, 'value': i};
             this.groups.push(newGroup); // add element
             return newGroup;
         },
-        'prettyAlert': function (title, text) {
+        'prettyAlert': function(title, text) {
             swal({
-              title: title,
-              text: text,
-              type: 'info',
-              confirmButtonColor: '#879fcb'
+                'title': title,
+                'text': text,
+                'type': 'info',
+                'confirmButtonColor': '#879fcb',
             });
         },
-        'prettyConfirm': function (title, text, callback) {
+        'prettyConfirm': function(title, text, callback) {
             swal({
-              title: title,
-              text: text,
-              type: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#ac6067',
-              cancelButtonColor: '#879fcb',
-              confirmButtonText: 'Delete',
-              focusCancel: true
+                'title': title,
+                'text': text,
+                'type': 'warning',
+                'showCancelButton': true,
+                'confirmButtonColor': '#ac6067',
+                'cancelButtonColor': '#879fcb',
+                'confirmButtonText': 'Delete',
+                'focusCancel': true,
             }).then(callback);
         },
-        'onAdd': function (item, callback) {
+        'onAdd': function(item, callback) {
             this.itemAdd.call(this, item);
         },
-        'onMove': function (item, callback) {
+        'onMove': function(item, callback) {
             this.updateTimes(item);
             callback(item);
         },
-        'onRemove': function (item, callback) {
-          let that = this;
-          this.prettyConfirm(
-            'Remove item',
-            'Do you really want to remove item ' + item.content + '?',
-            function (ok) {
-                if (ok) {
-                    if (callback) {
-                        callback(item); // confirm deletion
-                    } else {
-                        that.timeline.itemsData.remove(item.id);
+        'onRemove': function(item, callback) {
+            let that = this;
+            this.prettyConfirm(
+                'Remove item',
+                'Do you really want to remove item ' + item.content + '?',
+                function(ok) {
+                    if (ok) {
+                        if (callback) {
+                            callback(item); // confirm deletion
+                        } else {
+                            that.timeline.itemsData.remove(item.id);
+                        }
                     }
                 }
-            }
-          );
+            );
         },
-        'updateOrAdd': function (originalArray, newItem) {
+        'updateOrAdd': function(originalArray, newItem) {
         // this will update the object or add a new one
-            for(let i = 0; i < originalArray.length; i++) {
+            for (let i = 0; i < originalArray.length; i++) {
                 if (originalArray[i].id === newItem.id) {
                     originalArray[i] = newItem;
                     return;
@@ -76,7 +76,7 @@ export default {
             return;
         },
         // it comes from the onUpdate and the form calls this function
-        'editItem': function (editedItem) {
+        'editItem': function(editedItem) {
             // this.changeContentAndGroup(editedItem);
             // this.updateOrAdd(this.items, editedItem.item);
             // this.timeline.itemsData.clear();
@@ -94,7 +94,7 @@ export default {
             }
             this.toggleModal(false);
         },
-        'changeConnectionName': function (target, pattern, newId) {
+        'changeConnectionName': function(target, pattern, newId) {
             let temp = [];
             temp.push(target);
             temp.push(pattern);
@@ -110,7 +110,7 @@ export default {
 
             return temp.join('_');
         },
-        'itemAdd': function (item) {
+        'itemAdd': function(item) {
             let copyFromId = this.timeline.getSelection()[0];
             let oldItem = null;
             if (copyFromId == undefined) {
@@ -129,7 +129,7 @@ export default {
             this.cloneAndCreateItem(oldItem);
             this.syncTimelineWithVariables();
         },
-        'itemDelete': function () {
+        'itemDelete': function() {
             let that = this;
             let deleteId = this.timeline.getSelection()[0];
             if (deleteId === undefined) {
@@ -146,7 +146,7 @@ export default {
                 });
             }
         },
-        'itemEdit': function () {
+        'itemEdit': function() {
             let editId = this.timeline.getSelection()[0];
             if (editId === undefined) {
                 this.prettyAlert('Unable to edit', 'No item was selected');
@@ -158,13 +158,13 @@ export default {
             }
             this.syncTimelineWithVariables();
         },
-        'syncTimelineWithVariables': function () {
+        'syncTimelineWithVariables': function() {
             // it requires data objects like items[], groups[], timeline{}
             let timeline = this.timeline;
 
             let groupsIds = timeline.groupsData.getIds();
             let groupsTemp = [];
-            for(let i=0; i<groupsIds.length; i++) {
+            for (let i=0; i<groupsIds.length; i++) {
                 let obj = timeline.groupsData.get(groupsIds[i]);
                 groupsTemp.push(obj);
             }
@@ -172,34 +172,34 @@ export default {
 
             let itemsIds = timeline.itemsData.getIds();
             let itemsTemp = [];
-            for(let i=0; i<itemsIds.length; i++) {
+            for (let i=0; i<itemsIds.length; i++) {
                 let obj = timeline.itemsData.get(itemsIds[i]);
                 itemsTemp.push(obj);
             }
             this.items = itemsTemp;
         },
-        'getItemId': function () {
+        'getItemId': function() {
             let ids = this.timeline.itemsData.getIds();
             let max = Math.max(...ids) + 1;
             if (max < 0) {
-              max = 0;
+                max = 0;
             }
             return max;
         },
-        'createTimeline': function () {
+        'createTimeline': function() {
             let container = this.$el.querySelector('#visualization');
             let that = this;
             let options = {
                 'selectable': true,
-                'timeAxis': {scale: 'millisecond', step: 10},
+                'timeAxis': {'scale': 'millisecond', 'step': 10},
                 'showMajorLabels': false,
                 'showCurrentTime': false,
                 'format': {
-                    minorLabels: function(date, scale, step) {
+                    'minorLabels': function(date, scale, step) {
                         if (scale === 'millisecond') {
                             return new Date(date).getTime() + 'ms';
                         }
-                    }
+                    },
                 },
                 'start': 0,
                 'end': this.endTime * 1.5,
@@ -207,7 +207,7 @@ export default {
                 'onAdd': this.onAdd,
                 'onMove': this.onMove,
                 'onUpdate': this.onUpdate,
-                'onRemove': this.onRemove
+                'onRemove': this.onRemove,
             };
 
             this.timeline = new vis.Timeline(container);
@@ -220,7 +220,7 @@ export default {
             // tooltip section
             this.tooltipElem = this.$el.querySelector('.tooltip-span');
             this.timeline.on('itemover', this.createTooltip);
-            this.timeline.on('itemout', function () {
+            this.timeline.on('itemout', function() {
                 that.tooltipElem.style.display = 'none';
             });
             this.timeline.on('timechange', this.createCustomTimeLabel);
@@ -229,7 +229,7 @@ export default {
             setTimeout(this.createCustomTimeLabel, 100); // waits until timeline draws
             this.changeCustomTimeLabelOnResize();
         },
-        'showTooltip': function (event, output) {
+        'showTooltip': function(event, output) {
             // comes from the timeline.on('itemover')
             let x = event.event.clientX;
             let y = event.event.clientY;
@@ -238,7 +238,7 @@ export default {
             this.tooltipElem.style.display = 'block';
             this.tooltipElem.innerText = output;
         },
-        'createCustomTimeLabel': function (properties) {
+        'createCustomTimeLabel': function(properties) {
             // this redraw the label for indicate the end of simulation
             let customTime = this.$el.querySelector('.vis-custom-time');
             let customLabel = this.$el.querySelector('.custom-time-label');
@@ -247,15 +247,15 @@ export default {
                 customLabel.style.left = (left + 71) + 'px';
             }
         },
-        'changeCustomTimeLabelOnResize': function () {
+        'changeCustomTimeLabelOnResize': function() {
             let timeout = false; // holder for timeout id
             let delay = 250; // delay after event is "complete" to run callback
             let that = this;
             window.addEventListener('resize', function() {
-              clearTimeout(timeout);
-              // start timing for event "completion"
-              timeout = setTimeout(that.createCustomTimeLabel, delay);
+                clearTimeout(timeout);
+                // start timing for event "completion"
+                timeout = setTimeout(that.createCustomTimeLabel, delay);
             });
-        }
-    }
+        },
+    },
 };

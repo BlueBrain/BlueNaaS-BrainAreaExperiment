@@ -88,84 +88,84 @@ import targetList from 'assets/targetList.json';
 import {autocompleteBus} from 'autocomplete-vue';
 
 export default {
-   'name': 'report-form',
-   'props': ['reportEditableObject'],
-   'data': function () {
-      return {
-        processedTargetList: undefined,
-        report: this.reportEditableObject.report,
-        item: this.reportEditableObject.item
-      };
-   },
-   'components': {
-      'autocomplete-vue': AutocompleteVue
-   },
-   'methods': {
-      'processTargetList': function () {
-         let list = [];
-         for(let i=0; i<targetList.length; i++) {
-            list.push({'name': targetList[i]});
-         }
-         this.processedTargetList = list;
-      },
-      'closeForm': function () {
-        this.$emit('changeModalVisibility', false);
-      },
-      'editItem': function () {
-        this.checkTimeValues(this.form);
-        if(this.form.checkValidity()) {
-            this.convertToNumbers();
-            this.$emit('editItem', {
-                'item': this.item,
-                'report': this.report,
-                'callback': this.reportEditableObject.callback
-            });
-        }
-      },
-      'convertToNumbers': function () {
+    'name': 'report-form',
+    'props': ['reportEditableObject'],
+    'data': function() {
+        return {
+            'processedTargetList': undefined,
+            'report': this.reportEditableObject.report,
+            'item': this.reportEditableObject.item,
+        };
+    },
+    'components': {
+        'autocomplete-vue': AutocompleteVue,
+    },
+    'methods': {
+        'processTargetList': function() {
+            let list = [];
+            for (let i=0; i<targetList.length; i++) {
+                list.push({'name': targetList[i]});
+            }
+            this.processedTargetList = list;
+        },
+        'closeForm': function() {
+            this.$emit('changeModalVisibility', false);
+        },
+        'editItem': function() {
+            this.checkTimeValues(this.form);
+            if (this.form.checkValidity()) {
+                this.convertToNumbers();
+                this.$emit('editItem', {
+                    'item': this.item,
+                    'report': this.report,
+                    'callback': this.reportEditableObject.callback,
+                });
+            }
+        },
+        'convertToNumbers': function() {
         // this converts the number inputs in floats
-        let n = this.$el.querySelectorAll('input[type=number]');
-        for(let i = 0; i < n.length; i++) {
-            let input = n[i];
-            this.report[input.id] = parseFloat(input.value);
-        }
-      },
-      'checkTimeValues': function (form) {
-        let start = parseFloat(this.report.StartTime);
-        let end = parseFloat(this.report.EndTime);
-        if (start > end) {
-            form.elements.StartTime.setCustomValidity('StartTime should be smaller than EndTime');
-        } else {
-            form.elements.StartTime.setCustomValidity('');
-        }
-      }
+            let n = this.$el.querySelectorAll('input[type=number]');
+            for (let i = 0; i < n.length; i++) {
+                let input = n[i];
+                this.report[input.id] = parseFloat(input.value);
+            }
+        },
+        'checkTimeValues': function(form) {
+            let start = parseFloat(this.report.StartTime);
+            let end = parseFloat(this.report.EndTime);
+            if (start > end) {
+                form.elements.StartTime.setCustomValidity('StartTime should be smaller than EndTime');
+            } else {
+                form.elements.StartTime.setCustomValidity('');
+            }
+        },
     },
-    'created': function () {
-      this.processTargetList();
-      let that = this;
-      autocompleteBus.$on('autocomplete-select', function (selectedValue) {
-        that.item.group = selectedValue;
-        that.report.Target = selectedValue;
-      });
+    'created': function() {
+        this.processTargetList();
+        let that = this;
+        autocompleteBus.$on('autocomplete-select', function(selectedValue) {
+            that.item.group = selectedValue;
+            that.report.Target = selectedValue;
+        });
     },
-    'mounted': function () {
+    'mounted': function() {
         this.form = this.$el.querySelector('form');
     },
     'watch': {
-        'report.StartTime': function (newVal) {
+        'report.StartTime': function(newVal) {
             this.item.start = parseFloat(newVal);
             this.form.elements.StartTime.setCustomValidity(''); // clears errors
         },
-        'report.EndTime': function (newVal) {
+        'report.EndTime': function(newVal) {
             this.item.end = parseFloat(newVal);
         },
-        'report.ReportOn': function (newVal) {
+        'report.ReportOn': function(newVal) {
             this.item.content = newVal;
         },
-        'report.Target': function (newVal) {
+        'report.Target': function(newVal) {
             this.item.group = newVal;
-        }
-    }
+        },
+    },
 };
 </script>
 

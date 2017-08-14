@@ -22,8 +22,8 @@
 <script>
 // import blueConfig from 'assets/entity.json';
 import modal from 'components/modal-component.vue';
-import ReportForm from 'components/report/report-form.vue';
-import EditButtons from 'components/edit-buttons.vue';
+import ReportForm from 'components/run-simulation/report/report-form.vue';
+import EditButtons from 'components/run-simulation/edit-buttons.vue';
 import mixin from 'mixins/simulation.js';
 export default {
     'name': 'report-timeline',
@@ -31,23 +31,23 @@ export default {
     'mixins': [mixin],
     'data': function() {
         return {
-            timeline: undefined,
-            config: this.blueConfig,
-            groups: [],
-            items: [],
-            showModal: false,
-            reportEditableObject: {},
-            latestItem: undefined,
-            tooltipElem: undefined
+            'timeline': undefined,
+            'config': this.blueConfig,
+            'groups': [],
+            'items': [],
+            'showModal': false,
+            'reportEditableObject': {},
+            'latestItem': undefined,
+            'tooltipElem': undefined,
         };
     },
     'components': {
         'modal': modal,
         'report-form': ReportForm,
-        'edit-buttons': EditButtons
+        'edit-buttons': EditButtons,
     },
     'methods': {
-        'onUpdate': function (item, callback) {
+        'onUpdate': function(item, callback) {
             let a = {};
             let reportObj = this.config.Report[item.connection];
             if (reportObj) {
@@ -58,17 +58,11 @@ export default {
                 this.showModal = true;
             }
         },
-        'updateTimes': function (item) {
+        'updateTimes': function(item) {
             // this will change the item and config with the delay and duration in (ms)
             let connectionObj = this.config.Report[item.connection];
-            let start = item.start.getMilliseconds();
-            let end = item.end.getMilliseconds();
-            if (item.start.getHours() === 0) { // go to negatives
-                start = start - 1000;
-            }
-            if (item.end.getHours() === 0) { // go to negatives
-                end = end - 1000;
-            }
+            let start = item.start.getTime();
+            let end = item.end.getTime();
             if (connectionObj) {
                 item.start = connectionObj.StartTime = start;
                 item.end = connectionObj.EndTime = end;
@@ -76,7 +70,7 @@ export default {
             this.updateOrAdd(this.items, item);
             this.changeContentAndGroup({'item': item});
         },
-        'createNewItem': function (id, group, content, start, end, connection) {
+        'createNewItem': function(id, group, content, start, end, connection) {
             return {
                 'id': id,
                 'group': group,
@@ -84,10 +78,10 @@ export default {
                 'start': start,
                 'end': end,
                 'connection': connection,
-                'className': content
+                'className': content,
             };
         },
-        'changeContentAndGroup': function (editedItem) {
+        'changeContentAndGroup': function(editedItem) {
             let oldConnection = editedItem.item.connection;
             let newTarget = editedItem.item.group;
             let newConnection = this.changeConnectionName(
@@ -111,7 +105,7 @@ export default {
             this.config.Report[newConnection].Target = editedItem.item.group;
             this.config.Report[newConnection].ReportOn = editedItem.item.content;
         },
-        'cloneAndCreateItem': function (newItem) {
+        'cloneAndCreateItem': function(newItem) {
             let reportObj = undefined;
             if (!newItem) { // there is no more items to copy the configuration
                 newItem = {};
@@ -134,8 +128,8 @@ export default {
                 reportObj.ReportOn,
                 reportObj.StartTime,
                 reportObj.EndTime,
-                 // this will transform for example "Linear_stimulus_0" to "Noise_stimulus_1"
-                this.changeConnectionName(newItem.group, 'report', id),
+                // this will transform for example "Linear_stimulus_0" to "Noise_stimulus_1"
+                this.changeConnectionName(newItem.group, 'report', id)
             );
             reportObj.Target = newItem.group;
 
@@ -147,10 +141,10 @@ export default {
             this.reportEditableObject = a;
             this.showModal = true;
         },
-        'removeFromConfig': function (item) {
+        'removeFromConfig': function(item) {
             delete this.config.Report[item.connection];
         },
-        'createNewReport': function () {
+        'createNewReport': function() {
             let report = {};
             report.StartTime = 0;
             report.EndTime = this.endTime;
@@ -162,18 +156,18 @@ export default {
             report.Dt = 0.1;
             return report;
         },
-        'createTooltip': function (event) {
+        'createTooltip': function(event) {
             // comes from the timeline.on('itemover')
             let item = this.timeline.itemsData.get(event.item);
             let reportInfo = this.config.Report[item.connection];
             let output = 'Dt: ' + reportInfo.Dt + '\n Type: ' + reportInfo.Type;
             this.showTooltip(event, output);
-        }
+        },
     },
     'mounted': function() {
         // create a dataset with items
         let reports = Object.keys(this.config.Report);
-        for(let i=0; i<reports.length; i++) {
+        for (let i=0; i<reports.length; i++) {
             let connection = reports[i];
             let reportConnectionObj = this.config.Report[connection];
             let target = reportConnectionObj.Target;
@@ -193,12 +187,12 @@ export default {
         this.createTimeline(); // from the simulation.js
     },
     'watch': {
-        'endTime': function (newVal, oldVal) {
+        'endTime': function(newVal, oldVal) {
             let newValInt = parseInt(newVal);
             this.timeline.setCustomTime(newValInt, 'end');
             this.createCustomTimeLabel(); // from the simulation.js
-        }
-    }
+        },
+    },
 };
 </script>
 

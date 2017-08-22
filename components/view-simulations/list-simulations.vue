@@ -65,8 +65,8 @@ This component manage each job (delete, start, create, etc).
             <infinite-loading
                 :on-infinite="onInfinite"
                 ref="infiniteLoading">
-                <span slot="no-more">There is no more simulations :(</span>
-                <span slot="no-results">There is no more simulations :(</span>
+                <span slot="no-more">There is no more simulations</span>
+                <span slot="no-results">There is no more simulations</span>
             </infinite-loading>
         </div>
     </div>

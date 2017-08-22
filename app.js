@@ -1,12 +1,9 @@
 /* jshint esversion: 6 */
-import Vue from 'vue';
-import VueResource from 'vue-resource';
+import Vue from 'vue/dist/vue.min.js';
 import VueRouter from 'vue-router';
-// import RunSimulation from 'components/run-simulation/run-simulation.vue';
 import FrameTemplate from 'components/frame-template.vue';
 import UnicoreAPI from 'mixins/unicore.js';
 
-Vue.use(VueResource);
 Vue.use(VueRouter);
 
 const router = new VueRouter({

@@ -4,8 +4,8 @@ module.exports = {
     'entry': {
         'app': './app.js',
         'vendor': [
-            'vue','vue-resource', 'vue-router', 'hellojs',
-            'vue-infinite-loading', 'vis', 'autocomplete-vue'
+            'vue/dist/vue.min.js','vue-resource', 'vue-router', 'hellojs',
+            'vue-infinite-loading', 'vis/dist/vis.min.js', 'autocomplete-vue'
         ],
     },
     'output': {
@@ -22,6 +22,8 @@ module.exports = {
             'mixins': path.resolve(__dirname, './mixins'),
         },
     },
+    // to be able to read it with the source-map-explorer
+    // 'devtool': 'source-map',
     'module': {
         'rules': [
             {
@@ -37,6 +39,6 @@ module.exports = {
         ],
     },
     'plugins': [
-        new webpack.optimize.CommonsChunkPlugin("vendor")
+        new webpack.optimize.CommonsChunkPlugin("vendor"),
     ],
 };

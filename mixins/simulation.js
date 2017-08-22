@@ -1,4 +1,5 @@
-import vis from 'vis';
+import vis from 'vis/dist/vis.min.js';
+
 export default {
     'data'() {
         return {

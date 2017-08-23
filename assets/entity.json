@@ -1,6 +1,7 @@
 {
   "Stimulus": {
     "subthresh": {
+      "AmpStart": 0.0,
       "Delay": 0.0,
       "Pattern": "RelativeLinear",
       "Duration": 1000.0,
@@ -8,7 +9,6 @@
       "PercentStart": 95.0
     },
     "poisson1": {
-      "AmpStart": 0.0,
       "Weight": 0.5,
       "Pattern": "NPoisson",
       "NumOfSynapses": 5,

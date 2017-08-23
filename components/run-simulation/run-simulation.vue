@@ -38,32 +38,19 @@
                 <a class="button-with-icon" @click="runSimulation">
                     <i class="material-icons">play_arrow</i>Run
                 </a>
-                <a class="button-with-icon" @click="saveConfig">
-                    <i class="material-icons">file_download</i>Save
-                </a>
             </div>
         </transition>
         <!-- template for configuration -->
         <table id="configTemplate" class="config-template" style="display:none">
             <tr>
-                <th>Supercomputer: </th>
+                <th>Title: </th>
                 <th>
-                    <select class="computer">
-                        <option
-                            v-for="machine in runConfig.computerAvailable">
-                            {{ machine }}</option>
-                    </select>
+                    <input type="text" title="Title for the job" class="title" :value="runConfig.title">
                 </th>
             </tr>
             <tr>
-                <th>Application Name: </th>
-                <th>
-                    <select class="application-name">
-                        <option
-                            v-for="name in runConfig.applicationNameAvailable">
-                            {{ name }}</option>
-                    </select>
-                </th>
+                <th>Computer: </th>
+                <th>{{ runConfig.computer }}</th>
             </tr>
             <tr>
                 <th>Nodes: </th>
@@ -82,7 +69,6 @@ import StimulationTimeline from 'components/run-simulation/stimulation/stimulati
 import ReportTimeline from 'components/run-simulation/report/report-timeline.vue';
 import CollabAuthentication from 'mixins/collabAuthentication.js';
 import Unicore from 'mixins/unicore.js';
-const BLUEPY_CONFIG_V0 = 'https://services.humanbrainproject.eu/bluepy/v0/api/blueconfig/';
 export default {
     'name': 'run_simulation',
     'mixins': [CollabAuthentication],
@@ -95,11 +81,10 @@ export default {
             'unicore': Unicore,
             'header': {},
             'runConfig': {
+                'title': '',
                 'computer': 'JUQUEEN',
-                'computerAvailable': ['JUQUEEN', 'JURECA'],
-                'applicationName': 'Bash Shell',
-                'applicationNameAvailable': ['Bash shell', 'BSP'],
-                'nodes': 1,
+                'applicationName': 'BSP',
+                'nodes': 32,
             },
         };
     },
@@ -128,20 +113,14 @@ export default {
                 'showLoaderOnConfirm': true,
                 'allowOutsideClick': true,
                 'preConfirm': function() {
-                    let params = that.setupSelectedConfig();
-                    return that.unicore.submitJob(
-                        that.runConfig.computer,
-                        params.jobSpec,
-                        params.inputs
-                    );
+                    return that.setupSelectedConfig();
                 },
             }).then(function(jobObject) {
                 let id = jobObject._links.self.href.split('/').pop();
                 console.log('starting job...');
                 that.unicore.actionJob(jobObject._links['action:start'].href);
                 swal({
-                    'title': 'Job was created!',
-                    'text': `Simulation was started. ID: ${id}`,
+                    'title': 'Simulaiton started!',
                     'showCancelButton': true,
                     'cancelButtonText': 'View Job',
                     'type': 'success',
@@ -170,47 +149,6 @@ export default {
                 that.header = {'headers': {'Authorization': token}};
             }); // from collabAuthentication
         },
-        'saveCompleteConfig': function(config) {
-            let that = this;
-            return new Promise(function(resolve, reject) {
-                that.$http.post(BLUEPY_CONFIG_V0 + 'txt/', config, that.header)
-                .then(function(response) {
-                    if (response.ok) {
-                        return resolve('Configuration saved');
-                    }
-                }, function(error) {
-                    if (error.status === 401) {
-                        window.localStorage.setItem('blupyconfig', JSON.stringify(config));
-                        that.login('none').then(function() {
-                        // login in the background
-                            that.fillToken();
-                        });
-                    }
-                    let errorBodyParsed = JSON.parse(error.body);
-                    if (error.body && errorBodyParsed) {
-                        reject('Error saving bluepyconfig: ' + errorBodyParsed.message);
-                    } else {
-                        reject('Error saving bluepyconfig: ' + error);
-                    }
-                });
-            });
-        },
-        'loadCompleteConfig': function() {
-            let that = this;
-            return new Promise(function(resolve, reject) {
-                let url = BLUEPY_CONFIG_V0 + '41c6c0f6-a590-4a99-bb8c-30b6668b49bd';
-                that.$http.get(url, that.header)
-                .then(function(response) {
-                    return resolve(response.body);
-                }, function(error) {
-                    if (error.status === 401) {
-                        that.fillToken(true);
-                    }
-                    console.log(error);
-                    reject('Error loading bluepyconfig: ' + error);
-                });
-            });
-        },
         'loadLocalConfig': function() {
             return Promise.resolve(require('assets/entity.json'));
         },
@@ -221,57 +159,19 @@ export default {
                 return configTemplateFilled.querySelector('.' + name).value;
             };
             this.runConfig.nodes = getParam('nodes');
-            this.runConfig.applicationName = getParam('application-name');
-            this.runConfig.computer = getParam('computer');
-            let jobSpec = {};
-            let inputs = [];
-
-            if (this.runConfig.applicationName === 'BSP') {
-                jobSpec = {
-                    'ApplicationName': this.runConfig.applicationName,
-                    'Parameters': {
-                        'CONFIG': 'BlueConfig',
-                        'TARGET': 'user.target',
-                        'OUTPUT': 'output',
-                    },
-                    'Resources': {'Nodes': this.runConfig.nodes},
-                    'haveClientStageIn': 'true',
-                };
-                inputs = [
-                    {
-                        'To': 'BlueConfig',
-                        // 'Data': require('raw-loader!assets/BlueConfig'),
-                        'Data': JSON.stringify(this.blueConfig),
-                    },
-                    {
-                        'To': 'user.target',
-                        'Data': require('raw-loader!assets/user.target'),
-                    },
-                ];
-            }
-
-            if (this.runConfig.applicationName === 'Bash shell') {
-                jobSpec = {
-                    'ApplicationName': this.runConfig.applicationName,
-                    'Parameters': {'SOURCE': 'input.sh'},
-                    'Resources': {'Nodes': this.runConfig.nodes},
-                    'haveClientStageIn': 'true',
-                };
-                let inputShContent = `
-                    #!/bin/sh
-                    date
-                    hostname
-                    whoami
-                    `;
-                inputs = [{
-                    'To': 'input.sh',
-                    'Data': inputShContent,
-                }];
-            }
-            return {
-                'jobSpec': jobSpec,
-                'inputs': inputs,
-            };
+            this.runConfig.title = getParam('title');
+            let params = this.unicore.getConfig(
+                this.runConfig.applicationName,
+                this.runConfig.title,
+                this.runConfig.nodes,
+                this.blueConfig,
+                null
+            );
+            return this.unicore.submitJob(
+                this.runConfig.computer,
+                params.jobSpec,
+                params.inputs
+            );
         },
         'viewList': function() {
             this.$router.push({
@@ -374,11 +274,8 @@ export default {
         /* the first block simulation */
         margin-top: 10px;
     }
-    .config-template select {
-        width: 100%;
-    }
     .config-template {
-        margin: 0 15%;
+        margin: 0 23%;
     }
 </style>
 

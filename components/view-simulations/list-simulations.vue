@@ -16,11 +16,11 @@ This component manage each job (delete, start, create, etc).
                 </a>
             </span>
             <span>
-                <a class="button-with-icon"><i class="material-icons">fingerprint</i>ID</a>
+                <a class="button-with-icon"><i class="material-icons">fingerprint</i></a>
             </span>
             <input class="input-style" type="text" v-model="idFilter">
             <span>
-            <a class="button-with-icon"><i class="material-icons">check_circle</i>Status</a>
+            <a class="button-with-icon"><i class="material-icons">check_circle</i></a>
             </span>
             <select class="input-style" v-model="statusFilter">
                 <option value="ALL">ALL</option>
@@ -31,7 +31,7 @@ This component manage each job (delete, start, create, etc).
                 <option value="RUNNING">RUNNING</option>
             </select>
             <span>
-            <a class="button-with-icon"><i class="material-icons">dns</i>Computer</a>
+            <a class="button-with-icon"><i class="material-icons">dns</i></a>
             </span>
             <select class="input-style" v-model="computerFilter" title="Supercomputer to be used">
                 <option value="JUQUEEN">JUQUEEN</option>
@@ -48,7 +48,8 @@ This component manage each job (delete, start, create, etc).
         </div>
         <div class="table-header">
             <span class="id">Id</span>
-            <span class="status">Status</span>
+            <span class="status">Simulation</span>
+            <span class="status">Analysis</span>
             <span class="time">Submission Date</span>
         </div>
         <div v-if="!loading" class="simulation-items-container">
@@ -59,7 +60,7 @@ This component manage each job (delete, start, create, etc).
                 @actionJob="actionJob"
                 @deleteJob="deleteJob"
                 @showDetails="showDetails(job, computerFilter)"
-                @runValidation="runValidation(job)">
+                @runAnalysis="runAnalysis(job)">
             </simulation-item>
 
             <infinite-loading
@@ -69,6 +70,31 @@ This component manage each job (delete, start, create, etc).
                 <span slot="no-results">There is no more simulations</span>
             </infinite-loading>
         </div>
+        <!-- template for configuration -->
+        <table id="configTemplate" class="config-template" style="display:none">
+            <span class="subtitle">Copy files and run analysis</span>
+            <tr>
+                <th>Title:</th>
+                <th>
+                    <input type="text" name="" class="title" :value="moveObject.title">
+                </th>
+            </tr>
+            <tr>
+                <th>Origin:</th>
+                <th>{{ moveObject.from.computer }}</th>
+            </tr>
+            <tr>
+                <th>Destination: </th>
+                <th>{{ moveObject.to.computer }}</th>
+            </tr>
+            <tr>
+                <th>Nodes: </th>
+                <th>
+                    <input type="number" name="" class="nodes" :value="moveObject.nodes">
+                </th>
+            </tr>
+        </table>
+        <!-- END template for configuration -->
     </div>
 </template>
 
@@ -87,6 +113,19 @@ This component manage each job (delete, start, create, etc).
             return {
                 'loading': true,
                 'computerFilter': 'JUQUEEN',
+                'moveObject': {
+                    'from': {
+                        'workingDirectory': null,
+                        'computer': 'JUQUEEN',
+                    },
+                    'to': {
+                        'workingDirectory': null, // create a new one
+                        'computer': 'JURECA',
+                    },
+                    'files': ['out.dat', 'BlueConfig'],
+                    'nodes': 1,
+                    'title': '',
+                },
                 'unicoreAPI': Unicore,
                 'jobs': [],
                 'filteredObjects': [],
@@ -97,6 +136,7 @@ This component manage each job (delete, start, create, etc).
                 'idFilter': '',
                 'dateFilter': '',
                 'filterOn': false,
+                'pollInterval': 10,
             };
         },
         'computed': {
@@ -107,6 +147,17 @@ This component manage each job (delete, start, create, etc).
             },
         },
         'methods': {
+            'actionJob': function(actions) {
+                this.unicoreAPI.actionJob(actions.url);
+                swal('Great!', actions.text, 'success');
+            },
+            'checkFilterIcon': function() {
+                if (this.idFilter === '' && this.statusFilter === 'ALL') {
+                    this.filterOn = false;
+                } else {
+                    this.filterOn = true;
+                }
+            },
             'filter': function() {
                 let filteredByStatus = [];
                 if (this.statusFilter === 'ALL') {
@@ -122,7 +173,10 @@ This component manage each job (delete, start, create, etc).
                 let filteredById = [];
                 // used filtered status to continue filtering by id
                 filteredByStatus.map((job) => {
-                    if (job._links.self.href.search(this.idFilter) !== -1) {
+                    let id = job._links.self.href.split('/').pop().toUpperCase();
+                    let name = job.name.toUpperCase();
+                    if (id.search(this.idFilter.toUpperCase()) !== -1 ||
+                        name.search(this.idFilter.toUpperCase()) !== -1) {
                         filteredById.push(job);
                     }
                 });
@@ -152,16 +206,26 @@ This component manage each job (delete, start, create, etc).
                     });
                 });
             },
-            'actionJob': function(actions) {
-                this.unicoreAPI.actionJob(actions.url);
-                swal('Great!', actions.text, 'success');
-            },
-            'checkFilterIcon': function() {
-                if (this.idFilter === '' && this.statusFilter === 'ALL') {
-                    this.filterOn = false;
+            'getAnalysisInfo': function(simulationJob) {
+                /*  get the location of the analysis based on the mapping file
+                    that we save in the simulation and then the validation image */
+                if (simulationJob.status === 'SUCCESSFUL') {
+                    this.unicoreAPI.getAssociatedLocation(simulationJob._links.workingDirectory.href)
+                    .then((analysisObject) => {
+                        this.getStatus(analysisObject, simulationJob);
+                    }, (error) => { // stop loading status. analysis not run yet.
+                        this.$set(simulationJob, 'analysisStatus', undefined);
+                    });
                 } else {
-                    this.filterOn = true;
+                    this.$set(simulationJob, 'analysisStatus', 'BLOCK');
                 }
+            },
+            'getStatus': function(analysisObject, simulationJob) {
+                let analysisURL = analysisObject._links.self.href;
+                this.unicoreAPI.getJobProperties(analysisURL)
+                .then((jobInfo) => {
+                    this.$set(simulationJob, 'analysisStatus', jobInfo.status);
+                });
             },
             'removeFromList': function(url) {
                 this.jobs.map((job, index, arr) => {
@@ -213,14 +277,21 @@ This component manage each job (delete, start, create, etc).
                 this.unicoreAPI.getAllJobs(this.computerFilter)
                 .then((response) => {
                     let jobs = response.jobs;
-                    let promiseArray = [];
+                    let jobPropertiesArray = [];
+                    // let analysisArray = [];
                     for (let i = 0; i < jobs.length; i++) {
                         let job = jobs[i];
-                        promiseArray.push(this.unicoreAPI.getJobProperties(job));
+                        jobPropertiesArray.push(this.unicoreAPI.getJobProperties(job));
                     }
-                    Promise.all(promiseArray).then((resultsArray) => {
+                    Promise.all(jobPropertiesArray).then((resultsArray) => {
                         // I need to wait to all so I can sort them by date.
                         // TODO: ask for the API to obtain by date.
+                        // get the analysis information
+                        resultsArray.map((simulationJob) => {
+                            // add this so the item shows sync icon
+                            simulationJob['analysisStatus'] = 'LOADING';
+                            this.getAnalysisInfo(simulationJob);
+                        });
                         this.filteredObjects = this.jobs = resultsArray;
                         this.filter();
                         if (loadingComp) {
@@ -235,23 +306,13 @@ This component manage each job (delete, start, create, etc).
                 this.idFilter = '';
                 this.statusFilter = 'ALL';
             },
-            'runValidation': function(job) {
+            'runAnalysis': function(job) {
                 // TOOD: avoid hardcoding computers
                 let that = this;
-                let moveObject = {
-                    'from': {
-                        'workingDirectory': job._links.workingDirectory.href,
-                        'computer': 'JUQUEEN',
-                    },
-                    'to': {
-                        'workingDirectory': null, // create a new one
-                        'computer': 'JURECA',
-                    },
-                    'files': ['out.dat', 'BlueConfig', 'user.target'],
-                };
+                this.moveObject.from.workingDirectory = job._links.workingDirectory.href;
                 swal({
-                    'title': 'Move Files and Run Validation',
-                    'text': `Moving from ${moveObject.from.computer} to ${moveObject.to.computer}`,
+                    'title': 'Run analysis',
+                    'html': that.showSimulationParameters(),
                     'showCancelButton': true,
                     'confirmButtonText': 'Submit',
                     'confirmButtonColor': '#548d68',
@@ -259,20 +320,21 @@ This component manage each job (delete, start, create, etc).
                     'showLoaderOnConfirm': true,
                     'allowOutsideClick': true,
                     'preConfirm': function() {
-                        return that.unicoreAPI.submitValidation(moveObject);
+                        return that.setupSelectedConfig(that.moveObject);
                     },
-                }).then(function(validation) {
-                    let startURL = validation.destinationJob._links['action:start'].href;
-                    console.log('starting validation...');
+                }).then(function(analysis) {
+                    let startURL = analysis.destinationJob._links['action:start'].href;
+                    console.log('starting analysis...');
                     that.unicoreAPI.actionJob(startURL);
+                    that.startReloadJob(job);
                     swal({
-                        'title': 'Validation started!',
-                        'text': 'Validations results can take a long time',
+                        'title': 'Analysis started!',
+                        'text': 'Analysis results can take a long time',
                         'showCancelButton': true,
                         'cancelButtonText': 'View Job',
                         'type': 'success',
                     }).then(function() {}, function() {
-                        that.showDetails(validation.destinationJob, moveObject.to.computer);
+                        that.showDetails(job, that.moveObject.from.computer);
                     });
                 }).catch(swal.noop);
             },
@@ -288,6 +350,44 @@ This component manage each job (delete, start, create, etc).
                 this.readObjectIndex += this.loadIncrement;
                 this.viewList = this.viewList.concat(newItems);
                 this.$refs.infiniteLoading.$emit('$InfiniteLoading:loaded');
+            },
+            'showSimulationParameters': function() {
+                // create a copy of the template for get the params later
+                // due Swal library creates the HTML without vuejs.
+                let configTemplate = document.getElementById('configTemplate').cloneNode(true);
+                configTemplate.id = 'configTemplateFilled';
+                configTemplate.style.display = 'block';
+                return configTemplate;
+            },
+            'setupSelectedConfig': function(moveObject) {
+                // get the parameters based on the user's configuration
+                let configTemplateFilled = document.getElementById('configTemplateFilled');
+                let getParam = function(name) {
+                    return configTemplateFilled.querySelector('.' + name).value;
+                };
+                moveObject.nodes = getParam('nodes');
+                moveObject.title = getParam('title');
+                return this.unicoreAPI.submitAnalysis(moveObject);
+            },
+            'startReloadJob': function(simulationJob) {
+                let poolAnalysis = function(simulationJob) {
+                    if (simulationJob.autorefresh) {
+                        simulationJob.intervalReference = setInterval(() => {
+                            if (simulationJob && simulationJob.analysisStatus === 'SUCCESSFUL') {
+                                // stop interval on job finished
+                                simulationJob.intervalReference = clearTimeout(simulationJob.intervalReference);
+                            } else {
+                                this.getAnalysisInfo.call(this, simulationJob);
+                            }
+                        }, this.pollInterval * 1000);
+                    } else {
+                        simulationJob.intervalReference = clearTimeout(simulationJob.intervalReference);
+                    }
+                };
+                simulationJob['autorefresh'] = true;
+                simulationJob['intervalReference'] = null;
+                simulationJob['analysisStatus'] = 'LOADING';
+                poolAnalysis.call(this, simulationJob);
             },
         },
         'mounted': function() {
@@ -332,11 +432,12 @@ This component manage each job (delete, start, create, etc).
         border: 1px solid;
     }
     .table-header span.id {
-        width: 40%;
+        width: 48%;
         text-align: center;
     }
     .table-header span.status {
         width: 20%;
+        padding-left: 30px;
     }
     .table-header span.time {
         width: 40%;
@@ -363,6 +464,7 @@ This component manage each job (delete, start, create, etc).
         background-color: #879fcb;
         padding: 5px 10px;
         border-radius: 3px;
+        margin: 0;
     }
     a.create-simulation-button.router-link-active {
         text-decoration: none;
@@ -377,7 +479,7 @@ This component manage each job (delete, start, create, etc).
     }
     .input-style {
         height: 33px;
-        width: 120px;
+        width: 100px;
         margin: 0px 0;
         display: inline-block;
         border: 1px solid #ccc;
@@ -385,5 +487,49 @@ This component manage each job (delete, start, create, etc).
         border-radius: 4px;
         box-sizing: border-box;
         padding: 9px 15px;
+    }
+    .config-template {
+        text-align: left;
+        margin: 0 23%;
+    }
+    .config-template .subtitle {
+        padding: 10px;
+        display: block;
+    }
+    .config-template th {
+        padding-left: 10px;
+    }
+</style>
+<style>
+    /* disable the bounce effect sweetalerts*/
+    @-webkit-keyframes showSweetAlert {
+        0% {
+            -webkit-transform: scale(0.7);
+            transform: scale(0.7);
+        }
+
+        100% {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+        }
+    }
+    @keyframes showSweetAlert {
+        0% {
+            -webkit-transform: scale(0.7);
+            transform: scale(0.7);
+        }
+
+        100% {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+        }
+    }
+    .swal2-content td, .swal2-content th {
+        /*border: 1px solid #dddddd;*/
+        text-align: left;
+        padding: 8px;
+    }
+    .swal2-content table {
+        margin: 0 auto;
     }
 </style>

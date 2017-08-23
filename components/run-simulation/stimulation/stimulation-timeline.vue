@@ -23,7 +23,7 @@
 <script>
 import modal from 'components/modal-component.vue';
 import StimulationForm from 'components/run-simulation/stimulation/stimulation-form.vue';
-import mixin from 'mixins/simulation.js';
+import mixin from 'mixins/simulationTimeline.js';
 import EditButtons from 'components/run-simulation/edit-buttons.vue';
 export default {
     'name': 'stimulation-timeline',
@@ -191,8 +191,16 @@ export default {
             // comes from the timeline.on('itemover')
             let item = this.timeline.itemsData.get(event.item);
             let stimInfo = this.config.Stimulus[item.stimulusName];
-            let output = 'AmpStart(mv): ' + stimInfo.AmpStart + '\n AmpEnd(mv): ' + stimInfo.AmpEnd;
-            this.showTooltip(event, output);
+            let output = [];
+            if (stimInfo.AmpStart != null) {
+                output.push(`AmpStart(mV): ${stimInfo.AmpStart}`);
+            }
+            if (stimInfo.AmpEnd != null) {
+                output.push(`AmpEnd(mV): ${stimInfo.AmpEnd}`);
+            }
+            if (output.length > 0) {
+                this.showTooltip(event, output.join('\n'));
+            }
         },
     },
     'mounted': function() {
@@ -218,7 +226,7 @@ export default {
 
             this.items.push(item);
         }
-        this.createTimeline(); // from the simulation.js
+        this.createTimeline(); // from the simulationTimeline.js
     },
     'watch': {
         'endTime': function(newVal, oldVal) {

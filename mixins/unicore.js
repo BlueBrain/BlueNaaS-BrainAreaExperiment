@@ -11,17 +11,6 @@ module.exports = (function() {
             'headers': headers,
         }).then(handleErrors);
     };
-    let checkFileExists = function(fileURL) {
-        let headers = createHeaders(token);
-        return fetch(fileURL, {
-            'method': 'GET',
-            'headers': headers,
-        })
-        .then(handleErrors)
-        .then((response) => {
-            return response.json();
-        }, Promise.reject);
-    };
     let createHeaders = function(token) {
         return {
             'Authorization': 'Bearer ' + token,
@@ -71,6 +60,18 @@ module.exports = (function() {
             token = data.authResponse.access_token;
         });
     };
+    let getAssociatedLocation = function(workingDirectory) {
+        let url = workingDirectory + '/files/analysis_path';
+        return getFiles(url)
+        .then((location) => {
+            try {
+                let analysisObject = JSON.parse(location);
+                return Promise.resolve(analysisObject);
+            } catch (e) {
+                throw new Error('No analysis file. Images cannot be shown');
+            }
+        }, console.warn);
+    };
     let getFiles = function(jobURL) {
         let headers = createHeaders(token);
         headers['Accept'] = 'application/octet-stream';
@@ -92,17 +93,83 @@ module.exports = (function() {
             return response.text();
         }, Promise.reject);
     };
-    let getImage = function(jobURL) {
-        let headers = createHeaders(token);
-        headers['Accept'] = 'application/octet-stream';
-        delete headers['Content-Type'];
-        return fetch(jobURL, {
-            'method': 'GET',
-            'headers': headers,
-        })
-        .then((response) => {
-            return response.blob();
-        }, Promise.reject);
+    let getConfig = function(applicationName, title, nodes, blueConfig, shellCommand) {
+        let jobSpec = {};
+        let inputs = [];
+
+        if (applicationName === 'BSP') {
+            jobSpec = {
+                'ApplicationName': applicationName,
+                'Parameters': {
+                    'CONFIG': 'BlueConfig',
+                    'TARGET': 'user.target',
+                    'OUTPUT': 'output',
+                },
+                'Name': title,
+                'Resources': {'Nodes': nodes},
+                'haveClientStageIn': 'true',
+            };
+            inputs = [
+                {
+                    'To': 'BlueConfig',
+                    // 'Data': require('raw-loader!assets/BlueConfig'),
+                    'Data': JSON.stringify(blueConfig),
+                },
+                // {
+                //     'To': 'user.target',
+                //     'Data': require('raw-loader!assets/user.target'),
+                // },
+            ];
+        }
+
+        if (applicationName === 'Bash shell') {
+            jobSpec = {
+                'ApplicationName': applicationName,
+                'Parameters': {'SOURCE': 'input.sh'},
+                'Resources': {'Nodes': nodes},
+                'haveClientStageIn': 'true',
+            };
+            let inputShContent = '';
+            if (shellCommand) {
+                inputShContent = shellCommand;
+            } else {
+                inputShContent = `
+                    #!/bin/sh
+                    date
+                    hostname
+                    whoami
+                `;
+            }
+            inputs = [{
+                'To': 'input.sh',
+                'Data': inputShContent,
+            }];
+        }
+        return {
+            'jobSpec': jobSpec,
+            'inputs': inputs,
+        };
+    };
+    let getImage = function(imageURL) {
+        return new Promise((resolve, reject) => {
+            let headers = createHeaders(token);
+            headers['Accept'] = 'application/octet-stream';
+            delete headers['Content-Type'];
+            fetch(imageURL, {
+                'method': 'GET',
+                'headers': headers,
+            })
+            .then((imageBinary) => {
+                return imageBinary.blob();
+            }, Promise.reject)
+            .then((image) => {
+                if (image.size > 0) {
+                    resolve(image);
+                } else {
+                    reject('Image not found');
+                }
+            });
+        });
     };
     let getJobById = function(jobId, computer) {
         computer = computer.toUpperCase();
@@ -160,11 +227,11 @@ module.exports = (function() {
             return response;
         }
     };
-    let submitValidation = function(moveObject) {
+    let submitAnalysis = function(moveObject) {
         return new Promise((resolve, reject) => {
             /**
-                Create a new job so we have working space where to copy files for validation
-                    and upload the script to run validation after the files are move
+                Create a new job so we have working space where to copy files for analysis
+                    and upload the script to run analysis after the files are move
                 Move files from diferent locations using Unicore API
                 Returns one object with the information about transfer and
                     inside another 'destinationJob' object with info about destination job
@@ -181,34 +248,30 @@ module.exports = (function() {
                         'computer': computer name e.g: JURECA
                     }
                     'files' = array with name of files to copy
+                    'nodes' = number of nodes used to run the analysis
+                    'title' = title of the job
                 }
             */
             let jobSpec = {
                 'ApplicationName': 'Bash shell',
                 'Parameters': {'SOURCE': 'input.sh'},
-                'Resources': {'Nodes': '1'},
+                'Name': moveObject.title,
+                'Resources': {'Nodes': moveObject.nodes},
                 'haveClientStageIn': 'true',
             };
             let inputShContent = `
-                /homec/bp0/bp000024/jureca/venv_bluepy_analysis/bin/analysis_launch.py --blueconfig BlueConfig --output . --usertarget user.target
+                /homec/bp0/bp000024/jureca/venv_bluepy_analysis/bin/analysis_launch.py --blueconfig BlueConfig --output . --usertarget /homec/bp0/bp000024/proj30/pcp31k/mike_sim/juqueen_run00/user.target
                 `;
             let inputs = [{
                 'To': 'input.sh',
                 'Data': inputShContent,
             }];
-            this.checkFileExists(moveObject.from.workingDirectory + '/files/out.dat')
-            .then((output) => {
-                return Promise.resolve();
-            }, (error) => {
-                throw Error('No simulation output file (out.dat). No validation can be run');
-            })
-            .then(() => {
-                return this.submitJob(moveObject.to.computer, jobSpec, inputs);
-            })
+
+            return this.submitJob(moveObject.to.computer, jobSpec, inputs)
             .then((jobObject) => {
-                // mapping in simulation the validation path.
+                // mapping in simulation the analysis path.
                 let input = {
-                    'To': 'validation_path',
+                    'To': 'analysis_path',
                     'Data': JSON.stringify(jobObject),
                 };
                 // fill the destination and pass it to transfer
@@ -348,7 +411,7 @@ module.exports = (function() {
         }).then(handleErrors);
     };
     return {
-        'checkFileExists': checkFileExists,
+        'getAssociatedLocation': getAssociatedLocation,
         'deleteJob': deleteJob,
         'uploadData': uploadData,
         'submitJob': submitJob,
@@ -359,54 +422,9 @@ module.exports = (function() {
         'getFiles': getFiles,
         'getFilesList': getFilesList,
         'getImage': getImage,
+        'getConfig': getConfig,
         'init': init,
-        'submitValidation': submitValidation,
+        'submitAnalysis': submitAnalysis,
         'transferFiles': transferFiles,
     };
 }());
-
-/**
-    ------ example of job's params for Shell Commands
-    let jobSpec = {
-        // each application name is related to a script
-        // be carefull with case sensitive.
-        // for shell commands:
-        'ApplicationName': 'Bash shell',
-        'Parameters': {'SOURCE': 'input.sh'},
-        'Resources': {'Nodes': '1'},
-        'haveClientStageIn': 'true',
-    };
-    let inputShContent = `
-        #!/bin/sh
-        date
-        hostname
-        whoami
-        `;
-    let inputs = [{
-        'To': 'input.sh',
-        'Data': inputShContent,
-    }];
-    ------ END example of job's params
-    ------ example of job's params for SIMULATION
-    let jobSpec = {
-        'ApplicationName': 'BSP',
-        'Parameters': {
-            'CONFIG': 'BlueConfig',
-            'TARGET': 'user.target',
-            'OUTPUT': 'output',
-        },
-        'Resources': {'Nodes': '32'},
-        'haveClientStageIn': 'true',
-    };
-    inputs = [
-        {
-            'To': 'BlueConfig',
-            // 'Data': require('raw-loader!assets/BlueConfig'),
-        },
-        {
-            'To': 'user.target',
-            'Data': require('raw-loader!assets/user.target'),
-        },
-    ];
-    ------ END example of job's params for SIMULATION
-*/

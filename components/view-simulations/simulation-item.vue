@@ -2,22 +2,27 @@
 This will only display the item. It knows where to put all the information.
 -->
 <template>
-    <div class="simulation-item">
-        <div class="left-part">
-            <a
-                @click="showDetails"
-                title="View details"
-                class="button-with-icon">
-                    <i class="material-icons">pageview</i>
-            </a>
-            <div class="id">{{getId}}</div>
+    <div class="simulation-item" @click="itemSelected">
+        <div class="left-part clickable">
+            <div class="id clickable">{{job.name}}</div>
         </div>
-        <div class="middle-part">{{job.status}}</div>
-        <div class="right-part">
+        <!-- simulation status icon -->
+        <div class="middle-part clickable">
+            <i  class="material-icons colored"
+                :title="job.status">
+                {{ getStatusIcon(job.status) }}</i>
+        </div>
+        <!-- analysis status icon -->
+        <div class="middle-part clickable">
+            <i  class="material-icons colored"
+                :title="job.analysisStatus">
+                {{ getStatusIcon(job.analysisStatus) }}</i>
+        </div>
+        <div class="right-part clickable">
             <div>{{getDate}}</div>
             <div class="inline-flex">
-                <a @click="deleteJob" class="button-with-icon" title="Delete job forever"><i class="material-icons">delete_forever</i>Delete</a>
-                <a @click="runValidation" class="button-with-icon" title="Start validation"><i class="material-icons">play_arrow</i>Validation</a>
+                <a @click="deleteJob" class="button-with-icon danger" title="Delete job forever"><i class="material-icons">delete_forever</i>Delete</a>
+                <a @click="runAnalysis" class="button-with-icon analysis" :class="{available: analysisAvailable}" title="Start analysis"><i class="material-icons">play_arrow</i>Analysis</a>
                 <a @click="abortJob" class="button-with-icon" title="Cancel Job"><i class="material-icons">cancel</i>Abort</a>
             </div>
         </div>
@@ -30,8 +35,8 @@ export default {
     'name': 'simulationItem',
     'props': ['job'],
     'methods': {
-        'runValidation': function() {
-            this.$emit('runValidation');
+        'runAnalysis': function() {
+            this.$emit('runAnalysis');
         },
         'abortJob': function() {
             let actionURL = this.job._links.self.href + '/actions/abort';
@@ -41,8 +46,31 @@ export default {
             let url = this.job._links.self.href;
             this.$emit('deleteJob', url);
         },
-        'showDetails': function() {
-            this.$emit('showDetails', this.job);
+        'itemSelected': function(event) {
+            // check if the id for example is not selected so we can copy it.
+            if (event.target.classList.contains('clickable') &&
+                window.getSelection().toString() === '') {
+                this.$emit('showDetails', this.job);
+            }
+        },
+        'getStatusIcon': function(status) {
+            switch (status) {
+            case 'SUCCESSFUL':
+                return 'check_box';
+                break;
+            case 'FAILED':
+                return 'error';
+                break;
+            case 'BLOCK':
+                return 'block';
+                break;
+            case undefined:
+                return 'check_box_outline_blank';
+                break;
+            default: // if is RUNNING, QUEUE, etc
+                return 'sync';
+                break;
+            }
         },
     },
     'computed': {
@@ -57,6 +85,9 @@ export default {
             if (stringDate) {
                 return new Date(this.job.submissionTime).toLocaleString();
             }
+        },
+        'analysisAvailable': function() {
+            return (this.job.status === 'SUCCESSFUL' ? true : false);
         },
     },
 };
@@ -81,6 +112,7 @@ export default {
     width: 20%;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 .right-part {
     width: 40%;
@@ -103,5 +135,21 @@ a.button-with-icon {
     border-radius: 3px;
     display: flex;
     align-items: center;
+}
+a.button-with-icon.danger {
+    background-color: rgb(172, 96, 103);
+}
+a.button-with-icon.analysis {
+    background-color: #548d68;
+    opacity: 0.3;
+}
+a.button-with-icon.analysis.available {
+    opacity: 1;
+}
+.material-icons.colored {
+    color: rgb(172, 96, 103);
+}
+.material-icons.colored[title='SUCCESSFUL'] {
+    color: green;
 }
 </style>

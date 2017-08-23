@@ -24,7 +24,7 @@
 import modal from 'components/modal-component.vue';
 import ReportForm from 'components/run-simulation/report/report-form.vue';
 import EditButtons from 'components/run-simulation/edit-buttons.vue';
-import mixin from 'mixins/simulation.js';
+import mixin from 'mixins/simulationTimeline.js';
 export default {
     'name': 'report-timeline',
     'props': ['endTime', 'forwardSkip', 'blueConfig'],
@@ -184,7 +184,7 @@ export default {
 
             this.items.push(item);
         }
-        this.createTimeline(); // from the simulation.js
+        this.createTimeline(); // from the simulationTimeline.js
     },
     'watch': {
         'endTime': function(newVal, oldVal) {

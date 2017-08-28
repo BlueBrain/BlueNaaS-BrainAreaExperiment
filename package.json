@@ -5,6 +5,7 @@
   "main": "app.js",
   "devDependencies": {
     "autocomplete-vue": "^1.0.3",
+    "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.28.0",
     "eslint": "^4.3.0",
     "eslint-config-google": "^0.9.1",

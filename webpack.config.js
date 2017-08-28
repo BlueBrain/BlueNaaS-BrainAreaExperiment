@@ -1,5 +1,7 @@
 let path = require('path');
 let webpack = require('webpack');
+let CopyWebpackPlugin = require('copy-webpack-plugin');
+
 module.exports = {
     'entry': {
         'app': './app.js',
@@ -40,5 +42,8 @@ module.exports = {
     },
     'plugins': [
         new webpack.optimize.CommonsChunkPlugin("vendor"),
+        new CopyWebpackPlugin([
+            { from: './favicon.ico', to: 'dist/favicon.ico' },
+        ]),
     ],
 };

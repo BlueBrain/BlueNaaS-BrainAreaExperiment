@@ -224,6 +224,7 @@ This component manage each job (delete, start, create, etc).
                 let analysisURL = analysisObject._links.self.href;
                 this.unicoreAPI.getJobProperties(analysisURL)
                 .then((jobInfo) => {
+                    // $set because of Caveats
                     this.$set(simulationJob, 'analysisStatus', jobInfo.status);
                 });
             },
@@ -286,7 +287,7 @@ This component manage each job (delete, start, create, etc).
                     Promise.all(jobPropertiesArray).then((resultsArray) => {
                         // I need to wait to all so I can sort them by date.
                         // TODO: ask for the API to obtain by date.
-                        // get the analysis information
+                        // get the analysis information async
                         resultsArray.map((simulationJob) => {
                             // add this so the item shows sync icon
                             simulationJob['analysisStatus'] = 'LOADING';
@@ -326,6 +327,7 @@ This component manage each job (delete, start, create, etc).
                     let startURL = analysis.destinationJob._links['action:start'].href;
                     console.log('starting analysis...');
                     that.unicoreAPI.actionJob(startURL);
+                    // pool the status of the analysis
                     that.startReloadJob(job);
                     swal({
                         'title': 'Analysis started!',
@@ -386,6 +388,7 @@ This component manage each job (delete, start, create, etc).
                 };
                 simulationJob['autorefresh'] = true;
                 simulationJob['intervalReference'] = null;
+                // add this status to show the sync
                 simulationJob['analysisStatus'] = 'LOADING';
                 poolAnalysis.call(this, simulationJob);
             },

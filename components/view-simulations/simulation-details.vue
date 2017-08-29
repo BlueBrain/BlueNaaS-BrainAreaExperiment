@@ -6,8 +6,12 @@ This will display the details of a certain simulation and the analysis.
         <div v-if="!loading">
             <div class="detail-header">
                 <div>
-                    <item-summary :itemDetails="simulationDetails"></item-summary>
-                    <item-summary :itemDetails="analysisDetails"></item-summary>
+                    <item-summary
+                        :itemDetails="simulationDetails"
+                        @toggleAutoreload="toggleAutoreload"></item-summary>
+                    <item-summary
+                        :itemDetails="analysisDetails"
+                        @toggleAutoreload="toggleAutoreload"></item-summary>
                 </div>
                 <div class="space-flex"></div>
                 <a class="button-with-icon colored" @click="returnList"><i class="material-icons">arrow_back</i>Simulation List</a>

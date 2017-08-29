@@ -32,6 +32,9 @@
         'name': 'item-summary',
         'props': ['itemDetails'],
         'methods': {
+            'toggleAutoreload': function() {
+                this.$emit('toggleAutoreload', this.itemDetails);
+            },
         },
         'computed': {
             'date': function() {
@@ -50,8 +53,6 @@
                 }
                 return this.itemDetails.statusIcon;
             },
-        },
-        'mounted': function() {
         },
     };
 </script>
@@ -75,7 +76,7 @@
         display: inline-block;
     }
     .column .id {
-        width: 130px;
+        width: 335px;
     }
     .column .name {
         margin-left: 10px;
@@ -88,5 +89,8 @@
     }
     .material-icons {
         vertical-align: middle;
+    }
+    .bottom > * {
+        display: inline-block;
     }
 </style>

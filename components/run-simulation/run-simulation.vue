@@ -120,7 +120,7 @@ export default {
                 console.log('starting job...');
                 that.unicore.actionJob(jobObject._links['action:start'].href);
                 swal({
-                    'title': 'Simulaiton started!',
+                    'title': 'Simulation started!',
                     'showCancelButton': true,
                     'cancelButtonText': 'View Job',
                     'type': 'success',

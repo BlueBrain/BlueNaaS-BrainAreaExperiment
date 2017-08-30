@@ -7,24 +7,26 @@ This will only display the item. It knows where to put all the information.
             <div class="id clickable">{{job.name}}</div>
         </div>
         <!-- simulation status icon -->
-        <div class="middle-part clickable">
+        <div class="middle-part clickable simulation">
             <i  class="material-icons colored"
                 :title="job.status">
                 {{ getStatusIcon(job.status) }}</i>
         </div>
         <!-- analysis status icon -->
-        <div class="middle-part clickable">
-            <i  class="material-icons colored"
+        <div class="middle-part clickable analysis">
+            <a @click="runAnalysis" v-if="analysisAvailable" class="button-with-icon analysis" :class="{available: analysisAvailable}" title="Start analysis"><i class="material-icons">play_arrow</i>Analysis</a>
+            <i  class="material-icons colored"  v-else
                 :title="job.analysisStatus">
                 {{ getStatusIcon(job.analysisStatus) }}</i>
         </div>
         <div class="right-part clickable">
-            <div>{{getDate}}</div>
-            <div class="inline-flex">
-                <a @click="deleteJob" class="button-with-icon danger" title="Delete job forever"><i class="material-icons">delete_forever</i>Delete</a>
-                <a @click="runAnalysis" class="button-with-icon analysis" :class="{available: analysisAvailable}" title="Start analysis"><i class="material-icons">play_arrow</i>Analysis</a>
-                <a @click="abortJob" class="button-with-icon" title="Cancel Job"><i class="material-icons">cancel</i>Abort</a>
-            </div>
+                <div class="column">
+                    <div class="date">{{getDate}}</div>
+                    <div class="inline-flex">
+                        <a @click="deleteJob" class="button-with-icon danger" title="Delete job forever"><i class="material-icons">delete_forever</i>Delete</a>
+                        <a @click="abortJob" class="button-with-icon" title="Cancel Job"><i class="material-icons">cancel</i>Abort</a>
+                    </div>
+                </div>
         </div>
     </div>
 </template>
@@ -102,6 +104,10 @@ export default {
     margin: 5px;
     background-color: rgba(216, 223, 239, 0.38);
 }
+/*.simulation-item > * {
+    margin: 0 5px;
+    background-color: rgba(216, 223, 239, 0.38);
+}*/
 .left-part {
     width: 40%;
     display: flex;
@@ -113,6 +119,13 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+.middle-part.simulation {
+    border-left: solid lightgray;
+    border-right: solid lightgray;
+}
+.middle-part.analysis {
+    border-right: solid lightgray;
 }
 .right-part {
     width: 40%;
@@ -151,5 +164,15 @@ a.button-with-icon.analysis.available {
 }
 .material-icons.colored[title='SUCCESSFUL'] {
     color: green;
+}
+.column {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.date {
+    text-align: right;
+    padding-right: 10px;
 }
 </style>

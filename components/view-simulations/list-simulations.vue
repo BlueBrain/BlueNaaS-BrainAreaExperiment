@@ -16,11 +16,11 @@ This component manage each job (delete, start, create, etc).
                 </a>
             </span>
             <span>
-                <a class="button-with-icon"><i class="material-icons">fingerprint</i></a>
+                <a class="button-with-icon" title="Filter by Name or ID"><i class="material-icons">fingerprint</i></a>
             </span>
             <input class="input-style" type="text" v-model="idFilter">
             <span>
-            <a class="button-with-icon"><i class="material-icons">check_circle</i></a>
+            <a class="button-with-icon" title="Status"><i class="material-icons">check_circle</i></a>
             </span>
             <select class="input-style" v-model="statusFilter">
                 <option value="ALL">ALL</option>
@@ -31,9 +31,9 @@ This component manage each job (delete, start, create, etc).
                 <option value="RUNNING">RUNNING</option>
             </select>
             <span>
-            <a class="button-with-icon"><i class="material-icons">dns</i></a>
+            <a class="button-with-icon" title="Supercomputer to be used"><i class="material-icons">dns</i></a>
             </span>
-            <select class="input-style" v-model="computerFilter" title="Supercomputer to be used">
+            <select class="input-style" v-model="computerFilter">
                 <option value="JUQUEEN">JUQUEEN</option>
                 <option value="JURECA">JURECA</option>
             </select>
@@ -44,12 +44,11 @@ This component manage each job (delete, start, create, etc).
             <span class="refresh" @click="refreshJobs">
                 <a class="button-with-icon"><i class="material-icons">refresh</i>Reload</a>
             </span>
-
         </div>
         <div class="table-header">
-            <span class="id">Id</span>
-            <span class="status">Simulation</span>
-            <span class="status">Analysis</span>
+            <span class="id">Name</span>
+            <span class="status">Simulation Step</span>
+            <span class="status">Analysis Step</span>
             <span class="time">Submission Date</span>
         </div>
         <div v-if="!loading" class="simulation-items-container">
@@ -279,7 +278,6 @@ This component manage each job (delete, start, create, etc).
                 .then((response) => {
                     let jobs = response.jobs;
                     let jobPropertiesArray = [];
-                    // let analysisArray = [];
                     for (let i = 0; i < jobs.length; i++) {
                         let job = jobs[i];
                         jobPropertiesArray.push(this.unicoreAPI.getJobProperties(job));
@@ -435,15 +433,14 @@ This component manage each job (delete, start, create, etc).
         border: 1px solid;
     }
     .table-header span.id {
-        width: 48%;
+        width: 37%;
         text-align: center;
     }
     .table-header span.status {
-        width: 20%;
-        padding-left: 30px;
+        width: 18%;
     }
     .table-header span.time {
-        width: 40%;
+        width: 32%;
         text-align: end;
     }
     .filter {
@@ -482,7 +479,7 @@ This component manage each job (delete, start, create, etc).
     }
     .input-style {
         height: 33px;
-        width: 100px;
+        width: 130px;
         margin: 0px 0;
         display: inline-block;
         border: 1px solid #ccc;

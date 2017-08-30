@@ -25,12 +25,7 @@ This will display the details of a certain simulation and the analysis.
                         <analysis :itemDetails="analysisDetails"></analysis>
                     </div>
                 </collapse-title>
-                <collapse-title title="Files List" :collapsed="false">
-                    <div slot="element">
-                        <files :itemDetails="simulationDetails" @openFile="openFile"></files>
-                    </div>
-                </collapse-title>
-                <collapse-title title="Logs" :collapsed="true">
+                <collapse-title title="Unicore Logs" :collapsed="true">
                     <div slot="element">
                         <div v-for="log in job.log" class="log-item">
                             {{ log }}
@@ -40,7 +35,7 @@ This will display the details of a certain simulation and the analysis.
                         </a>
                     </div>
                 </collapse-title>
-                <collapse-title title="Errors" :collapsed="true">
+                <collapse-title title="Stderr" :collapsed="true">
                     <div slot="element" class="log-item">
                         <div v-for="error in simulationDetails.errors">
                             {{ error }}
@@ -50,7 +45,7 @@ This will display the details of a certain simulation and the analysis.
                         </a>
                     </div>
                 </collapse-title>
-                <collapse-title title="Output" :collapsed="true">
+                <collapse-title title="Stdout" :collapsed="true">
                     <div slot="element" class="log-item">
                         <div v-for="out in simulationDetails.output">
                             {{ out }}
@@ -73,7 +68,6 @@ This will display the details of a certain simulation and the analysis.
 import Unicore from 'mixins/unicore.js';
 import CollapseTitle from 'components/collapse-title.vue';
 import ItemSummary from 'components/view-simulations/simulation-details/item-summary.vue';
-import Files from 'components/view-simulations/simulation-details/files.vue';
 import Analysis from 'components/view-simulations/simulation-details/analysis.vue';
 export default {
     'name': 'simulationDetails',
@@ -99,7 +93,6 @@ export default {
                 'errors': [],
                 'files': '',
                 'output': [],
-                'filesList': [],
                 'status': '',
                 'refreshFunction': null,
             },
@@ -122,24 +115,12 @@ export default {
         'collapse-title': CollapseTitle,
         'item-summary': ItemSummary,
         'analysis': Analysis,
-        'files': Files,
     },
     'methods': {
         'getErrors': function() {
             let url = this.simulationDetails.files + '/files/stderr';
             this.unicoreAPI.getFiles(url).then((error) => {
                 this.simulationDetails.errors = error.split('\n');
-            }, console.warn);
-        },
-        'getFilesList': function() {
-            let url = this.simulationDetails.files + '/files';
-            this.unicoreAPI.getFilesList(url).then((output) => {
-                try {
-                    let response = JSON.parse(output);
-                    this.simulationDetails.filesList = response.children;
-                } catch (e) {
-                    console.error('Error parsing files list');
-                }
             }, console.warn);
         },
         'getOutputs': function() {
@@ -244,7 +225,6 @@ export default {
             this.getErrors();
             this.getOutputs();
             this.getAnalysisInfo();
-            this.getFilesList();
         },
         'openFile': function(file) {
             let url = this.simulationDetails.files + '/files' + file;

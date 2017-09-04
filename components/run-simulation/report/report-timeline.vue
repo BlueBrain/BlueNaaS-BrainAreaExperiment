@@ -160,8 +160,15 @@ export default {
             // comes from the timeline.on('itemover')
             let item = this.timeline.itemsData.get(event.item);
             let reportInfo = this.config.Report[item.connection];
-            let output = 'Dt: ' + reportInfo.Dt + '\n Type: ' + reportInfo.Type;
-            this.showTooltip(event, output);
+            let output = [];
+            output.push(`Dt: ${reportInfo.Dt}`);
+            output.push(`Type: ${reportInfo.Type}`);
+            if (reportInfo.Scaling) {
+                output.push(`Scaling: ${reportInfo.Scaling}`);
+            }
+            if (output.length > 0) {
+                this.showTooltip(event, output.join('\n'));
+            }
         },
     },
     'mounted': function() {
@@ -255,6 +262,9 @@ export default {
     }
     .report-timeline .vis-label {
         width: 100px;
+    }
+    .report-timeline .vis-panel {
+        box-sizing: content-box;
     }
 
 </style>

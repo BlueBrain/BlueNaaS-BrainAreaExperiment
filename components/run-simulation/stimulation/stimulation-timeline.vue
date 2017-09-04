@@ -192,11 +192,43 @@ export default {
             let item = this.timeline.itemsData.get(event.item);
             let stimInfo = this.config.Stimulus[item.stimulusName];
             let output = [];
-            if (stimInfo.AmpStart != null) {
-                output.push(`AmpStart(mV): ${stimInfo.AmpStart}`);
-            }
-            if (stimInfo.AmpEnd != null) {
-                output.push(`AmpEnd(mV): ${stimInfo.AmpEnd}`);
+            switch (stimInfo.Pattern) {
+            case 'Linear':
+            case 'RelativeLinear':
+                output.push(`AmpStart: ${stimInfo.AmpStart} mA`);
+                output.push(`AmpEnd: ${stimInfo.AmpEnd} mA`);
+                break;
+            case 'NPoisson':
+            case 'NPoissonInhomogenous':
+                output.push(`Lambda: ${stimInfo.Lambda}`);
+                output.push(`Weight: ${stimInfo.Weight}`);
+                output.push(`Number of synapses: ${stimInfo.NumOfSynapses}`);
+                break;
+            case 'Pulse':
+                output.push(`Width: ${stimInfo.Width} ms`);
+                output.push(`Frequency: ${stimInfo.Frequency}`);
+                output.push(`Offset: ${stimInfo.Offset}`);
+                break;
+            case 'Noise':
+                output.push(`Mean: ${stimInfo.Mean} mA`);
+                output.push(`Mean Percent: ${stimInfo.MeanPercent}`);
+                output.push(`Variance: ${stimInfo.Variance}`);
+                break;
+            case 'Hyperpolarizing':
+                output.push('Hyperpolarizing');
+                break;
+            case 'SubThreshold':
+                output.push('SubThreshold');
+                break;
+            case 'SynapseReplay':
+                output.push(`Spike File: ${stimInfo.SpikeFile}`);
+                break;
+            case 'ReplayVoltageTrace':
+                output.push(`H5 File: ${stimInfo.H5File}`);
+                output.push(`Dataset label: ${opover.DataSetLabel}`);
+                break;
+            case 'SEClamp':
+                output.push(`Voltage: ${stimInfo.Voltage} mV`);
             }
             if (output.length > 0) {
                 this.showTooltip(event, output.join('\n'));
@@ -326,5 +358,8 @@ export default {
         border-radius: 5px 0 5px 5px;
         padding: 3px;
         top: 3px;
+    }
+    .stimulation-timeline .vis-panel {
+        box-sizing: content-box;
     }
 </style>

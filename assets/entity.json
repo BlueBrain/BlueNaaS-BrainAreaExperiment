@@ -2,6 +2,7 @@
   "Stimulus": {
     "subthresh": {
       "AmpStart": 0.0,
+      "AmpEnd": 20.0,
       "Delay": 0.0,
       "Pattern": "RelativeLinear",
       "Duration": 1000.0,
@@ -32,7 +33,7 @@
       "ReportOn": "v",
       "Dt": 0.1,
       "EndTime": 1000.0,
-      "Type": "compartment",
+      "Type": "Compartment",
       "Unit": "mV"
     }
   },

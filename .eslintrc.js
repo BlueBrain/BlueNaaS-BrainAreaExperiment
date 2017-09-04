@@ -18,7 +18,8 @@ module.exports = {
         "quotes": ["error", "single"],
         "quote-props": ["error", "always"],
         "semi": ["error", "always"],
-        "max-len": 0
+        "max-len": 0,
+        "brace-style": ["error", "1tbs", { "allowSingleLine": true }]
     },
     "parserOptions": {
         "sourceType": "module"

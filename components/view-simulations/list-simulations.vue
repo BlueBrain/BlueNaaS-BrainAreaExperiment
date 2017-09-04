@@ -18,7 +18,7 @@ This component manage each job (delete, start, create, etc).
             <span>
                 <a class="button-with-icon" title="Filter by Name or ID"><i class="material-icons">fingerprint</i></a>
             </span>
-            <input class="input-style" type="text" v-model="idFilter">
+            <input class="input-style" type="text" v-model="nameFilter">
             <span>
             <a class="button-with-icon" title="Status"><i class="material-icons">check_circle</i></a>
             </span>
@@ -36,6 +36,7 @@ This component manage each job (delete, start, create, etc).
             <select class="input-style" v-model="computerFilter">
                 <option value="JUQUEEN">JUQUEEN</option>
                 <option value="JURECA">JURECA</option>
+                <option value="JULIA">JULIA</option>
             </select>
             <span class="space-flex"></span>
             <router-link to="/" class="create-simulation-button">
@@ -65,8 +66,8 @@ This component manage each job (delete, start, create, etc).
             <infinite-loading
                 :on-infinite="onInfinite"
                 ref="infiniteLoading">
-                <span slot="no-more">There is no more simulations</span>
-                <span slot="no-results">There is no more simulations</span>
+                <span slot="no-more"></span>
+                <span slot="no-results"></span>
             </infinite-loading>
         </div>
         <!-- template for configuration -->
@@ -132,7 +133,7 @@ This component manage each job (delete, start, create, etc).
                 'readObjectIndex': 0,
                 'loadIncrement': 10,
                 'statusFilter': 'ALL',
-                'idFilter': '',
+                'nameFilter': '',
                 'dateFilter': '',
                 'filterOn': false,
                 'pollInterval': 10,
@@ -151,7 +152,7 @@ This component manage each job (delete, start, create, etc).
                 swal('Great!', actions.text, 'success');
             },
             'checkFilterIcon': function() {
-                if (this.idFilter === '' && this.statusFilter === 'ALL') {
+                if (this.nameFilter === '' && this.statusFilter === 'ALL') {
                     this.filterOn = false;
                 } else {
                     this.filterOn = true;
@@ -172,10 +173,8 @@ This component manage each job (delete, start, create, etc).
                 let filteredById = [];
                 // used filtered status to continue filtering by id
                 filteredByStatus.map((job) => {
-                    let id = job._links.self.href.split('/').pop().toUpperCase();
                     let name = job.name.toUpperCase();
-                    if (id.search(this.idFilter.toUpperCase()) !== -1 ||
-                        name.search(this.idFilter.toUpperCase()) !== -1) {
+                    if (name.search(this.nameFilter.toUpperCase()) !== -1) {
                         filteredById.push(job);
                     }
                 });
@@ -302,7 +301,7 @@ This component manage each job (delete, start, create, etc).
                 });
             },
             'resetFilter': function() {
-                this.idFilter = '';
+                this.nameFilter = '';
                 this.statusFilter = 'ALL';
             },
             'runAnalysis': function(job) {
@@ -405,7 +404,7 @@ This component manage each job (delete, start, create, etc).
                     this.filter();
                 }
             },
-            'idFilter': function() {
+            'nameFilter': function() {
                 if (!this.loading) {
                     this.filter();
                 }
@@ -498,6 +497,10 @@ This component manage each job (delete, start, create, etc).
     }
     .config-template th {
         padding-left: 10px;
+    }
+    .config-template input {
+        border-radius: 4px;
+        border-style: groove;
     }
 </style>
 <style>

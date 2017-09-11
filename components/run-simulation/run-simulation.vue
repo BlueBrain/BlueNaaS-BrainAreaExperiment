@@ -4,7 +4,7 @@
             <div class="app-content" v-if="!loading">
                 <!-- header params -->
                 <div class="duration-skip">
-                    <span title="Duration">Duration(ms):</span>
+                    <span title="Time length of stimulus duration, given in milliseconds(ms)">Duration(ms):</span>
                     <input v-model="endTime" type="number" placeholder="Duration" class="form-control">
                     <span title="Run without Stimulus or Report for a given duration using a large timestep. This is to get the cells past any initial transience">ForwardSkip(ms):</span>
                     <input v-model="forwardSkip" type="number" placeholder="Duration" class="form-control">
@@ -41,24 +41,36 @@
             </div>
         </transition>
         <!-- template for configuration -->
-        <table id="configTemplate" class="config-template" style="display:none">
-            <tr>
+        <table id="configTemplate" class="config-template" style="display: none;">
+            <!-- be carefull cause when the popup in swal2 is open the vue models are not related anymore
+            so add the functionality in showSimulationParameters -->
+             <tr>
                 <th>Title: </th>
                 <th>
-                    <input type="text" title="Title for the job" class="title" :value="runConfig.title">
+                    <input type="text" name="Title of the Job" class="title" :value="runConfig.title">
                 </th>
-            </tr>
-            <tr>
+             </tr>
+             <tr>
                 <th>Computer: </th>
-                <th>{{ runConfig.computer }}</th>
-            </tr>
-            <tr>
-                <th>Nodes: </th>
                 <th>
-                    <input type="number" name="" class="nodes" :value="runConfig.nodes">
+                    <select class="computer" title="Supercomputer" v-model="runConfig.computer">
+                        <option v-for="resources in runConfig.computersAvailable" :value="resources">{{ resources }}</option>
+                    </select>
                 </th>
             </tr>
-        </table>
+            <tr>
+                <th>Project: </th>
+                <th>
+                    <input type="text" name="Project to be used" class="project" :value="runConfig.project">
+                </th>
+             </tr>
+             <tr>
+                 <th>Nodes: </th>
+                 <th>
+                    <input type="number" name="Number of computer resources" class="nodes" :value="runConfig.nodes">
+                 </th>
+             </tr>
+         </table>
         <!-- END template for configuration -->
     </div>
 </template>
@@ -83,8 +95,10 @@ export default {
             'runConfig': {
                 'title': '',
                 'computer': 'JUQUEEN',
+                'computersAvailable': ['JUQUEEN', 'JURECA', 'JULIA'],
                 'applicationName': 'BSP',
-                'nodes': 32,
+                'nodes': 1024,
+                'project': '',
             },
         };
     },
@@ -160,13 +174,9 @@ export default {
             };
             this.runConfig.nodes = getParam('nodes');
             this.runConfig.title = getParam('title');
-            let params = this.unicore.getConfig(
-                this.runConfig.applicationName,
-                this.runConfig.title,
-                this.runConfig.nodes,
-                this.blueConfig,
-                null
-            );
+            this.runConfig.project = getParam('project');
+            this.runConfig.computer = getParam('computer');
+            let params = this.unicore.getConfig(this.runConfig, this.blueConfig, null);
             return this.unicore.submitJob(
                 this.runConfig.computer,
                 params.jobSpec,
@@ -186,22 +196,28 @@ export default {
     'mounted': function() {
         document.getElementById('frameTemplateTitle').innerText = 'Run Simulation';
         let that = this;
-        this.login().then(function() { // from CollabAuthentication
-            that.fillToken();
-            that.loadLocalConfig().then(function(bluepyConfig) {
-                that.blueConfig = bluepyConfig;
-                let loadingComp = document.querySelector('#loading-component');
-                if (loadingComp) {
-                    loadingComp.style.display = 'none';
-                }
-                that.endTime = that.blueConfig.Run.Default.Duration;
-                that.forwardSkip = that.blueConfig.Run.Default.ForwardSkip;
-                that.loading = false;
-            });
+        that.loadLocalConfig().then(function(bluepyConfig) {
+            that.blueConfig = bluepyConfig;
+            let loadingComp = document.querySelector('#loading-component');
+            if (loadingComp) {
+                loadingComp.style.display = 'none';
+            }
+            that.endTime = that.blueConfig.Run.Default.Duration;
+            that.forwardSkip = that.blueConfig.Run.Default.ForwardSkip;
+            that.loading = false;
         }, function(error) {
             console.error(error);
             that.loading = false;
         });
+        // this.$nextTick(() => {
+        //     that.unicore.getResourcesAvailable()
+        //     .then((resources) => {
+        //         // adding {computerName, url, project} available
+        //         this.$set(this.runConfig, 'computersAvailable', resources);
+        //         this.runConfig.computer = resources[0].computerName;
+        //         // this.setProjectsAvailable();
+        //     });
+        // });
     },
     'watch': {
         'endTime': function(newVal) {
@@ -276,6 +292,14 @@ export default {
     }
     .config-template {
         margin: 0 23%;
+    }
+    .config-template input {
+        border-radius: 4px;
+        border-style: groove;
+    }
+    .config-template .computer,
+    .config-template .project {
+        width: 100%;
     }
 </style>
 

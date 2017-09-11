@@ -46,20 +46,6 @@ module.exports = (function() {
             return response.json();
         });
     };
-    let init = function() {
-        hello.init({
-            // 'hbp': '7a9b6bb2-2f6d-4624-9045-d1f12d9dedaa',
-            'hbp': 'c292031c-c91f-43fa-b1a9-72e65eb18e44',
-        });
-        return hello.login('hbp', {
-            'display': 'page',
-            'force': false,
-            'page_uri': window.location.href,
-        })
-        .then((data) => {
-            token = data.authResponse.access_token;
-        });
-    };
     let getAssociatedLocation = function(workingDirectory) {
         let url = workingDirectory + '/files/analysis_path';
         return getFiles(url)
@@ -93,20 +79,27 @@ module.exports = (function() {
             return response.text();
         }, Promise.reject);
     };
-    let getConfig = function(applicationName, title, nodes, blueConfig, shellCommand) {
+    let getConfig = function(configParams, blueConfig, shellCommand) {
+        /**
+        * @params
+        *   configParams {applicationName, title, nodes, project}
+        *   BlueConfig
+        *   shellCommand to be used when the job starts
+        */
         let jobSpec = {};
         let inputs = [];
 
-        if (applicationName === 'BSP') {
+        if (configParams.applicationName === 'BSP') {
             jobSpec = {
-                'ApplicationName': applicationName,
+                'ApplicationName': configParams.applicationName,
                 'Parameters': {
                     'CONFIG': 'BlueConfig',
                     'TARGET': 'user.target',
                     'OUTPUT': 'output',
                 },
-                'Name': title,
-                'Resources': {'Nodes': nodes},
+                'Name': configParams.title,
+                'Project': configParams.project,
+                'Resources': {'Nodes': configParams.nodes},
                 'haveClientStageIn': 'true',
             };
             inputs = [
@@ -122,12 +115,14 @@ module.exports = (function() {
             ];
         }
 
-        if (applicationName === 'Bash shell') {
+        if (configParams.applicationName === 'Bash shell') {
             jobSpec = {
-                'ApplicationName': applicationName,
+                'ApplicationName': configParams.applicationName,
                 'Parameters': {'SOURCE': 'input.sh'},
-                'Resources': {'Nodes': nodes},
+                'Name': configParams.title,
+                'Resources': {'Nodes': configParams.nodes},
                 'haveClientStageIn': 'true',
+                'Project': configParams.project,
             };
             let inputShContent = '';
             if (shellCommand) {
@@ -188,12 +183,92 @@ module.exports = (function() {
             return response.json();
         }, Promise.reject);
     };
+    let getResourcesAvailable = function() {
+        /** returns the site and project that the user have access related to HBP
+         *  way to obtain the data from https://github.com/HumanBrainProject/pyunicore/blob/dev/pyunicore/pyunicore.py
+        */
+        let headers = createHeaders(token);
+        let projectsArray = [];
+        let getJson = function(url) {
+            return fetch(url, {
+                'method': 'GET',
+                'headers': headers,
+            })
+            .then(handleErrors)
+            .then((response) => {
+                return response.json();
+            })
+            .catch((e) => {})
+            .then((notFound) => {
+                // workaround to wait Promise.all even if rejected
+                return notFound;
+            });
+        };
+        let getResourceInfo = function(objReference) {
+            return getJson(objReference.url)
+            .then((info) => {
+                if (info) {
+                    // add the UID because somethimes the projecs available
+                    // are empty even if I have account.
+                    objReference.project = info.client.xlogin.availableUIDs;
+                    return objReference;
+                }
+            });
+        };
+        let filterComputerName = function(url) {
+            // to be consistent with the getSites names returns that name based on the url
+            let sites = getSites();
+            let keys = Object.keys(sites);
+            for (let i = 0; i < keys.length; i++) {
+                let key = keys[i];
+                if (sites[key].url === url) {
+                    return key;
+                }
+            }
+        };
+        // let filterProject = function(sites) {
+        //     let filtered = [];
+        //     sites.forEach((site) => {
+        //         if (site && Array.isArray(site.project)) {
+        //             filtered.push(site);
+        //         }
+        //     });
+        //     return filtered;
+        // };
+        return new Promise((resolve, reject) => {
+            // get the resources
+            getJson(HBP_RESOURCES_URL)
+            .then((resources) => {
+                resources.entries.forEach((site) => {
+                    let href = site['href'];
+                    let serviceType = site['type'];
+                    if ('TargetSystemFactory' === serviceType) {
+                        let re = new RegExp('https://.*/rest/core', 'g');
+                        let obj = {};
+                        [obj.url] = re.exec(href);
+                        obj.computerName = filterComputerName(obj.url);
+                        // get the user projects and add them to obj element
+                        projectsArray.push(getResourceInfo(obj));
+                    }
+                });
+                // this will execute all of them even if reject is trown
+                Promise.all(projectsArray)
+                .then((filledObj) => {
+                    // let filtered = filterProject(filledObj);
+                    let filtered = filledObj.filter((site) => {return site && site.computerName;});
+                    resolve(filtered);
+                });
+            });
+        });
+    };
     let getSites = function() {
         let sites = {};
         sites['JUQUEEN'] = {'name': 'JUQUEEN (JSC)', 'id': 'JUQUEEN',
             'url': 'https://hbp-unic.fz-juelich.de:7112/HBP_JUQUEEN/rest/core'};
         sites['JURECA'] = {'name': 'JURECA (JSC)', 'id': 'JURECA',
             'url': 'https://hbp-unic.fz-juelich.de:7112/HBP_JURECA/rest/core'};
+        sites['JULIA'] = {'name': 'JULIA (JSC)', 'id': 'JULIA',
+            'url': 'https://hbp-unic.fz-juelich.de:7112/HBP_JULIA/rest/core'};
         sites['VIZ_CSCS'] = {'name': 'VIZ (CSCS)', 'id': 'VIS',
             'url': 'https://contra.cscs.ch:8080/VIS-CSCS/rest/core'};
         sites['BGQ_CSCS'] = {'name': 'BGQ (CSCS)', 'id': 'BGQ',
@@ -226,6 +301,20 @@ module.exports = (function() {
         } else {
             return response;
         }
+    };
+    let init = function() {
+        hello.init({
+            // 'hbp': '7a9b6bb2-2f6d-4624-9045-d1f12d9dedaa',
+            'hbp': 'c292031c-c91f-43fa-b1a9-72e65eb18e44',
+        });
+        return hello.login('hbp', {
+            'display': 'page',
+            'force': false,
+            'page_uri': window.location.href,
+        })
+        .then((data) => {
+            token = data.authResponse.access_token;
+        });
     };
     let submitAnalysis = function(moveObject) {
         return new Promise((resolve, reject) => {
@@ -423,6 +512,7 @@ module.exports = (function() {
         'getFilesList': getFilesList,
         'getImage': getImage,
         'getConfig': getConfig,
+        'getResourcesAvailable': getResourcesAvailable,
         'init': init,
         'submitAnalysis': submitAnalysis,
         'transferFiles': transferFiles,

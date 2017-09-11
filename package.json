@@ -1,7 +1,9 @@
 {
-  "name": "simulation_app",
+  "name": "simulationapp",
   "version": "0.0.1",
-  "description": "Simulation App",
+  "version_major": "0",
+  "version_minor": "1",
+  "description": "Run Simulations using Unicore API",
   "main": "app.js",
   "devDependencies": {
     "autocomplete-vue": "^1.0.3",
@@ -13,6 +15,7 @@
     "eslint-plugin-vue": "^2.1.0",
     "file-loader": "^0.11.1",
     "hellojs": "^1.14.1",
+    "jsdoc": "^3.5.4",
     "json-loader": "^0.5.4",
     "raw-loader": "^0.5.1",
     "url-loader": "^0.5.8",
@@ -31,13 +34,19 @@
     "dev": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --port 8088",
     "serve": "python -m SimpleHTTPServer 8005",
     "watch": "webpack --watch",
-    "build": "./node_modules/webpack/bin/webpack.js --define process.env.NODE_ENV='\"production\"'",
-    "eslint": "eslint"
+    "build": "./node_modules/webpack/bin/webpack.js --define process.env.NODE_ENV='\"production\"' && npm run jsdoc",
+    "eslint": "eslint",
+    "jsdoc": "jsdoc app.js --destination docs"
   },
   "repository": {
     "type": "git",
-    "url": "ssh://bbpgb019.epfl.ch:/home/git/ProductionEntityApp"
+    "url": "ssh://bbpcode.epfl.ch/nse/simulationapp",
+    "issuesurl": "ssh://bbpcode.epfl.ch/nse/simulationapp"
   },
-  "author": "stefano.antonel@epfl.ch",
-  "license": "ISC"
+  "author": "NSE Team",
+  "contributors": [
+    "stefano.antonel@epfl.ch",
+    "jean-denis.courcol@epfl.ch"
+  ],
+  "license": "GPLv3"
 }

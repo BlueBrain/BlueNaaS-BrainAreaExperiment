@@ -9,3 +9,6 @@
 ## Compile and serve in production
 ``` npm run build ```
 ``` npm run serve ```
+
+## Generate the documentation
+``` npm run jsdoc ```

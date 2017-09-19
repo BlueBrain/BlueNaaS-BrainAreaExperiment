@@ -34,9 +34,9 @@
     "dev": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --port 8088",
     "serve": "python -m SimpleHTTPServer 8005",
     "watch": "webpack --watch",
-    "build": "./node_modules/webpack/bin/webpack.js --define process.env.NODE_ENV='\"production\"' && npm run jsdoc",
+    "build": "./node_modules/webpack/bin/webpack.js --define process.env.NODE_ENV='\"production\"'",
     "eslint": "eslint",
-    "jsdoc": "jsdoc app.js --destination docs"
+    "jsdoc": "jsdoc --readme ./README.md app.js --destination docs"
   },
   "repository": {
     "type": "git",
@@ -46,7 +46,8 @@
   "author": "NSE Team",
   "contributors": [
     "stefano.antonel@epfl.ch",
-    "jean-denis.courcol@epfl.ch"
+    "jean-denis.courcol@epfl.ch",
+    "michael.gevaert@epfl.ch"
   ],
   "license": "GPLv3"
 }

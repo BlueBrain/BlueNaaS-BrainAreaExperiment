@@ -1,14 +1,16 @@
 # Simulationapp
 
-## INSTALLATION
+### Installation
 ``` npm install ```
 
-## Run as dev
+### Run as dev
 ``` npm run dev ```
 
-## Compile and serve in production
-``` npm run build ```
-``` npm run serve ```
+### Deploy production
+* `git review` will trigger: [jenkins plan](https://bbpcode.epfl.ch/ci/job/platform.simulationapp_to_objectstorage.gerrit/)
+* **Merge** will trigger: [jenkins plan](https://bbpcode.epfl.ch/ci/job/platform.simulationapp_to_objectstorage/)
+* [**Container**](https://bbpopenstack.epfl.ch/dashboard/project/containers/container/simulationapp) Open Stack
+* [**Website**](https://bbp.epfl.ch/public/simulationapp/index.html#/)
 
-## Generate the documentation
+### Generate the documentation
 ``` npm run jsdoc ```

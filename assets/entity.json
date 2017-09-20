@@ -27,7 +27,7 @@
   },
   "Report": {
     "voltage": {
-      "Target": "Column",
+      "Target": "cylinder",
       "Format": "Bin",
       "StartTime": 0.0,
       "ReportOn": "v",
@@ -61,15 +61,15 @@
   "StimulusInject": {
     "hypampIntoColumn": {
       "Stimulus": "hypamp",
-      "Target": "Column"
+      "Target": "cylinder"
     },
     "subthreshIntoColumn": {
       "Stimulus": "subthresh",
-      "Target": "Column"
+      "Target": "cylinder"
     },
     "pInj": {
       "Stimulus": "poisson1",
-      "Target": "Layer4"
+      "Target": "slice_int"
     }
   }
 }

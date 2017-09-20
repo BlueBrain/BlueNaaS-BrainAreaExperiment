@@ -47,7 +47,7 @@
              <tr>
                 <th>Title: </th>
                 <th>
-                    <input type="text" name="Title of the Job" class="title" :value="runConfig.title">
+                    <input type="text" name="Title of the Job" class="title" :value="runConfig.title" placeholder="Job's title">
                 </th>
              </tr>
              <tr>
@@ -61,13 +61,13 @@
             <tr>
                 <th>Project: </th>
                 <th>
-                    <input type="text" name="Project to be used" class="project" :value="runConfig.project">
+                    <input type="text" name="Project to be used" class="project" :value="runConfig.project" placeholder="Optional">
                 </th>
              </tr>
              <tr>
                  <th>Nodes: </th>
                  <th>
-                    <input type="number" name="Number of computer resources" class="nodes" :value="runConfig.nodes">
+                    <input type="number" name="Number of computer resources" class="nodes" :value="runConfig.nodes" placeholder="Node to allocate">
                  </th>
              </tr>
          </table>
@@ -297,8 +297,12 @@ export default {
         border-radius: 4px;
         border-style: groove;
     }
-    .config-template .computer,
-    .config-template .project {
+    .config-template .computer {
+        min-width: 120px;
+    }
+    .config-template > tr {
+        display: inline-flex;
+        justify-content: space-between;
         width: 100%;
     }
 </style>

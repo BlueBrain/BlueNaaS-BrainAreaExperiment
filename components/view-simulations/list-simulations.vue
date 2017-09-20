@@ -76,7 +76,7 @@ This component manage each job (delete, start, create, etc).
             <tr>
                 <th>Title:</th>
                 <th>
-                    <input type="text" name="" class="title" :value="moveObject.title">
+                    <input type="text" name="" class="title" :value="moveObject.title" placeholder="Job's title">
                 </th>
             </tr>
             <tr>
@@ -90,7 +90,7 @@ This component manage each job (delete, start, create, etc).
             <tr>
                 <th>Nodes: </th>
                 <th>
-                    <input type="number" name="" class="nodes" :value="moveObject.nodes">
+                    <input type="number" name="" class="nodes" :value="moveObject.nodes" placeholder="Node to allocate">
                 </th>
             </tr>
         </table>
@@ -488,15 +488,18 @@ This component manage each job (delete, start, create, etc).
         padding: 9px 15px;
     }
     .config-template {
-        text-align: left;
+        overflow: hidden;
+        text-align: center;
         margin: 0 23%;
     }
     .config-template .subtitle {
         padding: 10px;
         display: block;
     }
-    .config-template th {
-        padding-left: 10px;
+    .config-template > tr {
+        display: inline-flex;
+        justify-content: space-between;
+        width: 100%;
     }
     .config-template input {
         border-radius: 4px;

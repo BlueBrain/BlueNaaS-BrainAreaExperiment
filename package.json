@@ -1,8 +1,6 @@
 {
   "name": "simulationapp",
-  "version": "0.0.1",
-  "version_major": "0",
-  "version_minor": "1",
+  "version": "0.0.2",
   "description": "Run Simulations using Unicore API",
   "main": "app.js",
   "devDependencies": {

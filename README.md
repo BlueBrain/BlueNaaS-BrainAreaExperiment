@@ -1,4 +1,5 @@
-# Simulationapp
+# SimulationApp
+Run simulations in supercomputers using Unicore API.
 
 ### Installation
 ``` npm install ```

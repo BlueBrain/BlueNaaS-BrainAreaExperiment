@@ -34,7 +34,7 @@
     "watch": "webpack --watch",
     "build": "./node_modules/webpack/bin/webpack.js --define process.env.NODE_ENV='\"production\"'",
     "eslint": "eslint",
-    "jsdoc": "jsdoc --readme ./README.md app.js --destination docs"
+    "build_doc": "jsdoc --readme ./README.md app.js --destination docs"
   },
   "repository": {
     "type": "git",

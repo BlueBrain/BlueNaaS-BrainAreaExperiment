@@ -1,7 +1,7 @@
 /* jshint esversion: 6 */
 import Vue from 'vue/dist/vue.min.js';
 import VueRouter from 'vue-router';
-import FrameTemplate from 'components/frame-template.vue';
+import FrameTemplate from 'components/shared/frame-template.vue';
 import UnicoreAPI from 'mixins/unicore.js';
 
 Vue.use(VueRouter);

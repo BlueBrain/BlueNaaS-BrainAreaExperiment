@@ -21,7 +21,7 @@
 
 <script>
 // import blueConfig from 'assets/entity.json';
-import modal from 'components/modal-component.vue';
+import modal from 'components/shared/modal-component.vue';
 import ReportForm from 'components/run-simulation/report/report-form.vue';
 import EditButtons from 'components/run-simulation/edit-buttons.vue';
 import mixin from 'mixins/simulationTimeline.js';
@@ -192,6 +192,9 @@ export default {
             this.items.push(item);
         }
         this.createTimeline(); // from the simulationTimeline.js
+        this.$parent.$on('reportTargetSelected', (target) => {
+            this.itemAdd(target);
+        });
     },
     'watch': {
         'endTime': function(newVal, oldVal) {

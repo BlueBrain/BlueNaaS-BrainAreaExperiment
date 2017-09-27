@@ -122,9 +122,16 @@ export default {
                 // item exists (either selected or visible chosen)
                 oldItem = this.timeline.itemsData.get(copyFromId);
                 // update the old item with the new created item
-                if (item) { // creation with the mouse
+                if (item && item.start) { // creation with the mouse
                     oldItem.start = item.start.getMilliseconds();
                     oldItem.group = item.group;
+                }
+                if (item && item.name) { // create with the target selector
+                    oldItem.group = item.name;
+                    let newGroup = this.setupGroups(item.name);
+                    if (newGroup) {
+                        this.timeline.groupsData.getDataSet().add(newGroup);
+                    }
                 }
             }
             this.cloneAndCreateItem(oldItem);

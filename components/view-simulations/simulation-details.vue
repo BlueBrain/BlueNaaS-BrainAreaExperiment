@@ -80,7 +80,7 @@ This will display the details of a certain simulation and the analysis.
 
 <script>
 import Unicore from 'mixins/unicore.js';
-import CollapseTitle from 'components/collapse-title.vue';
+import CollapseTitle from 'components/shared/collapse-title.vue';
 import ItemSummary from 'components/view-simulations/simulation-details/item-summary.vue';
 import Analysis from 'components/view-simulations/simulation-details/analysis.vue';
 export default {

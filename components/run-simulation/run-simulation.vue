@@ -15,24 +15,34 @@
                     </span>
                 </div>
                 <!-- END header params -->
+
                 <!-- stimulation timeline -->
                 <div class="border-container">
                     <h2>Stimulations</h2>
                     <div class="subtitle">Defines pattern of stimuli to be injected into multiple locations</div>
-                    <stimulation-timeline
-                        :endTime="endTime"
-                        :forwardSkip="forwardSkip"
-                        :blueConfig="blueConfig"></stimulation-timeline>
+                    <div class="row">
+                        <stimulation-timeline
+                            :endTime="endTime"
+                            :forwardSkip="forwardSkip"
+                            :blueConfig="blueConfig"
+                            class="timeline"></stimulation-timeline>
+                        <target-selection @targetSelected="stimulationTargetSelected"></target-selection>
+                    </div>
                 </div>
                 <!-- END stimulation timeline -->
+
                 <!-- report timeline -->
                 <div class="border-container">
                     <h2>Reports</h2>
                     <div class="subtitle">Controls data collection during the simulation</div>
-                    <report-timeline
-                        :endTime="endTime"
-                        :forwardSkip="forwardSkip"
-                        :blueConfig="blueConfig"></report-timeline>
+                    <div class="row">
+                        <report-timeline
+                            :endTime="endTime"
+                            :forwardSkip="forwardSkip"
+                            :blueConfig="blueConfig"
+                            class="report"></report-timeline>
+                        <target-selection @targetSelected="reportTargetSelected"></target-selection>
+                    </div>
                 </div>
                 <!-- END report timeline -->
                 <a class="button-with-icon" @click="runSimulation">
@@ -81,6 +91,7 @@ import StimulationTimeline from 'components/run-simulation/stimulation/stimulati
 import ReportTimeline from 'components/run-simulation/report/report-timeline.vue';
 import CollabAuthentication from 'mixins/collabAuthentication.js';
 import Unicore from 'mixins/unicore.js';
+import TargetSelection from 'components/target-selection/target-selection.vue';
 export default {
     'name': 'run_simulation',
     'mixins': [CollabAuthentication],
@@ -105,6 +116,7 @@ export default {
     'components': {
         'stimulation-timeline': StimulationTimeline,
         'report-timeline': ReportTimeline,
+        'target-selection': TargetSelection,
     },
     'methods': {
         'saveConfig': function() {
@@ -191,6 +203,14 @@ export default {
                     'statusSearch': 'ALL',
                 },
             });
+        },
+        'stimulationTargetSelected': function(target) {
+            // an event in stimulation-timeline will be called
+            this.$emit('stimulationTargetSelected', target);
+        },
+        'reportTargetSelected': function(target) {
+            // an event in report-timeline will be called
+            this.$emit('reportTargetSelected', target);
         },
     },
     'mounted': function() {
@@ -304,6 +324,12 @@ export default {
         display: inline-flex;
         justify-content: space-between;
         width: 100%;
+    }
+    .row {
+        display: flex;
+    }
+    .timeline, .report {
+        flex-grow: 1;
     }
 </style>
 

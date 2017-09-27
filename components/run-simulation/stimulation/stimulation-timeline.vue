@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import modal from 'components/modal-component.vue';
+import modal from 'components/shared/modal-component.vue';
 import StimulationForm from 'components/run-simulation/stimulation/stimulation-form.vue';
 import mixin from 'mixins/simulationTimeline.js';
 import EditButtons from 'components/run-simulation/edit-buttons.vue';
@@ -131,6 +131,7 @@ export default {
                 newItem.end = newItem.start + 10;
                 stimInfo.Duration = newItem.end;
             }
+
             let newObj = this.createNewItem(
                 id,
                 newItem.group,
@@ -237,7 +238,6 @@ export default {
     },
     'mounted': function() {
         // create a dataset with items
-
         let stimulusApplied = Object.keys(this.config.StimulusInject);
         for (let i=0; i<stimulusApplied.length; i++) {
             let stimulusInjectName = stimulusApplied[i];
@@ -259,6 +259,10 @@ export default {
             this.items.push(item);
         }
         this.createTimeline(); // from the simulationTimeline.js
+
+        this.$parent.$on('stimulationTargetSelected', (target) => {
+            this.itemAdd(target);
+        });
     },
     'watch': {
         'endTime': function(newVal, oldVal) {

@@ -1,19 +1,22 @@
 <template>
-  <div class="target-selection">
-    <section class="img-container">
-        <img id="currentSliceImg">
-    </section>
-    <section class="autocomplete-container">
-        <list-autocomplete
-            :list="imagePoll"
-            selector="name"
-            displaySelector="displayName"
-            placeholder="Slice"
-            class="autocomplete"
-            @hover="hoverSelector"
-            @clicked="targetSelected"></list-autocomplete>
-    </section>
-  </div>
+    <div>
+        <div class="title">Add targets using slices of the Hippocampus</div>
+        <div class="target-selection">
+            <section class="img-container">
+                <img id="currentSliceImg">
+            </section>
+            <section class="autocomplete-container">
+                <list-autocomplete
+                    :list="imagePoll"
+                    selector="name"
+                    displaySelector="displayName"
+                    placeholder="Slice"
+                    class="autocomplete"
+                    @hover="hoverSelector"
+                    @clicked="targetSelected"></list-autocomplete>
+            </section>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -58,8 +61,12 @@ export default {
                 element = this.firstImgElement;
             }
             let image = this.$el.querySelector('#currentSliceImg');
+            image.classList.add('blur');
             image.src = element.src;
             this.selectedSlice = element;
+            image.onload = function() {
+                image.classList.remove('blur');
+            };
         },
         'changeBasedClick': function() {
             let changeImg = function(touched) {
@@ -86,6 +93,11 @@ export default {
 };
 </script>
 <style scoped>
+    .title {
+        font-size: 10px;
+        text-align: center;
+        margin-left: 15px;
+    }
     .target-selection {
         display: flex;
         flex-direction: row;
@@ -96,6 +108,10 @@ export default {
     img {
         position: absolute;
         width: 230px;
+        transition: opacity 0.2s;
+    }
+    .blur {
+        opacity: 0.5;
     }
     .autocomplete-container {
         margin: 0 10px;

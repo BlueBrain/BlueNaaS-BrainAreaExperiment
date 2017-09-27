@@ -1,8 +1,8 @@
 <template>
 	<div class="edit-buttons">
-		<a @click="itemAdd" class="button-with-icon"><i class="material-icons">add</i>Add</a>
-		<a @click="itemEdit" class="button-with-icon"><i class="material-icons">edit</i>Edit</a>
-		<a @click="itemDelete" class="button-with-icon"><i class="material-icons">delete</i>Delete</a>
+		<a @click="itemAdd" class="button-with-icon" title="Add"><i class="material-icons">add</i></a>
+		<a @click="itemEdit" class="button-with-icon" title="Edit"><i class="material-icons">edit</i></a>
+		<a @click="itemDelete" class="button-with-icon" title="Delete"><i class="material-icons">delete</i></a>
 	</div>
 </template>
 

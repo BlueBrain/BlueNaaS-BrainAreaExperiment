@@ -1,3 +1,11 @@
+<!-- <list-autocomplete
+    :list="imagePoll"
+    selector="name"
+    displaySelector="displayName"
+    placeholder="Slice"
+    class="autocomplete"
+    @hover="hoverSelector"
+    @clicked="targetSelected"></list-autocomplete> -->
 <template>
     <div>
         <input class="query" v-model="query" @keyup.enter="enterClick">
@@ -74,6 +82,7 @@ export default {
         align-items: center;
         justify-content: center;
         margin: 5px 0;
+        padding-right: 10px;
     }
     .list-item:hover {
         background-color: #e5e6ef;

@@ -6,21 +6,22 @@
                 <img id="currentSliceImg">
             </section>
             <section class="autocomplete-container">
-                <list-autocomplete
-                    :list="imagePoll"
-                    selector="name"
-                    displaySelector="displayName"
-                    placeholder="Slice"
-                    class="autocomplete"
-                    @hover="hoverSelector"
-                    @clicked="targetSelected"></list-autocomplete>
+                <p
+                v-for="(item, index) in imagePoll"
+                @mouseover="hoverSelector(item)"
+                @click="targetSelected(item)"
+                class="list-item"
+                >
+                    <i class="plus-icon material-icons hidden">add</i>
+                    <span>{{ item['displayName'] }}</span>
+                </p>
+
             </section>
         </div>
     </div>
 </template>
 
 <script>
-import ListAutocomplete from 'components/target-selection/list-autocomplete.vue';
 const TEST_IMG_URL = 'https://raw.githubusercontent.com/antonelepfl/testvue/master/imgtest/';
 export default {
     'name': 'target-selection',
@@ -43,9 +44,6 @@ export default {
             ],
             'selectedSlice': '',
         };
-    },
-    'components': {
-        'list-autocomplete': ListAutocomplete,
     },
     'mounted': function() {
         this.firstImgElement = this.imagePoll[0];
@@ -114,13 +112,28 @@ export default {
         opacity: 0.5;
     }
     .autocomplete-container {
-        margin: 0 10px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-    }
-    .autocomplete {
         height: 230px;
         overflow: scroll;
+    }
+    .list-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px 15px 15px 0;
+        margin: 0;
+    }
+    .list-item:hover {
+        background-color: #e5e6ef;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .plus-icon.hidden {
+        opacity: 0;
+    }
+    .list-item:hover .plus-icon.hidden {
+        opacity: 1;
     }
 </style>

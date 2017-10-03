@@ -1,38 +1,23 @@
 {
   "Stimulus": {
-    "subthresh": {
-      "AmpStart": 0.0,
-      "AmpEnd": 20.0,
-      "Delay": 0.0,
-      "Pattern": "RelativeLinear",
-      "Duration": 1000.0,
+    "Noise_stimulus_0": {
+      "Delay": 0,
+      "Pattern": "Noise",
+      "Duration": 1000,
       "Mode": "Current",
-      "PercentStart": 95.0
-    },
-    "poisson1": {
-      "Weight": 0.5,
-      "Pattern": "NPoisson",
-      "NumOfSynapses": 5,
-      "Delay": 0.0,
-      "Mode": "Current",
-      "Duration": 1000.0,
-      "Lambda": 20.0
-    },
-    "hypamp": {
-      "Delay": 0.0,
-      "Pattern": "Hyperpolarizing",
-      "Duration": 1000.0,
-      "Mode": "Current"
+      "Mean": 20,
+      "MeanPercent": 2,
+      "Variance": 2
     }
   },
   "Report": {
     "voltage": {
-      "Target": "cylinder",
+      "Target": "Mosaic",
       "Format": "Bin",
       "StartTime": 0.0,
       "ReportOn": "v",
       "Dt": 0.1,
-      "EndTime": 1000.0,
+      "EndTime": 100.0,
       "Type": "Compartment",
       "Unit": "mV"
     }
@@ -59,17 +44,9 @@
     }
   },
   "StimulusInject": {
-    "hypampIntoColumn": {
-      "Stimulus": "hypamp",
-      "Target": "cylinder"
-    },
-    "subthreshIntoColumn": {
-      "Stimulus": "subthresh",
-      "Target": "cylinder"
-    },
-    "pInj": {
-      "Stimulus": "poisson1",
-      "Target": "slice_int"
+    "Mosaic_stimulusinject_0": {
+      "Stimulus": "Noise_stimulus_0",
+      "Target": "Mosaic"
     }
   }
 }

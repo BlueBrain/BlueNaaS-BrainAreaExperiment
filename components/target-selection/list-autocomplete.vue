@@ -1,3 +1,11 @@
+<!-- <list-autocomplete
+    :list="imagePoll"
+    selector="name"
+    displaySelector="displayName"
+    placeholder="Slice"
+    class="autocomplete"
+    @hover="hoverSelector"
+    @clicked="targetSelected"></list-autocomplete> -->
 <template>
     <div>
         <input class="query" v-model="query" @keyup.enter="enterClick">
@@ -9,7 +17,10 @@
             @mouseover="hover(item)"
             @click="clicked(item)"
             class="list-item"
-            >{{ item[selector] }}</p>
+            >
+                <i class="plus-icon material-icons hidden">add</i>
+                <span>{{ item[displaySelector] }}</span>
+            </p>
         </transition-group>
     </div>
 </template>
@@ -66,8 +77,22 @@ export default {
         opacity: 0;
         transform: translateY(30px);
     }
+    .list-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 5px 0;
+        padding-right: 10px;
+    }
     .list-item:hover {
-        background-color: #f6f0f1;
+        background-color: #e5e6ef;
         border-radius: 5px;
+        cursor: pointer;
+    }
+    .plus-icon.hidden {
+        opacity: 0;
+    }
+    .list-item:hover .plus-icon.hidden {
+        opacity: 1;
     }
 </style>

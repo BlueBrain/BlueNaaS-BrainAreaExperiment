@@ -18,7 +18,9 @@ export default {
                     return;
                 }
             }
-            let newGroup = {'id': target, 'content': target, 'value': i};
+            // workaround to avoid changing the user.target
+            let displayName = target === 'Mosaic' ? 'FullCA1' : target;
+            let newGroup = {'id': target, 'content': displayName, 'value': i};
             this.groups.push(newGroup); // add element
             return newGroup;
         },

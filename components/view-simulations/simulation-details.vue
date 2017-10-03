@@ -272,7 +272,7 @@ export default {
     'mounted': function() {
         if (this.computerParam) {
             this.computer = this.computerParam;
-        };
+        }
         if (this.jobParam) {
             this.job = this.jobParam;
             this.fillJobs(this.job);

@@ -122,7 +122,7 @@ This component manage each job (delete, start, create, etc).
                         'workingDirectory': null, // create a new one
                         'computer': 'JURECA',
                     },
-                    'files': ['out.dat', 'BlueConfig'],
+                    'files': [], // this will be filled in getAllFiles in UnicoreAPI
                     'nodes': 1,
                     'title': '',
                 },

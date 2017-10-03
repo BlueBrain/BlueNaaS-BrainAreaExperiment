@@ -76,8 +76,28 @@ module.exports = (function() {
             'headers': headers,
         })
         .then((response) => {
-            return response.text();
-        }, Promise.reject);
+            return response.json();
+        }, Promise.reject)
+        .then((files) => {
+            return files;
+        });
+    };
+    let getFilesToCopy = function(filesURL) {
+        return this.getFilesList(filesURL)
+        .then((files) => {
+            let allowed = [];
+            files.children.forEach((file) => {
+                if (!file.endsWith('backup') &&
+                    file.indexOf('UNICORE_SCRIPT_EXIT_CODE') < 0 &&
+                    file.indexOf('stderr') < 0 &&
+                    file.indexOf('stdout') < 0 &&
+                    file.indexOf('analysis_path') < 0) {
+                    // remove the '/'
+                    allowed.push(file.substr(1));
+                }
+            });
+            return allowed;
+        });
     };
     let getConfig = function(configParams, blueConfig, shellCommand) {
         /**
@@ -349,7 +369,7 @@ module.exports = (function() {
                 'haveClientStageIn': 'true',
             };
             let inputShContent = `
-                /homec/bp0/bp000024/jureca/venv_bluepy_analysis/bin/analysis_launch.py --blueconfig BlueConfig --output . --usertarget /homec/bp0/bp000024/proj30/pcp31k/mike_sim/juqueen_run00/user.target
+                /homec/bp0/bp000024/jureca/venv_bluepy_analysis/bin/analysis_launch.py --blueconfig BlueConfig --output . --usertarget /homec/bp0/bp000024/proj30/hippocampus/user.target
                 `;
             let inputs = [{
                 'To': 'input.sh',
@@ -366,20 +386,28 @@ module.exports = (function() {
                 // fill the destination and pass it to transfer
                 moveObject.to['workingDirectory'] = jobObject._links.workingDirectory.href;
                 let transferArray = [];
+                // upload the analysis_path file
                 transferArray.push(this.uploadData(input, moveObject.from.workingDirectory + '/files'));
                 console.log(`moving ${moveObject.files.length} files ...`);
-                moveObject.files.forEach(function(val, i) {
-                    // change the object so transferFile transfer each individual file
-                    moveObject['fileName'] = moveObject.files[i];
-                    transferArray.push(transferFiles(moveObject));
-                });
-                Promise.all(transferArray).then(([upload, transfer]) => {
-                    // add this field so we have the info to start the job
-                    transfer['destinationJob'] = jobObject;
-                    return resolve(transfer);
-                }, (error) => {
-                    console.error(error);
-                    reject(error);
+                // get all the files to be copied
+                console.log('getting files to be copied ...');
+                return this.getFilesToCopy(`${moveObject.from.workingDirectory}/files`)
+                .then((files) => {
+                    console.log('coping ...', files);
+                    moveObject.files = files;
+                    moveObject.files.forEach(function(val, i) {
+                        // change the object so transferFile transfer each individual file
+                        moveObject['fileName'] = moveObject.files[i];
+                        transferArray.push(transferFiles(moveObject));
+                    });
+                    Promise.all(transferArray).then(([upload, transfer]) => {
+                        // add this field so we have the info to start the job
+                        transfer['destinationJob'] = jobObject;
+                        return resolve(transfer);
+                    }, (error) => {
+                        console.error(error);
+                        reject(error);
+                    });
                 });
             }, reject);
         });
@@ -510,6 +538,7 @@ module.exports = (function() {
         'getJobProperties': getJobProperties,
         'getFiles': getFiles,
         'getFilesList': getFilesList,
+        'getFilesToCopy': getFilesToCopy,
         'getImage': getImage,
         'getConfig': getConfig,
         'getResourcesAvailable': getResourcesAvailable,

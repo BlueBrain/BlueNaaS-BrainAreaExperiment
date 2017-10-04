@@ -14,6 +14,7 @@
                     <div class="controls">
                         <select class="form-control" v-model="report.Type" type="text" id="Type" placeholder="Type" required>
                             <option>Compartment</option>
+                            <option>Summation</option>
                             <option>Synapse</option>
                         </select>
                     </div>
@@ -76,15 +77,12 @@
                 <button class="cancel-button" @click="closeForm">Cancel</button>
             </div>
         </form>
-
-
 </div>
 </template>
 
 <script>
 import AutocompleteVue from 'autocomplete-vue';
 import targetList from 'assets/targetList.json';
-import {autocompleteBus} from 'autocomplete-vue';
 
 export default {
     'name': 'report-form',
@@ -92,7 +90,7 @@ export default {
     'data': function() {
         return {
             'processedTargetList': undefined,
-            'report': this.reportEditableObject.report,
+            'report': this.reportEditableObject.item.reportInfo,
             'item': this.reportEditableObject.item,
         };
     },
@@ -116,7 +114,6 @@ export default {
                 this.convertToNumbers();
                 this.$emit('editItem', {
                     'item': this.item,
-                    'report': this.report,
                     'callback': this.reportEditableObject.callback,
                 });
             }
@@ -141,11 +138,6 @@ export default {
     },
     'created': function() {
         this.processTargetList();
-        let that = this;
-        autocompleteBus.$on('autocomplete-select', function(selectedValue) {
-            that.item.group = selectedValue;
-            that.report.Target = selectedValue;
-        });
     },
     'mounted': function() {
         this.form = this.$el.querySelector('form');
@@ -163,6 +155,7 @@ export default {
         },
         'report.Target': function(newVal) {
             this.item.group = newVal;
+            this.report.Target = newVal;
         },
     },
 };

@@ -24,7 +24,7 @@
                         <stimulation-timeline
                             :endTime="endTime"
                             :forwardSkip="forwardSkip"
-                            :blueConfig="blueConfig"
+                            ref="stimulation"
                             class="timeline"></stimulation-timeline>
                         <target-selection @targetSelected="stimulationTargetSelected"></target-selection>
                     </div>
@@ -39,7 +39,7 @@
                         <report-timeline
                             :endTime="endTime"
                             :forwardSkip="forwardSkip"
-                            :blueConfig="blueConfig"
+                            ref="report"
                             class="report"></report-timeline>
                         <target-selection @targetSelected="reportTargetSelected"></target-selection>
                     </div>
@@ -79,6 +79,9 @@
                  <th>
                     <input type="number" name="Number of computer resources" class="nodes" :value="runConfig.nodes" placeholder="Node to allocate">
                  </th>
+             </tr>
+             <tr>
+                <div class="preview-config">Preview Config</div>
              </tr>
          </table>
         <!-- END template for configuration -->
@@ -129,6 +132,7 @@ export default {
         },
         'runSimulation': function() {
             let that = this;
+            this.createConfig();
             swal({
                 'title': 'Are you sure?',
                 'html': that.showSimulationParameters(),
@@ -166,6 +170,11 @@ export default {
             // due Swal library creates the HTML without vuejs.
             let configTemplate = document.getElementById('configTemplate').cloneNode(true);
             configTemplate.id = 'configTemplateFilled';
+            let that = this;
+            // timeout because it was not attached to dom
+            setTimeout(function() {
+                document.getElementById('configTemplateFilled').onclick = that.previewConfig;
+            }, 500);
             configTemplate.style.display = 'block';
             return configTemplate;
         },
@@ -212,6 +221,18 @@ export default {
             // an event in report-timeline will be called
             this.$emit('reportTargetSelected', target);
         },
+        'createConfig': function() {
+            // modify the config object respectively
+            this.$refs.stimulation.createConfig(this.blueConfig);
+            this.$refs.report.createConfig(this.blueConfig);
+        },
+        'previewConfig': function() {
+            let myjson = JSON.stringify(this.blueConfig, null, 2);
+            let x = window.open();
+            x.document.open();
+            x.document.write('<html><body><pre>' + myjson + '</pre></body></html>');
+            x.document.close();
+        },
     },
     'mounted': function() {
         document.getElementById('frameTemplateTitle').innerText = 'Run Simulation';
@@ -229,15 +250,6 @@ export default {
             console.error(error);
             that.loading = false;
         });
-        // this.$nextTick(() => {
-        //     that.unicore.getResourcesAvailable()
-        //     .then((resources) => {
-        //         // adding {computerName, url, project} available
-        //         this.$set(this.runConfig, 'computersAvailable', resources);
-        //         this.runConfig.computer = resources[0].computerName;
-        //         // this.setProjectsAvailable();
-        //     });
-        // });
     },
     'watch': {
         'endTime': function(newVal) {
@@ -330,6 +342,15 @@ export default {
     }
     .timeline, .report {
         flex-grow: 1;
+    }
+    .preview-config {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .config-template tr {
+        min-height: 40px;
     }
 </style>
 

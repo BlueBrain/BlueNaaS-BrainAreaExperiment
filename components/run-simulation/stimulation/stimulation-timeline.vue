@@ -10,7 +10,7 @@
         <modal :show="showModal" @changeModalVisibility="toggleModal">
             <h3 slot="header">Edit Stimulus</h3>
             <div slot="content">
-                <stimulation-form :stimulusEditableObject="stimulusEditableObject" @changeModalVisibility="toggleModal"
+                <stimulation-form :editableItem="editableItem" @changeModalVisibility="toggleModal"
                 @editItem="editItem"></stimulation-form>
             </div>
         </modal>
@@ -36,7 +36,7 @@ export default {
             'groups': [],
             'items': [],
             'showModal': false,
-            'stimulusEditableObject': {},
+            'editableItem': {},
             'tooltipElem': undefined,
         };
     },
@@ -47,151 +47,90 @@ export default {
     },
     'methods': {
         'onUpdate': function(item, callback) {
-            let a = {};
-            let stimInjObj = this.config.StimulusInject[item.stimulusInjectName];
-            if (stimInjObj) {
-                let stimulusName = stimInjObj.Stimulus;
-                a.item = item;
-                a.stimulusInfo = this.config.Stimulus[stimulusName];
-                a.callback = callback;
-                this.stimulusEditableObject = a;
-                this.showModal = true;
+            this.editableItem = {'item': item, 'callback': callback};
+            this.showModal = true;
+        },
+        'checkMove': function(item, callback) {
+            // check if the item was changed from group. If so open the edit page
+            if (item.group !== item.stimulusInfo.Target) {
+                item.stimulusInfo.Target = item.group;
+                // this.onUpdate(item, callback);
+                this.editItem({'item': item, 'callback': callback});
+            } else {
+                callback(item);
             }
         },
         'updateTimes': function(item) {
-            // this will change the item and config with the delay and duration in (ms)
-            let start = item.start.getTime();
-            let end = item.end.getTime();
-            let connectionObj = this.config.StimulusInject[item.stimulusInjectName];
-            if (connectionObj) {
-                let itemStimName = connectionObj.Stimulus;
-                let itemStimObj = this.config.Stimulus[itemStimName];
-                item.start = itemStimObj.Delay = start;
-                item.end = itemStimObj.Duration = end;
-            }
-            this.updateOrAdd(this.items, item);
+            // this will sync the item that was edited with the stimulus inside this item
+            try {
+                item.start = item.start.getTime();
+                item.end = item.end.getTime();
+            } catch (e) {};
+            item.stimulusInfo.Delay = item.start;
+            item.stimulusInfo.Duration = item.end;
         },
-        'changeContentAndGroup': function(editedItem) {
-            let newPattern = editedItem.stimulus.Pattern;
-            // let oldPattern = editedItem.item.content;
-            let newTarget = editedItem.item.group;
-            // let oldTarget = this.config.StimulusInject[editedItem.item.stimulusInjectName].Target;
-            let oldStimName = editedItem.item.stimulusName;
-            let oldStimInjName = editedItem.item.stimulusInjectName;
-
-            let newStimInjectObj = Object.assign({}, this.config.StimulusInject[oldStimInjName]);
-            let newStimObj = Object.assign({}, this.config.Stimulus[oldStimName]);
-            let newStimName = this.changeConnectionName(newPattern, 'stimulus', editedItem.item.id);
-            let newStimInjName = this.changeConnectionName(newTarget, 'stimulusinject', editedItem.item.id);
-            newStimInjectObj.Stimulus = newStimName;
-            this.config.StimulusInject[newStimInjName] = newStimInjectObj;
-            this.config.Stimulus[newStimName] = newStimObj;
-            editedItem.item.stimulusInjectName = newStimInjName;
-            editedItem.item.stimulusName = newStimName;
-            editedItem.item.className = newStimObj.Pattern;
-
-            if (oldStimName !== newStimName) {
-                delete this.config.Stimulus[oldStimName];
-            }
-            if (oldStimInjName !== newStimInjName) {
-                let newGroup = this.setupGroups(newTarget);
-                if (newGroup) {
-                    this.timeline.groupsData.getDataSet().add(newGroup);
+        'syncObjectInfoWithItemTime': function(item) {
+            /* put the information from the information stimulus in the item to conserve the position */
+            try {
+                item.start = item.stimulusInfo.Delay;
+                item.end = item.stimulusInfo.Duration;
+            } catch (e) {
+                console.error('Unable to put the stimulus time in item');
+            };
+        },
+        'createNewItem': function(newItem, callback) {
+            let stimInfo = Object.assign({}, this.createNewStimulus());
+            if (newItem) {
+                stimInfo.Target = newItem.group;
+                if (newItem.start) {
+                    stimInfo.Delay = newItem.start.getTime();
                 }
-                delete this.config.StimulusInject[oldStimInjName];
             }
-        },
-        'cloneAndCreateItem': function(newItem) {
-            let stimInfo = undefined;
-            let stimName = undefined;
-            let connectionKey = undefined;
-            let stimInjectObj = undefined;
-
-            if (!newItem) {
-                stimInfo = Object.assign({}, this.createNewStimulus());
-                newItem = {};
-                newItem.group = 'L5_TTPC1';
-                stimName = 'Linear_stimulus_0';
-                connectionKey = 'L5_TTPC1_stimulusinject_0';
-                stimInjectObj = {
-                    'Stimulus': connectionKey,
-                    'Target': newItem.group,
-                };
-            } else {
-                stimInjectObj = Object.assign({}, this.config.StimulusInject[newItem.stimulusInjectName]);
-                stimName = stimInjectObj.Stimulus;
-                connectionKey = newItem.stimulusInjectName;
-                stimInfo = Object.assign({}, this.config.Stimulus[stimName]);
-                stimInfo.Delay = newItem.start;
-                stimInfo.Duration = newItem.end;
-            }
-
             let id = this.getItemId();
-            if (newItem.start > newItem.end) {
+            if (newItem && newItem.start > newItem.end) {
                 newItem.end = newItem.start + 10;
                 stimInfo.Duration = newItem.end;
             }
 
-            let newObj = this.createNewItem(
+            let newObj = this.createItem(
                 id,
-                newItem.group,
+                stimInfo.Target,
                 stimInfo.Pattern,
                 stimInfo.Delay,
                 stimInfo.Duration,
-                // this will transform for example "Linear_stimulus_0" to "Noise_stimulus_1"
-                this.changeConnectionName(stimInfo.Pattern, 'stimulus', this.items.length),
-                this.changeConnectionName(newItem.group, 'stimulusinject', this.items.length)
+                stimInfo
             );
 
-            this.config.Stimulus[newObj.stimulusName] = stimInfo;
-
-            this.config.StimulusInject[newObj.stimulusInjectName] = {
-                'Stimulus': newObj.stimulusName,
-                'Target': newItem.group,
-            };
-
-            let a = {};
-            let stimInjObj = this.config.StimulusInject[newObj.stimulusInjectName];
-            if (stimInjObj) {
-                let stimulusName = stimInjObj.Stimulus;
-                a.item = newObj;
-                a.stimulusInfo = this.config.Stimulus[stimulusName];
-                a.callback = undefined;
-                this.stimulusEditableObject = a;
-                this.showModal = true;
-            }
+            // this will return into the editItem function in the mixin
+            this.editableItem = {'item': newObj, 'callback': callback};
+            this.showModal = true;
         },
-        'createNewItem': function(id, group, content, start, end, stimulusName, stimulusInjectName) {
+        'createItem': function(id, group, content, start, end, stimulusInfo) {
             return {
                 'id': id,
                 'group': group,
                 'content': content,
                 'start': start,
                 'end': end,
-                'stimulusName': stimulusName,
-                'stimulusInjectName': stimulusInjectName,
                 'className': content,
+                'stimulusInfo': stimulusInfo,
             };
-        },
-        'removeFromConfig': function(item) {
-            delete this.config.Stimulus[item.stimulusName];
-            delete this.config.StimulusInject[item.stimulusInjectName];
         },
         'createNewStimulus': function() {
             let stim = {};
-            stim.Pattern = 'Linear';
-            stim.AmpStart = 0;
-            stim.AmpEnd = 0;
-            stim.Duration = this.endTime;
+            stim.Pattern = 'Noise';
+            stim.Target = 'Mosaic';
+            stim.Mean = 5;
+            stim.Variance = 5;
+            stim.Duration = parseInt(this.endTime);
+            stim.MeanPercent = 50;
             stim.Delay = 0;
-            // this is the only supported value for stimuli in the editor.
-            stim.Mode = 'Current';
             return stim;
         },
         'createTooltip': function(event) {
             // comes from the timeline.on('itemover')
             let item = this.timeline.itemsData.get(event.item);
-            let stimInfo = this.config.Stimulus[item.stimulusName];
+            let stimInfo = item.stimulusInfo;
             let output = [];
             switch (stimInfo.Pattern) {
             case 'Linear':
@@ -235,33 +174,41 @@ export default {
                 this.showTooltip(event, output.join('\n'));
             }
         },
+        'createConfig': function(config) {
+            // clean the default configuration file
+            config['Stimulus'] = {};
+            config['StimulusInject'] = {};
+            for (let i=0; i<this.items.length; i++) {
+                // fill stimulus
+                let stimulus = this.items[i].stimulusInfo;
+                let stimName = this.changeConnectionName(stimulus.Pattern, 'stimulus', i);
+                config['Stimulus'][stimName] = stimulus;
+                // fill stimulusinject
+                let stimInjName = this.changeConnectionName(stimulus.Target, 'stimulusinject', i);
+                config['StimulusInject'][stimInjName] = {
+                    'Stimulus': stimName,
+                    'Target': stimulus.Target,
+                };
+            }
+            return config;
+        },
     },
     'mounted': function() {
-        // create a dataset with items
-        let stimulusApplied = Object.keys(this.config.StimulusInject);
-        for (let i=0; i<stimulusApplied.length; i++) {
-            let stimulusInjectName = stimulusApplied[i];
-            let stimulusInjectObj = this.config.StimulusInject[stimulusInjectName];
-            let stimulusInfo = this.config.Stimulus[stimulusInjectObj.Stimulus];
-            let target = stimulusInjectObj.Target;
-            this.setupGroups(target);
-
-            let item = this.createNewItem(
-                i,
-                target,
-                stimulusInfo.Pattern,
-                stimulusInfo.Delay,
-                100, // TODO: change this to duration
-                stimulusInjectObj.Stimulus,
-                stimulusInjectName
-            );
-
-            this.items.push(item);
-        }
+        let stimulus = this.createNewStimulus();
+        let item = this.createItem(
+            0, // id
+            stimulus.Target,
+            stimulus.Pattern,
+            stimulus.Delay,
+            stimulus.Duration, // TODO: change this to duration
+            stimulus
+        );
+        this.setupGroups(stimulus.Target);
+        this.items.push(item);
         this.createTimeline(); // from the simulationTimeline.js
 
         this.$parent.$on('stimulationTargetSelected', (target) => {
-            this.itemAdd(target);
+            this.itemAdd({'group': target.name});
         });
     },
     'watch': {
@@ -364,6 +311,8 @@ export default {
         top: 3px;
     }
     .stimulation-timeline .vis-panel {
-        box-sizing: content-box;
+        box-sizing: border-box;
+    }
+    .stimulation-timeline .vis-custom-time.end {
     }
 </style>

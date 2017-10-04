@@ -11,18 +11,44 @@ export default {
             this.showModal = value;
         },
         'setupGroups': function(target) {
+            // given a target returns an group object
+            console.log('setup groups');
             let i = 0;
             for (i; i<this.groups.length; i++) {
                 let group = this.groups[i];
                 if (group.id === target) {
-                    return;
+                    return group;
                 }
             }
             // workaround to avoid changing the user.target
-            let displayName = target === 'Mosaic' ? 'FullCA1' : target;
-            let newGroup = {'id': target, 'content': displayName, 'value': i};
+            let displayName = (target === 'Mosaic' ? 'FullCA1' : target);
+            let newGroup = {'id': target, 'content': displayName};
             this.groups.push(newGroup); // add element
             return newGroup;
+        },
+        'cleanGroups': function() {
+            // check if there are no items in the group so it can remove the group
+            console.log('cleaning up groups');
+            // let unusedGroups = [];
+            let tempGroups = this.groups.slice(0);
+            this.groups.forEach((group) => {
+                let elementsInGroup = [];
+                this.items.forEach((item) => {
+                    /*  sync stimulus/report and item times. if not sync
+                        when delete an item all the items go back to 0 - 100 duration */
+                    this.syncObjectInfoWithItemTime(item);
+                    if (item.group === group.id) {
+                        elementsInGroup.push(item);
+                    }
+                });
+                if (elementsInGroup.length <= 0) {
+                    console.log(`group ${group.id} is empty`);
+                    tempGroups = this.removeFrom(tempGroups, group);
+                }
+            });
+            this.groups = tempGroups;
+            this.timeline.setGroups(new vis.DataSet(this.groups));
+            return this.groups;
         },
         'prettyAlert': function(title, text) {
             swal({
@@ -45,11 +71,12 @@ export default {
             }).then(callback);
         },
         'onAdd': function(item, callback) {
-            this.itemAdd.call(this, item);
+            this.itemAdd.call(this, item, callback);
         },
         'onMove': function(item, callback) {
+            // sync in the respectives stimulation/report components
             this.updateTimes(item);
-            callback(item);
+            this.checkMove(item, callback);
         },
         'onRemove': function(item, callback) {
             let that = this;
@@ -58,11 +85,13 @@ export default {
                 'Do you really want to remove item ' + item.content + '?',
                 function(ok) {
                     if (ok) {
-                        if (callback) {
-                            callback(item); // confirm deletion
-                        } else {
-                            that.timeline.itemsData.remove(item.id);
-                        }
+                        that.items = that.removeFrom(that.items, item);
+                        that.groups = that.cleanGroups(item.group);
+                        // sync the timeline
+                        that.timeline.setData({
+                            'groups': new vis.DataSet(that.groups),
+                            'items': new vis.DataSet(that.items),
+                        });
                     }
                 }
             );
@@ -72,29 +101,28 @@ export default {
             for (let i = 0; i < originalArray.length; i++) {
                 if (originalArray[i].id === newItem.id) {
                     originalArray[i] = newItem;
-                    return;
+                    return originalArray;
                 }
             }
             originalArray.push(newItem);
-            return;
+            return originalArray;
         },
         // it comes from the onUpdate and the form calls this function
         'editItem': function(editedItem) {
-            // this.changeContentAndGroup(editedItem);
-            // this.updateOrAdd(this.items, editedItem.item);
-            // this.timeline.itemsData.clear();
-            // this.timeline.setGroups(new vis.DataSet(this.groups));
-            // this.timeline.setItems(new vis.DataSet(this.items));
-            // this.toggleModal(false);
-
-            // TODO modify only the item but so far I got error calling the callback
-            this.changeContentAndGroup(editedItem);
-            this.updateOrAdd(this.items, editedItem.item);
+            // change the  items
+            this.items = this.updateOrAdd(this.items, editedItem.item);
+            let newGroupInfo = this.setupGroups(editedItem.item.group);
+            // change groups
             if (!editedItem.callback) {
-                this.timeline.itemsData.update(editedItem.item);
+                // updates the timeline
+                console.log('edit element');
+                this.timeline.itemsData.getDataSet().update(editedItem.item);
+                this.timeline.groupsData.getDataSet().update(newGroupInfo);
+                // this.timeline.groupsData.update(newGroupInfo);
             } else {
                 editedItem.callback(editedItem.item);
             }
+            this.cleanGroups();
             this.toggleModal(false);
         },
         'changeConnectionName': function(target, pattern, newId) {
@@ -113,34 +141,11 @@ export default {
 
             return temp.join('_');
         },
-        'itemAdd': function(item) {
-            let copyFromId = this.timeline.getSelection()[0];
-            let oldItem = null;
-            if (copyFromId == undefined) {
-                // no element is selected. Grab the first one
-                copyFromId = this.timeline.getVisibleItems()[0];
-            }
-            if (copyFromId != undefined) {
-                // item exists (either selected or visible chosen)
-                oldItem = this.timeline.itemsData.get(copyFromId);
-                // update the old item with the new created item
-                if (item && item.start) { // creation with the mouse
-                    oldItem.start = item.start.getMilliseconds();
-                    oldItem.group = item.group;
-                }
-                if (item && item.name) { // create with the target selector
-                    oldItem.group = item.name;
-                    let newGroup = this.setupGroups(item.name);
-                    if (newGroup) {
-                        this.timeline.groupsData.getDataSet().add(newGroup);
-                    }
-                }
-            }
-            this.cloneAndCreateItem(oldItem);
-            this.syncTimelineWithVariables();
+        'itemAdd': function(item, callback) {
+            let oldItem = item || null;
+            this.createNewItem(oldItem, callback);
         },
         'itemDelete': function() {
-            let that = this;
             let deleteId = this.timeline.getSelection()[0];
             if (deleteId === undefined) {
                 console.error('Please select an item in the timeline');
@@ -148,12 +153,7 @@ export default {
                 return;
             } else {
                 let item = this.timeline.itemsData.get(deleteId);
-                this.onRemove.call(this, item, function() {
-                    that.timeline.itemsData.remove(item.id);
-                    that.syncTimelineWithVariables();
-                    // function implemented in report and stimulus
-                    that.removeFromConfig(item);
-                });
+                this.onRemove.call(this, item);
             }
         },
         'itemEdit': function() {
@@ -166,27 +166,6 @@ export default {
                 let item = this.timeline.itemsData.get(editId);
                 this.onUpdate.call(this, item, undefined);
             }
-            this.syncTimelineWithVariables();
-        },
-        'syncTimelineWithVariables': function() {
-            // it requires data objects like items[], groups[], timeline{}
-            let timeline = this.timeline;
-
-            let groupsIds = timeline.groupsData.getIds();
-            let groupsTemp = [];
-            for (let i=0; i<groupsIds.length; i++) {
-                let obj = timeline.groupsData.get(groupsIds[i]);
-                groupsTemp.push(obj);
-            }
-            this.groups = groupsTemp;
-
-            let itemsIds = timeline.itemsData.getIds();
-            let itemsTemp = [];
-            for (let i=0; i<itemsIds.length; i++) {
-                let obj = timeline.itemsData.get(itemsIds[i]);
-                itemsTemp.push(obj);
-            }
-            this.items = itemsTemp;
         },
         'getItemId': function() {
             let ids = this.timeline.itemsData.getIds();
@@ -266,6 +245,12 @@ export default {
                 // start timing for event "completion"
                 timeout = setTimeout(that.createCustomTimeLabel, delay);
             });
+        },
+        'removeFrom': function(originalArray, deletedItem) {
+            originalArray = originalArray.filter(function(item) {
+                return item.id !== deletedItem.id;
+            });
+            return originalArray;
         },
     },
 };

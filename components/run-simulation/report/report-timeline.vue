@@ -48,97 +48,72 @@ export default {
     },
     'methods': {
         'onUpdate': function(item, callback) {
-            let a = {};
-            let reportObj = this.config.Report[item.connection];
-            if (reportObj) {
-                a.item = item;
-                a.report = reportObj;
-                a.callback = callback;
-                this.reportEditableObject = a;
-                this.showModal = true;
-            }
+            this.reportEditableObject = {'item': item, 'callback': callback};
+            this.showModal = true;
         },
         'updateTimes': function(item) {
-            // this will change the item and config with the delay and duration in (ms)
-            let connectionObj = this.config.Report[item.connection];
-            let start = item.start.getTime();
-            let end = item.end.getTime();
-            if (connectionObj) {
-                item.start = connectionObj.StartTime = start;
-                item.end = connectionObj.EndTime = end;
-            }
-            this.updateOrAdd(this.items, item);
-            this.changeContentAndGroup({'item': item});
+            // this will sync the item that was edited with the report inside this item
+            try {
+                item.start = item.start.getTime();
+                item.end = item.end.getTime();
+            } catch (e) {};
+            item.reportInfo.StartTime = item.start;
+            item.reportInfo.EndTime = item.end;
         },
-        'createNewItem': function(id, group, content, start, end, connection) {
+        'syncObjectInfoWithItemTime': function(item) {
+            /* put the information from the information stimulus in the item to conserve the position */
+            try {
+                item.start = item.reportInfo.StartTime;
+                item.end = item.reportInfo.EndTime;
+            } catch (e) {
+                console.error('Unable to put the report time in item');
+            };
+        },
+        'checkMove': function(item, callback) {
+            // check if the item was changed from group. If so open the edit page
+            if (item.group !== item.reportInfo.Target) {
+                item.reportInfo.Target = item.group;
+                this.editItem({'item': item, 'callback': callback});
+            } else {
+                callback(item);
+            }
+        },
+        'createItem': function(id, group, content, start, end, reportInfo) {
             return {
                 'id': id,
                 'group': group,
                 'content': content,
                 'start': start,
                 'end': end,
-                'connection': connection,
                 'className': content,
+                'reportInfo': reportInfo,
             };
         },
-        'changeContentAndGroup': function(editedItem) {
-            let oldConnection = editedItem.item.connection;
-            let newTarget = editedItem.item.group;
-            let newConnection = this.changeConnectionName(
-                newTarget,
-                'report',
-                editedItem.item.id
-            );
-
-            let newReportObj = Object.assign({}, this.config.Report[oldConnection]);
-
-            if (newConnection !== oldConnection) {
-                this.config.Report[newConnection] = newReportObj;
-                let newGroup = this.setupGroups(newTarget);
-                if (newGroup) {
-                    this.timeline.groupsData.getDataSet().add(newGroup);
+        'createNewItem': function(newItem) {
+            let reportObj = Object.assign({}, this.createNewReport());
+            if (newItem) {
+                reportObj.Target = newItem.group;
+                if (newItem.start) {
+                    reportObj.StartTime = newItem.start.getTime();
                 }
-                delete this.config.Report[oldConnection];
-                editedItem.item.connection = newConnection;
             }
-            // upload the label and the target in the config
-            this.config.Report[newConnection].Target = editedItem.item.group;
-            this.config.Report[newConnection].ReportOn = editedItem.item.content;
-        },
-        'cloneAndCreateItem': function(newItem) {
-            let reportObj = undefined;
-            if (!newItem) { // there is no more items to copy the configuration
-                newItem = {};
-                reportObj = Object.assign({}, this.createNewReport());
-                newItem.connection = 'L4_PC_report_0';
-                newItem.group = 'L4_PC';
-            } else {
-                reportObj = Object.assign({}, this.config.Report[newItem.connection]);
+
+            if (newItem && newItem.start > newItem.end) {
+                newItem.end = newItem.start + 10;
                 reportObj.StartTime = newItem.start;
                 reportObj.EndTime = newItem.end;
             }
-            if (newItem.start > newItem.end) {
-                newItem.end = newItem.start + 10;
-                reportObj.EndTime = newItem.end;
-            }
             let id = this.getItemId();
-            let newObj = this.createNewItem(
+            let newObj = this.createItem(
                 id,
-                newItem.group,
+                reportObj.Target,
                 reportObj.ReportOn,
                 reportObj.StartTime,
                 reportObj.EndTime,
-                // this will transform for example "Linear_stimulus_0" to "Noise_stimulus_1"
-                this.changeConnectionName(newItem.group, 'report', id)
+                reportObj
             );
-            reportObj.Target = newItem.group;
 
-            this.config.Report[newObj.connection] = reportObj;
-
-            let a = {};
-            a.item = newObj;
-            a.report = reportObj;
-            this.reportEditableObject = a;
+            this.reportEditableObject = {'item': newObj};
             this.showModal = true;
         },
         'removeFromConfig': function(item) {
@@ -147,10 +122,10 @@ export default {
         'createNewReport': function() {
             let report = {};
             report.StartTime = 0;
-            report.EndTime = this.endTime;
+            report.EndTime = parseInt(this.endTime);
             report.ReportOn = 'v';
             report.Unit = 'mV';
-            report.Target = '';
+            report.Target = 'Mosaic';
             report.Type = 'Compartment';
             report.Format = 'Bin';
             report.Dt = 0.1;
@@ -159,7 +134,7 @@ export default {
         'createTooltip': function(event) {
             // comes from the timeline.on('itemover')
             let item = this.timeline.itemsData.get(event.item);
-            let reportInfo = this.config.Report[item.connection];
+            let reportInfo = item.reportInfo;
             let output = [];
             output.push(`Dt: ${reportInfo.Dt}`);
             output.push(`Type: ${reportInfo.Type}`);
@@ -170,30 +145,35 @@ export default {
                 this.showTooltip(event, output.join('\n'));
             }
         },
+        'createConfig': function(config) {
+            // clean the default configuration
+            config['Report'] = {};
+            for (let i=0; i<this.items.length; i++) {
+                let report = this.items[i].reportInfo;
+                let repName = this.changeConnectionName(report.Target, 'report', i);
+                config['Report'][repName] = report;
+            }
+            return config;
+        },
     },
     'mounted': function() {
         // create a dataset with items
-        let reports = Object.keys(this.config.Report);
-        for (let i=0; i<reports.length; i++) {
-            let connection = reports[i];
-            let reportConnectionObj = this.config.Report[connection];
-            let target = reportConnectionObj.Target;
-            this.setupGroups(target);
+        let reportInfo = this.createNewReport();
+        let item = this.createItem( // id, group, content, start, end, connection
+            0,
+            reportInfo.Target,
+            reportInfo.ReportOn,
+            reportInfo.StartTime,
+            reportInfo.EndTime, // TODO: change this to duration
+            reportInfo
+        );
 
-            let item = this.createNewItem( // id, group, content, start, end, connection
-                i,
-                target,
-                reportConnectionObj.ReportOn,
-                reportConnectionObj.StartTime,
-                reportConnectionObj.EndTime, // TODO: change this to duration
-                connection
-            );
-
-            this.items.push(item);
-        }
+        this.setupGroups(reportInfo.Target);
+        this.items.push(item);
         this.createTimeline(); // from the simulationTimeline.js
+
         this.$parent.$on('reportTargetSelected', (target) => {
-            this.itemAdd(target);
+            this.itemAdd({'group': target.name});
         });
     },
     'watch': {
@@ -267,7 +247,7 @@ export default {
         width: 100px;
     }
     .report-timeline .vis-panel {
-        box-sizing: content-box;
+        box-sizing: border-box;
     }
 
 </style>

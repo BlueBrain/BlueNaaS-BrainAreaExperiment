@@ -4,14 +4,14 @@
         <div class="form-group">
             <label class="control-label" title="Name of a target to receive the stimulation">Target</label>
             <div class="controls autocomplete-container">
-                <autocomplete-vue :list="processedTargetList" placeholder="Target" v-model="stimulusEditableObject.item.group"></autocomplete-vue>
+                <autocomplete-vue :list="processedTargetList" id="Target" placeholder="Target" v-model="stimulus.Target"></autocomplete-vue>
             </div>
         </div>
 
         <div class="form-group">
             <label class="control-label" title="Type of the stimulus">Pattern</label>
             <div class="controls">
-                <select class="form-control" v-model="stimulus.Pattern">
+                <select class="form-control" id="Pattern" v-model="stimulus.Pattern">
                     <option>Linear</option>
                     <option>RelativeLinear</option>
                     <option>Pulse</option>
@@ -174,16 +174,15 @@
 <script>
 import AutocompleteVue from 'autocomplete-vue';
 import targetList from 'assets/targetList.json';
-import {autocompleteBus} from 'autocomplete-vue';
 
 export default {
     'name': 'stimulation-form',
-    'props': ['stimulusEditableObject'],
+    'props': ['editableItem'],
     'data': function() {
         return {
             'processedTargetList': undefined,
-            'stimulus': this.stimulusEditableObject.stimulusInfo,
-            'item': this.stimulusEditableObject.item,
+            'item': this.editableItem.item,
+            'stimulus': this.editableItem.item.stimulusInfo,
             'form': undefined,
         };
     },
@@ -202,7 +201,7 @@ export default {
             this.$emit('changeModalVisibility', false);
         },
         'convertToNumbers': function() {
-        // this converts the number inputs in floats
+            // this converts the number inputs in floats
             let n = this.$el.querySelectorAll('input[type=number]');
             for (let i = 0; i < n.length; i++) {
                 let input = n[i];
@@ -212,12 +211,15 @@ export default {
         'editItem': function() {
             this.checkTimeValues(this.form);
             if (this.form.checkValidity()) {
+                this.items;
                 this.convertToNumbers();
+                this.item.stimulusInfo = this.stimulus;
                 this.$emit('editItem', {
                     'item': this.item,
-                    'stimulus': this.stimulus,
-                    'callback': this.stimulusEditableObject.callback,
+                    'callback': this.editableItem.callback,
                 });
+                this.item = null;
+                this.stimulus = null;
             }
         },
         'checkTimeValues': function(form) {
@@ -229,14 +231,18 @@ export default {
                 form.elements.Delay.setCustomValidity('');
             }
         },
+        'cleanStimulus': function() {
+            let cleanStim = {
+                'Delay': this.stimulus.Delay,
+                'Duration': this.stimulus.Duration,
+                'Pattern': this.stimulus.Pattern,
+                'Target': this.stimulus.Target,
+            };
+            this.stimulus = cleanStim;
+        },
     },
     'created': function() {
         this.processTargetList();
-        let that = this;
-        autocompleteBus.$on('autocomplete-select', function(selectedValue) {
-            that.item.group = selectedValue;
-            that.stimulus.Target = selectedValue;
-        });
     },
     'mounted': function() {
         this.form = this.$el.querySelector('form');
@@ -251,9 +257,12 @@ export default {
         },
         'stimulus.Pattern': function(newVal) {
             this.item.content = newVal;
+            this.item.className = newVal;
+            this.cleanStimulus();
         },
         'stimulus.Target': function(newVal) {
             this.item.group = newVal;
+            this.stimulus.Target = newVal;
         },
     },
 };

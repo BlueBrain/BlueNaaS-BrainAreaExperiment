@@ -106,10 +106,6 @@ export default {
             this.showModal = true;
         },
         'createItem': function(id, group, content, start, end, stimulusInfo) {
-            // workaround to the GUI
-            if (content === 'NPoisson') {
-                content = 'Poisson';
-            }
             return {
                 'id': id,
                 'group': group,
@@ -122,8 +118,8 @@ export default {
         },
         'createNewStimulus': function() {
             let stim = {};
-            stim.Pattern = 'NPoisson';
-            stim.Target = 'Mosaic';
+            stim.Pattern = 'Poisson';
+            stim.Target = 'FullCA1';
             stim.Mode = 'Current';
             stim.Duration = parseInt(this.endTime);
             stim.Delay = 0;
@@ -187,6 +183,13 @@ export default {
             for (let i=0; i<this.items.length; i++) {
                 // fill stimulus
                 let stimulus = this.items[i].stimulusInfo;
+                // workarounds for the GUI to match the user.target and BlueConfig
+                if (stimulus.Pattern === 'Poisson') {
+                    stimulus.Pattern = 'NPoisson';
+                }
+                if (stimulus.Target === 'FullCA1') {
+                    stimulus.Target = 'Mosaic';
+                }
                 let stimName = this.changeConnectionName(stimulus.Pattern, 'stimulus', i);
                 config['Stimulus'][stimName] = stimulus;
                 // fill stimulusinject

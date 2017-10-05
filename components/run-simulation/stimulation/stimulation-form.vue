@@ -15,7 +15,7 @@
                     <!-- <option>Linear</option>
                     <option>RelativeLinear</option>
                     <option>Pulse</option> -->
-                    <option value="NPoisson">Poisson</option>
+                    <option>Poisson</option>
                     <!-- <option>NPoissonInhomogenous</option> -->
                     <!-- <option>SubThreshold</option> -->
                     <!-- <option>Noise</option> -->

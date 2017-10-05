@@ -125,7 +125,7 @@ export default {
             report.EndTime = parseInt(this.endTime);
             report.ReportOn = 'v';
             report.Unit = 'mV';
-            report.Target = 'Mosaic';
+            report.Target = 'FullCA1';
             report.Type = 'Compartment';
             report.Format = 'Bin';
             report.Dt = 0.1;
@@ -150,6 +150,10 @@ export default {
             config['Report'] = {};
             for (let i=0; i<this.items.length; i++) {
                 let report = this.items[i].reportInfo;
+                // workarounds for the GUI to match the user.target and BlueConfig
+                if (report.Target === 'FullCA1') {
+                    report.Target = 'Mosaic';
+                }
                 let repName = this.changeConnectionName(report.Target, 'report', i);
                 config['Report'][repName] = report;
             }

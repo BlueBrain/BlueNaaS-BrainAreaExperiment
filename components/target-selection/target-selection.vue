@@ -41,7 +41,7 @@ export default {
                 {'name': 'slice4', 'displayName': 'Slice 4', 'src': TEST_IMG_URL + 'slice4_A.png?raw=true'},
                 {'name': 'slice5', 'displayName': 'Slice 5', 'src': TEST_IMG_URL + 'slice5_A.png?raw=true'},
                 {'name': 'slice6', 'displayName': 'Slice 6', 'src': TEST_IMG_URL + 'slice6_A.png?raw=true'},
-                {'name': 'Mosaic', 'displayName': 'FullCA1', 'src': TEST_IMG_URL + 'full_A.png?raw=true'},
+                {'name': 'FullCA1', 'displayName': 'FullCA1', 'src': TEST_IMG_URL + 'full_A.png?raw=true'},
             ],
             'selectedSlice': '',
         };

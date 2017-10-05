@@ -173,7 +173,7 @@ export default {
             let that = this;
             // timeout because it was not attached to dom
             setTimeout(function() {
-                document.getElementById('configTemplateFilled').onclick = that.previewConfig;
+                document.querySelector('#configTemplateFilled .preview-config').onclick = that.previewConfig;
             }, 500);
             configTemplate.style.display = 'block';
             return configTemplate;

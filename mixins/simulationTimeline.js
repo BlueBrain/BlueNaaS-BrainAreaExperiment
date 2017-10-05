@@ -112,7 +112,6 @@ export default {
             // change groups
             if (!editedItem.callback) {
                 // updates the timeline
-                console.log('edit element');
                 this.timeline.itemsData.getDataSet().update(editedItem.item);
                 this.timeline.groupsData.getDataSet().update(newGroupInfo);
                 // this.timeline.groupsData.update(newGroupInfo);

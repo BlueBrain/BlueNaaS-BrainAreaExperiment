@@ -317,8 +317,6 @@ export default {
         top: 3px;
     }
     .stimulation-timeline .vis-panel {
-        box-sizing: border-box;
-    }
-    .stimulation-timeline .vis-custom-time.end {
+        box-sizing: content-box;
     }
 </style>

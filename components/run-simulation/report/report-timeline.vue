@@ -247,7 +247,7 @@ export default {
         width: 100px;
     }
     .report-timeline .vis-panel {
-        box-sizing: border-box;
+        box-sizing: content-box;
     }
 
 </style>

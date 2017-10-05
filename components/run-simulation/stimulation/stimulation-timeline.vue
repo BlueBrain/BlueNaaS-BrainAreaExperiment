@@ -190,13 +190,15 @@ export default {
                 if (stimulus.Target === 'FullCA1') {
                     stimulus.Target = 'Mosaic';
                 }
+                let target = stimulus.Target;
+                delete stimulus.Target;
                 let stimName = this.changeConnectionName(stimulus.Pattern, 'stimulus', i);
                 config['Stimulus'][stimName] = stimulus;
                 // fill stimulusinject
-                let stimInjName = this.changeConnectionName(stimulus.Target, 'stimulusinject', i);
+                let stimInjName = this.changeConnectionName(target, 'stimulusinject', i);
                 config['StimulusInject'][stimInjName] = {
                     'Stimulus': stimName,
-                    'Target': stimulus.Target,
+                    'Target': target,
                 };
             }
             return config;

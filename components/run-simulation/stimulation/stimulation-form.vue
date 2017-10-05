@@ -62,21 +62,21 @@
         </div> -->
 
         <!-- <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' "> -->
-        <div class="form-group" v-if="stimulus.Pattern == 'NPoisson'">
+        <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
             <label class="control-label" title="Configure the random distribution">Lambda</label>
             <div class="controls">
                 <input v-model="stimulus.Lambda" type="number" id="Lambda" placeholder="Lambda" required class="form-control">
             </div>
         </div>
         <!-- <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' ">  -->
-        <div class="form-group" v-if="stimulus.Pattern == 'NPoisson'">
+        <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
             <label class="control-label" title="The strength of the created synapse">Weight</label>
             <div class="controls">
                 <input v-model="stimulus.Weight" type="number" id="Weight" placeholder="Weight" required class="form-control" step="0.1">
             </div>
         </div>
         <!-- <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' ">  -->
-        <div class="form-group" v-if="stimulus.Pattern == 'NPoisson'">
+        <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
             <label class="control-label" ftitle="The number of synapses to create">Number of synapses</label>
             <div class="controls">
                 <input v-model="stimulus.NumOfSynapses" type="number" id="NumOfSynapses" placeholder="Number of synapses" required class="form-control">
@@ -121,7 +121,7 @@
                 <input v-model="stimulus.PercentLess" type="number" id="PercentLess" placeholder="PercentLess" required class="form-control">
             </div>
         </div> -->
-        <div class="form-group" v-if="stimulus.Pattern == 'Noise'">
+        <!-- <div class="form-group" v-if="stimulus.Pattern == 'Noise'">
             <label class="control-label" title="The mean value of current to inject.">Mean(mA)</label>
             <div class="controls">
                 <input v-model="stimulus.Mean" type="number" id="Mean" placeholder="Mean" required class="form-control">
@@ -138,7 +138,7 @@
             <div class="controls">
                 <input v-model="stimulus.Variance" type="number" id="Variance" placeholder="Variance" required class="form-control">
             </div>
-        </div>
+        </div> -->
         <!-- <div class="form-group" v-if="stimulus.Pattern == 'SynapseReplay'">
             <label class="control-label" title="The location of the file with the spike information for injection.">Spike file</label>
             <div class="controls">

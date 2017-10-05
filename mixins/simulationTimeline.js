@@ -12,7 +12,6 @@ export default {
         },
         'setupGroups': function(target) {
             // given a target returns an group object
-            console.log('setup groups');
             let i = 0;
             for (i; i<this.groups.length; i++) {
                 let group = this.groups[i];
@@ -28,8 +27,6 @@ export default {
         },
         'cleanGroups': function() {
             // check if there are no items in the group so it can remove the group
-            console.log('cleaning up groups');
-            // let unusedGroups = [];
             let tempGroups = this.groups.slice(0);
             this.groups.forEach((group) => {
                 let elementsInGroup = [];

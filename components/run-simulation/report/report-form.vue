@@ -14,7 +14,7 @@
                     <div class="controls">
                         <select class="form-control" v-model="report.Type" type="text" id="Type" placeholder="Type" required>
                             <option>Compartment</option>
-                            <option>Summation</option>
+                            <!-- <option>Summation</option> -->
                             <option>Synapse</option>
                         </select>
                     </div>
@@ -62,7 +62,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group" v-if="report.Type == 'Summation'">
+                <!-- <div class="form-group" v-if="report.Type == 'Summation'">
                     <label class="control-label" title="Handling of density values">Scaling</label>
                     <div class="controls">
                         <select class="form-control" v-model="report.Scaling" type="text" id="Format" placeholder="Format" required>
@@ -70,7 +70,7 @@
                             <option>None</option>
                         </select>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="button-container">
                 <input class="ok-button" type="submit" value="OK" @click="editItem">

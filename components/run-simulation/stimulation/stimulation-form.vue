@@ -12,17 +12,17 @@
             <label class="control-label" title="Type of the stimulus">Pattern</label>
             <div class="controls">
                 <select class="form-control" id="Pattern" v-model="stimulus.Pattern">
-                    <option>Linear</option>
+                    <!-- <option>Linear</option>
                     <option>RelativeLinear</option>
-                    <option>Pulse</option>
-                    <option>NPoisson</option>
-                    <option>NPoissonInhomogenous</option>
-                    <option>SubThreshold</option>
-                    <option>Noise</option>
-                    <option>SynapseReplay</option>
+                    <option>Pulse</option> -->
+                    <option value="NPoisson">Poisson</option>
+                    <!-- <option>NPoissonInhomogenous</option> -->
+                    <!-- <option>SubThreshold</option> -->
+                    <!-- <option>Noise</option> -->
+                    <!-- <option>SynapseReplay</option>
                     <option>Hyperpolarizing</option>
                     <option>ReplayVoltageTarget</option>
-                    <option>SEClamp</option>
+                    <option>SEClamp</option> -->
                 </select>
             </div>
         </div>
@@ -40,54 +40,56 @@
             </div>
         </div>
 
-        <div class="form-group" v-if="stimulus.Pattern == 'Linear' || stimulus.Pattern == 'RelativeLinear' ">
+        <!-- <div class="form-group" v-if="stimulus.Pattern == 'Linear' || stimulus.Pattern == 'RelativeLinear' ">
             <label class="control-label" title="The amount of current initially injected when the stimulus activates. Given in mV">Amp start(mA)</label>
             <div class="controls">
                 <input v-model="stimulus.AmpStart" type="number" id="AmpStart" placeholder="AmpStart" required class="form-control">
             </div>
-        </div>
+        </div> -->
 
-
-        <div class="form-group" v-if="stimulus.Pattern == 'Linear' || stimulus.Pattern == 'RelativeLinear' ">
+        <!-- <div class="form-group" v-if="stimulus.Pattern == 'Linear' || stimulus.Pattern == 'RelativeLinear' ">
             <label class="control-label" title="The final current when a stimulus concludes.">Amp end (mA)</label>
             <div class="controls">
                 <input v-model="stimulus.AmpEnd" type="number" id="AmpEnd" placeholder="AmpEnd" required class="form-control">
             </div>
-        </div>
+        </div> -->
 
-
-        <div class="form-group" v-if="stimulus.Pattern == 'RelativeLinear'">
+        <!-- <div class="form-group" v-if="stimulus.Pattern == 'RelativeLinear'">
             <label class="control-label" title="The percentage of a cell's threshold current to inject at the start of the injection">Percent start</label>
             <div class="controls">
                 <input v-model="stimulus.PercentStart" type="number" required id="PercentStart" placeholder="PercentStart" class="form-control">
             </div>
-        </div>
+        </div> -->
 
-        <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' ">
+        <!-- <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' "> -->
+        <div class="form-group" v-if="stimulus.Pattern == 'NPoisson'">
             <label class="control-label" title="Configure the random distribution">Lambda</label>
             <div class="controls">
                 <input v-model="stimulus.Lambda" type="number" id="Lambda" placeholder="Lambda" required class="form-control">
             </div>
         </div>
-        <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' ">
+        <!-- <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' ">  -->
+        <div class="form-group" v-if="stimulus.Pattern == 'NPoisson'">
             <label class="control-label" title="The strength of the created synapse">Weight</label>
             <div class="controls">
                 <input v-model="stimulus.Weight" type="number" id="Weight" placeholder="Weight" required class="form-control" step="0.1">
             </div>
         </div>
-        <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' ">
+        <!-- <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' ">  -->
+        <div class="form-group" v-if="stimulus.Pattern == 'NPoisson'">
             <label class="control-label" ftitle="The number of synapses to create">Number of synapses</label>
             <div class="controls">
                 <input v-model="stimulus.NumOfSynapses" type="number" id="NumOfSynapses" placeholder="Number of synapses" required class="form-control">
             </div>
         </div>
-        <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' ">
+        <!-- <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' ">  -->
+        <!-- <div class="form-group" v-if="stimulus.Pattern == 'NPoisson'">
             <label class="control-label" title="Specifies a Synapse object type which is available to the simulator">Synapse type</label>
             <div class="controls">
                 <input v-model="stimulus.SynapseType" type="text" id="SynapseType" placeholder="Synapse type" required class="form-control">
             </div>
-        </div>
-        <div class="form-group" v-if="stimulus.Pattern == 'Pulse' ">
+        </div> -->
+        <!-- <div class="form-group" v-if="stimulus.Pattern == 'Pulse' ">
             <label class="control-label" title="The duration in milliseconds(ms) of a single pulse">Width(ms)</label>
             <div class="controls">
                 <input v-model="stimulus.Width" type="number" id="Width" placeholder="Width" required class="form-control">
@@ -118,7 +120,7 @@
             <div class="controls">
                 <input v-model="stimulus.PercentLess" type="number" id="PercentLess" placeholder="PercentLess" required class="form-control">
             </div>
-        </div>
+        </div> -->
         <div class="form-group" v-if="stimulus.Pattern == 'Noise'">
             <label class="control-label" title="The mean value of current to inject.">Mean(mA)</label>
             <div class="controls">
@@ -137,7 +139,7 @@
                 <input v-model="stimulus.Variance" type="number" id="Variance" placeholder="Variance" required class="form-control">
             </div>
         </div>
-        <div class="form-group" v-if="stimulus.Pattern == 'SynapseReplay'">
+        <!-- <div class="form-group" v-if="stimulus.Pattern == 'SynapseReplay'">
             <label class="control-label" title="The location of the file with the spike information for injection.">Spike file</label>
             <div class="controls">
                 <input v-model="stimulus.SpikeFile" type="text" id="SpikeFile" placeholder="SpikeFile" required class="form-control">
@@ -161,7 +163,7 @@
             <div class="controls">
                 <input v-model="stimulus.Voltage" type="number" id="Voltage" placeholder="Voltage" required class="form-control">
             </div>
-        </div>
+        </div> -->
         <div class="button-container">
             <input class="ok-button" type="submit" @click="editItem" value="Ok">
             <input class="cancel-button" type="button" @click="closeForm" value="Cancel">

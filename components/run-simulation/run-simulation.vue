@@ -348,6 +348,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
     }
     .config-template tr {
         min-height: 40px;

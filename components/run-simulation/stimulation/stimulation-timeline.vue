@@ -106,6 +106,10 @@ export default {
             this.showModal = true;
         },
         'createItem': function(id, group, content, start, end, stimulusInfo) {
+            // workaround to the GUI
+            if (content === 'NPoisson') {
+                content = 'Poisson';
+            }
             return {
                 'id': id,
                 'group': group,
@@ -118,13 +122,15 @@ export default {
         },
         'createNewStimulus': function() {
             let stim = {};
-            stim.Pattern = 'Noise';
+            stim.Pattern = 'NPoisson';
             stim.Target = 'Mosaic';
-            stim.Mean = 5;
-            stim.Variance = 5;
+            stim.Mode = 'Current';
             stim.Duration = parseInt(this.endTime);
-            stim.MeanPercent = 50;
             stim.Delay = 0;
+            stim.Lambda = 5;
+            stim.Weight = 0.2;
+            stim.NumOfSynapses = 10;
+            // stim.SynapseType = 50;
             return stim;
         },
         'createTooltip': function(event) {
@@ -133,42 +139,42 @@ export default {
             let stimInfo = item.stimulusInfo;
             let output = [];
             switch (stimInfo.Pattern) {
-            case 'Linear':
-            case 'RelativeLinear':
-                output.push(`AmpStart: ${stimInfo.AmpStart} mA`);
-                output.push(`AmpEnd: ${stimInfo.AmpEnd} mA`);
-                break;
+            // case 'Linear':
+            // case 'RelativeLinear':
+            //     output.push(`AmpStart: ${stimInfo.AmpStart} mA`);
+            //     output.push(`AmpEnd: ${stimInfo.AmpEnd} mA`);
+            //     break;
             case 'NPoisson':
-            case 'NPoissonInhomogenous':
+            // case 'NPoissonInhomogenous':
                 output.push(`Lambda: ${stimInfo.Lambda}`);
                 output.push(`Weight: ${stimInfo.Weight}`);
                 output.push(`Number of synapses: ${stimInfo.NumOfSynapses}`);
                 break;
-            case 'Pulse':
-                output.push(`Width: ${stimInfo.Width} ms`);
-                output.push(`Frequency: ${stimInfo.Frequency}`);
-                output.push(`Offset: ${stimInfo.Offset}`);
-                break;
-            case 'Noise':
-                output.push(`Mean: ${stimInfo.Mean} mA`);
-                output.push(`Mean Percent: ${stimInfo.MeanPercent}`);
-                output.push(`Variance: ${stimInfo.Variance}`);
-                break;
-            case 'Hyperpolarizing':
-                output.push('Hyperpolarizing');
-                break;
-            case 'SubThreshold':
-                output.push('SubThreshold');
-                break;
-            case 'SynapseReplay':
-                output.push(`Spike File: ${stimInfo.SpikeFile}`);
-                break;
-            case 'ReplayVoltageTrace':
-                output.push(`H5 File: ${stimInfo.H5File}`);
-                output.push(`Dataset label: ${opover.DataSetLabel}`);
-                break;
-            case 'SEClamp':
-                output.push(`Voltage: ${stimInfo.Voltage} mV`);
+            // case 'Pulse':
+            //     output.push(`Width: ${stimInfo.Width} ms`);
+            //     output.push(`Frequency: ${stimInfo.Frequency}`);
+            //     output.push(`Offset: ${stimInfo.Offset}`);
+            //     break;
+            // case 'Noise':
+            //     output.push(`Mean: ${stimInfo.Mean} mA`);
+            //     output.push(`Mean Percent: ${stimInfo.MeanPercent}`);
+            //     output.push(`Variance: ${stimInfo.Variance}`);
+            //     break;
+            // case 'Hyperpolarizing':
+            //     output.push('Hyperpolarizing');
+            //     break;
+            // case 'SubThreshold':
+            //     output.push('SubThreshold');
+            //     break;
+            // case 'SynapseReplay':
+            //     output.push(`Spike File: ${stimInfo.SpikeFile}`);
+            //     break;
+            // case 'ReplayVoltageTrace':
+            //     output.push(`H5 File: ${stimInfo.H5File}`);
+            //     output.push(`Dataset label: ${opover.DataSetLabel}`);
+            //     break;
+            // case 'SEClamp':
+            //     output.push(`Voltage: ${stimInfo.Voltage} mV`);
             }
             if (output.length > 0) {
                 this.showTooltip(event, output.join('\n'));

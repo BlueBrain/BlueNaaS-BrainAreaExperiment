@@ -349,6 +349,8 @@ export default {
         justify-content: center;
         align-items: center;
         cursor: pointer;
+        border-style: groove;
+        border-radius: 10px;
     }
     .config-template tr {
         min-height: 40px;

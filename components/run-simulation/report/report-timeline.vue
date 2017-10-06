@@ -126,7 +126,7 @@ export default {
             report.ReportOn = 'v';
             report.Unit = 'mV';
             report.Target = 'FullCA1';
-            report.Type = 'Compartment';
+            report.Type = 'compartment';
             report.Format = 'Bin';
             report.Dt = 0.1;
             return report;
@@ -149,7 +149,7 @@ export default {
             // clean the default configuration
             config['Report'] = {};
             for (let i=0; i<this.items.length; i++) {
-                let report = this.items[i].reportInfo;
+                let report = Object.assign({}, this.items[i].reportInfo);
                 // workarounds for the GUI to match the user.target and BlueConfig
                 if (report.Target === 'FullCA1') {
                     report.Target = 'Mosaic';

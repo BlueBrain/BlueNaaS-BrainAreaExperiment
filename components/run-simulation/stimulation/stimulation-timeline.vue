@@ -182,7 +182,7 @@ export default {
             config['StimulusInject'] = {};
             for (let i=0; i<this.items.length; i++) {
                 // fill stimulus
-                let stimulus = this.items[i].stimulusInfo;
+                let stimulus = Object.assign({}, this.items[i].stimulusInfo);
                 // workarounds for the GUI to match the user.target and BlueConfig
                 if (stimulus.Pattern === 'Poisson') {
                     stimulus.Pattern = 'NPoisson';

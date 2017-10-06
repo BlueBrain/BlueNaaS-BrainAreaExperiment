@@ -60,13 +60,13 @@ This will display the details of a certain simulation and the analysis.
                 </collapse-title>
                 <collapse-title title="Stdout" :collapsed="true">
                     <div slot="element" class="log-item">
-                        <div v-for="out in simulationDetails.output" class="log-item">
+                        <div v-for="out in simulationDetails.stdout" class="log-item">
                             {{ out }}
                         </div>
                         <a class="button-with-icon" v-if="simulationDetails.intervalReference" title="Loading">
                             <i class="material-icons spin">autorenew</i>
                         </a>
-                        <a @click="save('Stdout.txt', simulationDetails.output)" class="button-with-icon colored"><i class="material-icons download-file">file_download</i>Download File</a>
+                        <a @click="save('Stdout.txt', simulationDetails.stdout)" class="button-with-icon colored"><i class="material-icons download-file">file_download</i>Download File</a>
                     </div>
                 </collapse-title>
             </div>

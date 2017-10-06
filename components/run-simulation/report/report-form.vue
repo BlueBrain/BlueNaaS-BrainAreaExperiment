@@ -13,7 +13,7 @@
                     <label class="control-label" title="Compartment means that each compartment outputs separately in the report file. Synapse indicates that each synapse will have a separate entry in the report.">Type</label>
                     <div class="controls">
                         <select class="form-control" v-model="report.Type" type="text" id="Type" placeholder="Type" required>
-                            <option>Compartment</option>
+                            <option>compartment</option>
                             <!-- <option>Summation</option> -->
                             <option>Synapse</option>
                         </select>

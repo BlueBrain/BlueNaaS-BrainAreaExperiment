@@ -18,7 +18,7 @@
       "ReportOn": "v",
       "Dt": 0.1,
       "EndTime": 100.0,
-      "Type": "Compartment",
+      "Type": "compartment",
       "Unit": "mV"
     }
   },
@@ -30,7 +30,6 @@
       "CircuitPath": "/homec/bp0/bp000024/proj30/pcp31k/circuits",
       "Duration": 100.0,
       "nrnPath": "/homec/bp0/bp000024/proj30/pcp31k/circuits/ncsFunctionalAllRecipePathways",
-      "TargetFile": "/gpfs/bbp.cscs.ch/home/gevaert/private/src/SampleTask/simulation_launch_viz/data/out/user.target",
       "Note": "Sample configuration file.",
       "RunMode": "LoadBalance",
       "Version": "HEAD",
@@ -39,8 +38,7 @@
       "gitPath": "ssh://bbpgit.epfl.ch/sim/neurodamus/bbp",
       "CircuitTarget": "selection",
       "Dt": 0.025,
-      "ForwardSkip": 1000,
-      "OutputRoot": "/gpfs/bbp.cscs.ch/home/gevaert/private/src/SampleTask/simulation_launch_viz/data/out"
+      "ForwardSkip": 1000
     }
   },
   "StimulusInject": {

@@ -174,7 +174,7 @@ export default {
             let that = this;
             let options = {
                 'selectable': true,
-                'timeAxis': {'scale': 'millisecond', 'step': 10},
+                'timeAxis': {'scale': 'millisecond', 'step': 20},
                 'showMajorLabels': false,
                 'showCurrentTime': false,
                 'format': {

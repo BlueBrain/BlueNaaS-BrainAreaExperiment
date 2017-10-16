@@ -336,6 +336,7 @@ export default {
         display: inline-flex;
         justify-content: space-between;
         width: 100%;
+        align-items: center;
     }
     .row {
         display: flex;
@@ -349,8 +350,10 @@ export default {
         justify-content: center;
         align-items: center;
         cursor: pointer;
-        border-style: groove;
-        border-radius: 10px;
+        border-style: solid;
+        border-radius: 15px;
+        border-width: 1px;
+        padding: 5px 0;
     }
     .config-template tr {
         min-height: 40px;

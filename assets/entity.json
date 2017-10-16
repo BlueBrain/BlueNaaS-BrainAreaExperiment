@@ -24,21 +24,23 @@
   },
   "Run": {
     "Default": {
-      "MorphologyPath": "/homec/bp0/bp000024/proj30/pcp31k/morphologies",
-      "METypePath": "/homec/bp0/bp000024/proj30/pcp31k/CCells",
-      "CurrentDir": "/homec/bp0/bp000024/proj30/pcp31k/mike_sim/launch_script",
-      "CircuitPath": "/homec/bp0/bp000024/proj30/pcp31k/circuits",
-      "Duration": 100.0,
-      "nrnPath": "/homec/bp0/bp000024/proj30/pcp31k/circuits/ncsFunctionalAllRecipePathways",
+      "MorphologyPath": "/work/pra098/pra09801/CircuitRelease/r2017.06b/MorphologyRelease/",
+      "METypePath": "/work/pra098/pra09801/CircuitRelease/r2017.06b/ccells/",
+      "CurrentDir": "/work/pra098/pra09801/CircuitRelease/r2017.06b/simulation/2017-07-06/",
+      "CircuitPath": "/work/pra098/pra09801/CircuitRelease/r2017.06b/",
+      "Duration": 300.0,
+      "nrnPath": "/work/pra098/pra09801/CircuitRelease/r2017.06b/S2F/",
       "Note": "Sample configuration file.",
       "RunMode": "LoadBalance",
       "Version": "HEAD",
       "Time": "12:27:21",
       "Date": "15:2:16",
       "gitPath": "ssh://bbpgit.epfl.ch/sim/neurodamus/bbp",
-      "CircuitTarget": "selection",
+      "CircuitTarget": "Mosaic",
       "Dt": 0.025,
-      "ForwardSkip": 1000
+      "ForwardSkip": 500,
+      "NumSynapseFiles": 2048,
+      "BaseSeed": 10
     }
   },
   "StimulusInject": {

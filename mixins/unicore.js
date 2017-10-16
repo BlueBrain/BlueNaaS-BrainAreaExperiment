@@ -106,26 +106,26 @@ module.exports = (function() {
         *   BlueConfig
         *   shellCommand to be used when the job starts
         */
-        let jobSpec = {};
+        let jobSpec = {
+            'ApplicationName': configParams.applicationName,
+            'Name': configParams.title,
+            'Project': configParams.project,
+            'haveClientStageIn': 'true',
+            'Resources': {'Nodes': configParams.nodes},
+        };
         let inputs = [];
 
         if (configParams.applicationName === 'BSP') {
-            jobSpec = {
-                'ApplicationName': configParams.applicationName,
-                'Parameters': {
-                    'CONFIG': 'BlueConfig',
-                    'TARGET': 'user.target',
-                    'OUTPUT': 'output',
-                },
-                'Name': configParams.title,
-                'Project': configParams.project,
-                'Resources': {'Nodes': configParams.nodes},
-                'haveClientStageIn': 'true',
+            jobSpec['Parameters'] = {
+                'CONFIG': 'BlueConfig',
+                'TARGET': 'user.target',
+                'OUTPUT': 'output',
             };
+
             inputs = [
                 {
                     'To': 'BlueConfig',
-                    // 'Data': require('raw-loader!assets/BlueConfig'),
+                    // 'Data': require('raw-loader!assets/BlueConfigEx2'),
                     'Data': JSON.stringify(blueConfig),
                 },
                 // {
@@ -136,14 +136,8 @@ module.exports = (function() {
         }
 
         if (configParams.applicationName === 'Bash shell') {
-            jobSpec = {
-                'ApplicationName': configParams.applicationName,
-                'Parameters': {'SOURCE': 'input.sh'},
-                'Name': configParams.title,
-                'Resources': {'Nodes': configParams.nodes},
-                'haveClientStageIn': 'true',
-                'Project': configParams.project,
-            };
+            jobSpec['Parameters'] = {'SOURCE': 'input.sh'};
+
             let inputShContent = '';
             if (shellCommand) {
                 inputShContent = shellCommand;

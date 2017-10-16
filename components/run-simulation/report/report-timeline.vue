@@ -253,5 +253,4 @@ export default {
     .report-timeline .vis-panel {
         box-sizing: content-box;
     }
-
 </style>

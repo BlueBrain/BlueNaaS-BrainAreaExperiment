@@ -6,8 +6,8 @@ module.exports = {
     'entry': {
         'app': './app.js',
         'vendor': [
-            'vue/dist/vue.min.js','vue-resource', 'vue-router', 'hellojs',
-            'vue-infinite-loading', 'vis/dist/vis.min.js', 'autocomplete-vue'
+            'vue/dist/vue.min.js','vue-resource', 'vue-router',
+            'hellojs', 'vue-infinite-loading', 'autocomplete-vue'
         ],
     },
     'output': {

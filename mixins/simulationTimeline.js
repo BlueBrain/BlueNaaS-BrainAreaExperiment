@@ -1,5 +1,4 @@
-import vis from 'vis/dist/vis.min.js';
-
+/* Global Vis from index.html */
 export default {
     'data'() {
         return {

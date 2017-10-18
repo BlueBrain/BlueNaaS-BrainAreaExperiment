@@ -110,7 +110,7 @@ export default {
                 'title': '',
                 'computer': 'JUQUEEN',
                 'computersAvailable': ['JUQUEEN', 'JURECA', 'JULIA'],
-                'applicationName': 'BSP',
+                'applicationName': 'Bash shell',
                 'nodes': 1024,
                 'project': '',
             },

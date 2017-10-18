@@ -115,26 +115,7 @@ module.exports = (function() {
         };
         let inputs = [];
 
-        if (configParams.applicationName === 'BSP') {
-            jobSpec['Parameters'] = {
-                'CONFIG': 'BlueConfig',
-                'TARGET': 'user.target',
-                'OUTPUT': 'output',
-            };
-
-            inputs = [
-                {
-                    'To': 'BlueConfig',
-                    // 'Data': require('raw-loader!assets/BlueConfigEx2'),
-                    'Data': JSON.stringify(blueConfig),
-                },
-                // {
-                //     'To': 'user.target',
-                //     'Data': require('raw-loader!assets/user.target'),
-                // },
-            ];
-        }
-
+        // this is a workaround for running simulations using shell instead of BSP.
         if (configParams.applicationName === 'Bash shell') {
             jobSpec['Parameters'] = {'SOURCE': 'input.sh'};
 
@@ -147,12 +128,25 @@ module.exports = (function() {
                     date
                     hostname
                     whoami
+                    source /homec/bp0/bp000022/modulecmd/3.2.10/init/bash
+                    module use /homec/bp0/bp000022/modulesfiles
+                    module purge
+                    module load nix/hpc/neuron-hippocampus/7.5-201706
+                    mkdir -p output
+                    /homec/bp0/bp000024/simulation_launch_venv/bin/simulation_launch.py -vv --blueconfig BlueConfig --output output
                 `;
             }
-            inputs = [{
-                'To': 'input.sh',
-                'Data': inputShContent,
-            }];
+            inputs = [
+                {
+                    'To': 'input.sh',
+                    'Data': inputShContent,
+                },
+                {
+                    'To': 'BlueConfig',
+                    // 'Data': require('raw-loader!assets/BlueConfigEx2'),
+                    'Data': JSON.stringify(blueConfig),
+                },
+            ];
         }
         return {
             'jobSpec': jobSpec,

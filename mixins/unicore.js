@@ -111,7 +111,10 @@ module.exports = (function() {
             'Name': configParams.title,
             'Project': configParams.project,
             'haveClientStageIn': 'true',
-            'Resources': {'Nodes': configParams.nodes},
+            'Resources': {
+                'Nodes': configParams.nodes,
+                'Runtime': configParams.runtime,
+            },
         };
         let inputs = [];
 

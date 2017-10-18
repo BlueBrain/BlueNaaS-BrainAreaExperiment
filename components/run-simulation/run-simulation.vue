@@ -81,6 +81,12 @@
                  </th>
              </tr>
              <tr>
+                 <th>RunTime: </th>
+                 <th>
+                    <input type="number" name="Time until timeout" class="runtime" :value="runConfig.runtime" placeholder="Time before timeout">
+                 </th>
+             </tr>
+             <tr>
                 <div class="preview-config">Preview Config</div>
              </tr>
          </table>
@@ -112,6 +118,7 @@ export default {
                 'computersAvailable': ['JUQUEEN', 'JURECA', 'JULIA'],
                 'applicationName': 'Bash shell',
                 'nodes': 1024,
+                'runtime': 86400,
                 'project': '',
             },
         };
@@ -197,6 +204,7 @@ export default {
             this.runConfig.title = getParam('title');
             this.runConfig.project = getParam('project');
             this.runConfig.computer = getParam('computer');
+            this.runConfig.runtime = getParam('runtime');
             let params = this.unicore.getConfig(this.runConfig, this.blueConfig, null);
             return this.unicore.submitJob(
                 this.runConfig.computer,

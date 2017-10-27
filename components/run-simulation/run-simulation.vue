@@ -5,9 +5,9 @@
                 <!-- header params -->
                 <div class="duration-skip">
                     <span title="Time length of stimulus duration, given in milliseconds(ms)">Duration(ms):</span>
-                    <input v-model="endTime" type="number" placeholder="Duration" class="form-control">
+                    <input v-model="endTime" type="number" min="0" placeholder="Duration" class="form-control">
                     <span title="Run without Stimulus or Report for a given duration using a large timestep. This is to get the cells past any initial transience">ForwardSkip(ms):</span>
-                    <input v-model="forwardSkip" type="number" placeholder="Duration" class="form-control">
+                    <input v-model="forwardSkip" type="number" min="0" placeholder="Duration" class="form-control">
                     <span class="right-margin">
                         <a class="button-with-icon" @click="viewList">
                             <i class="material-icons">list</i>View Simulations
@@ -243,7 +243,7 @@ export default {
         },
     },
     'mounted': function() {
-        document.getElementById('frameTemplateTitle').innerText = 'Run Simulation';
+        document.getElementById('frameTemplateTitle').innerText = 'Configure & Launch Simulations';
         let that = this;
         that.loadLocalConfig().then(function(bluepyConfig) {
             that.blueConfig = bluepyConfig;

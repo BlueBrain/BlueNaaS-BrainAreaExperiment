@@ -65,21 +65,21 @@
         <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
             <label class="control-label" title="Configure the random distribution">Lambda</label>
             <div class="controls">
-                <input v-model="stimulus.Lambda" type="number" id="Lambda" placeholder="Lambda" required class="form-control">
+                <input v-model="stimulus.Lambda" type="number" min="0" id="Lambda" placeholder="Lambda" required class="form-control">
             </div>
         </div>
         <!-- <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' ">  -->
         <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
             <label class="control-label" title="The strength of the created synapse">Weight</label>
             <div class="controls">
-                <input v-model="stimulus.Weight" type="number" id="Weight" placeholder="Weight" required class="form-control" step="0.1">
+                <input v-model="stimulus.Weight" type="number" min="0" id="Weight" placeholder="Weight" required class="form-control" step="0.1">
             </div>
         </div>
         <!-- <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' ">  -->
         <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
-            <label class="control-label" ftitle="The number of synapses to create">Number of synapses</label>
+            <label class="control-label" title="The number of synapses to create">Number of synapses</label>
             <div class="controls">
-                <input v-model="stimulus.NumOfSynapses" type="number" id="NumOfSynapses" placeholder="Number of synapses" required class="form-control">
+                <input v-model="stimulus.NumOfSynapses" type="number" min="0" id="NumOfSynapses" placeholder="Number of synapses" required class="form-control">
             </div>
         </div>
         <!-- <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' ">  -->
@@ -212,6 +212,7 @@ export default {
         },
         'editItem': function() {
             this.checkTimeValues(this.form);
+            this.checkTargets(this.form);
             if (this.form.checkValidity()) {
                 this.items;
                 this.convertToNumbers();
@@ -231,6 +232,17 @@ export default {
                 form.elements.Delay.setCustomValidity('Delay should be smaller than duration');
             } else {
                 form.elements.Delay.setCustomValidity('');
+            }
+        },
+        'checkTargets': function(form) {
+            let found = this.processedTargetList.filter((t) => {
+                return t.name === this.stimulus.Target;
+            });
+            let targetElement = form.elements[0]; // target input
+            if (found.length <= 0) {
+                targetElement.setCustomValidity('Target should be in the list. try: slice');
+            } else {
+                targetElement.setCustomValidity('');
             }
         },
         'cleanStimulus': function() {

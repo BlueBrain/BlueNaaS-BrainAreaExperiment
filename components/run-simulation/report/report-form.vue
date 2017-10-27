@@ -37,19 +37,19 @@
                 <div class="form-group">
                     <label class="control-label" title="Time to start reporting">StartTime(ms)</label>
                     <div class="controls">
-                        <input v-model="report.StartTime" type="number" id="StartTime" placeholder="StartTime" required class="form-control">
+                        <input v-model="report.StartTime" type="number" min="0" id="StartTime" placeholder="StartTime" required class="form-control">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label" title="Time to stop reporting">EndTime(ms)</label>
                     <div class="controls">
-                        <input v-model="report.EndTime" type="number" id="EndTime" placeholder="EndTime" required class="form-control">
+                        <input v-model="report.EndTime" type="number" min="0" id="EndTime" placeholder="EndTime" required class="form-control">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label" title="The frequency of reporting in milliseconds(ms)">Dt(ms)</label>
                     <div class="controls">
-                        <input v-model="report.Dt" type="number" id="Dt" placeholder="Dt" required step="0.01" class="form-control">
+                        <input v-model="report.Dt" type="number" min="0" id="Dt" placeholder="Dt" required step="0.01" class="form-control">
                     </div>
                 </div>
                 <div class="form-group">

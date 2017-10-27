@@ -190,6 +190,7 @@ export default {
                 'onMove': this.onMove,
                 'onUpdate': this.onUpdate,
                 'onRemove': this.onRemove,
+                'zoomMax': 1000 * 5, // 5s limit zoom out
             };
 
             this.timeline = new vis.Timeline(container);

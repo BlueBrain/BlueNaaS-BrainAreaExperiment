@@ -3,7 +3,7 @@
         <form name="reportForm">
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="control-label" title="Defines what is to be reported. Note that cell targets versus compartment targets can influence report behavior">Target</label>
+                    <label class="control-label" title="Defines the region from where the data will be reported. Note that cell targets versus compartment targets can influence report behavior">Target</label>
                     <div class="controls autocomplete-container">
                         <autocomplete-vue :list="processedTargetList" placeholder="Target" v-model="report.Target"></autocomplete-vue>
                     </div>

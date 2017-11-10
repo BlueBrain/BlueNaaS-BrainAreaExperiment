@@ -278,6 +278,8 @@ module.exports = (function() {
             'url': 'https://hbp-unic.fz-juelich.de:7112/HBP_JUQUEEN/rest/core'};
         sites['JURECA'] = {'name': 'JURECA (JSC)', 'id': 'JURECA',
             'url': 'https://hbp-unic.fz-juelich.de:7112/HBP_JURECA/rest/core'};
+        sites['JURON'] = {'name': 'JURON (JSC)', 'id': 'JURON',
+            'url': 'https://hbp-unic.fz-juelich.de:7112/HBP_JURON/rest/core'};
         sites['JULIA'] = {'name': 'JULIA (JSC)', 'id': 'JULIA',
             'url': 'https://hbp-unic.fz-juelich.de:7112/HBP_JULIA/rest/core'};
         sites['VIZ_CSCS'] = {'name': 'VIZ (CSCS)', 'id': 'VIS',

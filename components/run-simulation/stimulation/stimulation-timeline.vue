@@ -140,7 +140,7 @@ export default {
             //     output.push(`AmpStart: ${stimInfo.AmpStart} mA`);
             //     output.push(`AmpEnd: ${stimInfo.AmpEnd} mA`);
             //     break;
-            case 'NPoisson':
+            case 'Poisson':
             // case 'NPoissonInhomogenous':
                 output.push(`Lambda: ${stimInfo.Lambda}`);
                 output.push(`Weight: ${stimInfo.Weight}`);

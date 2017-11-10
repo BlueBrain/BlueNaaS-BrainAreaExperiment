@@ -5,9 +5,10 @@
                 <!-- header params -->
                 <div class="duration-skip">
                     <span title="Time length of stimulus duration, given in milliseconds(ms)">Duration(ms):</span>
-                    <input v-model="endTime" type="number" min="0" placeholder="Duration" class="form-control">
+                    <input v-model="endTime" type="number" min="0" placeholder="Duration" class="form-control" @blur="checkNegative">
                     <span title="Run without Stimulus or Report for a given duration using a large timestep. This is to get the cells past any initial transience">ForwardSkip(ms):</span>
-                    <input v-model="forwardSkip" type="number" min="0" placeholder="Duration" class="form-control">
+                    <input v-model="forwardSkip" type="number" min="0" placeholder="Duration" class="form-control" @blur="checkNegative">
+                    <span id="errors" class="errors" v-show="errors">{{errors}}</span>
                     <span class="right-margin">
                         <a class="button-with-icon" @click="viewList">
                             <i class="material-icons">list</i>View Simulations
@@ -45,9 +46,12 @@
                     </div>
                 </div>
                 <!-- END report timeline -->
-                <a class="button-with-icon" @click="runSimulation">
-                    <i class="material-icons">play_arrow</i>Run
-                </a>
+                <div class="footer">
+                    <div class="tip">You can scroll in the timeline to zoom in/out</div>
+                    <a class="button-with-icon" @click="runSimulation">
+                        <i class="material-icons">play_arrow</i>Run
+                    </a>
+                </div>
             </div>
         </transition>
         <!-- template for configuration -->
@@ -107,6 +111,7 @@ export default {
     'data': function() {
         return {
             'endTime': 50,
+            'errors': '',
             'forwardSkip': null,
             'blueConfig': null,
             'loading': true,
@@ -241,6 +246,13 @@ export default {
             x.document.write('<html><body><pre>' + myjson + '</pre></body></html>');
             x.document.close();
         },
+        'checkNegative': function(event) {
+            if (event.target.value < 0) {
+                this.errors = 'Duration and ForwardSkip should be possitive';
+            } else {
+                this.errors = '';
+            }
+        },
     },
     'mounted': function() {
         document.getElementById('frameTemplateTitle').innerText = 'Configure & Launch Simulations';
@@ -365,6 +377,21 @@ export default {
     }
     .config-template tr {
         min-height: 40px;
+    }
+    .errors {
+        background-color: #f81b00;
+        color: white;
+        padding: 5px;
+        border-radius: 5px;
+    }
+    .footer {
+        display: flex;
+        justify-content: space-between;
+    }
+    .footer .tip {
+        color: #879fcb;
+        padding: 5px 10px;
+        margin: 30px 15px 30px 10px;
     }
 </style>
 

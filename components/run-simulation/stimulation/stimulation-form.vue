@@ -27,6 +27,14 @@
             </div>
         </div>
 
+        <!-- <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' "> -->
+        <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
+            <label class="control-label" title="Configure the random distribution">Lambda</label>
+            <div class="controls">
+                <input v-model="stimulus.Lambda" type="number" min="0" id="Lambda" placeholder="Lambda" required class="form-control">
+            </div>
+        </div>
+
         <div class="form-group">
             <label class="control-label" title="Time when the stimulus commences. given in milliseconds(ms)">Delay(ms)</label>
             <div class="controls">
@@ -61,13 +69,6 @@
             </div>
         </div> -->
 
-        <!-- <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' "> -->
-        <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
-            <label class="control-label" title="Configure the random distribution">Lambda</label>
-            <div class="controls">
-                <input v-model="stimulus.Lambda" type="number" min="0" id="Lambda" placeholder="Lambda" required class="form-control">
-            </div>
-        </div>
         <!-- <div class="form-group" v-if="stimulus.Pattern == 'NPoisson' || stimulus.Pattern == 'NPoissonInhomogenous' ">  -->
         <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
             <label class="control-label" title="The strength of the created synapse">Weight</label>

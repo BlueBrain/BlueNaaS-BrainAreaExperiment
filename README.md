@@ -15,3 +15,6 @@ Run simulations in supercomputers using Unicore API.
 
 ### Generate the documentation
 ``` npm run jsdoc ```
+
+### Documentation Online
+https://lbologna.github.io/hbp-sp6-guidebook/online_usecases/small_circuit_in_silico_experiments/small_circuit_in_silico_experiments.html

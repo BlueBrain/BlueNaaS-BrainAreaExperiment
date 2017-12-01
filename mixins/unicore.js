@@ -114,8 +114,12 @@ module.exports = (function() {
             'Resources': {
                 'Nodes': configParams.nodes,
                 'Runtime': configParams.runtime,
+                'CPUsPerNode': configParams.cpus,
             },
         };
+        if (configParams.runtime === '') {
+            delete jobSpec.Resources.Runtime;
+        }
         let inputs = [];
 
         // this is a workaround for running simulations using shell instead of BSP.
@@ -125,19 +129,6 @@ module.exports = (function() {
             let inputShContent = '';
             if (shellCommand) {
                 inputShContent = shellCommand;
-            } else {
-                inputShContent = `
-                    #!/bin/sh
-                    date
-                    hostname
-                    whoami
-                    source /homec/bp0/bp000022/modulecmd/3.2.10/init/bash
-                    module use /homec/bp0/bp000022/modulesfiles
-                    module purge
-                    module load nix/hpc/neuron-hippocampus/7.5-201706
-                    mkdir -p output
-                    /homec/bp0/bp000024/simulation_launch_venv/bin/simulation_launch.py -vv --blueconfig BlueConfig --output output
-                `;
             }
             inputs = [
                 {
@@ -145,8 +136,7 @@ module.exports = (function() {
                     'Data': inputShContent,
                 },
                 {
-                    'To': 'BlueConfig',
-                    // 'Data': require('raw-loader!assets/BlueConfigEx2'),
+                    'To': 'blueconfig.json',
                     'Data': JSON.stringify(blueConfig),
                 },
             ];
@@ -329,7 +319,7 @@ module.exports = (function() {
             token = data.authResponse.access_token;
         });
     };
-    let submitAnalysis = function(moveObject) {
+    let submitAnalysis = function(moveObject, script, filesToAvoidCopy) {
         return new Promise((resolve, reject) => {
             /**
                 Create a new job so we have working space where to copy files for analysis
@@ -352,6 +342,10 @@ module.exports = (function() {
                     'files' = array with name of files to copy
                     'nodes' = number of nodes used to run the analysis
                     'title' = title of the job
+                    // the following params should be in a new config file to upload
+                    // so the script reads that file before to start the analysis
+                    'checkedAnalysis' = list with the analysis to be run
+                    'percentageOfCells' = % cells to visualize
                 }
             */
             let jobSpec = {
@@ -361,48 +355,59 @@ module.exports = (function() {
                 'Resources': {'Nodes': moveObject.nodes},
                 'haveClientStageIn': 'true',
             };
-            let inputShContent = `
-                /homec/bp0/bp000024/jureca/venv_bluepy_analysis/bin/analysis_launch.py --blueconfig BlueConfig --output . --usertarget /homec/bp0/bp000024/proj30/hippocampus/user.target
-                `;
-            let inputs = [{
-                'To': 'input.sh',
-                'Data': inputShContent,
-            }];
-
+            let analysisConfig = {
+                'list_analysis': moveObject.checkedAnalysis,
+                'percentage_of_cells': moveObject.percentageOfCells,
+            };
+            let inputs = [
+                {
+                    'To': 'input.sh',
+                    'Data': script,
+                },
+                {
+                    'To': 'config.json',
+                    'Data': JSON.stringify(analysisConfig),
+                },
+            ];
+            let transferArray = [];
+            let newJobDestination = {};
             return this.submitJob(moveObject.to.computer, jobSpec, inputs)
-            .then((jobObject) => {
+            .then((destinationJobObject) => {
+                newJobDestination = destinationJobObject;
                 // mapping in simulation the analysis path.
                 let input = {
                     'To': 'analysis_path',
-                    'Data': JSON.stringify(jobObject),
+                    'Data': JSON.stringify(newJobDestination),
                 };
                 // fill the destination and pass it to transfer
-                moveObject.to['workingDirectory'] = jobObject._links.workingDirectory.href;
-                let transferArray = [];
+                moveObject.to['workingDirectory'] = newJobDestination._links.workingDirectory.href;
                 // upload the analysis_path file
                 transferArray.push(this.uploadData(input, moveObject.from.workingDirectory + '/files'));
-                console.log(`moving ${moveObject.files.length} files ...`);
                 // get all the files to be copied
                 console.log('getting files to be copied ...');
-                return this.getFilesToCopy(`${moveObject.from.workingDirectory}/files`)
-                .then((files) => {
-                    console.log('coping ...', files);
-                    moveObject.files = files;
-                    moveObject.files.forEach(function(val, i) {
-                        // change the object so transferFile transfer each individual file
-                        moveObject['fileName'] = moveObject.files[i];
-                        transferArray.push(transferFiles(moveObject));
-                    });
-                    Promise.all(transferArray).then(([upload, transfer]) => {
-                        // add this field so we have the info to start the job
-                        transfer['destinationJob'] = jobObject;
-                        return resolve(transfer);
-                    }, (error) => {
-                        console.error(error);
-                        reject(error);
-                    });
+                return this.getFilesToCopy(`${moveObject.from.workingDirectory}/files`);
+            })
+            .then((files) => {
+                files.forEach(function(fileName, i) {
+                    // change the object so transferFile transfers each individual file
+                    // this is for have each object with its own information becasue async calls
+                    if (filesToAvoidCopy.includes(fileName)) {
+                        return;
+                    }
+                    console.log('coping ...', fileName);
+                    moveObject['fileName'] = fileName;
+                    transferArray.push(transferFiles(moveObject));
                 });
-            }, reject);
+                return Promise.all(transferArray);
+            })
+            .then(([upload, transfer]) => {
+                // add this field so we have the info to start the job
+                transfer['destinationJob'] = newJobDestination;
+                return resolve(transfer);
+            }, (error) => {
+                console.error('Transfer failed: ', error);
+                reject(error);
+            });
         });
     };
     let submitJob = function(site, jobDefinition, inputs) {
@@ -486,13 +491,10 @@ module.exports = (function() {
             let storageURL = getSites()[moveObject.from.computer.toUpperCase()]['url'];
             storageURL = storageURL.replace('rest/core', 'services/StorageManagement?res=');
             let originWorkId = moveObject.from.workingDirectory.split('/').pop();
-            let sourceURL = `UFTP:${storageURL}${originWorkId}#/${moveObject.fileName}`;
+            let sourceURL = `BFT:${storageURL}${originWorkId}#/${moveObject.fileName}`;
             let payload = {
                 'file': moveObject.fileName,
                 'source': sourceURL,
-                'extraParameters': {
-                    'uftp.compression': true,
-                },
             };
             // post to move files request and check with poll
             let headers = createHeaders(token);

@@ -102,11 +102,11 @@ export default {
         flex-direction: row;
     }
     .img-container {
-        width: 200px;
+        width: 160px;
     }
     img {
         position: absolute;
-        width: 230px;
+        width: 160px;
         transition: opacity 0.2s;
     }
     .blur {
@@ -116,7 +116,7 @@ export default {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        height: 230px;
+        height: 170px;
         overflow: scroll;
     }
     .list-item {

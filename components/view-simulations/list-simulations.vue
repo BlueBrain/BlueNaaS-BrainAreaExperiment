@@ -34,9 +34,12 @@ This component manage each job (delete, start, create, etc).
             <a class="button-with-icon" title="Supercomputer to be used"><i class="material-icons">dns</i></a>
             </span>
             <select class="input-style" v-model="computerFilter">
-                <option value="JUQUEEN">JUQUEEN</option>
-                <option value="JURECA">JURECA</option>
-                <option value="JULIA">JULIA</option>
+                <option
+                    v-for="computer in simulationConfig.available"
+                    :key="computer"
+                    :value="computer">
+                    {{computer}}
+                </option>
             </select>
             <span class="space-flex"></span>
             <router-link to="/" class="create-simulation-button">
@@ -64,36 +67,23 @@ This component manage each job (delete, start, create, etc).
             </simulation-item>
 
             <infinite-loading
-                :on-infinite="onInfinite"
+                @infinite="onInfinite"
                 ref="infiniteLoading">
                 <span slot="no-more"></span>
                 <span slot="no-results"></span>
             </infinite-loading>
         </div>
         <!-- template for configuration -->
-        <table id="configTemplate" class="config-template" style="display:none">
-            <span class="subtitle">Copy files and run analysis</span>
-            <tr>
-                <th>Title:</th>
-                <th>
-                    <input type="text" name="" class="title" :value="moveObject.title" placeholder="Job's title">
-                </th>
-            </tr>
-            <tr>
-                <th>Origin:</th>
-                <th>{{ moveObject.from.computer }}</th>
-            </tr>
-            <tr>
-                <th>Destination: </th>
-                <th>{{ moveObject.to.computer }}</th>
-            </tr>
-            <tr>
-                <th>Nodes: </th>
-                <th>
-                    <input type="number" name="" class="nodes" :value="moveObject.nodes" placeholder="Node to allocate">
-                </th>
-            </tr>
-        </table>
+        <modal :show="showValidationForm" @changeModalVisibility="toggleModal">
+            <h3 slot="header">Copy files and run analysis</h3>
+            <div slot="content">
+                <launch-validation-form
+                    @validationConfigReady="validationConfigReady"
+                    :defaultAnalysisConfig="defaultAnalysisConfig"
+                    @changeModalVisibility="toggleModal">
+                </launch-validation-form>
+            </div>
+        </modal>
         <!-- END template for configuration -->
     </div>
 </template>
@@ -101,42 +91,40 @@ This component manage each job (delete, start, create, etc).
 <script>
     import SimulationItem from 'components/view-simulations/simulation-item.vue';
     import InfiniteLoading from 'vue-infinite-loading';
-    import Unicore from 'mixins/unicore.js';
+    import unicore from 'mixins/unicore.js';
+    import simulationConfig from 'assets/simulation-config.json';
+    import analysisConfig from 'assets/analysis-config.json';
+    import LaunchValidationForm from 'components/view-simulations/launch-analysis-form.vue';
+    import Modal from 'components/shared/modal-component.vue';
+    import templateBluepyConfig from 'assets/blueconfig.json';
     export default {
         'name': 'list_simulations',
         'components': {
             'simulation-item': SimulationItem,
             'infinite-loading': InfiniteLoading,
+            'launch-validation-form': LaunchValidationForm,
+            'modal': Modal,
         },
         'props': ['computerParam', 'statusSearch'],
         'data': function() {
             return {
                 'loading': true,
-                'computerFilter': 'JUQUEEN',
-                'moveObject': {
-                    'from': {
-                        'workingDirectory': null,
-                        'computer': 'JUQUEEN',
-                    },
-                    'to': {
-                        'workingDirectory': null, // create a new one
-                        'computer': 'JURECA',
-                    },
-                    'files': [], // this will be filled in getAllFiles in UnicoreAPI
-                    'nodes': 1,
-                    'title': '',
-                },
-                'unicoreAPI': Unicore,
+                'computerFilter': simulationConfig.default,
+                'defaultAnalysisConfig': analysisConfig,
+                'simulationConfig': simulationConfig,
+                'showValidationForm': false,
+                'unicoreAPI': unicore,
                 'jobs': [],
                 'filteredObjects': [],
                 'viewList': [],
                 'readObjectIndex': 0,
-                'loadIncrement': 10,
+                'loadIncrement': 5,
                 'statusFilter': 'ALL',
                 'nameFilter': '',
                 'dateFilter': '',
                 'filterOn': false,
                 'pollInterval': 10,
+                'jobSelectedForValidation': null,
             };
         },
         'computed': {
@@ -147,6 +135,13 @@ This component manage each job (delete, start, create, etc).
             },
         },
         'methods': {
+            'toggleModal': function(value) {
+                if (value) {
+                    this.showValidationForm = value;
+                    return;
+                }
+                this.showValidationForm = !this.showValidationForm;
+            },
             'actionJob': function(actions) {
                 this.unicoreAPI.actionJob(actions.url);
                 swal('Great!', actions.text, 'success');
@@ -245,16 +240,13 @@ This component manage each job (delete, start, create, etc).
                     'confirmButtonColor': '#ac6067',
                     'cancelButtonColor': '#879fcb',
                     'confirmButtonText': 'Yes, delete it!',
-                }).then(() => {
-                    this.unicoreAPI.deleteJob(url)
-                    .then(() => {
-                        swal(
-                            'Deleted!',
-                            'Your job has been deleted.',
-                            'success'
-                        );
-                        this.removeFromList(url);
-                    });
+                }).then((choice) => {
+                    if (choice.value === true) {
+                        this.unicoreAPI.deleteJob(url)
+                        .then(() => {
+                            this.removeFromList(url);
+                        });
+                    }
                 });
             },
             'showDetails': function(job, computer) {
@@ -281,23 +273,24 @@ This component manage each job (delete, start, create, etc).
                         let job = jobs[i];
                         jobPropertiesArray.push(this.unicoreAPI.getJobProperties(job));
                     }
-                    Promise.all(jobPropertiesArray).then((resultsArray) => {
-                        // I need to wait to all so I can sort them by date.
-                        // TODO: ask for the API to obtain by date.
-                        // get the analysis information async
-                        resultsArray.map((simulationJob) => {
-                            // add this so the item shows sync icon
-                            simulationJob['analysisStatus'] = 'LOADING';
-                            this.getAnalysisInfo(simulationJob);
-                        });
-                        this.filteredObjects = this.jobs = resultsArray;
-                        this.filter();
-                        if (loadingComp) {
-                            this.$nextTick(() => {
-                                loadingComp.style.display = 'none';
-                            });
-                        }
+                    return Promise.all(jobPropertiesArray);
+                })
+                .then((resultsArray) => {
+                    // I need to wait to all so I can sort them by date.
+                    // TODO: ask for the API to obtain by date.
+                    // get the analysis information async
+                    resultsArray.map((simulationJob) => {
+                        // add this so the item shows sync icon
+                        simulationJob['analysisStatus'] = 'LOADING';
+                        this.getAnalysisInfo(simulationJob);
                     });
+                    this.filteredObjects = this.jobs = resultsArray;
+                    this.filter();
+                    if (loadingComp) {
+                        this.$nextTick(() => {
+                            loadingComp.style.display = 'none';
+                        });
+                    }
                 });
             },
             'resetFilter': function() {
@@ -305,42 +298,16 @@ This component manage each job (delete, start, create, etc).
                 this.statusFilter = 'ALL';
             },
             'runAnalysis': function(job) {
-                // TOOD: avoid hardcoding computers
-                let that = this;
-                this.moveObject.from.workingDirectory = job._links.workingDirectory.href;
-                swal({
-                    'title': 'Run analysis',
-                    'html': that.showSimulationParameters(),
-                    'showCancelButton': true,
-                    'confirmButtonText': 'Submit',
-                    'confirmButtonColor': '#548d68',
-                    'cancelButtonColor': '#ac6067',
-                    'showLoaderOnConfirm': true,
-                    'allowOutsideClick': true,
-                    'preConfirm': function() {
-                        return that.setupSelectedConfig(that.moveObject);
-                    },
-                }).then(function(analysis) {
-                    let startURL = analysis.destinationJob._links['action:start'].href;
-                    console.log('starting analysis...');
-                    that.unicoreAPI.actionJob(startURL);
-                    // pool the status of the analysis
-                    that.startReloadJob(job);
-                    swal({
-                        'title': 'Analysis started!',
-                        'text': 'Analysis results can take a long time',
-                        'showCancelButton': true,
-                        'cancelButtonText': 'View Job',
-                        'type': 'success',
-                    }).then(function() {}, function() {
-                        that.showDetails(job, that.moveObject.from.computer);
-                    });
-                }).catch(swal.noop);
+                this.showValidationForm = true;
+                // set the origin computer
+                this.defaultAnalysisConfig.from = this.computerFilter;
+                this.jobSelectedForValidation = job;
+                // after the form will return to validationConfigReady
             },
-            'onInfinite': function() {
+            'onInfinite': function($state) {
                 if (this.loading) return; // avoid processing things while loading
                 if (this.readObjectIndex > this.filteredObjects.length) {
-                    this.$refs.infiniteLoading.$emit('$InfiniteLoading:complete');
+                    $state.complete();
                     return;
                 }
                 let newItems = [];
@@ -348,25 +315,7 @@ This component manage each job (delete, start, create, etc).
                 newItems = this.filteredObjects.slice(this.readObjectIndex, this.readObjectIndex + this.loadIncrement);
                 this.readObjectIndex += this.loadIncrement;
                 this.viewList = this.viewList.concat(newItems);
-                this.$refs.infiniteLoading.$emit('$InfiniteLoading:loaded');
-            },
-            'showSimulationParameters': function() {
-                // create a copy of the template for get the params later
-                // due Swal library creates the HTML without vuejs.
-                let configTemplate = document.getElementById('configTemplate').cloneNode(true);
-                configTemplate.id = 'configTemplateFilled';
-                configTemplate.style.display = 'block';
-                return configTemplate;
-            },
-            'setupSelectedConfig': function(moveObject) {
-                // get the parameters based on the user's configuration
-                let configTemplateFilled = document.getElementById('configTemplateFilled');
-                let getParam = function(name) {
-                    return configTemplateFilled.querySelector('.' + name).value;
-                };
-                moveObject.nodes = getParam('nodes');
-                moveObject.title = getParam('title');
-                return this.unicoreAPI.submitAnalysis(moveObject);
+                $state.loaded();
             },
             'startReloadJob': function(simulationJob) {
                 let poolAnalysis = function(simulationJob) {
@@ -388,6 +337,71 @@ This component manage each job (delete, start, create, etc).
                 // add this status to show the sync
                 simulationJob['analysisStatus'] = 'LOADING';
                 poolAnalysis.call(this, simulationJob);
+            },
+            'validationConfigReady': function(validationConfig) {
+                this.toggleModal();
+                swal.enableLoading();
+                let analysisInfo = {};
+                validationConfig.from.workingDirectory = this.jobSelectedForValidation._links.workingDirectory.href;
+
+                this.unicoreAPI.submitAnalysis(
+                    validationConfig,
+                    this.defaultAnalysisConfig.script,
+                    this.defaultAnalysisConfig.filesToAvoidCopy
+                ).then((analysis) => {
+                    analysisInfo = analysis;
+                    return this.changeBlueConfigPaths(
+                        validationConfig.to.workingDirectory,
+                        validationConfig.to.computer
+                    );
+                })
+                .then(() => {
+                    let startURL = analysisInfo.destinationJob._links['action:start'].href;
+                    console.log('starting analysis...');
+                    this.unicoreAPI.actionJob(startURL);
+                    // pool the status of the analysis
+                    this.startReloadJob(this.jobSelectedForValidation);
+                    swal.enableLoading();
+                    return swal({
+                        'title': 'Analysis started!',
+                        'text': 'Analysis results can take a long time',
+                        'showCancelButton': true,
+                        'confirmButtonText': 'View Job',
+                        'cancelButtonText': 'OK',
+                        'type': 'success',
+                    });
+                })
+                .then((choice) => {
+                    if (choice.value) {
+                        this.showDetails(
+                            this.jobSelectedForValidation,
+                            validationConfig.from.computer
+                        );
+                    }
+                });
+            },
+            'changeBlueConfigPaths': function(workingDirectory, computer) {
+                let blueConfigName = 'blueconfig.json';
+                let serverBlueConfig = `${workingDirectory}/files/${blueConfigName}`;
+                return this.unicoreAPI.getFiles(serverBlueConfig)
+                .then((blueConfig) => {
+                    blueConfig = JSON.parse(blueConfig);
+                    // templateBluepyConfig has the placeholder to replace the work directory
+                    let analysisBlueConfig = Object.assign({}, templateBluepyConfig.Run.Default);
+                    let inMemoryBlueConfig = blueConfig.Run.Default;
+                    let newPathWork = this.simulationConfig[computer].pathWork;
+                    let placeholder = '{{WORK_DIRECTORY}}';
+                    Object.keys(analysisBlueConfig).forEach((key) => {
+                        if (analysisBlueConfig[key].toString().startsWith(placeholder)) {
+                            inMemoryBlueConfig[key] = analysisBlueConfig[key].toString().replace(placeholder, newPathWork);
+                        }
+                    });
+                    let uploadFile = {
+                        'Data': JSON.stringify(blueConfig),
+                        'To': blueConfigName,
+                    };
+                    return this.unicoreAPI.uploadData(uploadFile, `${workingDirectory}/files`);
+                });
             },
         },
         'mounted': function() {
@@ -506,6 +520,7 @@ This component manage each job (delete, start, create, etc).
         border-style: groove;
     }
 </style>
+
 <style>
     /* disable the bounce effect sweetalerts*/
     @-webkit-keyframes showSweetAlert {

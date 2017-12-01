@@ -1,6 +1,6 @@
 <template>
     <div class="report-form">
-        <form name="reportForm">
+        <form name="reportForm modal-form">
             <div class="modal-body">
                 <div class="form-group">
                     <label class="control-label" title="Defines the region from where the data will be reported. Note that cell targets versus compartment targets can influence report behavior">Target</label>
@@ -30,14 +30,13 @@
                     <div class="controls">
                         <select v-model="report.Unit" type="text" id="Unit" placeholder="Unit" required class="form-control">
                           <option>mV</option>
-                          <option>nA</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label" title="Time to start reporting">StartTime(ms)</label>
                     <div class="controls">
-                        <input v-model="report.StartTime" type="number" min="0" id="StartTime" placeholder="StartTime" required class="form-control">
+                        <input v-model="report.StartTime" type="number" id="StartTime" placeholder="StartTime" required class="form-control">
                     </div>
                 </div>
                 <div class="form-group">
@@ -83,7 +82,7 @@
 <script>
 import AutocompleteVue from 'autocomplete-vue';
 import targetList from 'assets/targetList.json';
-
+import 'assets/css/run-simulation.css';
 export default {
     'name': 'report-form',
     'props': ['reportEditableObject'],
@@ -161,76 +160,3 @@ export default {
 };
 </script>
 
-<style scoped>
-.report-form {
-    max-width: 400px;
-    margin: 0 auto;
-}
-.form-group {
-    margin: 10px 0;
-    display: flex;
-    justify-content: space-around;
-}
-.form-group .controls select {
-    font-size: 1rem;
-}
-.control-label {
-    display: inline-flex;
-    width: 40%;
-}
-div.controls {
-    display: inline-flex;
-    width: 55%;
-}
-div.controls input,
-div.controls select.form-control {
-    width: 230px;
-    margin-right: 5px;
-}
-.ok-button, .cancel-button {
-    border: 0;
-    border-radius: 3px;
-    box-shadow: none;
-    color: #fff;
-    cursor: pointer;
-    font-size: 17px;
-    font-weight: 500;
-    margin: 15px 5px 0;
-    padding: 10px 32px;
-}
-.ok-button {
-    background-color: #548d68;
-}
-.cancel-button {
-    background-color: #ac6067;
-}
-.button-container {
-    display: flex;
-    justify-content: space-around;
-    width: 50%;
-    margin: 0 auto;
-}
-</style>
-
-<style>
-.report-form .form-group input
- {
-    padding: 2px 5px;
-    font-size: 1rem;
-    color: #464a4c;
-    background-color: #fff;
-    background-image: none;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    border: 1px solid rgba(0,0,0,.15);
-    border-radius: .25rem;
-    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-}
-div.controls .autocomplete {
-    width: 205px;
-}
-</style>

@@ -46,65 +46,50 @@
                     </div>
                 </div>
                 <!-- END report timeline -->
+
                 <div class="footer">
-                    <div class="tip">You can scroll in the timeline to zoom in/out</div>
+                    <div id="tip" class="tip">
+                        <div class="tips">
+                            <div v-for="tip in tipTexts">{{tip}}</div>
+                        </div>
+                        <div class="close">
+                            <i class="centered material-icons" @click="closeTip">close</i>
+                        </div>
+                    </div>
                     <a class="button-with-icon" @click="runSimulation">
                         <i class="material-icons">play_arrow</i>Run
                     </a>
                 </div>
+
             </div>
         </transition>
         <!-- template for configuration -->
-        <table id="configTemplate" class="config-template" style="display: none;">
-            <!-- be carefull cause when the popup in swal2 is open the vue models are not related anymore
-            so add the functionality in showSimulationParameters -->
-             <tr>
-                <th>Title: </th>
-                <th>
-                    <input type="text" name="Title of the Job" class="title" :value="runConfig.title" placeholder="Job's title">
-                </th>
-             </tr>
-             <tr>
-                <th>Computer: </th>
-                <th>
-                    <select class="computer" title="Supercomputer" v-model="runConfig.computer">
-                        <option v-for="resources in runConfig.computersAvailable" :value="resources">{{ resources }}</option>
-                    </select>
-                </th>
-            </tr>
-            <tr>
-                <th>Project: </th>
-                <th>
-                    <input type="text" name="Project to be used" class="project" :value="runConfig.project" placeholder="Optional">
-                </th>
-             </tr>
-             <tr>
-                 <th>Nodes: </th>
-                 <th>
-                    <input type="number" name="Number of computer resources" class="nodes" :value="runConfig.nodes" placeholder="Node to allocate">
-                 </th>
-             </tr>
-             <tr>
-                 <th>RunTime: </th>
-                 <th>
-                    <input type="number" name="Time until timeout" class="runtime" :value="runConfig.runtime" placeholder="Time before timeout">
-                 </th>
-             </tr>
-             <tr>
-                <div class="preview-config">Preview Config</div>
-             </tr>
-         </table>
+        <modal :show="showRunForm" @changeModalVisibility="toggleModal">
+            <h3 slot="header">Edit Parameters</h3>
+            <div slot="content">
+                <launch-form
+                    @runConfigReady="runConfigReady"
+                    @previewConfig="previewConfig"
+                    @circuitTargetChanged="circuitTargetChanged"
+                    @computerChanged="computerChanged"
+                    @changeModalVisibility="toggleModal">
+                </launch-form>
+            </div>
+        </modal>
         <!-- END template for configuration -->
     </div>
 </template>
 
 <script>
-
 import StimulationTimeline from 'components/run-simulation/stimulation/stimulation-timeline.vue';
 import ReportTimeline from 'components/run-simulation/report/report-timeline.vue';
 import CollabAuthentication from 'mixins/collabAuthentication.js';
+import templateBluepyConfig from 'assets/blueconfig.json';
 import Unicore from 'mixins/unicore.js';
 import TargetSelection from 'components/target-selection/target-selection.vue';
+import LaunchForm from 'components/run-simulation/launch-form.vue';
+import Modal from 'components/shared/modal-component.vue';
+import launchConfiguration from 'assets/simulation-config.json';
 export default {
     'name': 'run_simulation',
     'mixins': [CollabAuthentication],
@@ -113,27 +98,33 @@ export default {
             'endTime': 50,
             'errors': '',
             'forwardSkip': null,
-            'blueConfig': null,
+            'blueConfig': {},
             'loading': true,
             'unicore': Unicore,
             'header': {},
-            'runConfig': {
-                'title': '',
-                'computer': 'JUQUEEN',
-                'computersAvailable': ['JUQUEEN', 'JURECA', 'JULIA'],
-                'applicationName': 'Bash shell',
-                'nodes': 1024,
-                'runtime': 86400,
-                'project': '',
-            },
+            'showRunForm': false,
+            'currentComputer': launchConfiguration.default,
+            'tipTexts': [
+                'You can scroll in the timeline to zoom in/out',
+                'Drag the stimuli to modify its duration',
+            ],
         };
     },
     'components': {
         'stimulation-timeline': StimulationTimeline,
         'report-timeline': ReportTimeline,
         'target-selection': TargetSelection,
+        'launch-form': LaunchForm,
+        'modal': Modal,
     },
     'methods': {
+        'toggleModal': function(value) {
+            if (value) {
+                this.showRunForm = value;
+                return;
+            }
+            this.showRunForm = !this.showRunForm;
+        },
         'saveConfig': function() {
             this.saveCompleteConfig(this.blueConfig)
             .then(function(message) {
@@ -142,53 +133,29 @@ export default {
                 swal('Opss', 'Configuration was not saved. ' + error, 'error');
             });
         },
-        'runSimulation': function() {
-            let that = this;
-            this.createConfig();
-            swal({
-                'title': 'Are you sure?',
-                'html': that.showSimulationParameters(),
-                'showCancelButton': true,
-                'confirmButtonText': 'Submit',
-                'confirmButtonColor': '#548d68',
-                'cancelButtonColor': '#ac6067',
-                'showLoaderOnConfirm': true,
-                'allowOutsideClick': true,
-                'preConfirm': function() {
-                    return that.setupSelectedConfig();
-                },
-            }).then(function(jobObject) {
-                let id = jobObject._links.self.href.split('/').pop();
-                console.log('starting job...');
-                that.unicore.actionJob(jobObject._links['action:start'].href);
-                swal({
-                    'title': 'Simulation started!',
-                    'showCancelButton': true,
-                    'cancelButtonText': 'View Job',
-                    'type': 'success',
-                }).then(function() {}, function() {
-                    that.$router.push({
-                        'name': 'details',
-                        'params': {
-                            'jobId': id,
-                            'computerParam': that.runConfig.computer,
-                        },
-                    });
-                });
+        'computerChanged': function(computer) {
+            // runBlueConfig has the placeholder to replace the work directory
+            let runBlueConfig = Object.assign({}, templateBluepyConfig.Run.Default);
+            let inMemoryBlueConfig = this.blueConfig.Run.Default;
+            let newPathWork = launchConfiguration[computer].pathWork;
+            let placeholder = '{{WORK_DIRECTORY}}';
+            Object.keys(runBlueConfig).forEach((key) => {
+                if (runBlueConfig[key].toString().startsWith(placeholder)) {
+                    inMemoryBlueConfig[key] = runBlueConfig[key].toString().replace(placeholder, newPathWork);
+                }
             });
         },
-        'showSimulationParameters': function() {
-            // create a copy of the template for get the params later
-            // due Swal library creates the HTML without vuejs.
-            let configTemplate = document.getElementById('configTemplate').cloneNode(true);
-            configTemplate.id = 'configTemplateFilled';
-            let that = this;
-            // timeout because it was not attached to dom
-            setTimeout(function() {
-                document.querySelector('#configTemplateFilled .preview-config').onclick = that.previewConfig;
-            }, 500);
-            configTemplate.style.display = 'block';
-            return configTemplate;
+        'circuitTargetChanged': function(circuitTarget) {
+            this.blueConfig.Run.Default.CircuitTarget = circuitTarget;
+        },
+        'closeTip': function() {
+            let tipElement = this.$el.querySelector('#tip');
+            tipElement.classList.add('hidden');
+            localStorage.setItem('showTip', false);
+        },
+        'runSimulation': function() {
+            this.createConfig();
+            this.toggleModal();
         },
         'fillToken': function(renew) {
             let that = this;
@@ -196,32 +163,11 @@ export default {
                 that.header = {'headers': {'Authorization': token}};
             }); // from collabAuthentication
         },
-        'loadLocalConfig': function() {
-            return Promise.resolve(require('assets/entity.json'));
-        },
-        'setupSelectedConfig': function() {
-            // get the parameters based on the user's configuration
-            let configTemplateFilled = document.getElementById('configTemplateFilled');
-            let getParam = function(name) {
-                return configTemplateFilled.querySelector('.' + name).value;
-            };
-            this.runConfig.nodes = getParam('nodes');
-            this.runConfig.title = getParam('title');
-            this.runConfig.project = getParam('project');
-            this.runConfig.computer = getParam('computer');
-            this.runConfig.runtime = getParam('runtime');
-            let params = this.unicore.getConfig(this.runConfig, this.blueConfig, null);
-            return this.unicore.submitJob(
-                this.runConfig.computer,
-                params.jobSpec,
-                params.inputs
-            );
-        },
         'viewList': function() {
             this.$router.push({
                 'name': 'view',
                 'params': {
-                    'computerParam': this.runConfig.computer,
+                    'computerParam': this.currentComputer,
                     'statusSearch': 'ALL',
                 },
             });
@@ -238,6 +184,7 @@ export default {
             // modify the config object respectively
             this.$refs.stimulation.createConfig(this.blueConfig);
             this.$refs.report.createConfig(this.blueConfig);
+            this.computerChanged(launchConfiguration.default);
         },
         'previewConfig': function() {
             let myjson = JSON.stringify(this.blueConfig, null, 2);
@@ -253,23 +200,60 @@ export default {
                 this.errors = '';
             }
         },
+        'runConfigReady': function(runConfig) {
+            let that = this;
+            this.toggleModal();
+            swal.enableLoading();
+            let submittedJob = {};
+            let shellCommand = launchConfiguration[runConfig.computer].script.join('\n');
+            let params = this.unicore.getConfig(runConfig, this.blueConfig, shellCommand);
+            this.unicore.submitJob(
+                runConfig.computer,
+                params.jobSpec,
+                params.inputs
+            ).then((jobObject) => {
+                submittedJob = jobObject;
+                console.log('starting job...');
+                that.unicore.actionJob(submittedJob._links['action:start'].href);
+                swal.disableLoading();
+                return swal({
+                    'title': 'Simulation started!',
+                    'showCancelButton': true,
+                    'confirmButtonText': 'View Job',
+                    'cancelButtonText': 'OK',
+                    'type': 'success',
+                });
+            })
+            .then((choice) => {
+                if (choice.value) {
+                    this.showDetails(submittedJob, runConfig.computer);
+                }
+            });
+        },
+        'showDetails': function(job, computer) {
+            let url = job._links.self.href;
+            let id = url.substr(url.lastIndexOf('/') + 1);
+            this.$router.push({'name': 'details', 'params': {
+                'jobId': id,
+                'jobParam': job,
+                'computerParam': computer,
+            }});
+        },
     },
     'mounted': function() {
         document.getElementById('frameTemplateTitle').innerText = 'Configure & Launch Simulations';
-        let that = this;
-        that.loadLocalConfig().then(function(bluepyConfig) {
-            that.blueConfig = bluepyConfig;
-            let loadingComp = document.querySelector('#loading-component');
-            if (loadingComp) {
-                loadingComp.style.display = 'none';
-            }
-            that.endTime = that.blueConfig.Run.Default.Duration;
-            that.forwardSkip = that.blueConfig.Run.Default.ForwardSkip;
-            that.loading = false;
-        }, function(error) {
-            console.error(error);
-            that.loading = false;
-        });
+        // Object.assign does not work for deep copy
+        this.blueConfig = JSON.parse(JSON.stringify( templateBluepyConfig ));
+        let loadingComp = document.querySelector('#loading-component');
+        if (loadingComp) {
+            loadingComp.style.display = 'none';
+        }
+        this.endTime = this.blueConfig.Run.Default.Duration;
+        this.forwardSkip = this.blueConfig.Run.Default.ForwardSkip;
+        this.loading = false;
+        if (localStorage.getItem('showTip') === 'false') {
+            this.$nextTick(() => this.closeTip());
+        }
     },
     'watch': {
         'endTime': function(newVal) {
@@ -289,11 +273,12 @@ export default {
         letter-spacing: .5px;
         cursor: pointer;
         padding: 5px 10px;
-        margin: 30px 15px 30px 0;
+        margin: 0 15px;
         border-radius: 3px;
         display: flex;
         align-items: center;
         float: right;
+        max-height: 30px;
     }
     .duration-skip {
         padding: 10px 5px;
@@ -327,7 +312,7 @@ export default {
         background-color: rgba(216, 223, 239, 0.38);
         border-radius: 5px;
         padding: 20px 10px;
-        margin: 30px 15px 0 15px;
+        margin: 30px 15px;
     }
     .fade-enter-active, .fade-leave-active {
       transition: opacity .5s
@@ -389,9 +374,25 @@ export default {
         justify-content: space-between;
     }
     .footer .tip {
-        color: #879fcb;
-        padding: 5px 10px;
-        margin: 30px 15px 30px 10px;
+        background-color: #cef1fc;
+        border-color: #9ee3f9;
+        color: #12718f;
+        border-radius: 5px;
+        -webkit-box-shadow: 0 2px 3px rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.1);
+        box-shadow: 0 2px 3px rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.1);
+        display: block;
+        padding: 1rem;
+        font-size: 12px;
+        display: flex;
+        margin-left: 15px;
+    }
+    .footer .tip i.centered {
+        vertical-align: middle;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+    .hidden {
+        visibility: hidden;
     }
 </style>
 

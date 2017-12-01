@@ -1,0 +1,15 @@
+{
+  "to": "JURECA",
+  "script": "/homec/bp0/bp000024/jureca/venv_bluepy_analysis/bin/analysis_launch.py --blueconfig blueconfig.json --output . --usertarget /homeb/pra098/pra09809/test/user.target.mod",
+  "filesToAvoidCopy": [
+    "BlueConfig",
+    "input.sh",
+    "stderr",
+    "stdout",
+    "output/",
+    "UNICORE_SCRIPT_EXIT_CODE",
+    "BlueConfig.backup"
+  ],
+  "plots": ["psth", "raster"],
+  "analysisAvailable": ["psth", "raster"]
+}

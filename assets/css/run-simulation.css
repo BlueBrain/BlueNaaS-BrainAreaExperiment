@@ -1,0 +1,129 @@
+/* --------- form ---------- */
+.modal-form {
+    max-width: 400px;
+    margin: 0 auto;
+}
+.form-group {
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.form-group .controls select {
+    font-size: 1rem;
+}
+.control-label {
+    display: inline-flex;
+    width: 40%;
+}
+div.controls {
+    display: inline-flex;
+    width: 55%;
+}
+div.controls input,
+div.controls select.form-control {
+    width: 230px;
+    margin-right: 5px;
+}
+.ok-button, .cancel-button {
+    border: 0;
+    border-radius: 3px;
+    box-shadow: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 17px;
+    font-weight: 500;
+    margin: 15px 5px 0;
+    padding: 10px 32px;
+}
+.ok-button {
+    background-color: #548d68;
+}
+.cancel-button {
+    background-color: #ac6067;
+}
+.button-container {
+    display: flex;
+    justify-content: space-around;
+    width: 50%;
+    margin: 0 auto;
+}
+.form-group input
+ {
+    padding: 2px 5px;
+    font-size: 1rem;
+    color: #464a4c;
+    background-color: #fff;
+    background-image: none;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: .25rem;
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+}
+div.controls .autocomplete {
+    width: 205px;
+}
+/* --------- END form ---------- */
+/* --------- timeline ---------- */
+.home {
+  margin-bottom: 40px;
+}
+.visualization {
+    margin-top: 5px;
+}
+.targets-label {
+    position: relative;
+    top: 35px;
+}
+/* hide line and dot to the time */
+.vis-item.vis-line.vis-editable {
+    display: none;
+}
+.vis-item.vis-dot.vis-editable {
+    display: none;
+}
+.vis-custom-time.end {
+    background-color: #FF7F6E;
+    width: 2px;
+    pointer-events: none;
+}
+.vis-item.voltage {
+    background-color: #F6D5ED;
+    border-color: #F797E0;
+}
+.vis-item.Noise {
+    background-color: #d5ddf6;
+    border-color: #97B0F8;
+}
+.vis-item.NPoisson {
+    background-color: #F6EED5;
+    border-color: #F7Df97;
+}
+.vis-item.vis-selected {
+    -webkit-transition: background-color 0.25s linear;
+    border-color: #FFC200;
+    background-color: #FFF785;
+    z-index: 2;
+}
+.tooltip-span {
+    z-index: 2;
+    background-color: #8393b7;
+    color: white;
+    border-radius: 7px;
+    font-size: 14px;
+    padding: 8px;
+    display: none;
+    position: fixed;
+}
+.vis-label {
+    width: 100px;
+}
+.vis-panel {
+    box-sizing: content-box;
+}
+/* --------- END timeline ---------- */

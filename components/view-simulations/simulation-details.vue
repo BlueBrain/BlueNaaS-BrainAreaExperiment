@@ -83,6 +83,8 @@ import Unicore from 'mixins/unicore.js';
 import CollapseTitle from 'components/shared/collapse-title.vue';
 import ItemSummary from 'components/view-simulations/simulation-details/item-summary.vue';
 import Analysis from 'components/view-simulations/simulation-details/analysis.vue';
+import analysisConfig from 'assets/analysis-config.json';
+
 export default {
     'name': 'simulationDetails',
     'props': ['jobParam', 'jobId', 'computerParam'],
@@ -118,7 +120,6 @@ export default {
                 'type': 'Analysis',
                 'intervalReference': null,
                 'autorefresh': true,
-                'psth': null,
                 'id': '',
                 'name': '',
                 'status': '',
@@ -172,18 +173,20 @@ export default {
                 this.unicoreAPI.getAssociatedLocation(this.simulationDetails.files)
                 .then((analysisObject) => {
                     this.analysisDetails.id = analysisObject._links.self.href.split('/').pop();
-                    this.getAnalysisImage(analysisObject);
+                    analysisConfig.plots.forEach((plot) => {
+                        this.getAnalysisImage(analysisObject, plot);
+                    });
                     this.getAnalysisStatus(analysisObject);
                 });
             }
         },
-        'getAnalysisImage': function(analysisObject) {
+        'getAnalysisImage': function(analysisObject, plotName) {
             let analysisURL = analysisObject._links.workingDirectory.href;
-            this.unicoreAPI.getImage(analysisURL + '/files/psth.png')
+            this.unicoreAPI.getImage(`${analysisURL}/files/${plotName}.png`)
             .then((plot) => {
                 let reader = new FileReader();
                 reader.onloadend = () => {
-                    this.$set(this.analysisDetails, 'psth', reader.result);
+                    this.$set(this.analysisDetails, plotName, reader.result);
                 };
                 reader.readAsDataURL(plot);
             }, (error) => {
@@ -343,6 +346,7 @@ export default {
         margin-left: 5px;
     }
 </style>
+
 <style>
     .spin {
       animation: spin 2s infinite linear;

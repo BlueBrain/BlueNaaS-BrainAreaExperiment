@@ -6,8 +6,8 @@ module.exports = {
     'entry': {
         'app': './app.js',
         'vendor': [
-            'vue/dist/vue.min.js','vue-resource', 'vue-router',
-            'hellojs', 'vue-infinite-loading', 'autocomplete-vue'
+            'vue/dist/vue.min.js', 'vue-resource', 'vue-router',
+            'hellojs', 'vue-infinite-loading', 'autocomplete-vue',
         ],
     },
     'output': {
@@ -34,6 +34,7 @@ module.exports = {
                 'loader': 'eslint-loader',
                 'exclude': /node_modules/,
             },
+            {'test': /\.css$/, 'use': ['style-loader', 'css-loader']},
             {'test': /\.vue$/, 'use': 'vue-loader'},
             {'test': /\.html$/, 'use': 'html-loader'},
             {'test': /\.json$/, 'use': 'json-loader'},
@@ -41,9 +42,9 @@ module.exports = {
         ],
     },
     'plugins': [
-        new webpack.optimize.CommonsChunkPlugin("vendor"),
+        new webpack.optimize.CommonsChunkPlugin('vendor'),
         new CopyWebpackPlugin([
-            { from: './favicon.ico', to: 'dist/favicon.ico' },
+            {'from': './favicon.ico', 'to': 'dist/favicon.ico'},
         ]),
     ],
 };

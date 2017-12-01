@@ -1,0 +1,48 @@
+{
+    "JUQUEEN": {
+        "script": [
+            "source /homec/bp0/bp000022/modulecmd/3.2.10/init/bash",
+            "module use /homec/bp0/bp000022/modulesfiles",
+            "module purge",
+            "module load nix/hpc/neurodamus-hippocampus/1.9.0-201710/",
+            "mkdir -p output",
+            "python /homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /homeb/pra098/pra09809/test/user.target.mod --output output"
+        ],
+        "time": "86400",
+        "nodes": "512",
+        "cpus": "8",
+        "pathWork": "/work"
+    },
+    "JULIA": {
+        "script": [
+            "#!/bin/sh",
+            "unset LD_LIBRARY_PATH",
+            "export LD_LIBRARY_PATH=/global/opt/slurm/default/lib64/",
+            "module purge",
+            "module use /gpfs/work/pcp0/pcp0085/x64/modulefiles",
+            "module load nix/hpc/neuron-hippocampus/7.5-201707",
+            "mkdir -p output",
+            "python /gpfs/homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /gpfs/homeb/pra098/pra09809/test/user.target.mod --output output"
+        ],
+        "time": "86400",
+        "nodes": "16",
+        "cpus": "8",
+        "pathWork": "/gpfs/work"
+    },
+    "JURON": {
+        "script": [
+            "#!/bin/sh"
+        ],
+        "time": "1800",
+        "pathWork": "/gpfs/work"
+    },
+    "JURECA": {
+        "script": [
+            "#!/bin/sh"
+        ],
+        "time": "1800",
+        "pathWork": "/work"
+    },
+    "default": "JULIA",
+    "available": ["JULIA", "JURON", "JUQUEEN", "JURECA"]
+}

@@ -15,12 +15,10 @@
             </div>
         </modal>
         <span class="tooltip-span"></span> <!-- tooltip hover item -->
-        <span class="custom-time-label">End</span> <!-- custom time label -->
     </div>
 </template>
 
 <script>
-// import blueConfig from 'assets/entity.json';
 import modal from 'components/shared/modal-component.vue';
 import ReportForm from 'components/run-simulation/report/report-form.vue';
 import EditButtons from 'components/run-simulation/edit-buttons.vue';
@@ -123,9 +121,9 @@ export default {
             let report = {};
             report.StartTime = 0;
             report.EndTime = parseInt(this.endTime);
-            report.ReportOn = 'v';
+            report.ReportOn = 'voltage';
             report.Unit = 'mV';
-            report.Target = 'FullCA1';
+            report.Target = 'slice-4';
             report.Type = 'compartment';
             report.Format = 'Bin';
             report.Dt = 0.1;
@@ -154,6 +152,9 @@ export default {
                 if (report.Target === 'FullCA1') {
                     report.Target = 'Mosaic';
                 }
+                if (report.ReportOn === 'voltage') {
+                    report.ReportOn = 'v';
+                }
                 let repName = this.changeConnectionName(report.Target, 'report', i);
                 config['Report'][repName] = report;
             }
@@ -181,76 +182,10 @@ export default {
         });
     },
     'watch': {
-        'endTime': function(newVal, oldVal) {
-            let newValInt = parseInt(newVal);
-            this.timeline.setCustomTime(newValInt, 'end');
+        'endTime': function(newVal) {
+            this.timeline.setCustomTime(parseInt(newVal), 'end');
             this.createCustomTimeLabel(); // from the simulation.js
         },
     },
 };
 </script>
-
-<style scoped>
-    .home {
-        margin-bottom: 40px;
-    }
-    .duration-skip {
-        float: right;
-    }
-    .visualization {
-        margin-top: 5px;
-    }
-    .targets-label {
-        position: relative;
-        top: 35px;
-    }
-</style>
-
-<style>
-    /* hide line and dot to the time */
-    .report-timeline .vis-item.vis-line.vis-editable {
-        display: none;
-    }
-    .report-timeline .vis-item.vis-dot.vis-editable {
-        display: none;
-    }
-    .report-timeline .vis-item.NPoisson {
-        background-color: #F6EED5;
-        border-color: #F7Df97;
-    }
-    .report-timeline .vis-item.v {
-        background-color: #F6D5ED;
-        border-color: #F797E0;
-    }
-    .report-timeline .vis-item.Noise {
-        background-color: #d5ddf6;
-        border-color: #97B0F8;
-    }
-    .report-timeline .vis-item.vis-selected {
-        -webkit-transition: background-color 0.25s linear;
-        border-color: #FFC200;
-        background-color: #FFF785;
-        z-index: 2;
-    }
-    .report-timeline .vis-custom-time.end {
-        background-color: #FF7F6E;
-        width: 2px;
-        pointer-events: none;
-    }
-    .report-timeline .tooltip-span {
-        z-index: 2;
-        background-color: #8393b7;
-        color: white;
-        border-radius: 7px;
-        font-size: 14px;
-        padding: 8px;
-        display: none;
-        position: fixed;
-    }
-    .report-timeline .vis-label {
-        width: 100px;
-    }
-    .report-timeline .vis-panel {
-        box-sizing: content-box;
-    }
-</style>

@@ -173,7 +173,7 @@ export default {
             let that = this;
             let options = {
                 'selectable': true,
-                'timeAxis': {'scale': 'millisecond', 'step': 20},
+                'timeAxis': {'scale': 'millisecond', 'step': 50},
                 'showMajorLabels': false,
                 'showCurrentTime': false,
                 'format': {
@@ -190,7 +190,7 @@ export default {
                 'onMove': this.onMove,
                 'onUpdate': this.onUpdate,
                 'onRemove': this.onRemove,
-                'zoomMax': 1000 * 5, // 5s limit zoom out
+                'zoomMax': 1000 * 3, // 5s limit zoom out
             };
 
             this.timeline = new vis.Timeline(container);
@@ -198,7 +198,7 @@ export default {
             this.timeline.setGroups(new vis.DataSet(this.groups));
             this.timeline.setItems(new vis.DataSet(this.items));
             this.timeline.addCustomTime(this.endTime, 'end');
-            this.timeline.setCustomTimeTitle('End of the simulation', 'end');
+            this.timeline.setCustomTime(parseInt(this.endTime), 'end');
 
             // tooltip section
             this.tooltipElem = this.$el.querySelector('.tooltip-span');

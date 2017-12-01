@@ -44,6 +44,7 @@ export default {
         },
     },
     'created': function() {
+        this.localShow = this.show;
         document.addEventListener('keydown', (e) => {
             if (this.show && e.keyCode == 27) {
                 this.close();

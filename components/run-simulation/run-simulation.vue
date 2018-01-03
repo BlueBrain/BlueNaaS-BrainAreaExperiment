@@ -372,27 +372,7 @@ export default {
     .footer {
         display: flex;
         justify-content: space-between;
-    }
-    .footer .tip {
-        background-color: #cef1fc;
-        border-color: #9ee3f9;
-        color: #12718f;
-        border-radius: 5px;
-        -webkit-box-shadow: 0 2px 3px rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.1);
-        box-shadow: 0 2px 3px rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.1);
-        display: block;
-        padding: 1rem;
-        font-size: 12px;
-        display: flex;
         margin-left: 15px;
-    }
-    .footer .tip i.centered {
-        vertical-align: middle;
-        cursor: pointer;
-        margin-left: 5px;
-    }
-    .hidden {
-        visibility: hidden;
     }
 </style>
 

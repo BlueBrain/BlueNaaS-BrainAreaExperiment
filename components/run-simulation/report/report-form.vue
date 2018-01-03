@@ -86,7 +86,7 @@
 <script>
 import AutocompleteVue from 'autocomplete-vue';
 import targetList from 'assets/targetList.json';
-import 'assets/css/run-simulation.css';
+import 'assets/css/simulation.css';
 export default {
     'name': 'report-form',
     'props': ['reportEditableObject'],

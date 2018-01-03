@@ -48,8 +48,7 @@ div.controls select.form-control {
     width: 50%;
     margin: 0 auto;
 }
-.form-group input
- {
+.form-group input {
     padding: 2px 5px;
     font-size: 1rem;
     color: #464a4c;
@@ -67,6 +66,27 @@ div.controls select.form-control {
 }
 div.controls .autocomplete {
     width: 205px;
+}
+/* Tips styles */
+.footer .tip {
+    background-color: #cef1fc;
+    border-color: #9ee3f9;
+    color: #12718f;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 2px 3px rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.1);
+    box-shadow: 0 2px 3px rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.1);
+    display: block;
+    padding: 1rem;
+    font-size: 12px;
+    display: flex;
+}
+.footer .tip i.centered {
+    vertical-align: middle;
+    cursor: pointer;
+    margin-left: 5px;
+}
+.hidden {
+    visibility: hidden;
 }
 /* --------- END form ---------- */
 /* --------- timeline ---------- */

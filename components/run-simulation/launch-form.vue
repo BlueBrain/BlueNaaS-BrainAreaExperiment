@@ -99,7 +99,7 @@
 </template>
 
 <script>
-    import 'assets/css/run-simulation.css';
+    import 'assets/css/simulation.css';
     import launchConfig from 'assets/simulation-config.json';
     export default {
         'data': function() {

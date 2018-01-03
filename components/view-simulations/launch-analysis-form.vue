@@ -35,6 +35,16 @@
                 <input type="number" v-model="percentageOfCells" placeholder="Cells (%) to visualize">
             </div>
         </div>
+        <div class="footer">
+            <div id="tip" class="tip">
+                <div class="tips">
+                    <div v-for="tip in tipTexts">{{tip}}</div>
+                </div>
+                <div class="close">
+                    <i class="centered material-icons" @click="closeTip">close</i>
+                </div>
+            </div>
+        </div>
         <div class="button-container">
             <input class="ok-button" type="button" @click="editItem" value="Ok">
             <input class="cancel-button" type="button" @click="closeForm" value="Cancel">
@@ -43,7 +53,7 @@
 </template>
 
 <script>
-    import 'assets/css/run-simulation.css';
+    import 'assets/css/simulation.css';
     export default {
         'props': ['defaultAnalysisConfig'],
         'data': function() {
@@ -62,7 +72,16 @@
                 'analysisToRun': this.defaultAnalysisConfig.analysisAvailable,
                 'checkedAnalysis': [],
                 'percentageOfCells': 50,
+                'tipTexts': [
+                    `To run the Analysis we need to copy the output from the Simulation to ${this.defaultAnalysisConfig.to.computer} (because that machine has the analysis packages installed) and run the new Analysis Job.`,
+                    'The results of the Analysis will be shown in the detailed page.',
+                ],
             };
+        },
+        'mounted': function() {
+            if (localStorage.getItem('showAnalysisTip') === 'false') {
+                this.$nextTick(() => this.closeTip());
+            }
         },
         'methods': {
             'editItem': function() {
@@ -70,6 +89,11 @@
             },
             'closeForm': function() {
                 this.$emit('changeModalVisibility', false);
+            },
+            'closeTip': function() {
+                let tipElement = this.$el.querySelector('#tip');
+                tipElement.remove();
+                localStorage.setItem('showAnalysisTip', false);
             },
         },
     };

@@ -51,8 +51,8 @@ This component manage each job (delete, start, create, etc).
         </div>
         <div class="table-header">
             <span class="id">Name</span>
-            <span class="status">Simulation Step</span>
-            <span class="status">Analysis Step</span>
+            <span class="status" title="Check the simulation status">Simulation Step</span>
+            <span class="status" title="Check / run the analysis">Analysis Step</span>
             <span class="time">Submission Date</span>
         </div>
         <div v-if="!loading" class="simulation-items-container">
@@ -451,6 +451,7 @@ This component manage each job (delete, start, create, etc).
     }
     .table-header span.status {
         width: 18%;
+        cursor: help;
     }
     .table-header span.time {
         width: 32%;
@@ -499,7 +500,7 @@ This component manage each job (delete, start, create, etc).
         box-shadow: inset 0 1px 3px #ddd;
         border-radius: 4px;
         box-sizing: border-box;
-        padding: 9px 15px;
+        padding: 6px 10px;
     }
     .config-template {
         overflow: hidden;

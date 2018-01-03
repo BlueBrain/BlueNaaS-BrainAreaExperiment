@@ -24,7 +24,7 @@ import Modal from 'components/shared/modal-component.vue';
 import StimulationForm from 'components/run-simulation/stimulation/stimulation-form.vue';
 import mixin from 'mixins/simulationTimeline.js';
 import EditButtons from 'components/run-simulation/edit-buttons.vue';
-import 'assets/css/run-simulation.css';
+import 'assets/css/simulation.css';
 export default {
     'name': 'stimulation-timeline',
     'props': ['endTime', 'forwardSkip', 'blueConfig'],

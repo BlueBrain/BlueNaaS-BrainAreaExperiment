@@ -5,6 +5,9 @@ This will only display the item. It knows where to put all the information.
     <div class="simulation-item" @click="itemSelected">
         <div class="left-part clickable">
             <div class="id clickable">{{job.name}}</div>
+            <div class="details-button">
+                <a class="button-with-icon clickable" title="See Simulation details"><i class="material-icons">zoom_in</i>Details</a>
+            </div>
         </div>
         <!-- simulation status icon -->
         <div class="middle-part clickable simulation">
@@ -17,7 +20,7 @@ This will only display the item. It knows where to put all the information.
             <i  class="material-icons colored"  v-if="!showAnalysisButton"
                 :title="getStatusString(job.analysisStatus)">
                 {{ getStatusIcon(job.analysisStatus) }}</i>
-            <a @click="runAnalysis" v-else class="button-with-icon analysis" :class="{available: !analysisAlreadyDone}" title="Start analysis"><i class="material-icons">play_arrow</i>Analysis</a>
+            <a @click="runAnalysis" v-else class="button-with-icon analysis" :class="{available: !analysisAlreadyDone}" title="Start analysis"><i class="material-icons">play_arrow</i>Start</a>
         </div>
         <div class="right-part clickable">
             <div class="column clickable">
@@ -116,7 +119,7 @@ export default {
     .left-part {
         width: 40%;
         display: flex;
-        justify-content: start;
+        justify-content: space-between;
         align-items: center;
     }
     .middle-part {

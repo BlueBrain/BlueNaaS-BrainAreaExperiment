@@ -3,7 +3,7 @@
         <form name="reportForm modal-form">
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="control-label" title="Defines the region from where the data will be reported. Note that cell targets versus compartment targets can influence report behavior">Target</label>
+                    <label class="control-label" title="Defines the region from where the data will be reported.">Target</label>
                     <div class="controls autocomplete-container">
                         <autocomplete-vue :list="processedTargetList" placeholder="Target" v-model="report.Target"></autocomplete-vue>
                     </div>
@@ -13,9 +13,13 @@
                     <label class="control-label" title="Compartment means that each compartment outputs separately in the report file. Synapse indicates that each synapse will have a separate entry in the report.">Type</label>
                     <div class="controls">
                         <select class="form-control" v-model="report.Type" type="text" id="Type" placeholder="Type" required>
-                            <option>compartment</option>
+                            <option>Compartment</option>
                             <!-- <option>Summation</option> -->
-                            <option>Synapse</option>
+                            <option
+                                v-show="report.Target != 'AllCompartments'"
+                            >
+                                Synapse
+                            </option>
                         </select>
                     </div>
                 </div>

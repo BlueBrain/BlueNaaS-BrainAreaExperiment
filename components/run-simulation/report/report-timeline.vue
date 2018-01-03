@@ -124,7 +124,7 @@ export default {
             report.ReportOn = 'voltage';
             report.Unit = 'mV';
             report.Target = 'slice-4';
-            report.Type = 'compartment';
+            report.Type = 'Compartment';
             report.Format = 'Bin';
             report.Dt = 0.1;
             return report;
@@ -154,6 +154,9 @@ export default {
                 }
                 if (report.ReportOn === 'voltage') {
                     report.ReportOn = 'v';
+                }
+                if (report.Type === 'Compartment') {
+                    report.Type = 'compartment';
                 }
                 let repName = this.changeConnectionName(report.Target, 'report', i);
                 config['Report'][repName] = report;

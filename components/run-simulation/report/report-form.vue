@@ -13,12 +13,11 @@
                     <label class="control-label" title="Compartment means that each compartment outputs separately in the report file. Synapse indicates that each synapse will have a separate entry in the report.">Type</label>
                     <div class="controls">
                         <select class="form-control" v-model="report.Type" type="text" id="Type" placeholder="Type" required>
-                            <option>Compartment</option>
-                            <!-- <option>Summation</option> -->
                             <option
-                                v-show="report.Target != 'AllCompartments'"
+                                v-for="type in filteredTypes"
+                                v-bind:key="type"
                             >
-                                Synapse
+                                {{type}}
                             </option>
                         </select>
                     </div>
@@ -95,6 +94,8 @@ export default {
             'processedTargetList': undefined,
             'report': this.reportEditableObject.item.reportInfo,
             'item': this.reportEditableObject.item,
+            'typesFull': ['Compartment', 'Synapse'],
+            'filteredTypes': [],
         };
     },
     'components': {
@@ -141,6 +142,7 @@ export default {
     },
     'created': function() {
         this.processTargetList();
+        this.filteredTypes = this.typesFull;
     },
     'mounted': function() {
         this.form = this.$el.querySelector('form');
@@ -159,6 +161,13 @@ export default {
         'report.Target': function(newVal) {
             this.item.group = newVal;
             this.report.Target = newVal;
+            // check for AllCompartments allow only type compartment
+            if (this.report.Target === 'AllCompartments') {
+                this.filteredTypes = ['Compartment'];
+                this.report.Type = this.filteredTypes[0];
+            } else {
+                this.filteredTypes = this.typesFull;
+            }
         },
     },
 };

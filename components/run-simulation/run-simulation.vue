@@ -217,7 +217,7 @@ export default {
                 that.unicore.actionJob(submittedJob._links['action:start'].href);
                 swal.disableLoading();
                 return swal({
-                    'title': 'Simulation started!',
+                    'title': 'Simulation submitted!',
                     'showCancelButton': true,
                     'confirmButtonText': 'View Job',
                     'cancelButtonText': 'OK',

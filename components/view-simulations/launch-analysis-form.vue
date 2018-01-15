@@ -73,7 +73,7 @@
                 'checkedAnalysis': [],
                 'percentageOfCells': 50,
                 'tipTexts': [
-                    `To run the Analysis we need to copy the output from the Simulation to ${this.defaultAnalysisConfig.to.computer} (because that machine has the analysis packages installed) and run the new Analysis Job.`,
+                    `To run the Analysis we need to copy the output from the Simulation to ${this.defaultAnalysisConfig.to} (because that machine has the analysis packages installed) and run the new Analysis Job.`,
                     'The results of the Analysis will be shown in the detailed page.',
                 ],
             };

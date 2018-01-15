@@ -155,6 +155,17 @@ export default {
         },
         'runSimulation': function() {
             this.createConfig();
+            if (
+                Object.keys(this.blueConfig.Report).length === 0 ||
+                Object.keys(this.blueConfig.StimulusInject).length === 0
+            ) {
+                swal(
+                    'Missing parameter(s)',
+                    'Select at least one stimulus and one report.',
+                    'error'
+                );
+                return;
+            }
             this.toggleModal();
         },
         'fillToken': function(renew) {

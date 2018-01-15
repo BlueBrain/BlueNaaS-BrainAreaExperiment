@@ -54,6 +54,7 @@
 
 <script>
     import 'assets/css/simulation.css';
+    import utils from 'assets/utils.js';
     export default {
         'props': ['defaultAnalysisConfig'],
         'data': function() {
@@ -85,6 +86,7 @@
         },
         'methods': {
             'editItem': function() {
+                this.title = utils.filterName(this.title);
                 this.$emit('validationConfigReady', this.$data);
             },
             'closeForm': function() {

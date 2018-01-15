@@ -101,6 +101,7 @@
 <script>
     import 'assets/css/simulation.css';
     import launchConfig from 'assets/simulation-config.json';
+    import utils from 'assets/utils.js';
     export default {
         'data': function() {
             return {
@@ -117,6 +118,7 @@
         },
         'methods': {
             'editItem': function() {
+                this.title = utils.filterName(this.title);
                 let filtered = Object.assign({}, this.$data);
                 // remove the empty items
                 Object.keys(filtered).forEach((key) => {

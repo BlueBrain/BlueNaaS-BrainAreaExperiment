@@ -48,6 +48,7 @@ This will only display the item. It knows where to put all the information.
 const BLOCK_STATUS = 'BLOCK';
 const SUCCESSFUL_STATUS = 'SUCCESSFUL';
 const FAILED_STATUS = 'FAILED';
+import utils from 'assets/utils.js';
 export default {
     'name': 'simulationItem',
     'props': ['job'],
@@ -101,10 +102,7 @@ export default {
             }
         },
         'getDate': function() {
-            let stringDate = this.job.submissionTime;
-            if (stringDate) {
-                return new Date(this.job.submissionTime).toLocaleString();
-            }
+            return utils.getDateLocalTime(this.job.submissionTime);
         },
         'analysisDone': function() {
             return (this.job.analysisStatus === SUCCESSFUL_STATUS ? true : false);

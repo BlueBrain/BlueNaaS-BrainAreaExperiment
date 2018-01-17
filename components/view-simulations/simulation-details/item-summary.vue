@@ -28,6 +28,7 @@
     </div>
 </template>
 <script>
+    import utils from 'assets/utils.js';
     export default {
         'name': 'item-summary',
         'props': ['itemDetails'],
@@ -38,14 +39,13 @@
         },
         'computed': {
             'date': function() {
-                let rawDate = new Date(this.itemDetails.submissionTime);
-                return rawDate.toLocaleString();
+                return utils.getDateLocalTime(this.itemDetails.submissionTime);
             },
             'simulationAutorefreshString': function() {
                 return (this.itemDetails.autorefresh ? 'ON' : 'OFF');
             },
             'analysisAutorefreshString': function() {
-                return (this.itemDetails.autorefresh ? 'ON' : 'OFF');
+                this.simulationAutorefreshString();
             },
             'getStatusIcon': function() {
                 if (this.itemDetails.status === 'FAILED') {

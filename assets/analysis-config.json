@@ -11,5 +11,6 @@
     "BlueConfig.backup"
   ],
   "plots": ["psth", "raster"],
-  "analysisAvailable": ["psth", "raster"]
+  "analysisAvailable": ["psth", "raster"],
+  "configFileName": "analysis_config.json"
 }

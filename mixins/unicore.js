@@ -1,6 +1,7 @@
 module.exports = (function() {
     'use strict';
     let hello = require('assets/hbp.hello.js').hellojs;
+    let analysisConfig = require('assets/analysis-config.json');
     let token = '';
     let actionJob = function(actionURL) {
         // actions like start, restart, abort
@@ -46,6 +47,37 @@ module.exports = (function() {
             return response.json();
         });
     };
+    let getAllJobsExapandedWithChildren = function(site) {
+        // get the information of all jobs asociated with key + the children
+        let jobsList = [];
+        let chainPromise = [];
+        let output = [];
+        return getAllJobs(site)
+        .then((parsed) => {
+            jobsList = parsed.jobs;
+            if (jobsList.length <= 0) return;
+            jobsList.forEach((job) => {
+                let jobExapandedInfo = {};
+                let chain = getJobProperties(job)
+                .then((jobInfo) => {
+                    jobExapandedInfo = jobInfo;
+                    let url = `${jobInfo._links.workingDirectory.href}/files`;
+                    return getFilesList(url);
+                })
+                .then((childrenInfo) => {
+                    jobExapandedInfo['children'] = childrenInfo.children;
+                    let id = getLastJobId(job);
+                    jobExapandedInfo['id'] = id;
+                    output.push(jobExapandedInfo);
+                });
+                chainPromise.push(chain);
+            });
+            return Promise.all(chainPromise);
+        })
+        .then(() => {
+            return output;
+        });
+    };
     let getAssociatedLocation = function(workingDirectory) {
         let url = workingDirectory + '/files/analysis_path';
         return getFiles(url)
@@ -76,7 +108,11 @@ module.exports = (function() {
             'headers': headers,
         })
         .then((response) => {
-            return response.json();
+            try {
+                return response.json();
+            } catch (e) {
+                return Promise.reject;
+            }
         }, Promise.reject)
         .then((files) => {
             return files;
@@ -183,6 +219,9 @@ module.exports = (function() {
         .then((response) => {
             return response.json();
         }, Promise.reject);
+    };
+    let getLastJobId = function(url) {
+        return url.split('/').pop();
     };
     let getResourcesAvailable = function() {
         /** returns the site and project that the user have access related to HBP
@@ -320,6 +359,7 @@ module.exports = (function() {
         });
     };
     let submitAnalysis = function(moveObject, script, filesToAvoidCopy) {
+        let configName = analysisConfig.configFileName;
         return new Promise((resolve, reject) => {
             /**
                 Create a new job so we have working space where to copy files for analysis
@@ -365,7 +405,7 @@ module.exports = (function() {
                     'Data': script,
                 },
                 {
-                    'To': 'config.json',
+                    'To': configName,
                     'Data': JSON.stringify(analysisConfig),
                 },
             ];
@@ -523,22 +563,23 @@ module.exports = (function() {
         }).then(handleErrors);
     };
     return {
-        'getAssociatedLocation': getAssociatedLocation,
-        'deleteJob': deleteJob,
-        'uploadData': uploadData,
-        'submitJob': submitJob,
-        'actionJob': actionJob,
-        'getAllJobs': getAllJobs,
-        'getJobById': getJobById,
-        'getJobProperties': getJobProperties,
-        'getFiles': getFiles,
-        'getFilesList': getFilesList,
-        'getFilesToCopy': getFilesToCopy,
-        'getImage': getImage,
-        'getConfig': getConfig,
-        'getResourcesAvailable': getResourcesAvailable,
-        'init': init,
-        'submitAnalysis': submitAnalysis,
-        'transferFiles': transferFiles,
+        getAssociatedLocation,
+        deleteJob,
+        uploadData,
+        submitJob,
+        actionJob,
+        getAllJobs,
+        getAllJobsExapandedWithChildren,
+        getJobById,
+        getJobProperties,
+        getFiles,
+        getFilesList,
+        getFilesToCopy,
+        getImage,
+        getConfig,
+        getResourcesAvailable,
+        init,
+        submitAnalysis,
+        transferFiles,
     };
 }());

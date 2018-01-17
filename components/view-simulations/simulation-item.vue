@@ -4,13 +4,22 @@ This will only display the item. It knows where to put all the information.
 <template>
     <div class="simulation-item" @click="itemSelected">
         <div class="left-part clickable">
-            <div class="id clickable">{{job.name}}</div>
+            <div class="id clickable">
+                {{job.name}}
+            </div>
             <div class="details-button">
                 <a class="button-with-icon clickable" title="See Simulation details"><i class="material-icons">zoom_in</i>Details</a>
             </div>
         </div>
         <!-- simulation status icon -->
         <div class="middle-part clickable simulation">
+            <i
+                v-if="job.noOut"
+                class="material-icons colored"
+                title="No results produced"
+            >
+                warning
+            </i>
             <i  class="material-icons colored"
                 :title="getStatusString(job.status)">
                 {{ getStatusIcon(job.status) }}</i>
@@ -145,6 +154,7 @@ export default {
         display: flex;
         align-items: flex-end;
         flex-wrap: wrap;
+        justify-content: flex-end;
     }
     a.button-with-icon {
         color: #fff;

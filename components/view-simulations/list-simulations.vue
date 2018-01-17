@@ -265,26 +265,25 @@ This component manage each job (delete, start, create, etc).
                     loadingComp.style.display = 'block';
                 }
                 this.jobs = [];
-                this.unicoreAPI.getAllJobs(this.computerFilter)
-                .then((response) => {
-                    let jobs = response.jobs;
-                    let jobPropertiesArray = [];
-                    for (let i = 0; i < jobs.length; i++) {
-                        let job = jobs[i];
-                        jobPropertiesArray.push(this.unicoreAPI.getJobProperties(job));
-                    }
-                    return Promise.all(jobPropertiesArray);
-                })
+                this.unicoreAPI.getAllJobsExapandedWithChildren(this.computerFilter)
                 .then((resultsArray) => {
-                    // I need to wait to all so I can sort them by date.
-                    // TODO: ask for the API to obtain by date.
-                    // get the analysis information async
-                    resultsArray.map((simulationJob) => {
-                        // add this so the item shows sync icon
-                        simulationJob['analysisStatus'] = 'LOADING';
-                        this.getAnalysisInfo(simulationJob);
+                    let onlySimulations = resultsArray.filter((simulation) => {
+                        if (simulation.children.includes(`/${analysisConfig.configFileName}`)) {
+                            // it is an analysis that should be removed
+                            return false;
+                        }
+                        if (!simulation.children.includes('/out.dat') &&
+                            simulation.status === 'SUCCESSFUL') {
+                            // without out.dat no analysis should be run
+                            simulation['analysisStatus'] = 'BLOCK';
+                            simulation['noOut'] = true;
+                        } else {
+                            simulation['analysisStatus'] = 'LOADING';
+                            this.getAnalysisInfo(simulation);
+                        }
+                        return true;
                     });
-                    this.filteredObjects = this.jobs = resultsArray;
+                    this.filteredObjects = this.jobs = onlySimulations;
                     this.filter();
                     if (loadingComp) {
                         this.$nextTick(() => {

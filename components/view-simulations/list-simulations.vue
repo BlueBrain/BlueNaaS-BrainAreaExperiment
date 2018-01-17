@@ -118,7 +118,7 @@ This component manage each job (delete, start, create, etc).
                 'filteredObjects': [],
                 'viewList': [],
                 'readObjectIndex': 0,
-                'loadIncrement': 5,
+                'loadIncrement': 10,
                 'statusFilter': 'ALL',
                 'nameFilter': '',
                 'dateFilter': '',

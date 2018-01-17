@@ -43,6 +43,6 @@
         "time": "1800",
         "pathWork": "/work"
     },
-    "default": "JULIA",
+    "default": "JUQUEEN",
     "available": ["JULIA", "JURON", "JUQUEEN", "JURECA"]
 }

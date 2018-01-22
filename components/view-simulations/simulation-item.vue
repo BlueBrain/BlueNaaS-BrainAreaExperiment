@@ -181,14 +181,8 @@ export default {
     .material-icons.colored[title='SUCCESSFUL'] {
         color: green;
     }
-    .column {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-    }
     .date {
         text-align: right;
-        padding-right: 10px;
+        padding-right: 5px;
     }
 </style>

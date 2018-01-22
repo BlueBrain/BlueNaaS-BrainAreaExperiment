@@ -144,7 +144,7 @@ module.exports = (function() {
         */
         let jobSpec = {
             'ApplicationName': configParams.applicationName,
-            'Name': configParams.title,
+            'Name': configParams.title || 'unnamed job',
             'Project': configParams.project,
             'haveClientStageIn': 'true',
             'Resources': {
@@ -391,7 +391,7 @@ module.exports = (function() {
             let jobSpec = {
                 'ApplicationName': 'Bash shell',
                 'Parameters': {'SOURCE': 'input.sh'},
-                'Name': moveObject.title,
+                'Name': moveObject.title || 'unnamed job',
                 'Resources': {'Nodes': moveObject.nodes},
                 'haveClientStageIn': 'true',
             };

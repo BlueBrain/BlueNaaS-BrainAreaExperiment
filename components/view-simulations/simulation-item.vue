@@ -51,17 +51,17 @@ This will only display the item. It knows where to put all the information.
                 <div class="date">{{getDate}}</div>
                 <div class="inline-flex">
                     <a
-                        @click="deleteJob"
-                        class="button-with-icon danger"
-                        title="Delete job forever">
-                        <i class="material-icons">delete_forever</i>Delete
-                    </a>
-                    <a
                         @click="runAnalysis"
                         v-if="analysisCanRun"
                         class="button-with-icon analysis available"
                         title="Start analysis">
                         <i class="material-icons">play_arrow</i>Analysis
+                    </a>
+                    <a
+                        @click="deleteJob"
+                        class="button-with-icon danger"
+                        title="Delete job forever">
+                        <i class="material-icons">delete_forever</i>Delete
                     </a>
                     <a
                         @click="abortJob"

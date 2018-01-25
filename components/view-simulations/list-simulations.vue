@@ -97,6 +97,12 @@ This component manage each job (delete, start, create, etc).
     import LaunchAnalysisForm from 'components/view-simulations/launch-analysis-form.vue';
     import Modal from 'components/shared/modal-component.vue';
     import templateBluepyConfig from 'assets/blueconfig.json';
+    const BLOCK_STATUS = 'BLOCK';
+    const LOADING_STATUS = 'LOADING';
+    const SUCCESSFUL_STATUS = 'SUCCESSFUL';
+    const QUEUED_STATUS = 'QUEUED';
+    const RUNNING_STATUS = 'RUNNING';
+
     export default {
         'name': 'list_simulations',
         'components': {
@@ -202,17 +208,17 @@ This component manage each job (delete, start, create, etc).
             'getAnalysisInfo': function(simulationJob) {
                 /*  get the location of the analysis based on the mapping file
                     that we save in the simulation and then the validation image */
-                if (simulationJob.status === 'SUCCESSFUL') {
+                if (simulationJob.status === SUCCESSFUL_STATUS) {
                     this.unicoreAPI.getAssociatedLocation(simulationJob._links.workingDirectory.href)
                     .then((analysisObject) => {
                         if (analysisObject === '') {
                             // stop loading status. analysis not run yet.
-                            return this.$set(simulationJob, 'multipleAnalysisStatus', []);
+                            return this.setMultipleAnalysisStatus(simulationJob, []);
                         }
                         this.getStatus(analysisObject, simulationJob);
                     });
                 } else {
-                    this.$set(simulationJob, 'multipleAnalysisStatus', ['BLOCK']);
+                    this.setMultipleAnalysisStatus(simulationJob, [BLOCK_STATUS]);
                 }
             },
             'getStatus': function(analysisObject, simulationJob) {
@@ -222,9 +228,12 @@ This component manage each job (delete, start, create, etc).
                     this.unicoreAPI.getJobProperties(analysis._links.self.href)
                     .then((jobInfo) => {
                         multipleAnalysis.push(jobInfo.status);
-                        this.$set(simulationJob, 'multipleAnalysisStatus', multipleAnalysis);
+                        this.setMultipleAnalysisStatus(simulationJob, multipleAnalysis);
                     });
                 });
+            },
+            'setMultipleAnalysisStatus': function(simulationJob, statusList) {
+                this.$set(simulationJob, 'multipleAnalysisStatus', statusList.sort());
             },
             'removeFromList': function(url) {
                 this.jobs.map((job, index, arr) => {
@@ -278,13 +287,13 @@ This component manage each job (delete, start, create, etc).
                             return false;
                         }
                         if (!simulation.children.includes('/out.dat') &&
-                            simulation.status === 'SUCCESSFUL') {
+                            simulation.status === SUCCESSFUL_STATUS) {
                             // without out.dat no analysis should be run
-                            simulation['multipleAnalysisStatus'] = ['BLOCK'];
+                            simulation['multipleAnalysisStatus'] = [BLOCK_STATUS];
                             // flag to show the warning icon on the list
                             simulation['noOut'] = true;
                         } else {
-                            simulation['multipleAnalysisStatus'] = ['LOADING'];
+                            simulation['multipleAnalysisStatus'] = [LOADING_STATUS];
                             this.getAnalysisInfo(simulation);
                         }
                         return true;
@@ -327,9 +336,9 @@ This component manage each job (delete, start, create, etc).
                     if (simulationJob.autorefresh) {
                         simulationJob['intervalReference'] = setInterval(() => {
                             let statusList = simulationJob.multipleAnalysisStatus;
-                            if (!statusList.includes('LOADING') &&
-                                !statusList.includes('QUEUED') &&
-                                !statusList.includes('RUNNING')) {
+                            if (!statusList.includes(LOADING_STATUS) &&
+                                !statusList.includes(QUEUED_STATUS) &&
+                                !statusList.includes(RUNNING_STATUS)) {
                                 // stop interval on job finished
                                 simulationJob['intervalReference'] = clearTimeout(simulationJob.intervalReference);
                             } else {
@@ -343,7 +352,7 @@ This component manage each job (delete, start, create, etc).
                 simulationJob['autorefresh'] = true;
                 simulationJob['intervalReference'] = null;
                 // add this status to show the sync
-                simulationJob.multipleAnalysisStatus.push('LOADING');
+                simulationJob.multipleAnalysisStatus.push(LOADING_STATUS);
                 poolAnalysis.call(this, simulationJob);
             },
             'analysisConfigReady': function(analysisConfig) {

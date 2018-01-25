@@ -4,7 +4,7 @@
             <div class="top">
                 <span class="type">{{ itemDetails.type }}:</span>
                 <span class="name" v-if="itemDetails.name">{{ itemDetails.name }}</span>
-                <span class="name" v-else> Not available </span>
+                <span class="name" v-else> Not available yet </span>
             </div>
             <div class="bottom" v-if="itemDetails.id">
                 <a class="button-with-icon id" title="ID"><i class="material-icons">fingerprint</i>
@@ -19,10 +19,9 @@
                     <i class="material-icons">watch_later</i>
                     {{ date }}
                 </a>
-                <a class="button-with-icon" title="Auto Refresh" @click="toggleAutoreload">
-                    <i class="material-icons" :class="{spin : itemDetails.intervalReference}">autorenew</i>
-                    {{ simulationAutorefreshString }}
-                </a>
+                <span>
+                    <slot></slot>
+                </span>
             </div>
         </div>
     </div>
@@ -32,20 +31,9 @@
     export default {
         'name': 'item-summary',
         'props': ['itemDetails'],
-        'methods': {
-            'toggleAutoreload': function() {
-                this.$emit('toggleAutoreload', this.itemDetails);
-            },
-        },
         'computed': {
             'date': function() {
                 return utils.getDateLocalTime(this.itemDetails.submissionTime);
-            },
-            'simulationAutorefreshString': function() {
-                return (this.itemDetails.autorefresh ? 'ON' : 'OFF');
-            },
-            'analysisAutorefreshString': function() {
-                this.simulationAutorefreshString();
             },
             'getStatusIcon': function() {
                 if (this.itemDetails.status === 'FAILED') {
@@ -76,7 +64,11 @@
         display: inline-block;
     }
     .column .id {
-        width: 335px;
+        width: 180px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        vertical-align: middle;
     }
     .column .name {
         margin-left: 10px;

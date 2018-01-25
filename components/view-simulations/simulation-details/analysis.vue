@@ -12,9 +12,6 @@
             >
             <div v-else>{{ noValidationText }}</div>
         </div>
-        <a class="button-with-icon" v-if="itemDetails.intervalReference" title="Loading">
-            <i class="material-icons spin">autorenew</i>
-        </a>
     </div>
 </template>
 

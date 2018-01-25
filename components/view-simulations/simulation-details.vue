@@ -8,10 +8,15 @@ This will display the details of a certain simulation and the analysis.
                 <div>
                     <item-summary
                         :itemDetails="simulationDetails"
-                        @toggleAutoreload="toggleAutoreload"></item-summary>
-                    <item-summary
-                        :itemDetails="analysisDetails"
-                        @toggleAutoreload="toggleAutoreload"></item-summary>
+                        @toggleAutoreload="toggleAutoreload">
+                        <!-- in the slot show the spinner -->
+                        <a
+                            v-if="simulationDetails.intervalReference"
+                            title="Loading"
+                        >
+                            <i class="material-icons spin">autorenew</i>
+                        </a>
+                    </item-summary>
                 </div>
                 <div class="space-flex"></div>
                 <a class="button-with-icon colored" @click="returnList"><i class="material-icons">arrow_back</i>Simulation List</a>
@@ -22,7 +27,25 @@ This will display the details of a certain simulation and the analysis.
             <div class="detail-content">
                 <collapse-title title="Analysis" :collapsed="false">
                     <div slot="element">
-                        <analysis :itemDetails="analysisDetails"></analysis>
+                        <a
+                            v-if="analysisDetails.length === 0"
+                            title="Loading"
+                        >
+                            <i class="material-icons spin">autorenew</i>
+                        </a>
+                        <div v-for="analysis in analysisDetails" class="block">
+                            <item-summary :itemDetails="analysis">
+                                <a
+                                    class="delete"
+                                    title="Delete"
+                                    @click="deleteJob(analysis.jobURL)"
+                                >
+                                    <i class="material-icons">delete_forever</i>
+                                    Remove
+                                </a>
+                            </item-summary>
+                            <analysis :itemDetails="analysis"></analysis>
+                        </div>
                     </div>
                 </collapse-title>
                 <collapse-title title="BlueConfig" :collapsed="true">
@@ -31,7 +54,7 @@ This will display the details of a certain simulation and the analysis.
                             {{ log }}
                         </div>
                         <a class="button-with-icon" v-if="simulationDetails.intervalReference" title="Loading">
-                            <i class="material-icons">autorenew</i>
+                            <i class="material-icons spin">autorenew</i>
                         </a>
                         <a @click="save('BlueConfig.txt', simulationDetails.BlueConfig)" class="button-with-icon colored"><i class="material-icons download-file">file_download</i>Download File</a>
                     </div>
@@ -113,18 +136,16 @@ export default {
                 'BlueConfig': [],
                 'refreshFunction': null,
             },
-            'analysisDetails': {
+            'analysisDetailTemplate': {
                 // depending of the status change the icon
                 'statusIcon': 'check_circle',
                 'submissionTime': '',
                 'type': 'Analysis',
-                'intervalReference': null,
-                'autorefresh': true,
                 'id': '',
                 'name': '',
                 'status': '',
-                'refreshFunction': null,
             },
+            'analysisDetails': [],
         };
     },
     'components': {
@@ -133,6 +154,29 @@ export default {
         'analysis': Analysis,
     },
     'methods': {
+        'deleteJob': function(url) {
+            swal({
+                'title': 'Are you sure?',
+                'text': 'You won\'t be able to revert this!',
+                'type': 'warning',
+                'showCancelButton': true,
+                'focusCancel': true,
+                'confirmButtonColor': '#ac6067',
+                'cancelButtonColor': '#879fcb',
+                'confirmButtonText': 'Yes, delete it!',
+                'showLoaderOnConfirm': true,
+                'allowOutsideClick': false,
+                'preConfirm': (choice) => {
+                    if (choice === true) {
+                        return this.unicoreAPI.deleteJob(url)
+                        .then(() => {
+                            let id = url.split('/').pop();
+                            return this.removeFromList(id);
+                        });
+                    }
+                },
+            });
+        },
         'fillJobs': function(job) {
             this.simulationDetails.url = job._links.self.href;
             this.simulationDetails.status = job.status;
@@ -170,36 +214,48 @@ export default {
             /*  get the location of the analysis based on the mapping file
                 that we save in the simulation and then the analysis image */
             if (this.job && this.simulationDetails.status === 'SUCCESSFUL') {
+                this.analysisDetails = []; // reset all the analysis
                 this.unicoreAPI.getAssociatedLocation(this.simulationDetails.files)
                 .then((analysisObject) => {
-                    this.analysisDetails.id = analysisObject._links.self.href.split('/').pop();
-                    analysisConfig.plots.forEach((plot) => {
-                        this.getAnalysisImage(analysisObject, plot);
+                    // an array of all the analysis associated with simulation
+                    if (analysisObject === '') { // no analysis
+                        return;
+                    }
+                    analysisObject.forEach((analysis) => {
+                        let childAnalysis = Object.assign({}, this.analysisDetailTemplate);
+                        childAnalysis['jobURL'] = analysis._links.self.href;
+                        childAnalysis.id = analysis._links.self.href.split('/').pop();
+                        analysisConfig.plots.forEach((plot) => {
+                            this.getAnalysisImage(
+                                analysis._links.workingDirectory.href,
+                                plot,
+                                childAnalysis
+                            );
+                        });
+                        this.getAnalysisStatus(analysis._links.self.href, childAnalysis);
+                        this.analysisDetails.push(childAnalysis);
                     });
-                    this.getAnalysisStatus(analysisObject);
                 });
             }
         },
-        'getAnalysisImage': function(analysisObject, plotName) {
-            let analysisURL = analysisObject._links.workingDirectory.href;
+        'getAnalysisImage': function(analysisURL, plotName, childAnalysis) {
             this.unicoreAPI.getImage(`${analysisURL}/files/${plotName}.png`)
             .then((plot) => {
                 let reader = new FileReader();
                 reader.onloadend = () => {
-                    this.$set(this.analysisDetails, plotName, reader.result);
+                    this.$set(childAnalysis, plotName, reader.result);
                 };
                 reader.readAsDataURL(plot);
             }, (error) => {
                 console.log('No analysis image available yet');
             });
         },
-        'getAnalysisStatus': function(analysisObject) {
-            let analysisURL = analysisObject._links.self.href;
+        'getAnalysisStatus': function(analysisURL, childAnalysis) {
             this.unicoreAPI.getJobProperties(analysisURL)
             .then((jobInfo) => {
-                this.analysisDetails.status = jobInfo.status;
-                this.analysisDetails.submissionTime = jobInfo.submissionTime;
-                this.analysisDetails.name = jobInfo.name;
+                childAnalysis.status = jobInfo.status;
+                childAnalysis.submissionTime = jobInfo.submissionTime;
+                childAnalysis.name = jobInfo.name;
             });
         },
         'getJobById': function() {
@@ -268,6 +324,18 @@ export default {
                 obj.intervalReference = clearTimeout(obj.intervalReference);
             }
         },
+        'removeFromList': function(analysisId) {
+            return this.unicoreAPI.deleteJobFromAssociatedFile(
+                this.simulationDetails.files,
+                analysisId
+            )
+            .then(() => {
+                let listTemp = this.analysisDetails.filter((analysis) => {
+                    return analysis.id !== analysisId;
+                });
+                this.analysisDetails = listTemp;
+            });
+        },
     },
     'created': function() {
         document.getElementById('frameTemplateTitle').innerText = 'Simulation Details';
@@ -288,13 +356,10 @@ export default {
         this.simulationDetails.autorefresh = !this.simulationDetails.autorefresh;
         this.analysisDetails.autorefresh = !this.analysisDetails.autorefresh;
         this.simulationDetails.refreshFunction = this.refreshJobs;
-        this.analysisDetails.refreshFunction = this.getAnalysisInfo;
         this.toggleAutoreload(this.simulationDetails);
-        this.toggleAutoreload(this.analysisDetails);
     },
     'beforeDestroy': function() {
         clearTimeout(this.simulationDetails.intervalReference);
-        clearTimeout(this.analysisDetails.intervalReference);
     },
 };
 </script>
@@ -344,6 +409,18 @@ export default {
     }
     .item-summary {
         margin-left: 5px;
+    }
+    .block {
+        border-style: solid;
+        border-color: lightgray;
+        border-width: 1px;
+        margin-bottom: 5px;
+        padding: 5px;
+    }
+    .block .delete {
+        min-width: 90px;
+        color: #b0686f;
+        cursor: pointer;
     }
 </style>
 

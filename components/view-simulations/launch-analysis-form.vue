@@ -87,7 +87,7 @@
         'methods': {
             'editItem': function() {
                 this.title = utils.filterName(this.title);
-                this.$emit('validationConfigReady', this.$data);
+                this.$emit('analysisConfigReady', this.$data);
             },
             'closeForm': function() {
                 this.$emit('changeModalVisibility', false);

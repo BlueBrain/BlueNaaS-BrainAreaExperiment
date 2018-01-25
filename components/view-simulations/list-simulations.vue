@@ -74,14 +74,14 @@ This component manage each job (delete, start, create, etc).
             </infinite-loading>
         </div>
         <!-- template for configuration -->
-        <modal :show="showValidationForm" @changeModalVisibility="toggleModal">
+        <modal :show="showAnalysisForm" @changeModalVisibility="toggleModal">
             <h3 slot="header">Copy files and run analysis</h3>
             <div slot="content">
-                <launch-validation-form
-                    @validationConfigReady="validationConfigReady"
+                <launch-analysis-form
+                    @analysisConfigReady="analysisConfigReady"
                     :defaultAnalysisConfig="defaultAnalysisConfig"
                     @changeModalVisibility="toggleModal">
-                </launch-validation-form>
+                </launch-analysis-form>
             </div>
         </modal>
         <!-- END template for configuration -->
@@ -94,7 +94,7 @@ This component manage each job (delete, start, create, etc).
     import unicore from 'mixins/unicore.js';
     import simulationConfig from 'assets/simulation-config.json';
     import analysisConfig from 'assets/analysis-config.json';
-    import LaunchValidationForm from 'components/view-simulations/launch-analysis-form.vue';
+    import LaunchAnalysisForm from 'components/view-simulations/launch-analysis-form.vue';
     import Modal from 'components/shared/modal-component.vue';
     import templateBluepyConfig from 'assets/blueconfig.json';
     export default {
@@ -102,7 +102,7 @@ This component manage each job (delete, start, create, etc).
         'components': {
             'simulation-item': SimulationItem,
             'infinite-loading': InfiniteLoading,
-            'launch-validation-form': LaunchValidationForm,
+            'launch-analysis-form': LaunchAnalysisForm,
             'modal': Modal,
         },
         'props': ['computerParam', 'statusSearch'],
@@ -112,7 +112,7 @@ This component manage each job (delete, start, create, etc).
                 'computerFilter': simulationConfig.default,
                 'defaultAnalysisConfig': analysisConfig,
                 'simulationConfig': simulationConfig,
-                'showValidationForm': false,
+                'showAnalysisForm': false,
                 'unicoreAPI': unicore,
                 'jobs': [],
                 'filteredObjects': [],
@@ -137,10 +137,10 @@ This component manage each job (delete, start, create, etc).
         'methods': {
             'toggleModal': function(value) {
                 if (value) {
-                    this.showValidationForm = value;
+                    this.showAnalysisForm = value;
                     return;
                 }
-                this.showValidationForm = !this.showValidationForm;
+                this.showAnalysisForm = !this.showAnalysisForm;
             },
             'actionJob': function(actions) {
                 this.unicoreAPI.actionJob(actions.url);
@@ -205,20 +205,25 @@ This component manage each job (delete, start, create, etc).
                 if (simulationJob.status === 'SUCCESSFUL') {
                     this.unicoreAPI.getAssociatedLocation(simulationJob._links.workingDirectory.href)
                     .then((analysisObject) => {
+                        if (analysisObject === '') {
+                            // stop loading status. analysis not run yet.
+                            return this.$set(simulationJob, 'multipleAnalysisStatus', []);
+                        }
                         this.getStatus(analysisObject, simulationJob);
-                    }, (error) => { // stop loading status. analysis not run yet.
-                        this.$set(simulationJob, 'analysisStatus', undefined);
                     });
                 } else {
-                    this.$set(simulationJob, 'analysisStatus', 'BLOCK');
+                    this.$set(simulationJob, 'multipleAnalysisStatus', ['BLOCK']);
                 }
             },
             'getStatus': function(analysisObject, simulationJob) {
-                let analysisURL = analysisObject._links.self.href;
-                this.unicoreAPI.getJobProperties(analysisURL)
-                .then((jobInfo) => {
-                    // $set because of Caveats
-                    this.$set(simulationJob, 'analysisStatus', jobInfo.status);
+                let multipleAnalysis = [];
+                analysisObject.forEach((analysis) => {
+                    // fill the information for all the analysis
+                    this.unicoreAPI.getJobProperties(analysis._links.self.href)
+                    .then((jobInfo) => {
+                        multipleAnalysis.push(jobInfo.status);
+                        this.$set(simulationJob, 'multipleAnalysisStatus', multipleAnalysis);
+                    });
                 });
             },
             'removeFromList': function(url) {
@@ -275,10 +280,11 @@ This component manage each job (delete, start, create, etc).
                         if (!simulation.children.includes('/out.dat') &&
                             simulation.status === 'SUCCESSFUL') {
                             // without out.dat no analysis should be run
-                            simulation['analysisStatus'] = 'BLOCK';
+                            simulation['multipleAnalysisStatus'] = ['BLOCK'];
+                            // flag to show the warning icon on the list
                             simulation['noOut'] = true;
                         } else {
-                            simulation['analysisStatus'] = 'LOADING';
+                            simulation['multipleAnalysisStatus'] = ['LOADING'];
                             this.getAnalysisInfo(simulation);
                         }
                         return true;
@@ -297,11 +303,11 @@ This component manage each job (delete, start, create, etc).
                 this.statusFilter = 'ALL';
             },
             'runAnalysis': function(job) {
-                this.showValidationForm = true;
+                this.showAnalysisForm = true;
                 // set the origin computer
                 this.defaultAnalysisConfig.from = this.computerFilter;
                 this.jobSelectedForValidation = job;
-                // after the form will return to validationConfigReady
+                // after the form will return to analysisConfigReady
             },
             'onInfinite': function($state) {
                 if (this.loading) return; // avoid processing things while loading
@@ -319,39 +325,42 @@ This component manage each job (delete, start, create, etc).
             'startReloadJob': function(simulationJob) {
                 let poolAnalysis = function(simulationJob) {
                     if (simulationJob.autorefresh) {
-                        simulationJob.intervalReference = setInterval(() => {
-                            if (simulationJob && simulationJob.analysisStatus === 'SUCCESSFUL') {
+                        simulationJob['intervalReference'] = setInterval(() => {
+                            let statusList = simulationJob.multipleAnalysisStatus;
+                            if (!statusList.includes('LOADING') &&
+                                !statusList.includes('QUEUED') &&
+                                !statusList.includes('RUNNING')) {
                                 // stop interval on job finished
-                                simulationJob.intervalReference = clearTimeout(simulationJob.intervalReference);
+                                simulationJob['intervalReference'] = clearTimeout(simulationJob.intervalReference);
                             } else {
                                 this.getAnalysisInfo.call(this, simulationJob);
                             }
                         }, this.pollInterval * 1000);
                     } else {
-                        simulationJob.intervalReference = clearTimeout(simulationJob.intervalReference);
+                        simulationJob['intervalReference'] = clearTimeout(simulationJob.intervalReference);
                     }
                 };
                 simulationJob['autorefresh'] = true;
                 simulationJob['intervalReference'] = null;
                 // add this status to show the sync
-                simulationJob['analysisStatus'] = 'LOADING';
+                simulationJob.multipleAnalysisStatus.push('LOADING');
                 poolAnalysis.call(this, simulationJob);
             },
-            'validationConfigReady': function(validationConfig) {
+            'analysisConfigReady': function(analysisConfig) {
                 this.toggleModal();
                 swal.enableLoading();
                 let analysisInfo = {};
-                validationConfig.from.workingDirectory = this.jobSelectedForValidation._links.workingDirectory.href;
+                analysisConfig.from.workingDirectory = this.jobSelectedForValidation._links.workingDirectory.href;
 
                 this.unicoreAPI.submitAnalysis(
-                    validationConfig,
+                    analysisConfig,
                     this.defaultAnalysisConfig.script,
                     this.defaultAnalysisConfig.filesToAvoidCopy
                 ).then((analysis) => {
                     analysisInfo = analysis;
                     return this.changeBlueConfigPaths(
-                        validationConfig.to.workingDirectory,
-                        validationConfig.to.computer
+                        analysisConfig.to.workingDirectory,
+                        analysisConfig.to.computer
                     );
                 })
                 .then(() => {
@@ -360,7 +369,7 @@ This component manage each job (delete, start, create, etc).
                     this.unicoreAPI.actionJob(startURL);
                     // pool the status of the analysis
                     this.startReloadJob(this.jobSelectedForValidation);
-                    swal.enableLoading();
+                    // swal.enableLoading();
                     return swal({
                         'title': 'Analysis started!',
                         'text': 'Analysis results can take a long time',
@@ -374,7 +383,7 @@ This component manage each job (delete, start, create, etc).
                     if (choice.value) {
                         this.showDetails(
                             this.jobSelectedForValidation,
-                            validationConfig.from.computer
+                            analysisConfig.from.computer
                         );
                     }
                 });

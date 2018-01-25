@@ -26,18 +26,49 @@ This will only display the item. It knows where to put all the information.
         </div>
         <!-- analysis status icon -->
         <div class="middle-part clickable analysis">
-            <i  class="material-icons colored"  v-if="!showAnalysisButton"
-                :title="getStatusString(job.analysisStatus)">
-                {{ getStatusIcon(job.analysisStatus) }}</i>
-            <a @click="runAnalysis" v-else class="button-with-icon analysis" :class="{available: !analysisAlreadyDone}" title="Start analysis"><i class="material-icons">play_arrow</i>Start</a>
+            <i v-if="showAnalysisStatus()">
+                <i
+                    class="material-icons colored"
+                    v-for="analysisStatus in job.multipleAnalysisStatus"
+                    :title="getStatusString(analysisStatus)"
+                >
+                    {{ getStatusIcon(analysisStatus) }}
+                </i>
+            </i>
+            <a
+                v-else
+                @click="runAnalysis"
+                class="button-with-icon analysis"
+                title="Start analysis"
+            >
+                <i class="material-icons">play_arrow</i>
+                Start
+            </a>
         </div>
+        <!-- END analysis status icon -->
         <div class="right-part clickable">
             <div class="column clickable">
                 <div class="date">{{getDate}}</div>
                 <div class="inline-flex">
-                    <a @click="deleteJob" class="button-with-icon danger" title="Delete job forever"><i class="material-icons">delete_forever</i>Delete</a>
-                    <a @click="runAnalysis" v-if="analysisDone" class="button-with-icon analysis available" title="Start analysis"><i class="material-icons">play_arrow</i>Analysis</a>
-                    <a @click="abortJob" class="button-with-icon" title="Cancel Job"><i class="material-icons">cancel</i>Abort</a>
+                    <a
+                        @click="deleteJob"
+                        class="button-with-icon danger"
+                        title="Delete job forever">
+                        <i class="material-icons">delete_forever</i>Delete
+                    </a>
+                    <a
+                        @click="runAnalysis"
+                        v-if="analysisCanRun"
+                        class="button-with-icon analysis available"
+                        title="Start analysis">
+                        <i class="material-icons">play_arrow</i>Analysis
+                    </a>
+                    <a
+                        @click="abortJob"
+                        class="button-with-icon"
+                        title="Cancel Job">
+                        <i class="material-icons">cancel</i>Abort
+                    </a>
                 </div>
             </div>
         </div>
@@ -46,6 +77,7 @@ This will only display the item. It knows where to put all the information.
 
 <script>
 const BLOCK_STATUS = 'BLOCK';
+const LOADING_STATUS = 'LOADING';
 const SUCCESSFUL_STATUS = 'SUCCESSFUL';
 const FAILED_STATUS = 'FAILED';
 import utils from 'assets/utils.js';
@@ -93,6 +125,14 @@ export default {
             }
             return status;
         },
+        'showAnalysisStatus': function() {
+            // show analysis button in the middle
+            if (this.job.multipleAnalysisStatus &&
+                this.job.multipleAnalysisStatus.length > 0) {
+                return true;
+            }
+            return false;
+        },
     },
     'computed': {
         'getId': function() {
@@ -104,11 +144,25 @@ export default {
         'getDate': function() {
             return utils.getDateLocalTime(this.job.submissionTime);
         },
-        'analysisDone': function() {
-            return (this.job.analysisStatus === SUCCESSFUL_STATUS ? true : false);
+        'analysisCanRun': function() {
+            // show the analysis button on the right
+            if (!this.job.multipleAnalysisStatus) {
+                return false;
+            }
+            if (this.job.multipleAnalysisStatus.includes(BLOCK_STATUS) ||
+                this.job.multipleAnalysisStatus.length === 0) {
+                return false;
+            }
+            if (this.job.multipleAnalysisStatus.length === 1 &&
+                this.job.multipleAnalysisStatus.includes(LOADING_STATUS)) {
+                return false;
+            }
+            return true;
         },
-        'showAnalysisButton': function() {
-            return (this.job.analysisStatus == null ? true : false);
+    },
+    'watch': {
+        'job.multipleAnalysisStatus': function(newVal) {
+            this.showAnalysisStatus();
         },
     },
 };
@@ -134,6 +188,7 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-wrap: wrap;
     }
     .middle-part.simulation {
         border-left: solid lightgray;
@@ -170,10 +225,6 @@ export default {
     }
     a.button-with-icon.analysis {
         background-color: #548d68;
-        opacity: 0.3;
-    }
-    a.button-with-icon.analysis.available {
-        opacity: 1;
     }
     .material-icons.colored {
         color: rgb(172, 96, 103);

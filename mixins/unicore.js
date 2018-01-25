@@ -35,6 +35,28 @@ module.exports = (function() {
             'headers': headers,
         }).then(handleErrors);
     };
+    let deleteJobFromAssociatedFile = function(simulationWorkDir, idToDelete) {
+        return getAssociatedLocation(simulationWorkDir)
+        .then((associationFile) => {
+            let newAssociationFile = [];
+            let analysisPath = analysisConfig.analysisConnectionPath;
+            if (associationFile) {
+                associationFile.forEach((oldAnalysis) => {
+                    let oldId = oldAnalysis._links.self.href.split('/').pop();
+                    if (oldId !== idToDelete) {
+                        newAssociationFile.push(oldAnalysis);
+                    }
+                });
+            }
+            // mapping in simulation the analysis path.
+            let input = {
+                'To': analysisPath,
+                'Data': JSON.stringify(newAssociationFile),
+            };
+            // upload the analysis_path.json file
+            return uploadData(input, simulationWorkDir + '/files');
+        });
+    };
     let getAllJobs = function(site) {
         let unicoreURL = getSites()[site.toUpperCase()]['url'];
         let headers = createHeaders(token);
@@ -79,10 +101,14 @@ module.exports = (function() {
         });
     };
     let getAssociatedLocation = function(workingDirectory) {
-        let url = workingDirectory + '/files/analysis_path';
+        let analysisPath = analysisConfig.analysisConnectionPath;
+        let url = `${workingDirectory}/files/${analysisPath}`;
         return getFiles(url)
         .then((location) => {
             try {
+                if (location === '' || location === '[]') {
+                    return Promise.resolve('');
+                }
                 let analysisObject = JSON.parse(location);
                 return Promise.resolve(analysisObject);
             } catch (e) {
@@ -119,6 +145,7 @@ module.exports = (function() {
         });
     };
     let getFilesToCopy = function(filesURL) {
+        let analysisPath = analysisConfig.analysisConnectionPath;
         return this.getFilesList(filesURL)
         .then((files) => {
             let allowed = [];
@@ -127,7 +154,7 @@ module.exports = (function() {
                     file.indexOf('UNICORE_SCRIPT_EXIT_CODE') < 0 &&
                     file.indexOf('stderr') < 0 &&
                     file.indexOf('stdout') < 0 &&
-                    file.indexOf('analysis_path') < 0) {
+                    file.indexOf(analysisPath) < 0) {
                     // remove the '/'
                     allowed.push(file.substr(1));
                 }
@@ -327,6 +354,28 @@ module.exports = (function() {
             'url': 'https://unicore.data.kit.edu:8080/HBP-KIT/rest/core'};
         return sites;
     };
+    let generateUpdatedAssociatedFile = function(simulationWorkDirectory, analysisObject) {
+        return getAssociatedLocation(simulationWorkDirectory)
+        .then((associationFile) => {
+            let newAssociationFile = [];
+            let analysisPath = analysisConfig.analysisConnectionPath;
+            if (associationFile) {
+                associationFile.forEach((oldAnalysis) => {
+                    newAssociationFile.push(oldAnalysis);
+                });
+                newAssociationFile.push(analysisObject);
+            } else {
+                newAssociationFile.push(analysisObject);
+            }
+            // mapping in simulation the analysis path.
+            let input = {
+                'To': analysisPath,
+                'Data': JSON.stringify(newAssociationFile),
+            };
+            // upload the analysis_path.json file
+            return uploadData(input, simulationWorkDirectory + '/files');
+        });
+    };
     let handleErrors = function(response, callback, params) {
         if (!response.ok) {
             // if (response.status === 403) {
@@ -395,7 +444,7 @@ module.exports = (function() {
                 'Resources': {'Nodes': moveObject.nodes},
                 'haveClientStageIn': 'true',
             };
-            let analysisConfig = {
+            let analysisParamsConfig = {
                 'list_analysis': moveObject.checkedAnalysis,
                 'percentage_of_cells': moveObject.percentageOfCells,
             };
@@ -406,7 +455,7 @@ module.exports = (function() {
                 },
                 {
                     'To': configName,
-                    'Data': JSON.stringify(analysisConfig),
+                    'Data': JSON.stringify(analysisParamsConfig),
                 },
             ];
             let transferArray = [];
@@ -414,20 +463,19 @@ module.exports = (function() {
             return this.submitJob(moveObject.to.computer, jobSpec, inputs)
             .then((destinationJobObject) => {
                 newJobDestination = destinationJobObject;
-                // mapping in simulation the analysis path.
-                let input = {
-                    'To': 'analysis_path',
-                    'Data': JSON.stringify(newJobDestination),
-                };
-                // fill the destination and pass it to transfer
-                moveObject.to['workingDirectory'] = newJobDestination._links.workingDirectory.href;
-                // upload the analysis_path file
-                transferArray.push(this.uploadData(input, moveObject.from.workingDirectory + '/files'));
+                return generateUpdatedAssociatedFile(
+                    moveObject.from.workingDirectory,
+                    destinationJobObject
+                );
+            })
+            .then(() => {
                 // get all the files to be copied
                 console.log('getting files to be copied ...');
                 return this.getFilesToCopy(`${moveObject.from.workingDirectory}/files`);
             })
             .then((files) => {
+                // fill the destination and pass it to transfer
+                moveObject.to['workingDirectory'] = newJobDestination._links.workingDirectory.href;
                 files.forEach(function(fileName, i) {
                     // change the object so transferFile transfers each individual file
                     // this is for have each object with its own information becasue async calls
@@ -565,6 +613,7 @@ module.exports = (function() {
     return {
         getAssociatedLocation,
         deleteJob,
+        deleteJobFromAssociatedFile,
         uploadData,
         submitJob,
         actionJob,

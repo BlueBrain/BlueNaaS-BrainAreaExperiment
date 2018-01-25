@@ -12,5 +12,6 @@
   ],
   "plots": ["psth", "raster"],
   "analysisAvailable": ["psth", "raster"],
-  "configFileName": "analysis_config.json"
+  "configFileName": "analysis_config.json",
+  "analysisConnectionPath": "analysis_path.json"
 }

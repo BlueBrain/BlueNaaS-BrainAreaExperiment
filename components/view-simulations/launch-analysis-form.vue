@@ -6,6 +6,16 @@
                 <input type="text" name="" class="title" v-model="title" placeholder="Job's title">
             </div>
         </div>
+
+        <div class="form-group">
+            <label class="control-label">Title:</label>
+            <div class="controls">
+                <target-autocomplete
+                    @targetChanged="targetChanged"
+                ></target-autocomplete>
+            </div>
+        </div>
+        
         <div class="form-group">
             <label class="control-label">Origin:</label>
             <div class="controls">{{ from.computer }}</div>
@@ -13,12 +23,6 @@
         <div class="form-group">
             <label class="control-label">Destination: </label>
             <div class="controls">{{ to.computer }}</div>
-        </div>
-        <div class="form-group">
-            <label class="control-label">Nodes: </label>
-            <div class="controls">
-                <input type="number" name="" class="nodes" v-model="nodes" placeholder="Node to allocate">
-            </div>
         </div>
         <div class="form-group">
             <label class="control-label">Analysis: </label>
@@ -30,9 +34,9 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label">Cells (%): </label>
+            <label class="control-label">Cells (number): </label>
             <div class="controls">
-                <input type="number" v-model="percentageOfCells" placeholder="Cells (%) to visualize">
+                <input type="number" v-model="numberOfCells" placeholder="Cells (number) to visualize">
             </div>
         </div>
         <div class="footer">
@@ -54,6 +58,7 @@
 
 <script>
     import 'assets/css/simulation.css';
+    import targetAutocomplete from 'components/shared/autocomplete-targets.vue';
     import utils from 'assets/utils.js';
     export default {
         'props': ['defaultAnalysisConfig'],
@@ -72,12 +77,16 @@
                 'title': '',
                 'analysisToRun': this.defaultAnalysisConfig.analysisAvailable,
                 'checkedAnalysis': [],
-                'percentageOfCells': 50,
+                'numberOfCells': 5,
                 'tipTexts': [
                     `To run the Analysis we need to copy the output from the Simulation to ${this.defaultAnalysisConfig.to} (because that machine has the analysis packages installed) and run the new Analysis Job.`,
                     'The results of the Analysis will be shown in the detailed page.',
                 ],
+                'target': '',
             };
+        },
+        'components': {
+            'target-autocomplete': targetAutocomplete,
         },
         'mounted': function() {
             if (localStorage.getItem('showAnalysisTip') === 'false') {
@@ -97,6 +106,9 @@
                 tipElement.remove();
                 localStorage.setItem('showAnalysisTip', false);
             },
+            'targetChanged': function(newTarget) {
+                this.target = newTarget;
+            },
         },
     };
 </script>
@@ -111,9 +123,6 @@
     .analysis-list .checkbox-container {
         display: flex;
         align-items: flex-end;
-    }
-    .analysis-list {
-
     }
     .analysis-list .small {
         width: 10%;

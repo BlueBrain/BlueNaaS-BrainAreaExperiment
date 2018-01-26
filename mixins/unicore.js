@@ -434,7 +434,8 @@ module.exports = (function() {
                     // the following params should be in a new config file to upload
                     // so the script reads that file before to start the analysis
                     'checkedAnalysis' = list with the analysis to be run
-                    'percentageOfCells' = % cells to visualize
+                    'numberOfCells' = % cells to visualize
+                    'target' = target where the analysis should be applied
                 }
             */
             let jobSpec = {
@@ -446,7 +447,8 @@ module.exports = (function() {
             };
             let analysisParamsConfig = {
                 'list_analysis': moveObject.checkedAnalysis,
-                'percentage_of_cells': moveObject.percentageOfCells,
+                'number_of_cells': moveObject.numberOfCells,
+                'target_analysis': moveObject.target,
             };
             let inputs = [
                 {

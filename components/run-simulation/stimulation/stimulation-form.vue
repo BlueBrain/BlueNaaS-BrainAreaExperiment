@@ -1,19 +1,42 @@
 <template>
     <div class="stimulation-form">
-        <form class="modal-form">
+    <form class="modal-form">
+
         <div class="form-group">
             <label class="control-label" title="Name of a target to receive the stimulation">Target</label>
             <div class="controls autocomplete-container">
-                <autocomplete-vue :list="processedTargetList" id="Target" placeholder="Target" v-model="stimulus.Target"></autocomplete-vue>
+                <autocomplete-targets
+                    :model="stimulus.Target"
+                    @targetChanged="targetChanged"
+                ></autocomplete-targets>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" title="Time when the stimulus commences. given in milliseconds(ms)">Delay(ms)</label>
+            <div class="controls">
+                <input v-model="stimulus.Delay" type="number" id="Delay" required placeholder="Delay" class="form-control">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" title="Time length of stimulus duration, given in milliseconds(ms)">Duration(ms)</label>
+            <div class="controls">
+                <input v-model="stimulus.Duration" type="number" min="0" id="Duration" required placeholder="Duration" class="form-control">
+            </div>
+        </div>
+
+        <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
+            <label class="control-label" title="The number of synapses to create per cell">New synapses per cell</label>
+            <div class="controls">
+                <input v-model="stimulus.NumOfSynapses" type="number" min="0" id="NumOfSynapses" placeholder="Number of synapses" required class="form-control">
             </div>
         </div>
 
         <div class="form-group">
             <label class="control-label" title="Type of the stimulus">Pattern</label>
             <div class="controls">
-                <select class="form-control" id="Pattern" v-model="stimulus.Pattern">
-                    <option>Poisson</option>
-                </select>
+                <input v-model="stimulus.Pattern" type="text" min="0" id="Pattern" required class="form-control" disabled value="Poisson">
             </div>
         </div>
 
@@ -24,19 +47,6 @@
             </div>
         </div>
 
-        <div class="form-group">
-            <label class="control-label" title="Time when the stimulus commences. given in milliseconds(ms)">Delay(ms)</label>
-            <div class="controls">
-                <input v-model="stimulus.Delay" type="number" id="Delay" required placeholder="Delay" class="form-control">
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label" title="Time length of stimulus duration, given in milliseconds(ms)">Duration(ms)</label>
-            <div class="controls">
-                <input v-model="stimulus.Duration" type="number" min="0" id="Duration" required placeholder="Duration" class="form-control">
-            </div>
-        </div>
-
         <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
             <label class="control-label" title="The strength of the created synapse">Weight</label>
             <div class="controls">
@@ -44,25 +54,17 @@
             </div>
         </div>
 
-        <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
-            <label class="control-label" title="The number of synapses to create">Number of synapses</label>
-            <div class="controls">
-                <input v-model="stimulus.NumOfSynapses" type="number" min="0" id="NumOfSynapses" placeholder="Number of synapses" required class="form-control">
-            </div>
-        </div>
-
         <div class="button-container">
             <input class="ok-button" type="submit" @click="editItem" value="Ok">
             <input class="cancel-button" type="button" @click="closeForm" value="Cancel">
         </div>
-    </form>
 
-</div>
+    </form>
+    </div>
 </template>
 
 <script>
-import AutocompleteVue from 'autocomplete-vue';
-import targetList from 'assets/targetList.json';
+import autocompleteTargets from 'components/shared/autocomplete-targets.vue';
 import 'assets/css/simulation.css';
 export default {
     'name': 'stimulation-form',
@@ -76,16 +78,9 @@ export default {
         };
     },
     'components': {
-        'autocomplete-vue': AutocompleteVue,
+        'autocomplete-targets': autocompleteTargets,
     },
     'methods': {
-        'processTargetList': function() {
-            let list = [];
-            for (let i=0; i<targetList.length; i++) {
-                list.push({'name': targetList[i]});
-            }
-            this.processedTargetList = list;
-        },
         'closeForm': function() {
             this.$emit('changeModalVisibility', false);
         },
@@ -97,9 +92,12 @@ export default {
                 this.stimulus[input.id] = parseFloat(input.value);
             }
         },
-        'editItem': function() {
+        'editItem': function(event) {
+            if (event.x === 0 && event.y === 0) {
+                // avoid Enter key submissions
+                return;
+            }
             this.checkTimeValues(this.form);
-            this.checkTargets(this.form);
             if (this.form.checkValidity()) {
                 this.items;
                 this.convertToNumbers();
@@ -121,17 +119,6 @@ export default {
                 form.elements.Delay.setCustomValidity('');
             }
         },
-        'checkTargets': function(form) {
-            let found = this.processedTargetList.filter((t) => {
-                return t.name === this.stimulus.Target;
-            });
-            let targetElement = form.elements[0]; // target input
-            if (found.length <= 0) {
-                targetElement.setCustomValidity('Target should be in the list. try: slice');
-            } else {
-                targetElement.setCustomValidity('');
-            }
-        },
         'cleanStimulus': function() {
             let cleanStim = {
                 'Delay': this.stimulus.Delay,
@@ -141,9 +128,12 @@ export default {
             };
             this.stimulus = cleanStim;
         },
-    },
-    'created': function() {
-        this.processTargetList();
+        'targetChanged': function(selection) {
+            if (this.stimulus.Target !== selection) {
+                this.item.group = selection;
+                this.stimulus.Target = selection;
+            }
+        },
     },
     'mounted': function() {
         this.form = this.$el.querySelector('form');
@@ -162,8 +152,7 @@ export default {
             this.cleanStimulus();
         },
         'stimulus.Target': function(newVal) {
-            this.item.group = newVal;
-            this.stimulus.Target = newVal;
+            this.targetChanged(newVal);
         },
     },
 };

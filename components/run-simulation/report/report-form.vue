@@ -5,7 +5,10 @@
                 <div class="form-group">
                     <label class="control-label" title="Defines the region from where the data will be reported.">Target</label>
                     <div class="controls autocomplete-container">
-                        <autocomplete-vue :list="processedTargetList" placeholder="Target" v-model="report.Target"></autocomplete-vue>
+                        <autocomplete-targets
+                            :model="report.Target"
+                            @targetChanged="targetChanged"
+                        ></autocomplete-targets>
                     </div>
                 </div>
 
@@ -83,15 +86,13 @@
 </template>
 
 <script>
-import AutocompleteVue from 'autocomplete-vue';
-import targetList from 'assets/targetList.json';
+import autocompleteTargets from 'components/shared/autocomplete-targets.vue';
 import 'assets/css/simulation.css';
 export default {
     'name': 'report-form',
     'props': ['reportEditableObject'],
     'data': function() {
         return {
-            'processedTargetList': undefined,
             'report': this.reportEditableObject.item.reportInfo,
             'item': this.reportEditableObject.item,
             'typesFull': ['Compartment', 'Synapse'],
@@ -99,20 +100,17 @@ export default {
         };
     },
     'components': {
-        'autocomplete-vue': AutocompleteVue,
+        'autocomplete-targets': autocompleteTargets,
     },
     'methods': {
-        'processTargetList': function() {
-            let list = [];
-            for (let i=0; i<targetList.length; i++) {
-                list.push({'name': targetList[i]});
-            }
-            this.processedTargetList = list;
-        },
         'closeForm': function() {
             this.$emit('changeModalVisibility', false);
         },
-        'editItem': function() {
+        'editItem': function(event) {
+            if (event.x === 0 && event.y === 0) {
+                // avoid Enter key submissions
+                return;
+            }
             this.checkTimeValues(this.form);
             if (this.form.checkValidity()) {
                 this.convertToNumbers();
@@ -139,9 +137,21 @@ export default {
                 form.elements.StartTime.setCustomValidity('');
             }
         },
+        'targetChanged': function(selection) {
+            if (this.report.Target !== selection) {
+                this.item.group = selection;
+                this.report.Target = selection;
+                // check for AllCompartments allow only type compartment
+                if (this.report.Target === 'AllCompartments') {
+                    this.filteredTypes = ['Compartment'];
+                    this.report.Type = this.filteredTypes[0];
+                } else {
+                    this.filteredTypes = this.typesFull;
+                }
+            }
+        },
     },
     'created': function() {
-        this.processTargetList();
         this.filteredTypes = this.typesFull;
     },
     'mounted': function() {
@@ -159,15 +169,7 @@ export default {
             this.item.content = newVal;
         },
         'report.Target': function(newVal) {
-            this.item.group = newVal;
-            this.report.Target = newVal;
-            // check for AllCompartments allow only type compartment
-            if (this.report.Target === 'AllCompartments') {
-                this.filteredTypes = ['Compartment'];
-                this.report.Type = this.filteredTypes[0];
-            } else {
-                this.filteredTypes = this.typesFull;
-            }
+            this.targetChanged(newVal);
         },
     },
 };

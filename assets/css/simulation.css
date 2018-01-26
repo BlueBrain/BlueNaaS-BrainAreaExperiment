@@ -20,10 +20,13 @@ div.controls {
     display: inline-flex;
     width: 55%;
 }
-div.controls input,
-div.controls select.form-control {
-    width: 230px;
-    margin-right: 5px;
+div.controls select.form-control,
+div.controls input {
+    width: 100%;
+}
+.form-control:disabled {
+    background-color: #f8f8f8;
+    color: #989797;
 }
 .ok-button, .cancel-button {
     border: 0;

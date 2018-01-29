@@ -8,14 +8,14 @@
         </div>
 
         <div class="form-group">
-            <label class="control-label">Title:</label>
+            <label class="control-label">Target:</label>
             <div class="controls">
                 <target-autocomplete
                     @targetChanged="targetChanged"
                 ></target-autocomplete>
             </div>
         </div>
-        
+
         <div class="form-group">
             <label class="control-label">Origin:</label>
             <div class="controls">{{ from.computer }}</div>

@@ -27,7 +27,7 @@
         </div>
 
         <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
-            <label class="control-label" title="The number of synapses to create per cell">New synapses per cell</label>
+            <label class="control-label" title="Number of synapses to add per neuron">New synapses per cell</label>
             <div class="controls">
                 <input v-model="stimulus.NumOfSynapses" type="number" min="0" id="NumOfSynapses" placeholder="Number of synapses" required class="form-control">
             </div>
@@ -48,7 +48,7 @@
         </div>
 
         <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
-            <label class="control-label" title="The strength of the created synapse">Weight</label>
+            <label class="control-label" title="The strengths of the added synapses">Weight</label>
             <div class="controls">
                 <input v-model="stimulus.Weight" type="number" min="0" id="Weight" placeholder="Weight" required class="form-control" step="0.1">
             </div>

@@ -11,7 +11,11 @@
     "BlueConfig.backup"
   ],
   "plots": ["psth", "raster"],
-  "analysisAvailable": ["psth", "raster"],
+  "analysisAvailable": [
+    { "param": "psth" , "name": "Peristimulus Time Histogram" },
+    { "param": "raster", "name": "Spike Raster Plot"},
+    { "param": "traces", "name": "Voltage Trace Plot"}
+  ],
   "configFileName": "analysis_config.json",
   "analysisConnectionPath": "analysis_path.json"
 }

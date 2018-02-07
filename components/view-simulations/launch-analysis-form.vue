@@ -27,9 +27,18 @@
         <div class="form-group">
             <label class="control-label">Analysis: </label>
             <div class="controls analysis-list">
-                <div class="checkbox-container" v-for="analysis in analysisToRun">
-                    <input class="small" type="checkbox" :value="analysis" v-model="checkedAnalysis">
-                    <label class="" :for="analysis">{{ analysis }}</label>
+                <div
+                    class="checkbox-container"
+                    v-for="analysis in analysisToRun"
+                >
+                    <input
+                        class="small"
+                        type="checkbox"
+                        :id="analysis.param"
+                        :value="analysis.param"
+                        v-model="checkedAnalysis"
+                    >
+                    <label :for="analysis.param">{{ analysis.name }}</label>
                 </div>
             </div>
         </div>
@@ -122,10 +131,15 @@
     }
     .analysis-list .checkbox-container {
         display: flex;
-        align-items: flex-end;
+        align-items: center;
+        border-style: solid;
+        border-radius: 5px;
+        border-width: 1px;
+        border-color: lightgray;
+        margin-bottom: 5px;
     }
     .analysis-list .small {
         width: 10%;
-        margin: 0;
+        margin: 3px 5px 0 0;
     }
 </style>

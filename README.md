@@ -8,8 +8,8 @@ Configure and Launch simulations in supercomputers using Unicore API.
 ``` npm run dev ```
 
 ### Deploy production
-* `git review` will trigger: [jenkins plan](https://bbpcode.epfl.ch/ci/job/platform.simulationapp_to_objectstorage.gerrit/) this will deploy dev version in [dev simulation](https://bbp.epfl.ch/public/dev.simulationapp/index.html#/)
-* **Merge** will trigger: [jenkins plan](https://bbpcode.epfl.ch/ci/job/platform.simulationapp_to_objectstorage/)
+* `git review` will trigger: [jenkins plan](https://bbpcode.epfl.ch/ci/job/nse.simulation-launcher-deploy.gerrit/) this will deploy dev version in [dev simulation](https://bbp.epfl.ch/public/dev.simulationapp/index.html#/)
+* **Merge** will trigger: [jenkins plan](https://bbpcode.epfl.ch/ci/job/nse.simulation-launcher-deploy/)
 * [**Container**](https://bbpopenstack.epfl.ch/dashboard/project/containers/container/simulationapp) Open Stack
 * [**Website**](https://bbp.epfl.ch/public/simulationapp/index.html#/)
 

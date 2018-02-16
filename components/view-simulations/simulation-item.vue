@@ -30,7 +30,7 @@ This will only display the item. It knows where to put all the information.
                 <i
                     class="material-icons colored"
                     v-for="analysisStatus in job.multipleAnalysisStatus"
-                    :title="getStatusString(analysisStatus)"
+                    :title="getAnalysisStatus"
                 >
                     {{ getStatusIcon(analysisStatus) }}
                 </i>
@@ -80,91 +80,106 @@ const BLOCK_STATUS = 'BLOCK';
 const LOADING_STATUS = 'LOADING';
 const SUCCESSFUL_STATUS = 'SUCCESSFUL';
 const FAILED_STATUS = 'FAILED';
+const RUNNING_STATUS = 'RUNNING';
+const QUEUED_STATUS = 'QUEUED';
 import utils from 'assets/utils.js';
 export default {
-    'name': 'simulationItem',
-    'props': ['job'],
-    'methods': {
-        'runAnalysis': function() {
-            this.$emit('runAnalysis');
-        },
-        'abortJob': function() {
-            let actionURL = this.job._links.self.href + '/actions/abort';
-            this.$emit('actionJob', {'url': actionURL, 'text': 'Job Aborted'});
-        },
-        'deleteJob': function() {
-            let url = this.job._links.self.href;
-            this.$emit('deleteJob', url);
-        },
-        'itemSelected': function(event) {
-            // check if the id for example is not selected so we can copy it.
-            if (event.target.classList.contains('clickable') &&
+  'name': 'simulationItem',
+  'props': ['job'],
+  'methods': {
+    'runAnalysis': function() {
+      this.$emit('runAnalysis');
+    },
+    'abortJob': function() {
+      let actionURL = this.job._links.self.href + '/actions/abort';
+      this.$emit('actionJob', {'url': actionURL, 'text': 'Job Aborted'});
+    },
+    'deleteJob': function() {
+      let url = this.job._links.self.href;
+      this.$emit('deleteJob', url);
+    },
+    'itemSelected': function(event) {
+      // check if the id for example is not selected so we can copy it.
+      if (event.target.classList.contains('clickable') &&
                 window.getSelection().toString() === '') {
-                this.$emit('showDetails', this.job);
-            }
-        },
-        'getStatusIcon': function(status) {
-            switch (status) {
-            case SUCCESSFUL_STATUS:
-                return 'check_box';
-                break;
-            case FAILED_STATUS:
-                return 'error';
-                break;
-            case BLOCK_STATUS:
-                return 'block';
-                break;
-            default: // if is RUNNING, QUEUE, etc
-                return 'sync';
-                break;
-            }
-        },
-        'getStatusString': function(status) {
-            if (!status || status === BLOCK_STATUS) {
-                return 'Waiting for simulation ends';
-            }
-            return status;
-        },
-        'showAnalysisStatus': function() {
-            // show analysis button in the middle
-            if (this.job.multipleAnalysisStatus &&
+        this.$emit('showDetails', this.job);
+      }
+    },
+    'getStatusIcon': function(status) {
+      switch (status) {
+      case SUCCESSFUL_STATUS:
+        return 'check_box';
+        break;
+      case FAILED_STATUS:
+        return 'error';
+        break;
+      case BLOCK_STATUS:
+        return 'block';
+        break;
+      default: // if is RUNNING, QUEUE, etc
+        return 'sync';
+        break;
+      }
+    },
+    'getStatusString': function(status) {
+      if (!status || status === BLOCK_STATUS) {
+        return 'Waiting for simulation ends';
+      }
+      return status;
+    },
+    'showAnalysisStatus': function() {
+      // show analysis button in the middle
+      if (this.job.multipleAnalysisStatus &&
                 this.job.multipleAnalysisStatus.length > 0) {
-                return true;
-            }
-            return false;
-        },
+        return true;
+      }
+      return false;
     },
-    'computed': {
-        'getId': function() {
-            let url = this.job._links.self.href;
-            if (this.job._links && url) {
-                return url.substr(url.lastIndexOf('/') + 1);
-            }
-        },
-        'getDate': function() {
-            return utils.getDateLocalTime(this.job.submissionTime);
-        },
-        'analysisCanRun': function() {
-            // show the analysis button on the right
-            if (!this.job.multipleAnalysisStatus) {
-                return false;
-            }
-            if (this.job.multipleAnalysisStatus.includes(BLOCK_STATUS) ||
+  },
+  'computed': {
+    'getId': function() {
+      let url = this.job._links.self.href;
+      if (this.job._links && url) {
+        return url.substr(url.lastIndexOf('/') + 1);
+      }
+    },
+    'getDate': function() {
+      return utils.getDateLocalTime(this.job.submissionTime);
+    },
+    'analysisCanRun': function() {
+      // show the analysis button on the right
+      if (!this.job.multipleAnalysisStatus) {
+        return false;
+      }
+      if (this.job.multipleAnalysisStatus.includes(BLOCK_STATUS) ||
                 this.job.multipleAnalysisStatus.length === 0) {
-                return false;
-            }
-            if (this.job.multipleAnalysisStatus.length === 1 &&
+        return false;
+      }
+      if (this.job.multipleAnalysisStatus.length === 1 &&
                 this.job.multipleAnalysisStatus.includes(LOADING_STATUS)) {
-                return false;
-            }
-            return true;
-        },
+        return false;
+      }
+      return true;
     },
-    'watch': {
-        'job.multipleAnalysisStatus': function(newVal) {
-            this.showAnalysisStatus();
-        },
+    'getAnalysisStatus': function() {
+      if (this.job.status === FAILED_STATUS) {
+        return 'Simulation failed. No analysis can be run';
+      }
+      if (this.job.noOut) {
+        return 'Simulation did not produce results. No analysis can be run';
+      }
+      if (this.job.status === RUNNING_STATUS ||
+          this.job.status === QUEUED_STATUS) {
+        return 'Waiting for the simulation to finish';
+      }
+      return this.job.status;
     },
+  },
+  'watch': {
+    'job.multipleAnalysisStatus': function(newVal) {
+      this.showAnalysisStatus();
+    },
+  },
 };
 </script>
 

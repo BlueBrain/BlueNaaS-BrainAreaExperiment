@@ -18,22 +18,22 @@
 <script>
     import analysisConfig from 'assets/analysis-config.json';
     export default {
-        'name': 'analysis',
-        'props': ['itemDetails'],
-        'data': function() {
-            return {
-                'analysisConfig': analysisConfig,
-            };
+      'name': 'analysis',
+      'props': ['itemDetails'],
+      'data': function() {
+        return {
+          'analysisConfig': analysisConfig,
+        };
+      },
+      'computed': {
+        'noValidationText': function() {
+          if (this.itemDetails.id) {
+            return 'No available image yet';
+          } else {
+            return 'No Analysis was run yet';
+          }
         },
-        'computed': {
-            'noValidationText': function() {
-                if (this.itemDetails.id) {
-                    return 'No available image yet';
-                } else {
-                    return 'No Analysis was run yet';
-                }
-            },
-        },
+      },
     };
 </script>
 

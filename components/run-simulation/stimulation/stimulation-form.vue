@@ -67,94 +67,94 @@
 import autocompleteTargets from 'components/shared/autocomplete-targets.vue';
 import 'assets/css/simulation.css';
 export default {
-    'name': 'stimulation-form',
-    'props': ['editableItem'],
-    'data': function() {
-        return {
-            'processedTargetList': undefined,
-            'item': this.editableItem.item,
-            'stimulus': this.editableItem.item.stimulusInfo,
-            'form': undefined,
-        };
+  'name': 'stimulation-form',
+  'props': ['editableItem'],
+  'data': function() {
+    return {
+      'processedTargetList': undefined,
+      'item': this.editableItem.item,
+      'stimulus': this.editableItem.item.stimulusInfo,
+      'form': undefined,
+    };
+  },
+  'components': {
+    'autocomplete-targets': autocompleteTargets,
+  },
+  'methods': {
+    'closeForm': function() {
+      this.$emit('changeModalVisibility', false);
     },
-    'components': {
-        'autocomplete-targets': autocompleteTargets,
+    'convertToNumbers': function() {
+      // this converts the number inputs in floats
+      let n = this.$el.querySelectorAll('input[type=number]');
+      for (let i = 0; i < n.length; i++) {
+        let input = n[i];
+        this.stimulus[input.id] = parseFloat(input.value);
+      }
     },
-    'methods': {
-        'closeForm': function() {
-            this.$emit('changeModalVisibility', false);
-        },
-        'convertToNumbers': function() {
-            // this converts the number inputs in floats
-            let n = this.$el.querySelectorAll('input[type=number]');
-            for (let i = 0; i < n.length; i++) {
-                let input = n[i];
-                this.stimulus[input.id] = parseFloat(input.value);
-            }
-        },
-        'editItem': function(event) {
-            if (event.x === 0 && event.y === 0) {
-                // avoid Enter key submissions
-                return;
-            }
-            this.checkTimeValues(this.form);
-            if (this.form.checkValidity()) {
-                this.items;
-                this.convertToNumbers();
-                this.item.stimulusInfo = this.stimulus;
-                this.$emit('editItem', {
-                    'item': this.item,
-                    'callback': this.editableItem.callback,
-                });
-                this.item = null;
-                this.stimulus = null;
-            }
-        },
-        'checkTimeValues': function(form) {
-            let start = parseFloat(this.stimulus.Delay);
-            let end = parseFloat(this.stimulus.Duration);
-            if (start > end) {
-                form.elements.Delay.setCustomValidity('Delay should be smaller than duration');
-            } else {
-                form.elements.Delay.setCustomValidity('');
-            }
-        },
-        'cleanStimulus': function() {
-            let cleanStim = {
-                'Delay': this.stimulus.Delay,
-                'Duration': this.stimulus.Duration,
-                'Pattern': this.stimulus.Pattern,
-                'Target': this.stimulus.Target,
-            };
-            this.stimulus = cleanStim;
-        },
-        'targetChanged': function(selection) {
-            if (this.stimulus.Target !== selection) {
-                this.item.group = selection;
-                this.stimulus.Target = selection;
-            }
-        },
+    'editItem': function(event) {
+      if (event.x === 0 && event.y === 0) {
+        // avoid Enter key submissions
+        return;
+      }
+      this.checkTimeValues(this.form);
+      if (this.form.checkValidity()) {
+        this.items;
+        this.convertToNumbers();
+        this.item.stimulusInfo = this.stimulus;
+        this.$emit('editItem', {
+          'item': this.item,
+          'callback': this.editableItem.callback,
+        });
+        this.item = null;
+        this.stimulus = null;
+      }
     },
-    'mounted': function() {
-        this.form = this.$el.querySelector('form');
+    'checkTimeValues': function(form) {
+      let start = parseFloat(this.stimulus.Delay);
+      let end = parseFloat(this.stimulus.Duration);
+      if (start > end) {
+        form.elements.Delay.setCustomValidity('Delay should be smaller than duration');
+      } else {
+        form.elements.Delay.setCustomValidity('');
+      }
     },
-    'watch': {
-        'stimulus.Delay': function(newVal) {
-            this.item.start = parseFloat(newVal);
-            this.form.elements.Delay.setCustomValidity(''); // clears errors
-        },
-        'stimulus.Duration': function(newVal) {
-            this.item.end = parseFloat(newVal);
-        },
-        'stimulus.Pattern': function(newVal) {
-            this.item.content = newVal;
-            this.item.className = newVal;
-            this.cleanStimulus();
-        },
-        'stimulus.Target': function(newVal) {
-            this.targetChanged(newVal);
-        },
+    'cleanStimulus': function() {
+      let cleanStim = {
+        'Delay': this.stimulus.Delay,
+        'Duration': this.stimulus.Duration,
+        'Pattern': this.stimulus.Pattern,
+        'Target': this.stimulus.Target,
+      };
+      this.stimulus = cleanStim;
     },
+    'targetChanged': function(selection) {
+      if (this.stimulus.Target !== selection) {
+        this.item.group = selection;
+        this.stimulus.Target = selection;
+      }
+    },
+  },
+  'mounted': function() {
+    this.form = this.$el.querySelector('form');
+  },
+  'watch': {
+    'stimulus.Delay': function(newVal) {
+      this.item.start = parseFloat(newVal);
+      this.form.elements.Delay.setCustomValidity(''); // clears errors
+    },
+    'stimulus.Duration': function(newVal) {
+      this.item.end = parseFloat(newVal);
+    },
+    'stimulus.Pattern': function(newVal) {
+      this.item.content = newVal;
+      this.item.className = newVal;
+      this.cleanStimulus();
+    },
+    'stimulus.Target': function(newVal) {
+      this.targetChanged(newVal);
+    },
+  },
 };
 </script>
 

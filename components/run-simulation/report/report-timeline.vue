@@ -24,171 +24,171 @@ import ReportForm from 'components/run-simulation/report/report-form.vue';
 import EditButtons from 'components/run-simulation/edit-buttons.vue';
 import mixin from 'mixins/simulationTimeline.js';
 export default {
-    'name': 'report-timeline',
-    'props': ['endTime', 'forwardSkip', 'blueConfig'],
-    'mixins': [mixin],
-    'data': function() {
-        return {
-            'timeline': undefined,
-            'config': this.blueConfig,
-            'groups': [],
-            'items': [],
-            'showModal': false,
-            'reportEditableObject': {},
-            'latestItem': undefined,
-            'tooltipElem': undefined,
-        };
+  'name': 'report-timeline',
+  'props': ['endTime', 'forwardSkip', 'blueConfig'],
+  'mixins': [mixin],
+  'data': function() {
+    return {
+      'timeline': undefined,
+      'config': this.blueConfig,
+      'groups': [],
+      'items': [],
+      'showModal': false,
+      'reportEditableObject': {},
+      'latestItem': undefined,
+      'tooltipElem': undefined,
+    };
+  },
+  'components': {
+    'modal': modal,
+    'report-form': ReportForm,
+    'edit-buttons': EditButtons,
+  },
+  'methods': {
+    'onUpdate': function(item, callback) {
+      this.reportEditableObject = {'item': item, 'callback': callback};
+      this.showModal = true;
     },
-    'components': {
-        'modal': modal,
-        'report-form': ReportForm,
-        'edit-buttons': EditButtons,
+    'updateTimes': function(item) {
+      // this will sync the item that was edited with the report inside this item
+      try {
+        item.start = item.start.getTime();
+        item.end = item.end.getTime();
+      } catch (e) {};
+      item.reportInfo.StartTime = item.start;
+      item.reportInfo.EndTime = item.end;
     },
-    'methods': {
-        'onUpdate': function(item, callback) {
-            this.reportEditableObject = {'item': item, 'callback': callback};
-            this.showModal = true;
-        },
-        'updateTimes': function(item) {
-            // this will sync the item that was edited with the report inside this item
-            try {
-                item.start = item.start.getTime();
-                item.end = item.end.getTime();
-            } catch (e) {};
-            item.reportInfo.StartTime = item.start;
-            item.reportInfo.EndTime = item.end;
-        },
-        'syncObjectInfoWithItemTime': function(item) {
-            /* put the information from the information stimulus in the item to conserve the position */
-            try {
-                item.start = item.reportInfo.StartTime;
-                item.end = item.reportInfo.EndTime;
-            } catch (e) {
-                console.error('Unable to put the report time in item');
-            };
-        },
-        'checkMove': function(item, callback) {
-            // check if the item was changed from group. If so open the edit page
-            if (item.group !== item.reportInfo.Target) {
-                item.reportInfo.Target = item.group;
-                this.editItem({'item': item, 'callback': callback});
-            } else {
-                callback(item);
-            }
-        },
-        'createItem': function(id, group, content, start, end, reportInfo) {
-            return {
-                'id': id,
-                'group': group,
-                'content': content,
-                'start': start,
-                'end': end,
-                'className': content,
-                'reportInfo': reportInfo,
-            };
-        },
-        'createNewItem': function(newItem) {
-            let reportObj = Object.assign({}, this.createNewReport());
-            if (newItem) {
-                reportObj.Target = newItem.group;
-                if (newItem.start) {
-                    reportObj.StartTime = newItem.start.getTime();
-                }
-            }
+    'syncObjectInfoWithItemTime': function(item) {
+      /* put the information from the information stimulus in the item to conserve the position */
+      try {
+        item.start = item.reportInfo.StartTime;
+        item.end = item.reportInfo.EndTime;
+      } catch (e) {
+        console.error('Unable to put the report time in item');
+      };
+    },
+    'checkMove': function(item, callback) {
+      // check if the item was changed from group. If so open the edit page
+      if (item.group !== item.reportInfo.Target) {
+        item.reportInfo.Target = item.group;
+        this.editItem({'item': item, 'callback': callback});
+      } else {
+        callback(item);
+      }
+    },
+    'createItem': function(id, group, content, start, end, reportInfo) {
+      return {
+        'id': id,
+        'group': group,
+        'content': content,
+        'start': start,
+        'end': end,
+        'className': content,
+        'reportInfo': reportInfo,
+      };
+    },
+    'createNewItem': function(newItem) {
+      let reportObj = Object.assign({}, this.createNewReport());
+      if (newItem) {
+        reportObj.Target = newItem.group;
+        if (newItem.start) {
+          reportObj.StartTime = newItem.start.getTime();
+        }
+      }
 
-            if (newItem && newItem.start > newItem.end) {
-                newItem.end = newItem.start + 10;
-                reportObj.StartTime = newItem.start;
-                reportObj.EndTime = newItem.end;
-            }
-            let id = this.getItemId();
-            let newObj = this.createItem(
-                id,
-                reportObj.Target,
-                reportObj.ReportOn,
-                reportObj.StartTime,
-                reportObj.EndTime,
-                reportObj
-            );
+      if (newItem && newItem.start > newItem.end) {
+        newItem.end = newItem.start + 10;
+        reportObj.StartTime = newItem.start;
+        reportObj.EndTime = newItem.end;
+      }
+      let id = this.getItemId();
+      let newObj = this.createItem(
+        id,
+        reportObj.Target,
+        reportObj.ReportOn,
+        reportObj.StartTime,
+        reportObj.EndTime,
+        reportObj
+      );
 
-            this.reportEditableObject = {'item': newObj};
-            this.showModal = true;
-        },
-        'removeFromConfig': function(item) {
-            delete this.config.Report[item.connection];
-        },
-        'createNewReport': function() {
-            let report = {};
-            report.StartTime = 0;
-            report.EndTime = parseInt(this.endTime);
-            report.ReportOn = 'voltage';
-            report.Unit = 'mV';
-            report.Target = 'slice-4';
-            report.Type = 'Compartment';
-            report.Format = 'Bin';
-            report.Dt = 0.1;
-            return report;
-        },
-        'createTooltip': function(event) {
-            // comes from the timeline.on('itemover')
-            let item = this.timeline.itemsData.get(event.item);
-            let reportInfo = item.reportInfo;
-            let output = [];
-            output.push(`Dt: ${reportInfo.Dt}`);
-            output.push(`Type: ${reportInfo.Type}`);
-            if (reportInfo.Scaling) {
-                output.push(`Scaling: ${reportInfo.Scaling}`);
-            }
-            if (output.length > 0) {
-                this.showTooltip(event, output.join('\n'));
-            }
-        },
-        'createConfig': function(config) {
-            // clean the default configuration
-            config['Report'] = {};
-            for (let i=0; i<this.items.length; i++) {
-                let report = Object.assign({}, this.items[i].reportInfo);
-                // workarounds for the GUI to match the user.target and BlueConfig
-                if (report.Target === 'FullCA1') {
-                    report.Target = 'Mosaic';
-                }
-                if (report.ReportOn === 'voltage') {
-                    report.ReportOn = 'v';
-                }
-                if (report.Type === 'Compartment') {
-                    report.Type = 'compartment';
-                }
-                let repName = this.changeConnectionName(report.Target, 'report', i);
-                config['Report'][repName] = report;
-            }
-            return config;
-        },
+      this.reportEditableObject = {'item': newObj};
+      this.showModal = true;
     },
-    'mounted': function() {
-        // create a dataset with items
-        let reportInfo = this.createNewReport();
-        let item = this.createItem( // id, group, content, start, end, connection
-            0,
-            reportInfo.Target,
-            reportInfo.ReportOn,
-            reportInfo.StartTime,
-            reportInfo.EndTime, // TODO: change this to duration
-            reportInfo
-        );
+    'removeFromConfig': function(item) {
+      delete this.config.Report[item.connection];
+    },
+    'createNewReport': function() {
+      let report = {};
+      report.StartTime = 0;
+      report.EndTime = parseInt(this.endTime);
+      report.ReportOn = 'voltage';
+      report.Unit = 'mV';
+      report.Target = 'slice-4';
+      report.Type = 'Compartment';
+      report.Format = 'Bin';
+      report.Dt = 0.1;
+      return report;
+    },
+    'createTooltip': function(event) {
+      // comes from the timeline.on('itemover')
+      let item = this.timeline.itemsData.get(event.item);
+      let reportInfo = item.reportInfo;
+      let output = [];
+      output.push(`Dt: ${reportInfo.Dt}`);
+      output.push(`Type: ${reportInfo.Type}`);
+      if (reportInfo.Scaling) {
+        output.push(`Scaling: ${reportInfo.Scaling}`);
+      }
+      if (output.length > 0) {
+        this.showTooltip(event, output.join('\n'));
+      }
+    },
+    'createConfig': function(config) {
+      // clean the default configuration
+      config['Report'] = {};
+      for (let i=0; i<this.items.length; i++) {
+        let report = Object.assign({}, this.items[i].reportInfo);
+        // workarounds for the GUI to match the user.target and BlueConfig
+        if (report.Target === 'FullCA1') {
+          report.Target = 'Mosaic';
+        }
+        if (report.ReportOn === 'voltage') {
+          report.ReportOn = 'v';
+        }
+        if (report.Type === 'Compartment') {
+          report.Type = 'compartment';
+        }
+        let repName = this.changeConnectionName(report.Target, 'report', i);
+        config['Report'][repName] = report;
+      }
+      return config;
+    },
+  },
+  'mounted': function() {
+    // create a dataset with items
+    let reportInfo = this.createNewReport();
+    let item = this.createItem( // id, group, content, start, end, connection
+      0,
+      reportInfo.Target,
+      reportInfo.ReportOn,
+      reportInfo.StartTime,
+      reportInfo.EndTime, // TODO: change this to duration
+      reportInfo
+    );
 
-        this.setupGroups(reportInfo.Target);
-        this.items.push(item);
-        this.createTimeline(); // from the simulationTimeline.js
+    this.setupGroups(reportInfo.Target);
+    this.items.push(item);
+    this.createTimeline(); // from the simulationTimeline.js
 
-        this.$parent.$on('reportTargetSelected', (target) => {
-            this.itemAdd({'group': target.name});
-        });
+    this.$parent.$on('reportTargetSelected', (target) => {
+      this.itemAdd({'group': target.name});
+    });
+  },
+  'watch': {
+    'endTime': function(newVal) {
+      this.timeline.setCustomTime(parseInt(newVal), 'end');
+      this.createCustomTimeLabel(); // from the simulation.js
     },
-    'watch': {
-        'endTime': function(newVal) {
-            this.timeline.setCustomTime(parseInt(newVal), 'end');
-            this.createCustomTimeLabel(); // from the simulation.js
-        },
-    },
+  },
 };
 </script>

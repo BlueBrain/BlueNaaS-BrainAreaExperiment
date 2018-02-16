@@ -104,348 +104,348 @@ This component manage each job (delete, start, create, etc).
     const RUNNING_STATUS = 'RUNNING';
 
     export default {
-        'name': 'list_simulations',
-        'components': {
-            'simulation-item': SimulationItem,
-            'infinite-loading': InfiniteLoading,
-            'launch-analysis-form': LaunchAnalysisForm,
-            'modal': Modal,
+      'name': 'list_simulations',
+      'components': {
+        'simulation-item': SimulationItem,
+        'infinite-loading': InfiniteLoading,
+        'launch-analysis-form': LaunchAnalysisForm,
+        'modal': Modal,
+      },
+      'props': ['computerParam', 'statusSearch'],
+      'data': function() {
+        return {
+          'loading': true,
+          'computerFilter': simulationConfig.default,
+          'defaultAnalysisConfig': analysisConfig,
+          'simulationConfig': simulationConfig,
+          'showAnalysisForm': false,
+          'unicoreAPI': unicore,
+          'jobs': [],
+          'filteredObjects': [],
+          'viewList': [],
+          'readObjectIndex': 0,
+          'loadIncrement': 10,
+          'statusFilter': 'ALL',
+          'nameFilter': '',
+          'dateFilter': '',
+          'filterOn': false,
+          'pollInterval': 10,
+          'jobSelectedForValidation': null,
+        };
+      },
+      'computed': {
+        'filterStatus': function() {
+          if (this.filterOn) {
+            return 'Filter is activated';
+          }
         },
-        'props': ['computerParam', 'statusSearch'],
-        'data': function() {
-            return {
-                'loading': true,
-                'computerFilter': simulationConfig.default,
-                'defaultAnalysisConfig': analysisConfig,
-                'simulationConfig': simulationConfig,
-                'showAnalysisForm': false,
-                'unicoreAPI': unicore,
-                'jobs': [],
-                'filteredObjects': [],
-                'viewList': [],
-                'readObjectIndex': 0,
-                'loadIncrement': 10,
-                'statusFilter': 'ALL',
-                'nameFilter': '',
-                'dateFilter': '',
-                'filterOn': false,
-                'pollInterval': 10,
-                'jobSelectedForValidation': null,
-            };
+      },
+      'methods': {
+        'toggleModal': function(value) {
+          if (value) {
+            this.showAnalysisForm = value;
+            return;
+          }
+          this.showAnalysisForm = !this.showAnalysisForm;
         },
-        'computed': {
-            'filterStatus': function() {
-                if (this.filterOn) {
-                    return 'Filter is activated';
-                }
-            },
+        'actionJob': function(actions) {
+          this.unicoreAPI.actionJob(actions.url);
+          swal('Great!', actions.text, 'success');
         },
-        'methods': {
-            'toggleModal': function(value) {
-                if (value) {
-                    this.showAnalysisForm = value;
-                    return;
-                }
-                this.showAnalysisForm = !this.showAnalysisForm;
-            },
-            'actionJob': function(actions) {
-                this.unicoreAPI.actionJob(actions.url);
-                swal('Great!', actions.text, 'success');
-            },
-            'checkFilterIcon': function() {
-                if (this.nameFilter === '' && this.statusFilter === 'ALL') {
-                    this.filterOn = false;
-                } else {
-                    this.filterOn = true;
-                }
-            },
-            'filter': function() {
-                let filteredByStatus = [];
-                if (this.statusFilter === 'ALL') {
-                    filteredByStatus = this.jobs;
-                }
-                this.jobs.map((job) => {
-                    // filter items first by status
-                    if (job.status === this.statusFilter) {
-                        filteredByStatus.push(job);
-                    }
-                });
+        'checkFilterIcon': function() {
+          if (this.nameFilter === '' && this.statusFilter === 'ALL') {
+            this.filterOn = false;
+          } else {
+            this.filterOn = true;
+          }
+        },
+        'filter': function() {
+          let filteredByStatus = [];
+          if (this.statusFilter === 'ALL') {
+            filteredByStatus = this.jobs;
+          }
+          this.jobs.map((job) => {
+            // filter items first by status
+            if (job.status === this.statusFilter) {
+              filteredByStatus.push(job);
+            }
+          });
 
-                let filteredById = [];
-                // used filtered status to continue filtering by id
-                filteredByStatus.map((job) => {
-                    let name = job.name.toUpperCase();
-                    if (name.search(this.nameFilter.toUpperCase()) !== -1) {
-                        filteredById.push(job);
-                    }
-                });
+          let filteredById = [];
+          // used filtered status to continue filtering by id
+          filteredByStatus.map((job) => {
+            let name = job.name.toUpperCase();
+            if (name.search(this.nameFilter.toUpperCase()) !== -1) {
+              filteredById.push(job);
+            }
+          });
 
-                // set color to the filter if there is one
-                this.checkFilterIcon();
-                // sort by date
-                this.readObjectIndex = this.loadIncrement;
-                filteredById.sort((a, b) => {
-                    if (a.submissionTime > b.submissionTime) return -1;
-                    return 1;
-                });
-                this.filteredObjects = filteredById;
-                // put items in the view
-                this.viewList = filteredById.slice(0, this.loadIncrement);
-                this.loading = false;
-                // reset inifiteloading so it checks the next time if there are more items
-                this.$nextTick(() => { // wait until the infinite component is loaded
-                    this.$refs.infiniteLoading.$emit('$InfiniteLoading:reset');
-                    // TODO: add id in as parameter (in general it will be "")
-                    this.$router.replace({
-                        'name': 'view',
-                        'params': {
-                            'computerParam': this.computerFilter,
-                            'statusSearch': this.statusFilter,
-                        },
-                    });
-                });
-            },
-            'getAnalysisInfo': function(simulationJob) {
-                /*  get the location of the analysis based on the mapping file
+          // set color to the filter if there is one
+          this.checkFilterIcon();
+          // sort by date
+          this.readObjectIndex = this.loadIncrement;
+          filteredById.sort((a, b) => {
+            if (a.submissionTime > b.submissionTime) return -1;
+            return 1;
+          });
+          this.filteredObjects = filteredById;
+          // put items in the view
+          this.viewList = filteredById.slice(0, this.loadIncrement);
+          this.loading = false;
+          // reset inifiteloading so it checks the next time if there are more items
+          this.$nextTick(() => { // wait until the infinite component is loaded
+            this.$refs.infiniteLoading.$emit('$InfiniteLoading:reset');
+            // TODO: add id in as parameter (in general it will be "")
+            this.$router.replace({
+              'name': 'view',
+              'params': {
+                'computerParam': this.computerFilter,
+                'statusSearch': this.statusFilter,
+              },
+            });
+          });
+        },
+        'getAnalysisInfo': function(simulationJob) {
+          /*  get the location of the analysis based on the mapping file
                     that we save in the simulation and then the validation image */
-                if (simulationJob.status === SUCCESSFUL_STATUS) {
-                    this.unicoreAPI.getAssociatedLocation(simulationJob._links.workingDirectory.href)
-                    .then((analysisObject) => {
-                        if (analysisObject === '') {
-                            // stop loading status. analysis not run yet.
-                            return this.setMultipleAnalysisStatus(simulationJob, []);
-                        }
-                        this.getStatus(analysisObject, simulationJob);
-                    });
-                } else {
-                    this.setMultipleAnalysisStatus(simulationJob, [BLOCK_STATUS]);
-                }
-            },
-            'getStatus': function(analysisObject, simulationJob) {
-                let multipleAnalysis = [];
-                analysisObject.forEach((analysis) => {
-                    // fill the information for all the analysis
-                    this.unicoreAPI.getJobProperties(analysis._links.self.href)
-                    .then((jobInfo) => {
-                        multipleAnalysis.push(jobInfo.status);
-                        this.setMultipleAnalysisStatus(simulationJob, multipleAnalysis);
-                    });
-                });
-            },
-            'setMultipleAnalysisStatus': function(simulationJob, statusList) {
-                this.$set(simulationJob, 'multipleAnalysisStatus', statusList.sort());
-            },
-            'removeFromList': function(url) {
-                this.jobs.map((job, index, arr) => {
-                    if (job._links.self.href === url) {
-                        this.jobs.splice(index, 1);
-                        return;
-                    }
-                });
-                this.filter();
-            },
-            'deleteJob': function(url) {
-                swal({
-                    'title': 'Are you sure?',
-                    'text': 'You won\'t be able to revert this!',
-                    'type': 'warning',
-                    'showCancelButton': true,
-                    'focusCancel': true,
-                    'confirmButtonColor': '#ac6067',
-                    'cancelButtonColor': '#879fcb',
-                    'confirmButtonText': 'Yes, delete it!',
-                }).then((choice) => {
-                    if (choice.value === true) {
-                        this.unicoreAPI.deleteJob(url)
-                        .then(() => {
-                            this.removeFromList(url);
-                        });
-                    }
-                });
-            },
-            'showDetails': function(job, computer) {
-                let url = job._links.self.href;
-                let id = url.substr(url.lastIndexOf('/') + 1);
-                this.$router.push({'name': 'details', 'params': {
-                    'jobId': id,
-                    'jobParam': job,
-                    'computerParam': computer,
-                }});
-            },
-            'refreshJobs': function() {
-                this.loading = true;
-                let loadingComp = document.getElementById('loading-component');
-                if (loadingComp && loadingComp.style.display === 'none') {
-                    loadingComp.style.display = 'block';
-                }
-                this.jobs = [];
-                this.unicoreAPI.getAllJobsExapandedWithChildren(this.computerFilter)
-                .then((resultsArray) => {
-                    let onlySimulations = resultsArray.filter((simulation) => {
-                        if (simulation.children.includes(`/${analysisConfig.configFileName}`)) {
-                            // it is an analysis that should be removed
-                            return false;
-                        }
-                        if (!simulation.children.includes('/out.dat') &&
+          if (simulationJob.status === SUCCESSFUL_STATUS) {
+            this.unicoreAPI.getAssociatedLocation(simulationJob._links.workingDirectory.href)
+            .then((analysisObject) => {
+              if (analysisObject === '') {
+                // stop loading status. analysis not run yet.
+                return this.setMultipleAnalysisStatus(simulationJob, []);
+              }
+              this.getStatus(analysisObject, simulationJob);
+            });
+          } else {
+            this.setMultipleAnalysisStatus(simulationJob, [BLOCK_STATUS]);
+          }
+        },
+        'getStatus': function(analysisObject, simulationJob) {
+          let multipleAnalysis = [];
+          analysisObject.forEach((analysis) => {
+            // fill the information for all the analysis
+            this.unicoreAPI.getJobProperties(analysis._links.self.href)
+            .then((jobInfo) => {
+              multipleAnalysis.push(jobInfo.status);
+              this.setMultipleAnalysisStatus(simulationJob, multipleAnalysis);
+            });
+          });
+        },
+        'setMultipleAnalysisStatus': function(simulationJob, statusList) {
+          this.$set(simulationJob, 'multipleAnalysisStatus', statusList.sort());
+        },
+        'removeFromList': function(url) {
+          this.jobs.map((job, index, arr) => {
+            if (job._links.self.href === url) {
+              this.jobs.splice(index, 1);
+              return;
+            }
+          });
+          this.filter();
+        },
+        'deleteJob': function(url) {
+          swal({
+            'title': 'Are you sure?',
+            'text': 'You won\'t be able to revert this!',
+            'type': 'warning',
+            'showCancelButton': true,
+            'focusCancel': true,
+            'confirmButtonColor': '#ac6067',
+            'cancelButtonColor': '#879fcb',
+            'confirmButtonText': 'Yes, delete it!',
+          }).then((choice) => {
+            if (choice.value === true) {
+              this.unicoreAPI.deleteJob(url)
+              .then(() => {
+                this.removeFromList(url);
+              });
+            }
+          });
+        },
+        'showDetails': function(job, computer) {
+          let url = job._links.self.href;
+          let id = url.substr(url.lastIndexOf('/') + 1);
+          this.$router.push({'name': 'details', 'params': {
+            'jobId': id,
+            'jobParam': job,
+            'computerParam': computer,
+          }});
+        },
+        'refreshJobs': function() {
+          this.loading = true;
+          let loadingComp = document.getElementById('loading-component');
+          if (loadingComp && loadingComp.style.display === 'none') {
+            loadingComp.style.display = 'block';
+          }
+          this.jobs = [];
+          this.unicoreAPI.getAllJobsExapandedWithChildren(this.computerFilter)
+          .then((resultsArray) => {
+            let onlySimulations = resultsArray.filter((simulation) => {
+              if (simulation.children.includes(`/${analysisConfig.configFileName}`)) {
+                // it is an analysis that should be removed
+                return false;
+              }
+              if (!simulation.children.includes('/out.dat') &&
                             simulation.status === SUCCESSFUL_STATUS) {
-                            // without out.dat no analysis should be run
-                            simulation['multipleAnalysisStatus'] = [BLOCK_STATUS];
-                            // flag to show the warning icon on the list
-                            simulation['noOut'] = true;
-                        } else {
-                            simulation['multipleAnalysisStatus'] = [LOADING_STATUS];
-                            this.getAnalysisInfo(simulation);
-                        }
-                        return true;
-                    });
-                    this.filteredObjects = this.jobs = onlySimulations;
-                    this.filter();
-                    if (loadingComp) {
-                        this.$nextTick(() => {
-                            loadingComp.style.display = 'none';
-                        });
-                    }
-                });
-            },
-            'resetFilter': function() {
-                this.nameFilter = '';
-                this.statusFilter = 'ALL';
-            },
-            'runAnalysis': function(job) {
-                this.showAnalysisForm = true;
-                // set the origin computer
-                this.defaultAnalysisConfig.from = this.computerFilter;
-                this.jobSelectedForValidation = job;
-                // after the form will return to analysisConfigReady
-            },
-            'onInfinite': function($state) {
-                if (this.loading) return; // avoid processing things while loading
-                if (this.readObjectIndex > this.filteredObjects.length) {
-                    $state.complete();
-                    return;
-                }
-                let newItems = [];
-                // obtain the next elements
-                newItems = this.filteredObjects.slice(this.readObjectIndex, this.readObjectIndex + this.loadIncrement);
-                this.readObjectIndex += this.loadIncrement;
-                this.viewList = this.viewList.concat(newItems);
-                $state.loaded();
-            },
-            'startReloadJob': function(simulationJob) {
-                let poolAnalysis = function(simulationJob) {
-                    if (simulationJob.autorefresh) {
-                        simulationJob['intervalReference'] = setInterval(() => {
-                            let statusList = simulationJob.multipleAnalysisStatus;
-                            if (!statusList.includes(LOADING_STATUS) &&
+                // without out.dat no analysis should be run
+                simulation['multipleAnalysisStatus'] = [BLOCK_STATUS];
+                // flag to show the warning icon on the list
+                simulation['noOut'] = true;
+              } else {
+                simulation['multipleAnalysisStatus'] = [LOADING_STATUS];
+                this.getAnalysisInfo(simulation);
+              }
+              return true;
+            });
+            this.filteredObjects = this.jobs = onlySimulations;
+            this.filter();
+            if (loadingComp) {
+              this.$nextTick(() => {
+                loadingComp.style.display = 'none';
+              });
+            }
+          });
+        },
+        'resetFilter': function() {
+          this.nameFilter = '';
+          this.statusFilter = 'ALL';
+        },
+        'runAnalysis': function(job) {
+          this.showAnalysisForm = true;
+          // set the origin computer
+          this.defaultAnalysisConfig.from = this.computerFilter;
+          this.jobSelectedForValidation = job;
+          // after the form will return to analysisConfigReady
+        },
+        'onInfinite': function($state) {
+          if (this.loading) return; // avoid processing things while loading
+          if (this.readObjectIndex > this.filteredObjects.length) {
+            $state.complete();
+            return;
+          }
+          let newItems = [];
+          // obtain the next elements
+          newItems = this.filteredObjects.slice(this.readObjectIndex, this.readObjectIndex + this.loadIncrement);
+          this.readObjectIndex += this.loadIncrement;
+          this.viewList = this.viewList.concat(newItems);
+          $state.loaded();
+        },
+        'startReloadJob': function(simulationJob) {
+          let poolAnalysis = function(simulationJob) {
+            if (simulationJob.autorefresh) {
+              simulationJob['intervalReference'] = setInterval(() => {
+                let statusList = simulationJob.multipleAnalysisStatus;
+                if (!statusList.includes(LOADING_STATUS) &&
                                 !statusList.includes(QUEUED_STATUS) &&
                                 !statusList.includes(RUNNING_STATUS)) {
-                                // stop interval on job finished
-                                simulationJob['intervalReference'] = clearTimeout(simulationJob.intervalReference);
-                            } else {
-                                this.getAnalysisInfo.call(this, simulationJob);
-                            }
-                        }, this.pollInterval * 1000);
-                    } else {
-                        simulationJob['intervalReference'] = clearTimeout(simulationJob.intervalReference);
-                    }
-                };
-                simulationJob['autorefresh'] = true;
-                simulationJob['intervalReference'] = null;
-                // add this status to show the sync
-                simulationJob.multipleAnalysisStatus.push(LOADING_STATUS);
-                poolAnalysis.call(this, simulationJob);
-            },
-            'analysisConfigReady': function(analysisConfig) {
-                this.toggleModal();
-                swal.enableLoading();
-                let analysisInfo = {};
-                analysisConfig.from.workingDirectory = this.jobSelectedForValidation._links.workingDirectory.href;
-
-                this.unicoreAPI.submitAnalysis(
-                    analysisConfig,
-                    this.defaultAnalysisConfig.script,
-                    this.defaultAnalysisConfig.filesToAvoidCopy
-                ).then((analysis) => {
-                    analysisInfo = analysis;
-                    return this.changeBlueConfigPaths(
-                        analysisConfig.to.workingDirectory,
-                        analysisConfig.to.computer
-                    );
-                })
-                .then(() => {
-                    let startURL = analysisInfo.destinationJob._links['action:start'].href;
-                    console.log('starting analysis...');
-                    this.unicoreAPI.actionJob(startURL);
-                    // pool the status of the analysis
-                    this.startReloadJob(this.jobSelectedForValidation);
-                    // swal.enableLoading();
-                    return swal({
-                        'title': 'Analysis started!',
-                        'text': 'Analysis results can take a long time',
-                        'showCancelButton': true,
-                        'confirmButtonText': 'View Job',
-                        'cancelButtonText': 'OK',
-                        'type': 'success',
-                    });
-                })
-                .then((choice) => {
-                    if (choice.value) {
-                        this.showDetails(
-                            this.jobSelectedForValidation,
-                            analysisConfig.from.computer
-                        );
-                    }
-                });
-            },
-            'changeBlueConfigPaths': function(workingDirectory, computer) {
-                let blueConfigName = 'blueconfig.json';
-                let serverBlueConfig = `${workingDirectory}/files/${blueConfigName}`;
-                return this.unicoreAPI.getFiles(serverBlueConfig)
-                .then((blueConfig) => {
-                    blueConfig = JSON.parse(blueConfig);
-                    // templateBluepyConfig has the placeholder to replace the work directory
-                    let analysisBlueConfig = Object.assign({}, templateBluepyConfig.Run.Default);
-                    let inMemoryBlueConfig = blueConfig.Run.Default;
-                    let newPathWork = this.simulationConfig[computer].pathWork;
-                    let placeholder = '{{WORK_DIRECTORY}}';
-                    Object.keys(analysisBlueConfig).forEach((key) => {
-                        if (analysisBlueConfig[key].toString().startsWith(placeholder)) {
-                            inMemoryBlueConfig[key] = analysisBlueConfig[key].toString().replace(placeholder, newPathWork);
-                        }
-                    });
-                    let uploadFile = {
-                        'Data': JSON.stringify(blueConfig),
-                        'To': blueConfigName,
-                    };
-                    return this.unicoreAPI.uploadData(uploadFile, `${workingDirectory}/files`);
-                });
-            },
-        },
-        'mounted': function() {
-            if (this.statusSearch) {
-                this.statusFilter = this.statusSearch.toUpperCase();
-                this.checkFilterIcon();
+                  // stop interval on job finished
+                  simulationJob['intervalReference'] = clearTimeout(simulationJob.intervalReference);
+                } else {
+                  this.getAnalysisInfo.call(this, simulationJob);
+                }
+              }, this.pollInterval * 1000);
+            } else {
+              simulationJob['intervalReference'] = clearTimeout(simulationJob.intervalReference);
             }
-            this.computerFilter = this.computerParam.toUpperCase();
+          };
+          simulationJob['autorefresh'] = true;
+          simulationJob['intervalReference'] = null;
+          // add this status to show the sync
+          simulationJob.multipleAnalysisStatus.push(LOADING_STATUS);
+          poolAnalysis.call(this, simulationJob);
+        },
+        'analysisConfigReady': function(analysisConfig) {
+          this.toggleModal();
+          swal.enableLoading();
+          let analysisInfo = {};
+          analysisConfig.from.workingDirectory = this.jobSelectedForValidation._links.workingDirectory.href;
+
+          this.unicoreAPI.submitAnalysis(
+            analysisConfig,
+            this.defaultAnalysisConfig.script,
+            this.defaultAnalysisConfig.filesToAvoidCopy
+          ).then((analysis) => {
+            analysisInfo = analysis;
+            return this.changeBlueConfigPaths(
+              analysisConfig.to.workingDirectory,
+              analysisConfig.to.computer
+            );
+          })
+          .then(() => {
+            let startURL = analysisInfo.destinationJob._links['action:start'].href;
+            console.log('starting analysis...');
+            this.unicoreAPI.actionJob(startURL);
+            // pool the status of the analysis
+            this.startReloadJob(this.jobSelectedForValidation);
+            // swal.enableLoading();
+            return swal({
+              'title': 'Analysis started!',
+              'text': 'Analysis results can take a long time',
+              'showCancelButton': true,
+              'confirmButtonText': 'View Job',
+              'cancelButtonText': 'OK',
+              'type': 'success',
+            });
+          })
+          .then((choice) => {
+            if (choice.value) {
+              this.showDetails(
+                this.jobSelectedForValidation,
+                analysisConfig.from.computer
+              );
+            }
+          });
+        },
+        'changeBlueConfigPaths': function(workingDirectory, computer) {
+          let blueConfigName = 'blueconfig.json';
+          let serverBlueConfig = `${workingDirectory}/files/${blueConfigName}`;
+          return this.unicoreAPI.getFiles(serverBlueConfig)
+          .then((blueConfig) => {
+            blueConfig = JSON.parse(blueConfig);
+            // templateBluepyConfig has the placeholder to replace the work directory
+            let analysisBlueConfig = Object.assign({}, templateBluepyConfig.Run.Default);
+            let inMemoryBlueConfig = blueConfig.Run.Default;
+            let newPathWork = this.simulationConfig[computer].pathWork;
+            let placeholder = '{{WORK_DIRECTORY}}';
+            Object.keys(analysisBlueConfig).forEach((key) => {
+              if (analysisBlueConfig[key].toString().startsWith(placeholder)) {
+                inMemoryBlueConfig[key] = analysisBlueConfig[key].toString().replace(placeholder, newPathWork);
+              }
+            });
+            let uploadFile = {
+              'Data': JSON.stringify(blueConfig),
+              'To': blueConfigName,
+            };
+            return this.unicoreAPI.uploadData(uploadFile, `${workingDirectory}/files`);
+          });
+        },
+      },
+      'mounted': function() {
+        if (this.statusSearch) {
+          this.statusFilter = this.statusSearch.toUpperCase();
+          this.checkFilterIcon();
+        }
+        this.computerFilter = this.computerParam.toUpperCase();
+        this.refreshJobs();
+      },
+      'watch': {
+        'statusFilter': function() {
+          if (!this.loading) {
+            this.filter();
+          }
+        },
+        'nameFilter': function() {
+          if (!this.loading) {
+            this.filter();
+          }
+        },
+        'computerFilter': function() {
+          if (!this.loading) {
             this.refreshJobs();
+          }
         },
-        'watch': {
-            'statusFilter': function() {
-                if (!this.loading) {
-                    this.filter();
-                }
-            },
-            'nameFilter': function() {
-                if (!this.loading) {
-                    this.filter();
-                }
-            },
-            'computerFilter': function() {
-                if (!this.loading) {
-                    this.refreshJobs();
-                }
-            },
-        },
+      },
     };
 </script>
 

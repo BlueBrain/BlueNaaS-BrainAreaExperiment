@@ -70,55 +70,55 @@
     import targetAutocomplete from 'components/shared/autocomplete-targets.vue';
     import utils from 'assets/utils.js';
     export default {
-        'props': ['defaultAnalysisConfig'],
-        'data': function() {
-            return {
-                'from': {
-                    'workingDirectory': null,
-                    'computer': this.defaultAnalysisConfig.from,
-                },
-                'to': {
-                    'workingDirectory': null, // create a new one
-                    'computer': this.defaultAnalysisConfig.to,
-                },
-                'files': [], // this will be filled in later in UnicoreAPI
-                'nodes': 1,
-                'title': '',
-                'analysisToRun': this.defaultAnalysisConfig.analysisAvailable,
-                'checkedAnalysis': [],
-                'numberOfCells': 5,
-                'tipTexts': [
-                    `To run the Analysis we need to copy the output from the Simulation to ${this.defaultAnalysisConfig.to} (because that machine has the analysis packages installed) and run the new Analysis Job.`,
-                    'The results of the Analysis will be shown in the detailed page.',
-                ],
-                'target': '',
-            };
+      'props': ['defaultAnalysisConfig'],
+      'data': function() {
+        return {
+          'from': {
+            'workingDirectory': null,
+            'computer': this.defaultAnalysisConfig.from,
+          },
+          'to': {
+            'workingDirectory': null, // create a new one
+            'computer': this.defaultAnalysisConfig.to,
+          },
+          'files': [], // this will be filled in later in UnicoreAPI
+          'nodes': 1,
+          'title': '',
+          'analysisToRun': this.defaultAnalysisConfig.analysisAvailable,
+          'checkedAnalysis': [],
+          'numberOfCells': 5,
+          'tipTexts': [
+            `To run the Analysis we need to copy the output from the Simulation to ${this.defaultAnalysisConfig.to} (because that machine has the analysis packages installed) and run the new Analysis Job.`,
+            'The results of the Analysis will be shown in the detailed page.',
+          ],
+          'target': '',
+        };
+      },
+      'components': {
+        'target-autocomplete': targetAutocomplete,
+      },
+      'mounted': function() {
+        if (localStorage.getItem('showAnalysisTip') === 'false') {
+          this.$nextTick(() => this.closeTip());
+        }
+      },
+      'methods': {
+        'editItem': function() {
+          this.title = utils.filterName(this.title);
+          this.$emit('analysisConfigReady', this.$data);
         },
-        'components': {
-            'target-autocomplete': targetAutocomplete,
+        'closeForm': function() {
+          this.$emit('changeModalVisibility', false);
         },
-        'mounted': function() {
-            if (localStorage.getItem('showAnalysisTip') === 'false') {
-                this.$nextTick(() => this.closeTip());
-            }
+        'closeTip': function() {
+          let tipElement = this.$el.querySelector('#tip');
+          tipElement.remove();
+          localStorage.setItem('showAnalysisTip', false);
         },
-        'methods': {
-            'editItem': function() {
-                this.title = utils.filterName(this.title);
-                this.$emit('analysisConfigReady', this.$data);
-            },
-            'closeForm': function() {
-                this.$emit('changeModalVisibility', false);
-            },
-            'closeTip': function() {
-                let tipElement = this.$el.querySelector('#tip');
-                tipElement.remove();
-                localStorage.setItem('showAnalysisTip', false);
-            },
-            'targetChanged': function(newTarget) {
-                this.target = newTarget;
-            },
+        'targetChanged': function(newTarget) {
+          this.target = newTarget;
         },
+      },
     };
 </script>
 

@@ -26,36 +26,36 @@
 
 <script>
 export default {
-    'name': 'modal-component',
-    'props': ['show'],
-    'data': function() {
-        return {
-            'localShow': false,
-        };
+  'name': 'modal-component',
+  'props': ['show'],
+  'data': function() {
+    return {
+      'localShow': false,
+    };
+  },
+  'methods': {
+    'close': function() {
+      this.$emit('changeModalVisibility', false);
     },
-    'methods': {
-        'close': function() {
-            this.$emit('changeModalVisibility', false);
-        },
-        'clickOutside': function(e) {
-            if (e.target.className.indexOf('modal-wrapper') >= 0) {
-                this.close();
-            }
-        },
+    'clickOutside': function(e) {
+      if (e.target.className.indexOf('modal-wrapper') >= 0) {
+        this.close();
+      }
     },
-    'created': function() {
-        this.localShow = this.show;
-        document.addEventListener('keydown', (e) => {
-            if (this.show && e.keyCode == 27) {
-                this.close();
-            }
-        });
+  },
+  'created': function() {
+    this.localShow = this.show;
+    document.addEventListener('keydown', (e) => {
+      if (this.show && e.keyCode == 27) {
+        this.close();
+      }
+    });
+  },
+  'watch': {
+    'show': function(newVal) {
+      this.localShow = newVal;
     },
-    'watch': {
-        'show': function(newVal) {
-            this.localShow = newVal;
-        },
-    },
+  },
 };
 </script>
 

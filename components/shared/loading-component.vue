@@ -9,7 +9,7 @@
 
 <script>
 export default {
-    'name': 'loading-component',
+  'name': 'loading-component',
 };
 </script>
 <style scoped>

@@ -27,37 +27,37 @@
 
 <script>
 export default {
-    'name': 'staggered-list-demo',
-    'props': {
-        'list': [],
-        'selector': String,
-        'displaySelector': String,
+  'name': 'staggered-list-demo',
+  'props': {
+    'list': [],
+    'selector': String,
+    'displaySelector': String,
+  },
+  'data': function() {
+    return {
+      'query': '',
+    };
+  },
+  'computed': {
+    'computedList': function() {
+      let vm = this;
+      let filtered = this.list.filter(function(item) {
+        return item[vm.selector].toLowerCase().indexOf(vm.query.toLowerCase()) !== -1;
+      });
+      return filtered;
     },
-    'data': function() {
-        return {
-            'query': '',
-        };
+  },
+  'methods': {
+    'hover': function(el) {
+      this.$emit('hover', el);
     },
-    'computed': {
-        'computedList': function() {
-            let vm = this;
-            let filtered = this.list.filter(function(item) {
-                return item[vm.selector].toLowerCase().indexOf(vm.query.toLowerCase()) !== -1;
-            });
-            return filtered;
-        },
+    'enterClick': function() {
+      this.$emit('hover', this.computedList[0]);
     },
-    'methods': {
-        'hover': function(el) {
-            this.$emit('hover', el);
-        },
-        'enterClick': function() {
-            this.$emit('hover', this.computedList[0]);
-        },
-        'clicked': function(el) {
-            this.$emit('clicked', el);
-        },
+    'clicked': function(el) {
+      this.$emit('clicked', el);
     },
+  },
 };
 </script>
 

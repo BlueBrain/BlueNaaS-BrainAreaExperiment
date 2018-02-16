@@ -13,24 +13,24 @@
 </template>
 <script>
   export default {
-      'name': 'collapse-title',
-      'props': {
-          'title': {'type': String, 'default': 'Notes'},
-          'collapsed': {'type': Boolean, 'default': true},
-          'sublevel': {'type': Boolean, 'default': false},
-      },
-      'data': function() {
-          return {
-              'toggleCollapse': Boolean, // this is to avoid mutiating the prop
-          };
-      },
-      'mounted': function() {
-          if (this.collapsed === undefined) {
-              this.toggleCollapse = true;
-          } else {
-              this.toggleCollapse = this.collapsed;
-          }
-      },
+    'name': 'collapse-title',
+    'props': {
+      'title': {'type': String, 'default': 'Notes'},
+      'collapsed': {'type': Boolean, 'default': true},
+      'sublevel': {'type': Boolean, 'default': false},
+    },
+    'data': function() {
+      return {
+        'toggleCollapse': Boolean, // this is to avoid mutiating the prop
+      };
+    },
+    'mounted': function() {
+      if (this.collapsed === undefined) {
+        this.toggleCollapse = true;
+      } else {
+        this.toggleCollapse = this.collapsed;
+      }
+    },
   };
 </script>
 

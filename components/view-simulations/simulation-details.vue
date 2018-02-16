@@ -109,258 +109,258 @@ import Analysis from 'components/view-simulations/simulation-details/analysis.vu
 import analysisConfig from 'assets/analysis-config.json';
 
 export default {
-    'name': 'simulationDetails',
-    'props': ['jobParam', 'jobId', 'computerParam'],
-    'data': function() {
-        return {
-            'loading': true,
-            'computer': 'JUQUEEN',
-            'unicoreAPI': Unicore,
-            'job': null,
-            'pollInterval': 10, // seconds
-            // add more accesible information to the simulation
-            'simulationDetails': {
-                // depending of the status change the icon
-                'statusIcon': 'check_circle',
-                'submissionTime': '',
-                'type': 'Simulation',
-                'intervalReference': null,
-                'autorefresh': true,
-                'id': '',
-                'name': '',
-                'url': '',
-                'stderr': [],
-                'files': '',
-                'stdout': [],
-                'status': '',
-                'BlueConfig': [],
-                'refreshFunction': null,
-            },
-            'analysisDetailTemplate': {
-                // depending of the status change the icon
-                'statusIcon': 'check_circle',
-                'submissionTime': '',
-                'type': 'Analysis',
-                'id': '',
-                'name': '',
-                'status': '',
-            },
-            'analysisDetails': [],
-        };
-    },
-    'components': {
-        'collapse-title': CollapseTitle,
-        'item-summary': ItemSummary,
-        'analysis': Analysis,
-    },
-    'methods': {
-        'deleteJob': function(url) {
-            swal({
-                'title': 'Are you sure?',
-                'text': 'You won\'t be able to revert this!',
-                'type': 'warning',
-                'showCancelButton': true,
-                'focusCancel': true,
-                'confirmButtonColor': '#ac6067',
-                'cancelButtonColor': '#879fcb',
-                'confirmButtonText': 'Yes, delete it!',
-                'showLoaderOnConfirm': true,
-                'allowOutsideClick': false,
-                'preConfirm': (choice) => {
-                    if (choice === true) {
-                        return this.unicoreAPI.deleteJob(url)
-                        .then(() => {
-                            let id = url.split('/').pop();
-                            return this.removeFromList(id);
-                        });
-                    }
-                },
-            });
-        },
-        'fillJobs': function(job) {
-            this.simulationDetails.url = job._links.self.href;
-            this.simulationDetails.status = job.status;
-            this.simulationDetails.id = this.simulationDetails.url.split('/').pop();
-            this.simulationDetails.name = job.name;
-            this.simulationDetails.files = job._links.workingDirectory.href;
-            this.simulationDetails.submissionTime = this.job.submissionTime;
-            this.loading = false;
-            let loadingComp = document.querySelector('#loading-component');
-            if (loadingComp) {
-                loadingComp.style.display = 'none';
-            }
-            this.getFiles('stderr', this.simulationDetails);
-            this.getFiles('stdout', this.simulationDetails);
-            this.getFiles('BlueConfig', this.simulationDetails);
-            this.getAnalysisInfo();
-        },
-        'getFiles': function(fileName, destination) {
-            let url = this.simulationDetails.files + '/files/' + fileName;
-            this.unicoreAPI.getFiles(url).then((output) => {
-                if (fileName === 'BlueConfig') {
-                    // parse to visualize it prettier
-                    try {
-                        let prettyText = JSON.stringify(JSON.parse(output), null, 2).split('\n');
-                        destination[fileName] = prettyText;
-                    } catch (e) {
-                        destination[fileName] = output.split('\n');
-                    }
-                } else {
-                    destination[fileName] = output.split('\n');
-                }
-            }, console.warn);
-        },
-        'getAnalysisInfo': function() {
-            /*  get the location of the analysis based on the mapping file
-                that we save in the simulation and then the analysis image */
-            if (this.job && this.simulationDetails.status === 'SUCCESSFUL') {
-                this.analysisDetails = []; // reset all the analysis
-                this.unicoreAPI.getAssociatedLocation(this.simulationDetails.files)
-                .then((analysisObject) => {
-                    // an array of all the analysis associated with simulation
-                    if (analysisObject === '') { // no analysis
-                        return;
-                    }
-                    analysisObject.forEach((analysis) => {
-                        let childAnalysis = Object.assign({}, this.analysisDetailTemplate);
-                        childAnalysis['jobURL'] = analysis._links.self.href;
-                        childAnalysis.id = analysis._links.self.href.split('/').pop();
-                        analysisConfig.plots.forEach((plot) => {
-                            this.getAnalysisImage(
-                                analysis._links.workingDirectory.href,
-                                plot,
-                                childAnalysis
-                            );
-                        });
-                        this.getAnalysisStatus(analysis._links.self.href, childAnalysis);
-                        this.analysisDetails.push(childAnalysis);
-                    });
-                });
-            }
-        },
-        'getAnalysisImage': function(analysisURL, plotName, childAnalysis) {
-            this.unicoreAPI.getImage(`${analysisURL}/files/${plotName}.png`)
-            .then((plot) => {
-                let reader = new FileReader();
-                reader.onloadend = () => {
-                    this.$set(childAnalysis, plotName, reader.result);
-                };
-                reader.readAsDataURL(plot);
-            }, (error) => {
-                console.log('No analysis image available yet');
-            });
-        },
-        'getAnalysisStatus': function(analysisURL, childAnalysis) {
-            this.unicoreAPI.getJobProperties(analysisURL)
-            .then((jobInfo) => {
-                childAnalysis.status = jobInfo.status;
-                childAnalysis.submissionTime = jobInfo.submissionTime;
-                childAnalysis.name = jobInfo.name;
-            });
-        },
-        'getJobById': function() {
-            // search for the details by id
-            this.unicoreAPI.getJobById(this.jobId, this.computer)
-            .then((jobDetails) => {
-                this.job = jobDetails;
-                this.fillJobs(jobDetails);
-            }, (error) => {
-                let loadingComp = document.getElementById('loading-component');
-                if (loadingComp) {
-                    loadingComp.style.display = 'none';
-                }
-                let content = document.querySelector('.detail-content');
-                let errorMessage = 'Job not in this computer? Try change the computer from the URL';
-                content.innerText = errorMessage;
-                console.warn(errorMessage);
-            });
-        },
-        'refreshJobs': function() {
-            this.getJobById();
-        },
-        'rejectError': function(error) {
-            throw String(error);
-        },
-        'returnList': function() {
-            this.$router.push({
-                'name': 'view',
-                'params': {
-                    'statusSearch': 'all',
-                    'computerParam': this.computerParam,
-                },
-            });
-        },
-        'save': function(filename, data) {
-            let stringFormat = null;
-            if (data && Array.isArray(data)) {
-                stringFormat = data.join('\n');
-            } else {
-                stringFormat = data;
-            }
-            let blob = new Blob([stringFormat], {'type': 'text/plain'});
-            if (window.navigator.msSaveOrOpenBlob) {
-                window.navigator.msSaveBlob(blob, filename);
-            } else {
-                let elem = window.document.createElement('a');
-                elem.href = window.URL.createObjectURL(blob);
-                elem.download = filename;
-                document.body.appendChild(elem);
-                elem.click();
-                document.body.removeChild(elem);
-            }
-        },
-        'toggleAutoreload': function(obj) {
-            obj.autorefresh = !obj.autorefresh;
-            if (obj.autorefresh) {
-                obj.intervalReference = setInterval(() => {
-                    if (obj && obj.status === 'SUCCESSFUL') {
-                        // stop interval on job finished
-                        obj.intervalReference = clearTimeout(obj.intervalReference);
-                    } else {
-                        obj.refreshFunction();
-                    }
-                }, this.pollInterval * 1000);
-            } else {
-                obj.intervalReference = clearTimeout(obj.intervalReference);
-            }
-        },
-        'removeFromList': function(analysisId) {
-            return this.unicoreAPI.deleteJobFromAssociatedFile(
-                this.simulationDetails.files,
-                analysisId
-            )
+  'name': 'simulationDetails',
+  'props': ['jobParam', 'jobId', 'computerParam'],
+  'data': function() {
+    return {
+      'loading': true,
+      'computer': 'JUQUEEN',
+      'unicoreAPI': Unicore,
+      'job': null,
+      'pollInterval': 10, // seconds
+      // add more accesible information to the simulation
+      'simulationDetails': {
+        // depending of the status change the icon
+        'statusIcon': 'check_circle',
+        'submissionTime': '',
+        'type': 'Simulation',
+        'intervalReference': null,
+        'autorefresh': true,
+        'id': '',
+        'name': '',
+        'url': '',
+        'stderr': [],
+        'files': '',
+        'stdout': [],
+        'status': '',
+        'BlueConfig': [],
+        'refreshFunction': null,
+      },
+      'analysisDetailTemplate': {
+        // depending of the status change the icon
+        'statusIcon': 'check_circle',
+        'submissionTime': '',
+        'type': 'Analysis',
+        'id': '',
+        'name': '',
+        'status': '',
+      },
+      'analysisDetails': [],
+    };
+  },
+  'components': {
+    'collapse-title': CollapseTitle,
+    'item-summary': ItemSummary,
+    'analysis': Analysis,
+  },
+  'methods': {
+    'deleteJob': function(url) {
+      swal({
+        'title': 'Are you sure?',
+        'text': 'You won\'t be able to revert this!',
+        'type': 'warning',
+        'showCancelButton': true,
+        'focusCancel': true,
+        'confirmButtonColor': '#ac6067',
+        'cancelButtonColor': '#879fcb',
+        'confirmButtonText': 'Yes, delete it!',
+        'showLoaderOnConfirm': true,
+        'allowOutsideClick': false,
+        'preConfirm': (choice) => {
+          if (choice === true) {
+            return this.unicoreAPI.deleteJob(url)
             .then(() => {
-                let listTemp = this.analysisDetails.filter((analysis) => {
-                    return analysis.id !== analysisId;
-                });
-                this.analysisDetails = listTemp;
+              let id = url.split('/').pop();
+              return this.removeFromList(id);
             });
+          }
         },
+      });
     },
-    'created': function() {
-        document.getElementById('frameTemplateTitle').innerText = 'Simulation Details';
+    'fillJobs': function(job) {
+      this.simulationDetails.url = job._links.self.href;
+      this.simulationDetails.status = job.status;
+      this.simulationDetails.id = this.simulationDetails.url.split('/').pop();
+      this.simulationDetails.name = job.name;
+      this.simulationDetails.files = job._links.workingDirectory.href;
+      this.simulationDetails.submissionTime = this.job.submissionTime;
+      this.loading = false;
+      let loadingComp = document.querySelector('#loading-component');
+      if (loadingComp) {
+        loadingComp.style.display = 'none';
+      }
+      this.getFiles('stderr', this.simulationDetails);
+      this.getFiles('stdout', this.simulationDetails);
+      this.getFiles('BlueConfig', this.simulationDetails);
+      this.getAnalysisInfo();
     },
-    'mounted': function() {
-        if (this.computerParam) {
-            this.computer = this.computerParam;
+    'getFiles': function(fileName, destination) {
+      let url = this.simulationDetails.files + '/files/' + fileName;
+      this.unicoreAPI.getFiles(url).then((output) => {
+        if (fileName === 'BlueConfig') {
+          // parse to visualize it prettier
+          try {
+            let prettyText = JSON.stringify(JSON.parse(output), null, 2).split('\n');
+            destination[fileName] = prettyText;
+          } catch (e) {
+            destination[fileName] = output.split('\n');
+          }
+        } else {
+          destination[fileName] = output.split('\n');
         }
-        if (this.jobParam) {
-            this.job = this.jobParam;
-            this.fillJobs(this.job);
-        }
-        if (this.jobParam == null) {
-            this.getJobById();
-        }
-        // poll check. I do the assigment to treat it like first time.
-        // Otherwithse the toggle will negate again.
-        this.simulationDetails.autorefresh = !this.simulationDetails.autorefresh;
-        this.analysisDetails.autorefresh = !this.analysisDetails.autorefresh;
-        this.simulationDetails.refreshFunction = this.refreshJobs;
-        this.toggleAutoreload(this.simulationDetails);
+      }, console.warn);
     },
-    'beforeDestroy': function() {
-        clearTimeout(this.simulationDetails.intervalReference);
+    'getAnalysisInfo': function() {
+      /*  get the location of the analysis based on the mapping file
+                that we save in the simulation and then the analysis image */
+      if (this.job && this.simulationDetails.status === 'SUCCESSFUL') {
+        this.analysisDetails = []; // reset all the analysis
+        this.unicoreAPI.getAssociatedLocation(this.simulationDetails.files)
+        .then((analysisObject) => {
+          // an array of all the analysis associated with simulation
+          if (analysisObject === '') { // no analysis
+            return;
+          }
+          analysisObject.forEach((analysis) => {
+            let childAnalysis = Object.assign({}, this.analysisDetailTemplate);
+            childAnalysis['jobURL'] = analysis._links.self.href;
+            childAnalysis.id = analysis._links.self.href.split('/').pop();
+            analysisConfig.plots.forEach((plot) => {
+              this.getAnalysisImage(
+                analysis._links.workingDirectory.href,
+                plot,
+                childAnalysis
+              );
+            });
+            this.getAnalysisStatus(analysis._links.self.href, childAnalysis);
+            this.analysisDetails.push(childAnalysis);
+          });
+        });
+      }
     },
+    'getAnalysisImage': function(analysisURL, plotName, childAnalysis) {
+      this.unicoreAPI.getImage(`${analysisURL}/files/${plotName}.png`)
+      .then((plot) => {
+        let reader = new FileReader();
+        reader.onloadend = () => {
+          this.$set(childAnalysis, plotName, reader.result);
+        };
+        reader.readAsDataURL(plot);
+      }, (error) => {
+        console.log('No analysis image available yet');
+      });
+    },
+    'getAnalysisStatus': function(analysisURL, childAnalysis) {
+      this.unicoreAPI.getJobProperties(analysisURL)
+      .then((jobInfo) => {
+        childAnalysis.status = jobInfo.status;
+        childAnalysis.submissionTime = jobInfo.submissionTime;
+        childAnalysis.name = jobInfo.name;
+      });
+    },
+    'getJobById': function() {
+      // search for the details by id
+      this.unicoreAPI.getJobById(this.jobId, this.computer)
+      .then((jobDetails) => {
+        this.job = jobDetails;
+        this.fillJobs(jobDetails);
+      }, (error) => {
+        let loadingComp = document.getElementById('loading-component');
+        if (loadingComp) {
+          loadingComp.style.display = 'none';
+        }
+        let content = document.querySelector('.detail-content');
+        let errorMessage = 'Job not in this computer? Try change the computer from the URL';
+        content.innerText = errorMessage;
+        console.warn(errorMessage);
+      });
+    },
+    'refreshJobs': function() {
+      this.getJobById();
+    },
+    'rejectError': function(error) {
+      throw String(error);
+    },
+    'returnList': function() {
+      this.$router.push({
+        'name': 'view',
+        'params': {
+          'statusSearch': 'all',
+          'computerParam': this.computerParam,
+        },
+      });
+    },
+    'save': function(filename, data) {
+      let stringFormat = null;
+      if (data && Array.isArray(data)) {
+        stringFormat = data.join('\n');
+      } else {
+        stringFormat = data;
+      }
+      let blob = new Blob([stringFormat], {'type': 'text/plain'});
+      if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveBlob(blob, filename);
+      } else {
+        let elem = window.document.createElement('a');
+        elem.href = window.URL.createObjectURL(blob);
+        elem.download = filename;
+        document.body.appendChild(elem);
+        elem.click();
+        document.body.removeChild(elem);
+      }
+    },
+    'toggleAutoreload': function(obj) {
+      obj.autorefresh = !obj.autorefresh;
+      if (obj.autorefresh) {
+        obj.intervalReference = setInterval(() => {
+          if (obj && obj.status === 'SUCCESSFUL') {
+            // stop interval on job finished
+            obj.intervalReference = clearTimeout(obj.intervalReference);
+          } else {
+            obj.refreshFunction();
+          }
+        }, this.pollInterval * 1000);
+      } else {
+        obj.intervalReference = clearTimeout(obj.intervalReference);
+      }
+    },
+    'removeFromList': function(analysisId) {
+      return this.unicoreAPI.deleteJobFromAssociatedFile(
+        this.simulationDetails.files,
+        analysisId
+      )
+      .then(() => {
+        let listTemp = this.analysisDetails.filter((analysis) => {
+          return analysis.id !== analysisId;
+        });
+        this.analysisDetails = listTemp;
+      });
+    },
+  },
+  'created': function() {
+    document.getElementById('frameTemplateTitle').innerText = 'Simulation Details';
+  },
+  'mounted': function() {
+    if (this.computerParam) {
+      this.computer = this.computerParam;
+    }
+    if (this.jobParam) {
+      this.job = this.jobParam;
+      this.fillJobs(this.job);
+    }
+    if (this.jobParam == null) {
+      this.getJobById();
+    }
+    // poll check. I do the assigment to treat it like first time.
+    // Otherwithse the toggle will negate again.
+    this.simulationDetails.autorefresh = !this.simulationDetails.autorefresh;
+    this.analysisDetails.autorefresh = !this.analysisDetails.autorefresh;
+    this.simulationDetails.refreshFunction = this.refreshJobs;
+    this.toggleAutoreload(this.simulationDetails);
+  },
+  'beforeDestroy': function() {
+    clearTimeout(this.simulationDetails.intervalReference);
+  },
 };
 </script>
 

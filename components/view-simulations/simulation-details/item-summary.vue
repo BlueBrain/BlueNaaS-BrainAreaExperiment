@@ -29,19 +29,19 @@
 <script>
     import utils from 'assets/utils.js';
     export default {
-        'name': 'item-summary',
-        'props': ['itemDetails'],
-        'computed': {
-            'date': function() {
-                return utils.getDateLocalTime(this.itemDetails.submissionTime);
-            },
-            'getStatusIcon': function() {
-                if (this.itemDetails.status === 'FAILED') {
-                    return 'cancel';
-                }
-                return this.itemDetails.statusIcon;
-            },
+      'name': 'item-summary',
+      'props': ['itemDetails'],
+      'computed': {
+        'date': function() {
+          return utils.getDateLocalTime(this.itemDetails.submissionTime);
         },
+        'getStatusIcon': function() {
+          if (this.itemDetails.status === 'FAILED') {
+            return 'cancel';
+          }
+          return this.itemDetails.statusIcon;
+        },
+      },
     };
 </script>
 <style scoped>

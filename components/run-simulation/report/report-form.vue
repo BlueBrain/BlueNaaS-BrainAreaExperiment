@@ -89,89 +89,89 @@
 import autocompleteTargets from 'components/shared/autocomplete-targets.vue';
 import 'assets/css/simulation.css';
 export default {
-    'name': 'report-form',
-    'props': ['reportEditableObject'],
-    'data': function() {
-        return {
-            'report': this.reportEditableObject.item.reportInfo,
-            'item': this.reportEditableObject.item,
-            'typesFull': ['Compartment', 'Synapse'],
-            'filteredTypes': [],
-        };
+  'name': 'report-form',
+  'props': ['reportEditableObject'],
+  'data': function() {
+    return {
+      'report': this.reportEditableObject.item.reportInfo,
+      'item': this.reportEditableObject.item,
+      'typesFull': ['Compartment', 'Synapse'],
+      'filteredTypes': [],
+    };
+  },
+  'components': {
+    'autocomplete-targets': autocompleteTargets,
+  },
+  'methods': {
+    'closeForm': function() {
+      this.$emit('changeModalVisibility', false);
     },
-    'components': {
-        'autocomplete-targets': autocompleteTargets,
+    'editItem': function(event) {
+      if (event.x === 0 && event.y === 0) {
+        // avoid Enter key submissions
+        return;
+      }
+      this.checkTimeValues(this.form);
+      if (this.form.checkValidity()) {
+        this.convertToNumbers();
+        this.$emit('editItem', {
+          'item': this.item,
+          'callback': this.reportEditableObject.callback,
+        });
+      }
     },
-    'methods': {
-        'closeForm': function() {
-            this.$emit('changeModalVisibility', false);
-        },
-        'editItem': function(event) {
-            if (event.x === 0 && event.y === 0) {
-                // avoid Enter key submissions
-                return;
-            }
-            this.checkTimeValues(this.form);
-            if (this.form.checkValidity()) {
-                this.convertToNumbers();
-                this.$emit('editItem', {
-                    'item': this.item,
-                    'callback': this.reportEditableObject.callback,
-                });
-            }
-        },
-        'convertToNumbers': function() {
-        // this converts the number inputs in floats
-            let n = this.$el.querySelectorAll('input[type=number]');
-            for (let i = 0; i < n.length; i++) {
-                let input = n[i];
-                this.report[input.id] = parseFloat(input.value);
-            }
-        },
-        'checkTimeValues': function(form) {
-            let start = parseFloat(this.report.StartTime);
-            let end = parseFloat(this.report.EndTime);
-            if (start > end) {
-                form.elements.StartTime.setCustomValidity('StartTime should be smaller than EndTime');
-            } else {
-                form.elements.StartTime.setCustomValidity('');
-            }
-        },
-        'targetChanged': function(selection) {
-            if (this.report.Target !== selection) {
-                this.item.group = selection;
-                this.report.Target = selection;
-                // check for AllCompartments allow only type compartment
-                if (this.report.Target === 'AllCompartments') {
-                    this.filteredTypes = ['Compartment'];
-                    this.report.Type = this.filteredTypes[0];
-                } else {
-                    this.filteredTypes = this.typesFull;
-                }
-            }
-        },
+    'convertToNumbers': function() {
+      // this converts the number inputs in floats
+      let n = this.$el.querySelectorAll('input[type=number]');
+      for (let i = 0; i < n.length; i++) {
+        let input = n[i];
+        this.report[input.id] = parseFloat(input.value);
+      }
     },
-    'created': function() {
-        this.filteredTypes = this.typesFull;
+    'checkTimeValues': function(form) {
+      let start = parseFloat(this.report.StartTime);
+      let end = parseFloat(this.report.EndTime);
+      if (start > end) {
+        form.elements.StartTime.setCustomValidity('StartTime should be smaller than EndTime');
+      } else {
+        form.elements.StartTime.setCustomValidity('');
+      }
     },
-    'mounted': function() {
-        this.form = this.$el.querySelector('form');
+    'targetChanged': function(selection) {
+      if (this.report.Target !== selection) {
+        this.item.group = selection;
+        this.report.Target = selection;
+        // check for AllCompartments allow only type compartment
+        if (this.report.Target === 'AllCompartments') {
+          this.filteredTypes = ['Compartment'];
+          this.report.Type = this.filteredTypes[0];
+        } else {
+          this.filteredTypes = this.typesFull;
+        }
+      }
     },
-    'watch': {
-        'report.StartTime': function(newVal) {
-            this.item.start = parseFloat(newVal);
-            this.form.elements.StartTime.setCustomValidity(''); // clears errors
-        },
-        'report.EndTime': function(newVal) {
-            this.item.end = parseFloat(newVal);
-        },
-        'report.ReportOn': function(newVal) {
-            this.item.content = newVal;
-        },
-        'report.Target': function(newVal) {
-            this.targetChanged(newVal);
-        },
+  },
+  'created': function() {
+    this.filteredTypes = this.typesFull;
+  },
+  'mounted': function() {
+    this.form = this.$el.querySelector('form');
+  },
+  'watch': {
+    'report.StartTime': function(newVal) {
+      this.item.start = parseFloat(newVal);
+      this.form.elements.StartTime.setCustomValidity(''); // clears errors
     },
+    'report.EndTime': function(newVal) {
+      this.item.end = parseFloat(newVal);
+    },
+    'report.ReportOn': function(newVal) {
+      this.item.content = newVal;
+    },
+    'report.Target': function(newVal) {
+      this.targetChanged(newVal);
+    },
+  },
 };
 </script>
 

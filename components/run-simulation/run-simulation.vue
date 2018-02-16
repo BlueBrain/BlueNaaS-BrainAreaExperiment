@@ -91,189 +91,189 @@ import LaunchForm from 'components/run-simulation/launch-form.vue';
 import Modal from 'components/shared/modal-component.vue';
 import launchConfiguration from 'assets/simulation-config.json';
 export default {
-    'name': 'run_simulation',
-    'mixins': [CollabAuthentication],
-    'data': function() {
-        return {
-            'endTime': 50,
-            'errors': '',
-            'forwardSkip': null,
-            'blueConfig': {},
-            'loading': true,
-            'unicore': Unicore,
-            'header': {},
-            'showRunForm': false,
-            'currentComputer': launchConfiguration.default,
-            'tipTexts': [
-                'You can scroll in the timeline to zoom in/out',
-                'Drag the stimuli to modify its duration',
-            ],
-        };
+  'name': 'run_simulation',
+  'mixins': [CollabAuthentication],
+  'data': function() {
+    return {
+      'endTime': 50,
+      'errors': '',
+      'forwardSkip': null,
+      'blueConfig': {},
+      'loading': true,
+      'unicore': Unicore,
+      'header': {},
+      'showRunForm': false,
+      'currentComputer': launchConfiguration.default,
+      'tipTexts': [
+        'You can scroll in the timeline to zoom in/out',
+        'Drag the stimuli to modify its duration',
+      ],
+    };
+  },
+  'components': {
+    'stimulation-timeline': StimulationTimeline,
+    'report-timeline': ReportTimeline,
+    'target-selection': TargetSelection,
+    'launch-form': LaunchForm,
+    'modal': Modal,
+  },
+  'methods': {
+    'toggleModal': function(value) {
+      if (value) {
+        this.showRunForm = value;
+        return;
+      }
+      this.showRunForm = !this.showRunForm;
     },
-    'components': {
-        'stimulation-timeline': StimulationTimeline,
-        'report-timeline': ReportTimeline,
-        'target-selection': TargetSelection,
-        'launch-form': LaunchForm,
-        'modal': Modal,
+    'saveConfig': function() {
+      this.saveCompleteConfig(this.blueConfig)
+      .then(function(message) {
+        swal('Great!', 'Configuration was saved', 'success');
+      }, function(error) {
+        swal('Opss', 'Configuration was not saved. ' + error, 'error');
+      });
     },
-    'methods': {
-        'toggleModal': function(value) {
-            if (value) {
-                this.showRunForm = value;
-                return;
-            }
-            this.showRunForm = !this.showRunForm;
-        },
-        'saveConfig': function() {
-            this.saveCompleteConfig(this.blueConfig)
-            .then(function(message) {
-                swal('Great!', 'Configuration was saved', 'success');
-            }, function(error) {
-                swal('Opss', 'Configuration was not saved. ' + error, 'error');
-            });
-        },
-        'computerChanged': function(computer) {
-            // runBlueConfig has the placeholder to replace the work directory
-            let runBlueConfig = Object.assign({}, templateBluepyConfig.Run.Default);
-            let inMemoryBlueConfig = this.blueConfig.Run.Default;
-            let newPathWork = launchConfiguration[computer].pathWork;
-            let placeholder = '{{WORK_DIRECTORY}}';
-            Object.keys(runBlueConfig).forEach((key) => {
-                if (runBlueConfig[key].toString().startsWith(placeholder)) {
-                    inMemoryBlueConfig[key] = runBlueConfig[key].toString().replace(placeholder, newPathWork);
-                }
-            });
-        },
-        'circuitTargetChanged': function(circuitTarget) {
-            this.blueConfig.Run.Default.CircuitTarget = circuitTarget;
-        },
-        'closeTip': function() {
-            let tipElement = this.$el.querySelector('#tip');
-            tipElement.classList.add('hidden');
-            localStorage.setItem('showTip', false);
-        },
-        'runSimulation': function() {
-            this.createConfig();
-            if (
-                Object.keys(this.blueConfig.Report).length === 0 ||
+    'computerChanged': function(computer) {
+      // runBlueConfig has the placeholder to replace the work directory
+      let runBlueConfig = Object.assign({}, templateBluepyConfig.Run.Default);
+      let inMemoryBlueConfig = this.blueConfig.Run.Default;
+      let newPathWork = launchConfiguration[computer].pathWork;
+      let placeholder = '{{WORK_DIRECTORY}}';
+      Object.keys(runBlueConfig).forEach((key) => {
+        if (runBlueConfig[key].toString().startsWith(placeholder)) {
+          inMemoryBlueConfig[key] = runBlueConfig[key].toString().replace(placeholder, newPathWork);
+        }
+      });
+    },
+    'circuitTargetChanged': function(circuitTarget) {
+      this.blueConfig.Run.Default.CircuitTarget = circuitTarget;
+    },
+    'closeTip': function() {
+      let tipElement = this.$el.querySelector('#tip');
+      tipElement.classList.add('hidden');
+      localStorage.setItem('showTip', false);
+    },
+    'runSimulation': function() {
+      this.createConfig();
+      if (
+        Object.keys(this.blueConfig.Report).length === 0 ||
                 Object.keys(this.blueConfig.StimulusInject).length === 0
-            ) {
-                swal(
-                    'Missing parameter(s)',
-                    'Select at least one stimulus and one report.',
-                    'error'
-                );
-                return;
-            }
-            this.toggleModal();
-        },
-        'fillToken': function(renew) {
-            let that = this;
-            this.getToken(renew).then(function(token) {
-                that.header = {'headers': {'Authorization': token}};
-            }); // from collabAuthentication
-        },
-        'viewList': function() {
-            this.$router.push({
-                'name': 'view',
-                'params': {
-                    'computerParam': this.currentComputer,
-                    'statusSearch': 'ALL',
-                },
-            });
-        },
-        'stimulationTargetSelected': function(target) {
-            // an event in stimulation-timeline will be called
-            this.$emit('stimulationTargetSelected', target);
-        },
-        'reportTargetSelected': function(target) {
-            // an event in report-timeline will be called
-            this.$emit('reportTargetSelected', target);
-        },
-        'createConfig': function() {
-            // modify the config object respectively
-            this.$refs.stimulation.createConfig(this.blueConfig);
-            this.$refs.report.createConfig(this.blueConfig);
-            this.computerChanged(launchConfiguration.default);
-        },
-        'previewConfig': function() {
-            let myjson = JSON.stringify(this.blueConfig, null, 2);
-            let x = window.open();
-            x.document.open();
-            x.document.write('<html><body><pre>' + myjson + '</pre></body></html>');
-            x.document.close();
-        },
-        'checkNegative': function(event) {
-            if (event.target.value < 0) {
-                this.errors = 'Duration and ForwardSkip should be possitive';
-            } else {
-                this.errors = '';
-            }
-        },
-        'runConfigReady': function(runConfig) {
-            let that = this;
-            this.toggleModal();
-            swal.enableLoading();
-            let submittedJob = {};
-            let shellCommand = launchConfiguration[runConfig.computer].script.join('\n');
-            let params = this.unicore.getConfig(runConfig, this.blueConfig, shellCommand);
-            this.unicore.submitJob(
-                runConfig.computer,
-                params.jobSpec,
-                params.inputs
-            ).then((jobObject) => {
-                submittedJob = jobObject;
-                console.log('starting job...');
-                that.unicore.actionJob(submittedJob._links['action:start'].href);
-                swal.disableLoading();
-                return swal({
-                    'title': 'Simulation submitted!',
-                    'showCancelButton': true,
-                    'confirmButtonText': 'View Job',
-                    'cancelButtonText': 'OK',
-                    'type': 'success',
-                });
-            })
-            .then((choice) => {
-                if (choice.value) {
-                    this.showDetails(submittedJob, runConfig.computer);
-                }
-            });
-        },
-        'showDetails': function(job, computer) {
-            let url = job._links.self.href;
-            let id = url.substr(url.lastIndexOf('/') + 1);
-            this.$router.push({'name': 'details', 'params': {
-                'jobId': id,
-                'jobParam': job,
-                'computerParam': computer,
-            }});
-        },
+      ) {
+        swal(
+          'Missing parameter(s)',
+          'Select at least one stimulus and one report.',
+          'error'
+        );
+        return;
+      }
+      this.toggleModal();
     },
-    'mounted': function() {
-        document.getElementById('frameTemplateTitle').innerText = 'Configure & Launch Simulations';
-        // Object.assign does not work for deep copy
-        this.blueConfig = JSON.parse(JSON.stringify( templateBluepyConfig ));
-        let loadingComp = document.querySelector('#loading-component');
-        if (loadingComp) {
-            loadingComp.style.display = 'none';
+    'fillToken': function(renew) {
+      let that = this;
+      this.getToken(renew).then(function(token) {
+        that.header = {'headers': {'Authorization': token}};
+      }); // from collabAuthentication
+    },
+    'viewList': function() {
+      this.$router.push({
+        'name': 'view',
+        'params': {
+          'computerParam': this.currentComputer,
+          'statusSearch': 'ALL',
+        },
+      });
+    },
+    'stimulationTargetSelected': function(target) {
+      // an event in stimulation-timeline will be called
+      this.$emit('stimulationTargetSelected', target);
+    },
+    'reportTargetSelected': function(target) {
+      // an event in report-timeline will be called
+      this.$emit('reportTargetSelected', target);
+    },
+    'createConfig': function() {
+      // modify the config object respectively
+      this.$refs.stimulation.createConfig(this.blueConfig);
+      this.$refs.report.createConfig(this.blueConfig);
+      this.computerChanged(launchConfiguration.default);
+    },
+    'previewConfig': function() {
+      let myjson = JSON.stringify(this.blueConfig, null, 2);
+      let x = window.open();
+      x.document.open();
+      x.document.write('<html><body><pre>' + myjson + '</pre></body></html>');
+      x.document.close();
+    },
+    'checkNegative': function(event) {
+      if (event.target.value < 0) {
+        this.errors = 'Duration and ForwardSkip should be possitive';
+      } else {
+        this.errors = '';
+      }
+    },
+    'runConfigReady': function(runConfig) {
+      let that = this;
+      this.toggleModal();
+      swal.enableLoading();
+      let submittedJob = {};
+      let shellCommand = launchConfiguration[runConfig.computer].script.join('\n');
+      let params = this.unicore.getConfig(runConfig, this.blueConfig, shellCommand);
+      this.unicore.submitJob(
+        runConfig.computer,
+        params.jobSpec,
+        params.inputs
+      ).then((jobObject) => {
+        submittedJob = jobObject;
+        console.log('starting job...');
+        that.unicore.actionJob(submittedJob._links['action:start'].href);
+        swal.disableLoading();
+        return swal({
+          'title': 'Simulation submitted!',
+          'showCancelButton': true,
+          'confirmButtonText': 'View Job',
+          'cancelButtonText': 'OK',
+          'type': 'success',
+        });
+      })
+      .then((choice) => {
+        if (choice.value) {
+          this.showDetails(submittedJob, runConfig.computer);
         }
-        this.endTime = this.blueConfig.Run.Default.Duration;
-        this.forwardSkip = this.blueConfig.Run.Default.ForwardSkip;
-        this.loading = false;
-        if (localStorage.getItem('showTip') === 'false') {
-            this.$nextTick(() => this.closeTip());
-        }
+      });
     },
-    'watch': {
-        'endTime': function(newVal) {
-            this.blueConfig.Run.Default.Duration = parseFloat(newVal);
-        },
-        'forwardSkip': function(newVal) {
-            this.blueConfig.Run.Default.ForwardSkip = parseFloat(newVal);
-        },
+    'showDetails': function(job, computer) {
+      let url = job._links.self.href;
+      let id = url.substr(url.lastIndexOf('/') + 1);
+      this.$router.push({'name': 'details', 'params': {
+        'jobId': id,
+        'jobParam': job,
+        'computerParam': computer,
+      }});
     },
+  },
+  'mounted': function() {
+    document.getElementById('frameTemplateTitle').innerText = 'Configure & Launch Simulations';
+    // Object.assign does not work for deep copy
+    this.blueConfig = JSON.parse(JSON.stringify( templateBluepyConfig ));
+    let loadingComp = document.querySelector('#loading-component');
+    if (loadingComp) {
+      loadingComp.style.display = 'none';
+    }
+    this.endTime = this.blueConfig.Run.Default.Duration;
+    this.forwardSkip = this.blueConfig.Run.Default.ForwardSkip;
+    this.loading = false;
+    if (localStorage.getItem('showTip') === 'false') {
+      this.$nextTick(() => this.closeTip());
+    }
+  },
+  'watch': {
+    'endTime': function(newVal) {
+      this.blueConfig.Run.Default.Duration = parseFloat(newVal);
+    },
+    'forwardSkip': function(newVal) {
+      this.blueConfig.Run.Default.ForwardSkip = parseFloat(newVal);
+    },
+  },
 };
 </script>
 

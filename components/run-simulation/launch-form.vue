@@ -103,57 +103,57 @@
     import launchConfig from 'assets/simulation-config.json';
     import utils from 'assets/utils.js';
     export default {
-        'data': function() {
-            return {
-                'title': '',
-                'computer': launchConfig.default,
-                'computersAvailable': launchConfig.available,
-                'applicationName': 'Bash shell',
-                'nodes': 1,
-                'runtime': 86400,
-                'project': '',
-                'cpus': '',
-                'circuitTarget': 'slice-4',
-            };
+      'data': function() {
+        return {
+          'title': '',
+          'computer': launchConfig.default,
+          'computersAvailable': launchConfig.available,
+          'applicationName': 'Bash shell',
+          'nodes': 1,
+          'runtime': 86400,
+          'project': '',
+          'cpus': '',
+          'circuitTarget': 'slice-4',
+        };
+      },
+      'methods': {
+        'editItem': function() {
+          this.title = utils.filterName(this.title);
+          let filtered = Object.assign({}, this.$data);
+          // remove the empty items
+          Object.keys(filtered).forEach((key) => {
+            if (!filtered[key]) {
+              delete filtered[key];
+            }
+          });
+          this.$emit('runConfigReady', filtered);
         },
-        'methods': {
-            'editItem': function() {
-                this.title = utils.filterName(this.title);
-                let filtered = Object.assign({}, this.$data);
-                // remove the empty items
-                Object.keys(filtered).forEach((key) => {
-                    if (!filtered[key]) {
-                        delete filtered[key];
-                    }
-                });
-                this.$emit('runConfigReady', filtered);
-            },
-            'closeForm': function() {
-                this.$emit('changeModalVisibility', false);
-            },
-            'previewConfig': function() {
-                this.$emit('previewConfig');
-            },
-            'changeValues': function(computer) {
-                // the first time load the default values.
-                this.runtime = launchConfig[computer].time;
-                this.nodes = launchConfig[computer].nodes;
-                this.cpus = launchConfig[computer].cpus;
-            },
+        'closeForm': function() {
+          this.$emit('changeModalVisibility', false);
         },
-        'mounted': function() {
-            this.changeValues(this.computer);
+        'previewConfig': function() {
+          this.$emit('previewConfig');
         },
-        'watch': {
-            'computer': function(newVal) {
-                this.changeValues(newVal);
-                this.computer = newVal;
-                this.$emit('computerChanged', newVal);
-            },
-            'circuitTarget': function(newVal) {
-                this.$emit('circuitTargetChanged', newVal);
-            },
+        'changeValues': function(computer) {
+          // the first time load the default values.
+          this.runtime = launchConfig[computer].time;
+          this.nodes = launchConfig[computer].nodes;
+          this.cpus = launchConfig[computer].cpus;
         },
+      },
+      'mounted': function() {
+        this.changeValues(this.computer);
+      },
+      'watch': {
+        'computer': function(newVal) {
+          this.changeValues(newVal);
+          this.computer = newVal;
+          this.$emit('computerChanged', newVal);
+        },
+        'circuitTarget': function(newVal) {
+          this.$emit('circuitTargetChanged', newVal);
+        },
+      },
     };
 </script>
 

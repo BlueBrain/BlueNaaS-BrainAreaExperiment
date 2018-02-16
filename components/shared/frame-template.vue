@@ -11,10 +11,10 @@
 </template>
 <script>
   export default {
-      'name': 'frame-template',
-      'props': {
-          'title': {'type': String, 'default': ''},
-      },
+    'name': 'frame-template',
+    'props': {
+      'title': {'type': String, 'default': ''},
+    },
   };
 </script>
 

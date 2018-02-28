@@ -61,8 +61,16 @@ This will display the details of a certain simulation and the analysis.
                 </collapse-title>
                 <collapse-title title="Unicore Logs" :collapsed="true">
                     <div slot="element">
-                        <div v-for="log in job.log" class="log-item">
-                            {{ log }}
+                        <!-- {{job.logParsed}} -->
+                        <div v-for="log in job.logParsed" class="log-item">
+                            <div v-if="typeof(log) === 'object'">
+                              <div v-for="logItem in log" class="indent">
+                                {{ logItem }}
+                              </div>
+                            </div>
+                            <div v-else>
+                              {{log}}
+                            </div>
                         </div>
                         <a class="button-with-icon" v-if="simulationDetails.intervalReference" title="Loading">
                             <i class="material-icons">autorenew</i>
@@ -193,6 +201,7 @@ export default {
       this.getFiles('stdout', this.simulationDetails);
       this.getFiles('BlueConfig', this.simulationDetails);
       this.getAnalysisInfo();
+      this.job.logParsed = this.parseLog(this.job.log.slice(0));
     },
     'getFiles': function(fileName, destination) {
       let url = this.simulationDetails.files + '/files/' + fileName;
@@ -274,6 +283,14 @@ export default {
         content.innerText = errorMessage;
         console.warn(errorMessage);
       });
+    },
+    'parseLog': function(logArray) {
+      logArray.forEach((elem, index) => {
+        if (elem.includes('\n')) {
+          logArray[index] = elem.split('\n');
+        }
+      });
+      return logArray;
     },
     'refreshJobs': function() {
       this.getJobById();
@@ -421,6 +438,12 @@ export default {
         min-width: 90px;
         color: #b0686f;
         cursor: pointer;
+    }
+    .indent {
+      margin-left: 20px;
+    }
+    div.indent:first-child {
+      margin-left: 0;
     }
 </style>
 

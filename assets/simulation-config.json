@@ -3,8 +3,8 @@
         "script": [
             "source /homec/bp0/bp000022/modulecmd/3.2.10/init/bash",
             "module use /homec/bp0/bp000022/modulesfiles",
-            "module purge",
-            "module load nix/hpc/neurodamus-hippocampus/1.9.0-201710/",
+            "module load nix/hpc/neuron",
+            "module load nix/hpc/neurodamus-hippocampus",
             "mkdir -p output",
             "python /homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /homeb/pra098/pra09809/test/user.target.mod --output output"
         ],
@@ -29,13 +29,6 @@
         "cpus": "1",
         "pathWork": "/gpfs/work"
     },
-    "JURON": {
-        "script": [
-            "#!/bin/sh"
-        ],
-        "time": "1800",
-        "pathWork": "/gpfs/work"
-    },
     "JURECA": {
         "script": [
             "#!/bin/sh"
@@ -44,5 +37,5 @@
         "pathWork": "/work"
     },
     "default": "JUQUEEN",
-    "available": ["JULIA", "JURON", "JUQUEEN", "JURECA"]
+    "available": ["JULIA", "JUQUEEN", "JURECA"]
 }

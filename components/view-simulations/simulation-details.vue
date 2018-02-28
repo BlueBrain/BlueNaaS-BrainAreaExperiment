@@ -28,7 +28,10 @@ This will display the details of a certain simulation and the analysis.
                 <collapse-title title="Analysis" :collapsed="false">
                     <div slot="element">
                         <a
-                            v-if="analysisDetails.length === 0"
+                            v-if="
+                              analysisDetails.length === 0 &&
+                              simulationDetails.intervalReference
+                            "
                             title="Loading"
                         >
                             <i class="material-icons spin">autorenew</i>
@@ -201,7 +204,7 @@ export default {
       this.getFiles('stdout', this.simulationDetails);
       this.getFiles('BlueConfig', this.simulationDetails);
       this.getAnalysisInfo();
-      this.job.logParsed = this.parseLog(this.job.log.slice(0));
+      this.job.logParsed = this.parseLog(this.job);
     },
     'getFiles': function(fileName, destination) {
       let url = this.simulationDetails.files + '/files/' + fileName;
@@ -285,12 +288,14 @@ export default {
       });
     },
     'parseLog': function(logArray) {
-      logArray.forEach((elem, index) => {
+      if (!logArray.log) return [];
+      let clone = logArray.log.slice(0);
+      clone.forEach((elem, index) => {
         if (elem.includes('\n')) {
-          logArray[index] = elem.split('\n');
+          clone[index] = elem.split('\n');
         }
       });
-      return logArray;
+      return clone;
     },
     'refreshJobs': function() {
       this.getJobById();
@@ -330,7 +335,11 @@ export default {
       obj.autorefresh = !obj.autorefresh;
       if (obj.autorefresh) {
         obj.intervalReference = setInterval(() => {
-          if (obj && obj.status === 'SUCCESSFUL') {
+          if (obj && (
+            obj.status === 'SUCCESSFUL' ||
+            obj.status === 'FAILED' ||
+            obj.status === 'BLOCK'
+          )) {
             // stop interval on job finished
             obj.intervalReference = clearTimeout(obj.intervalReference);
           } else {

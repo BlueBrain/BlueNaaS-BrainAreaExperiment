@@ -157,7 +157,7 @@ export default {
       this.createConfig();
       if (
         Object.keys(this.blueConfig.Report).length === 0 ||
-                Object.keys(this.blueConfig.StimulusInject).length === 0
+        Object.keys(this.blueConfig.StimulusInject).length === 0
       ) {
         swal(
           'Missing parameter(s)',
@@ -233,12 +233,14 @@ export default {
           'confirmButtonText': 'View Job',
           'cancelButtonText': 'OK',
           'type': 'success',
+        })
+        .then((choice) => {
+          if (choice.value) {
+            this.showDetails(submittedJob, runConfig.computer);
+          }
         });
-      })
-      .then((choice) => {
-        if (choice.value) {
-          this.showDetails(submittedJob, runConfig.computer);
-        }
+      }, (error) => {
+        swal('Error launching the simulation', error.message, 'error');
       });
     },
     'showDetails': function(job, computer) {

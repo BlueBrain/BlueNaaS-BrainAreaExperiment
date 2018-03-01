@@ -2,15 +2,14 @@
     <v-autocomplete
         class="full-width"
         :items="filteredTargets"
-        min-len="1"
+        min-len="0"
         wait="0"
         placeholder="Target"
         :component-item="autocompleteTemplate"
-        v-model="model"
+        v-model="modelSelected"
         @update-items="updateItems"
         @item-selected="itemSelected"
         @item-clicked="itemSelected"
-        :auto-select-one-item="false"
     ></v-autocomplete>
 </template>
 
@@ -24,12 +23,12 @@ Vue.use(Autocomplete);
 import targetList from 'assets/targetList.json';
 
 export default {
-  'props': ['model'],
   'data': function() {
     return {
       'autocompleteTemplate': autocompleteTemplate,
       'targetList': targetList,
       'filteredTargets': [],
+      'modelSelected': null,
     };
   },
   'components': {

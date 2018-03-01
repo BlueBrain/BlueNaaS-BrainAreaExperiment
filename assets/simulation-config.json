@@ -8,9 +8,9 @@
             "mkdir -p output",
             "python /homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /homeb/pra098/pra09809/test/user.target.mod --output output"
         ],
-        "time": "86400",
-        "nodes": "512",
-        "cpus": "8",
+        "time": "36000",
+        "nodes": "130",
+        "cpus": "16",
         "pathWork": "/work"
     },
     "JULIA": {
@@ -20,7 +20,8 @@
             "export LD_LIBRARY_PATH=/global/opt/slurm/default/lib64/",
             "module purge",
             "module use /gpfs/work/pcp0/pcp0085/x64/modulefiles",
-            "module load nix/hpc/neuron-hippocampus/7.5-201707",
+            "module load nix/hpc/neuron-hippocampus/7.5-201707 nix/dev-env-gcc/09.2016",
+            "module load nix/python/2.7-full",
             "mkdir -p output",
             "python /gpfs/homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /gpfs/homeb/pra098/pra09809/test/user.target.mod --output output"
         ],
@@ -31,9 +32,16 @@
     },
     "JURECA": {
         "script": [
-            "#!/bin/sh"
+            "#!/bin/sh",
+            "module purge",
+            "module use /homec/bp0/bp000022/modulesfiles-x64",
+            "module load nix/hpc/neurodamus-hippocampus/1.9.0-201710",
+            "mkdir -p output",
+            "python /homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /homeb/pra098/pra09809/test/user.target.mod --output output"
         ],
         "time": "1800",
+        "nodes": "16",
+        "cpus": "1",
         "pathWork": "/work"
     },
     "default": "JUQUEEN",

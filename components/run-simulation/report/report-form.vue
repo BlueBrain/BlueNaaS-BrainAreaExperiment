@@ -6,7 +6,6 @@
                     <label class="control-label" title="Defines the region from where the data will be reported.">Target</label>
                     <div class="controls autocomplete-container">
                         <autocomplete-targets
-                            :model="report.Target"
                             @targetChanged="targetChanged"
                         ></autocomplete-targets>
                     </div>

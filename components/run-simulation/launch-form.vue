@@ -27,17 +27,6 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label">Project: </label>
-            <div class="controls">
-                <input
-                    type="text"
-                    name="Project to be used"
-                    class="project"
-                    v-model="project"
-                    placeholder="(optional)">
-            </div>
-        </div>
-        <div class="form-group">
             <label class="control-label">Nodes: </label>
             <div class="controls">
                 <input
@@ -111,7 +100,6 @@
           'applicationName': 'Bash shell',
           'nodes': 1,
           'runtime': 86400,
-          'project': '',
           'cpus': '',
           'circuitTarget': 'slice-4',
         };

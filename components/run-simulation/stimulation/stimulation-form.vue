@@ -6,7 +6,6 @@
             <label class="control-label" title="Name of a target to receive the stimulation">Target</label>
             <div class="controls autocomplete-container">
                 <autocomplete-targets
-                    :model="stimulus.Target"
                     @targetChanged="targetChanged"
                 ></autocomplete-targets>
             </div>

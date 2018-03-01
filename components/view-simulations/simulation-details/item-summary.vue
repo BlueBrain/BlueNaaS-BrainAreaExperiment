@@ -63,13 +63,6 @@
         font-size: 20px;
         display: inline-block;
     }
-    .column .id {
-        width: 180px;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        vertical-align: middle;
-    }
     .column .name {
         margin-left: 10px;
     }

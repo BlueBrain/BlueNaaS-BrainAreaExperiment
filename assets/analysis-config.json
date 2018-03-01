@@ -1,6 +1,8 @@
 {
   "to": "JURECA",
-  "script": "/homec/bp0/bp000024/jureca/venv_bluepy_analysis/bin/analysis_launch.py --blueconfig blueconfig.json --output . --usertarget /homeb/pra098/pra09809/test/user.target.mod",
+  "script": [
+    "/homec/bp0/bp000037/analysis/analysis_launch_params.py --blueconfig {{origin}}/blueconfig.json --output {{origin}} -vv"
+  ],
   "filesToAvoidCopy": [
     "BlueConfig",
     "input.sh",
@@ -8,14 +10,21 @@
     "stdout",
     "output/",
     "UNICORE_SCRIPT_EXIT_CODE",
-    "BlueConfig.backup"
+    "BlueConfig.backup",
+    "cx_",
+    "TSI_temp_file",
+    "mcomplex.dat",
+    "cxinfo_"
   ],
-  "plots": ["psth", "raster"],
+  "plots": ["firing_rate_histogram", "raster", "voltage_collage"],
   "analysisAvailable": [
-    { "param": "psth" , "name": "Peristimulus Time Histogram" },
+    { "param": "firing_rate_histogram" , "name": "Peristimulus Time Histogram" },
     { "param": "raster", "name": "Spike Raster Plot"},
-    { "param": "traces", "name": "Voltage Trace Plot"}
+    { "param": "voltage_collage", "name": "Voltage Trace Plot", "report_select": true}
   ],
   "configFileName": "analysis_config.json",
-  "analysisConnectionPath": "analysis_path.json"
+  "analysisConnectionPath": "analysis_path.json",
+  "workDirectoyBase": {
+    "JURECA": "/work/unicore_jureca/"
+  }
 }

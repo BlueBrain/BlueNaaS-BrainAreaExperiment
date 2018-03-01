@@ -80,6 +80,7 @@ This component manage each job (delete, start, create, etc).
                 <launch-analysis-form
                     @analysisConfigReady="analysisConfigReady"
                     :defaultAnalysisConfig="defaultAnalysisConfig"
+                    :jobSelectedForValidation="jobSelectedForValidation"
                     @changeModalVisibility="toggleModal">
                 </launch-analysis-form>
             </div>
@@ -115,7 +116,7 @@ This component manage each job (delete, start, create, etc).
       'data': function() {
         return {
           'loading': true,
-          'computerFilter': simulationConfig.default,
+          'computerFilter': '',
           'defaultAnalysisConfig': analysisConfig,
           'simulationConfig': simulationConfig,
           'showAnalysisForm': false,
@@ -207,19 +208,16 @@ This component manage each job (delete, start, create, etc).
         },
         'getAnalysisInfo': function(simulationJob) {
           /*  get the location of the analysis based on the mapping file
-                    that we save in the simulation and then the validation image */
-          if (simulationJob.status === SUCCESSFUL_STATUS) {
-            this.unicoreAPI.getAssociatedLocation(simulationJob._links.workingDirectory.href)
-            .then((analysisObject) => {
-              if (analysisObject === '') {
-                // stop loading status. analysis not run yet.
-                return this.setMultipleAnalysisStatus(simulationJob, []);
-              }
-              this.getStatus(analysisObject, simulationJob);
-            });
-          } else {
-            this.setMultipleAnalysisStatus(simulationJob, [BLOCK_STATUS]);
-          }
+            that we save in the simulation and then the validation image */
+          this.unicoreAPI.getAssociatedLocation(simulationJob._links.workingDirectory.href)
+          .then((analysisObject) => {
+            if (typeof(analysisObject) === 'object' &&
+              analysisObject.length === 0) {
+              // the file is empty or it is not there
+              return this.setMultipleAnalysisStatus(simulationJob, []);
+            }
+            this.getStatus(analysisObject, simulationJob);
+          });
         },
         'getStatus': function(analysisObject, simulationJob) {
           let multipleAnalysis = [];
@@ -261,7 +259,8 @@ This component manage each job (delete, start, create, etc).
                 this.removeFromList(url);
               });
             }
-          });
+          })
+          .catch(this.handleError);
         },
         'showDetails': function(job, computer) {
           let url = job._links.self.href;
@@ -279,6 +278,7 @@ This component manage each job (delete, start, create, etc).
             loadingComp.style.display = 'block';
           }
           this.jobs = [];
+          let computerRequested = this.computerFilter;
           this.unicoreAPI.getAllJobsExapandedWithChildren(this.computerFilter)
           .then((resultsArray) => {
             let onlySimulations = resultsArray.filter((simulation) => {
@@ -287,25 +287,33 @@ This component manage each job (delete, start, create, etc).
                 return false;
               }
               if (!simulation.children.includes('/out.dat') &&
-                            simulation.status === SUCCESSFUL_STATUS) {
+                  simulation.status === SUCCESSFUL_STATUS) {
                 // without out.dat no analysis should be run
-                simulation['multipleAnalysisStatus'] = [BLOCK_STATUS];
+                this.setMultipleAnalysisStatus(simulation, [BLOCK_STATUS]);
                 // flag to show the warning icon on the list
                 simulation['noOut'] = true;
-              } else {
-                simulation['multipleAnalysisStatus'] = [LOADING_STATUS];
+              } else if (simulation.status === SUCCESSFUL_STATUS) {
+                this.setMultipleAnalysisStatus(simulation, [LOADING_STATUS]);
                 this.getAnalysisInfo(simulation);
+              } else {
+                this.setMultipleAnalysisStatus(simulation, [BLOCK_STATUS]);
               }
               return true;
             });
-            this.filteredObjects = this.jobs = onlySimulations;
-            this.filter();
-            if (loadingComp) {
-              this.$nextTick(() => {
-                loadingComp.style.display = 'none';
-              });
+
+            if (computerRequested === this.computerFilter) {
+              // make sure we don't load other jobs if we change the selector
+              // because of async call
+              this.filteredObjects = this.jobs = onlySimulations;
+              this.filter();
+              if (loadingComp) {
+                this.$nextTick(() => {
+                  loadingComp.style.display = 'none';
+                });
+              }
             }
-          });
+          })
+          .catch(this.handleError);
         },
         'resetFilter': function() {
           this.nameFilter = '';
@@ -367,6 +375,7 @@ This component manage each job (delete, start, create, etc).
             this.defaultAnalysisConfig.filesToAvoidCopy
           ).then((analysis) => {
             analysisInfo = analysis;
+            if (analysisInfo.avoidCopy) return;
             return this.changeBlueConfigPaths(
               analysisConfig.to.workingDirectory,
               analysisConfig.to.computer
@@ -395,14 +404,14 @@ This component manage each job (delete, start, create, etc).
                 analysisConfig.from.computer
               );
             }
-          });
+          })
+          .catch(this.handleError);
         },
         'changeBlueConfigPaths': function(workingDirectory, computer) {
           let blueConfigName = 'blueconfig.json';
           let serverBlueConfig = `${workingDirectory}/files/${blueConfigName}`;
           return this.unicoreAPI.getFiles(serverBlueConfig)
           .then((blueConfig) => {
-            blueConfig = JSON.parse(blueConfig);
             // templateBluepyConfig has the placeholder to replace the work directory
             let analysisBlueConfig = Object.assign({}, templateBluepyConfig.Run.Default);
             let inMemoryBlueConfig = blueConfig.Run.Default;
@@ -420,6 +429,9 @@ This component manage each job (delete, start, create, etc).
             return this.unicoreAPI.uploadData(uploadFile, `${workingDirectory}/files`);
           });
         },
+        'handleError': function(error) {
+          return swal('Error', error.message, 'error');
+        },
       },
       'mounted': function() {
         if (this.statusSearch) {
@@ -427,7 +439,6 @@ This component manage each job (delete, start, create, etc).
           this.checkFilterIcon();
         }
         this.computerFilter = this.computerParam.toUpperCase();
-        this.refreshJobs();
       },
       'watch': {
         'statusFilter': function() {
@@ -440,8 +451,8 @@ This component manage each job (delete, start, create, etc).
             this.filter();
           }
         },
-        'computerFilter': function() {
-          if (!this.loading) {
+        'computerFilter': function(newVal, oldVal) {
+          if (newVal !== oldVal) {
             this.refreshJobs();
           }
         },

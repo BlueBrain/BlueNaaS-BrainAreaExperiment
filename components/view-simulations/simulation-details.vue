@@ -47,13 +47,21 @@ This will display the details of a certain simulation and the analysis.
                                     Remove
                                 </a>
                             </item-summary>
-                            <analysis :itemDetails="analysis"></analysis>
+                            <i
+                              v-if="analysis.status === QUEUED_STATUS"
+                              class="material-icons spin">autorenew
+                            </i>
+                            <analysis
+                              :itemDetails="analysis"
+                              @analysisLogRequest="getAnalysisLog">
+                            </analysis>
                         </div>
                     </div>
                 </collapse-title>
+
                 <collapse-title title="BlueConfig" :collapsed="true">
                     <div slot="element">
-                        <div v-for="log in simulationDetails.BlueConfig" class="log-item">
+                        <div v-for="log in simulationDetails.blueconfig" class="log-item">
                             {{ log }}
                         </div>
                         <a class="button-with-icon" v-if="simulationDetails.intervalReference" title="Loading">
@@ -62,6 +70,7 @@ This will display the details of a certain simulation and the analysis.
                         <a @click="save('BlueConfig.txt', simulationDetails.BlueConfig)" class="button-with-icon colored"><i class="material-icons download-file">file_download</i>Download File</a>
                     </div>
                 </collapse-title>
+
                 <collapse-title title="Unicore Logs" :collapsed="true">
                     <div slot="element">
                         <!-- {{job.logParsed}} -->
@@ -81,6 +90,7 @@ This will display the details of a certain simulation and the analysis.
                         <a @click="save('Unicore_Logs.txt', job.log)" class="button-with-icon colored"><i class="material-icons download-file">file_download</i>Download File</a>
                     </div>
                 </collapse-title>
+
                 <collapse-title title="Stderr" :collapsed="true">
                     <div slot="element" class="log-item">
                         <div v-for="error in simulationDetails.stderr" class="log-item">
@@ -92,6 +102,7 @@ This will display the details of a certain simulation and the analysis.
                         <a @click="save('Stderr.txt', simulationDetails.stderr)" class="button-with-icon colored"><i class="material-icons download-file">file_download</i>Download File</a>
                     </div>
                 </collapse-title>
+
                 <collapse-title title="Stdout" :collapsed="true">
                     <div slot="element" class="log-item">
                         <div v-for="out in simulationDetails.stdout" class="log-item">
@@ -118,13 +129,14 @@ import CollapseTitle from 'components/shared/collapse-title.vue';
 import ItemSummary from 'components/view-simulations/simulation-details/item-summary.vue';
 import Analysis from 'components/view-simulations/simulation-details/analysis.vue';
 import analysisConfig from 'assets/analysis-config.json';
-
+const QUEUED_STATUS = 'QUEUED';
 export default {
   'name': 'simulationDetails',
   'props': ['jobParam', 'jobId', 'computerParam'],
   'data': function() {
     return {
       'loading': true,
+      'QUEUED_STATUS': QUEUED_STATUS,
       'computer': 'JUQUEEN',
       'unicoreAPI': Unicore,
       'job': null,
@@ -202,29 +214,33 @@ export default {
       }
       this.getFiles('stderr', this.simulationDetails);
       this.getFiles('stdout', this.simulationDetails);
-      this.getFiles('BlueConfig', this.simulationDetails);
+      // this.getFiles('BlueConfig', this.simulationDetails);
+      this.getBlueConfig(this.simulationDetails);
       this.getAnalysisInfo();
       this.job.logParsed = this.parseLog(this.job);
     },
     'getFiles': function(fileName, destination) {
       let url = this.simulationDetails.files + '/files/' + fileName;
       this.unicoreAPI.getFiles(url).then((output) => {
-        if (fileName === 'BlueConfig') {
-          // parse to visualize it prettier
-          try {
-            let prettyText = JSON.stringify(JSON.parse(output), null, 2).split('\n');
-            destination[fileName] = prettyText;
-          } catch (e) {
-            destination[fileName] = output.split('\n');
-          }
-        } else {
-          destination[fileName] = output.split('\n');
-        }
-      }, console.warn);
+        destination[fileName] = output.split('\n');
+      }, () => {console.error(`No file ${fileName} found`);});
+    },
+    'getBlueConfig': function(destination) {
+      let fileName = 'BlueConfig';
+      let url = this.simulationDetails.files + '/files/' + fileName;
+      this.unicoreAPI.getFiles(url).then((output) => {
+        destination.blueconfig = output.split('\n');
+      }, (error) => {
+        fileName = 'blueconfig.json';
+        url = this.simulationDetails.files + '/files/' + fileName;
+        this.unicoreAPI.getFiles(url).then((output) => {
+          destination.blueconfig = JSON.stringify(output, null, 2).split('\n');
+        });
+      });
     },
     'getAnalysisInfo': function() {
       /*  get the location of the analysis based on the mapping file
-                that we save in the simulation and then the analysis image */
+          that we save in the simulation and then the analysis image */
       if (this.job && this.simulationDetails.status === 'SUCCESSFUL') {
         this.analysisDetails = []; // reset all the analysis
         this.unicoreAPI.getAssociatedLocation(this.simulationDetails.files)
@@ -235,19 +251,29 @@ export default {
           }
           analysisObject.forEach((analysis) => {
             let childAnalysis = Object.assign({}, this.analysisDetailTemplate);
-            childAnalysis['jobURL'] = analysis._links.self.href;
+            childAnalysis.jobURL = analysis._links.self.href;
+            childAnalysis.workingDirectory = analysis._links.workingDirectory.href;
             childAnalysis.id = analysis._links.self.href.split('/').pop();
-            analysisConfig.plots.forEach((plot) => {
-              this.getAnalysisImage(
-                analysis._links.workingDirectory.href,
-                plot,
-                childAnalysis
-              );
-            });
-            this.getAnalysisStatus(analysis._links.self.href, childAnalysis);
+            this.refreshAnalysis(analysisConfig, childAnalysis);
             this.analysisDetails.push(childAnalysis);
           });
         });
+      }
+    },
+    'refreshAnalysis': function(analysisConfig, childAnalysis) {
+      analysisConfig.plots.forEach((plot) => {
+        this.getAnalysisImage(
+          childAnalysis.workingDirectory,
+          plot,
+          childAnalysis
+        );
+      });
+      this.getAnalysisStatus(childAnalysis.jobURL, childAnalysis);
+      if (childAnalysis.status === '' ||
+          childAnalysis.status === QUEUED_STATUS) {
+        setTimeout(() => {
+          this.refreshAnalysis(analysisConfig, childAnalysis);
+        }, this.pollInterval * 500);
       }
     },
     'getAnalysisImage': function(analysisURL, plotName, childAnalysis) {
@@ -268,6 +294,24 @@ export default {
         childAnalysis.status = jobInfo.status;
         childAnalysis.submissionTime = jobInfo.submissionTime;
         childAnalysis.name = jobInfo.name;
+      });
+    },
+    'getAnalysisLog': function(childAnalysis) {
+      let url = `${childAnalysis.workingDirectory}/files/stderr`;
+      this.unicoreAPI.getFiles(url)
+      .then((stderr) => {
+        this.$set(childAnalysis, 'log', stderr.split('\n'));
+      })
+      .catch((noFile) => {
+        let log = [];
+        if (childAnalysis.status === QUEUED_STATUS) {
+          log.push('No log available yet');
+          log.push('Analysis ' + QUEUED_STATUS);
+        } else {
+          log.push('No log available');
+          log.push('Job failed before script was executed');
+        }
+        this.$set(childAnalysis, 'log', log);
       });
     },
     'getJobById': function() {

@@ -1,16 +1,19 @@
+
 module.exports = (function() {
   'use strict';
+  let axios = require('axios');
   let hello = require('assets/hbp.hello.js').hellojs;
   let analysisConfig = require('assets/analysis-config.json');
   let token = '';
   let actionJob = function(actionURL) {
     // actions like start, restart, abort
     let headers = createHeaders(token);
-    return fetch(actionURL, {
-      'method': 'POST',
-      'body': JSON.stringify({}),
+    return axios({
+      'url': actionURL,
+      'method': 'post',
+      'data': JSON.stringify({}),
       'headers': headers,
-    }).then(handleErrors);
+    });
   };
   let createHeaders = function(token) {
     return {
@@ -21,19 +24,21 @@ module.exports = (function() {
   };
   let createJob = function(url, jobDefinition) {
     let headers = createHeaders(token);
-    return fetch(url + '/jobs', {
-      'method': 'POST',
-      'body': JSON.stringify(jobDefinition),
+    return axios({
+      'url': url + '/jobs',
+      'method': 'post',
+      'data': JSON.stringify(jobDefinition),
       'headers': headers,
-    }).then(handleErrors);
+    });
   };
   let deleteJob = function(url) {
     let headers = createHeaders(token);
-    return fetch(url, {
-      'method': 'DELETE',
-      'body': JSON.stringify({}),
+    return axios({
+      'url': url,
+      'method': 'delete',
+      'data': JSON.stringify({}),
       'headers': headers,
-    }).then(handleErrors);
+    });
   };
   let deleteJobFromAssociatedFile = function(simulationWorkDir, idToDelete) {
     return getAssociatedLocation(simulationWorkDir)
@@ -60,14 +65,13 @@ module.exports = (function() {
   let getAllJobs = function(site) {
     let unicoreURL = getSites()[site.toUpperCase()]['url'];
     let headers = createHeaders(token);
-    return fetch(unicoreURL + '/jobs', {
-      'method': 'GET',
+    return axios({
+      'url': unicoreURL + '/jobs',
+      'method': 'get',
       'headers': headers,
     })
-    .then(handleErrors)
-    .then((response) => {
-      return response.json();
-    });
+    .then((response) => (response.data))
+    .catch((e) => {throw Error('Getting all jobs - ' + e);});
   };
   let getAllJobsExapandedWithChildren = function(site) {
     // get the information of all jobs asociated with key + the children
@@ -98,66 +102,50 @@ module.exports = (function() {
     })
     .then(() => {
       return output;
-    });
+    }, (error) => {throw Error('getAllJobsExapandedWithChildren - ' + error);});
   };
   let getAssociatedLocation = function(workingDirectory) {
     let analysisPath = analysisConfig.analysisConnectionPath;
     let url = `${workingDirectory}/files/${analysisPath}`;
     return getFiles(url)
-    .then((location) => {
-      try {
-        if (location === '' || location === '[]') {
-          return Promise.resolve('');
-        }
-        let analysisObject = JSON.parse(location);
-        return Promise.resolve(analysisObject);
-      } catch (e) {
-        throw new Error('No analysis file. Images cannot be shown');
-      }
-    }, console.warn);
+    .then((analysisObject) => (analysisObject))
+    // even if the file is not there it will be updated later
+    .catch((e) => ([]));
   };
   let getFiles = function(jobURL) {
     let headers = createHeaders(token);
     headers['Accept'] = 'application/octet-stream';
-    return fetch(jobURL, {
-      'method': 'GET',
+    return axios({
+      'url': jobURL,
+      'method': 'get',
       'headers': headers,
     })
-    .then((response) => {
-      return response.text();
-    }, Promise.reject);
+    .then((r) => (r.data))
+    .catch((e) => {throw Error('getFiles ' + e);});
   };
   let getFilesList = function(jobURL) {
     let headers = createHeaders(token);
-    return fetch(jobURL, {
-      'method': 'GET',
+    return axios({
+      'url': jobURL,
+      'method': 'get',
       'headers': headers,
     })
-    .then((response) => {
-      try {
-        return response.json();
-      } catch (e) {
-        return Promise.reject;
-      }
-    }, Promise.reject)
-    .then((files) => {
-      return files;
-    });
+    .then((r) => (r.data))
+    .catch((e) => {throw Error('getting file list ' + e);});
   };
   let getFilesToCopy = function(filesURL) {
-    let analysisPath = analysisConfig.analysisConnectionPath;
     return this.getFilesList(filesURL)
     .then((files) => {
       let allowed = [];
-      files.children.forEach((file) => {
-        if (!file.endsWith('backup') &&
-                    file.indexOf('UNICORE_SCRIPT_EXIT_CODE') < 0 &&
-                    file.indexOf('stderr') < 0 &&
-                    file.indexOf('stdout') < 0 &&
-                    file.indexOf(analysisPath) < 0) {
-          // remove the '/'
-          allowed.push(file.substr(1));
-        }
+      let avoidFilesList = analysisConfig.filesToAvoidCopy;
+      files.children.map((file) => {
+        // remove the '/'
+        let fileName = file.substr(1);
+        let found = avoidFilesList.find((avoidFile) => {
+          return fileName.indexOf(avoidFile) !== -1;
+        });
+        if (found) return;
+        allowed.push(fileName);
       });
       return allowed;
     });
@@ -165,14 +153,13 @@ module.exports = (function() {
   let getConfig = function(configParams, blueConfig, shellCommand) {
     /**
         * @params
-        *   configParams {applicationName, title, nodes, project}
+        *   configParams {applicationName, title, nodes}
         *   BlueConfig
         *   shellCommand to be used when the job starts
         */
     let jobSpec = {
       'ApplicationName': configParams.applicationName,
       'Name': configParams.title || 'unnamed job',
-      'Project': configParams.project,
       'haveClientStageIn': 'true',
       'Resources': {
         'Nodes': configParams.nodes,
@@ -194,14 +181,8 @@ module.exports = (function() {
         inputShContent = shellCommand;
       }
       inputs = [
-        {
-          'To': 'input.sh',
-          'Data': inputShContent,
-        },
-        {
-          'To': 'blueconfig.json',
-          'Data': JSON.stringify(blueConfig),
-        },
+        {'To': 'input.sh', 'Data': inputShContent},
+        {'To': 'blueconfig.json', 'Data': JSON.stringify(blueConfig)},
       ];
     }
     return {
@@ -210,24 +191,20 @@ module.exports = (function() {
     };
   };
   let getImage = function(imageURL) {
-    return new Promise((resolve, reject) => {
-      let headers = createHeaders(token);
-      headers['Accept'] = 'application/octet-stream';
-      delete headers['Content-Type'];
-      fetch(imageURL, {
-        'method': 'GET',
-        'headers': headers,
-      })
-      .then((imageBinary) => {
-        return imageBinary.blob();
-      }, Promise.reject)
-      .then((image) => {
-        if (image.size > 0) {
-          resolve(image);
-        } else {
-          reject('Image not found');
-        }
-      });
+    let headers = createHeaders(token);
+    headers['Accept'] = 'application/octet-stream';
+    delete headers['Content-Type'];
+    return axios({
+      'url': imageURL,
+      'method': 'get',
+      'responseType': 'blob',
+      'headers': headers,
+    })
+    .then((image) => {
+      return image.data;
+    })
+    .catch((e) => {
+      throw String('Image not found');
     });
   };
   let getJobById = function(jobId, computer) {
@@ -238,95 +215,16 @@ module.exports = (function() {
   };
   let getJobProperties = function(jobURL) {
     let headers = createHeaders(token);
-    return fetch(jobURL, {
-      'method': 'GET',
+    return axios({
+      'url': jobURL,
+      'method': 'get',
       'headers': headers,
     })
-    .then(handleErrors)
-    .then((response) => {
-      return response.json();
-    }, Promise.reject);
+    .then((response) => (response.data))
+    .catch((e) => {throw Error('Error getting job properties');});
   };
   let getLastJobId = function(url) {
     return url.split('/').pop();
-  };
-  let getResourcesAvailable = function() {
-    /** returns the site and project that the user have access related to HBP
-         *  way to obtain the data from https://github.com/HumanBrainProject/pyunicore/blob/dev/pyunicore/pyunicore.py
-        */
-    let headers = createHeaders(token);
-    let projectsArray = [];
-    let getJson = function(url) {
-      return fetch(url, {
-        'method': 'GET',
-        'headers': headers,
-      })
-      .then(handleErrors)
-      .then((response) => {
-        return response.json();
-      })
-      .catch((e) => {})
-      .then((notFound) => {
-        // workaround to wait Promise.all even if rejected
-        return notFound;
-      });
-    };
-    let getResourceInfo = function(objReference) {
-      return getJson(objReference.url)
-      .then((info) => {
-        if (info) {
-          // add the UID because somethimes the projecs available
-          // are empty even if I have account.
-          objReference.project = info.client.xlogin.availableUIDs;
-          return objReference;
-        }
-      });
-    };
-    let filterComputerName = function(url) {
-      // to be consistent with the getSites names returns that name based on the url
-      let sites = getSites();
-      let keys = Object.keys(sites);
-      for (let i = 0; i < keys.length; i++) {
-        let key = keys[i];
-        if (sites[key].url === url) {
-          return key;
-        }
-      }
-    };
-    // let filterProject = function(sites) {
-    //     let filtered = [];
-    //     sites.forEach((site) => {
-    //         if (site && Array.isArray(site.project)) {
-    //             filtered.push(site);
-    //         }
-    //     });
-    //     return filtered;
-    // };
-    return new Promise((resolve, reject) => {
-      // get the resources
-      getJson(HBP_RESOURCES_URL)
-      .then((resources) => {
-        resources.entries.forEach((site) => {
-          let href = site['href'];
-          let serviceType = site['type'];
-          if ('TargetSystemFactory' === serviceType) {
-            let re = new RegExp('https://.*/rest/core', 'g');
-            let obj = {};
-            [obj.url] = re.exec(href);
-            obj.computerName = filterComputerName(obj.url);
-            // get the user projects and add them to obj element
-            projectsArray.push(getResourceInfo(obj));
-          }
-        });
-        // this will execute all of them even if reject is trown
-        Promise.all(projectsArray)
-        .then((filledObj) => {
-          // let filtered = filterProject(filledObj);
-          let filtered = filledObj.filter((site) => {return site && site.computerName;});
-          resolve(filtered);
-        });
-      });
-    });
   };
   let getSites = function() {
     let sites = {};
@@ -359,14 +257,10 @@ module.exports = (function() {
     .then((associationFile) => {
       let newAssociationFile = [];
       let analysisPath = analysisConfig.analysisConnectionPath;
-      if (associationFile) {
-        associationFile.forEach((oldAnalysis) => {
-          newAssociationFile.push(oldAnalysis);
-        });
-        newAssociationFile.push(analysisObject);
-      } else {
-        newAssociationFile.push(analysisObject);
-      }
+      associationFile.forEach((oldAnalysis) => {
+        newAssociationFile.push(oldAnalysis);
+      });
+      newAssociationFile.push(analysisObject);
       // mapping in simulation the analysis path.
       let input = {
         'To': analysisPath,
@@ -374,24 +268,10 @@ module.exports = (function() {
       };
       // upload the analysis_path.json file
       return uploadData(input, simulationWorkDirectory + '/files');
+    })
+    .catch((e) => {
+      throw Error('generateUpdatedAssociatedFile ' + e);
     });
-  };
-  let handleErrors = function(response, callback, params) {
-    if (!response.ok) {
-      // if (response.status === 403) {
-      // console.log('403....');
-      // return hello.logout();
-      // return getAuthenticationToken();
-      // });
-      // } else {
-      response.json().then((err) => {
-        console.error(err.errorMessage);
-      }, (anotherError) => {});
-      throw Error(response.statusText + ' - check console for more details');
-      // }
-    } else {
-      return response;
-    }
   };
   let init = function() {
     hello.init({
@@ -405,39 +285,40 @@ module.exports = (function() {
     })
     .then((data) => {
       token = data.authResponse.access_token;
-    });
+    }, (error) => {throw Error('init ' + e);});
   };
-  let submitAnalysis = function(moveObject, script, filesToAvoidCopy) {
+  let submitAnalysis = function(moveObject, script) {
     let configName = analysisConfig.configFileName;
     return new Promise((resolve, reject) => {
       /**
-                Create a new job so we have working space where to copy files for analysis
-                    and upload the script to run analysis after the files are move
-                Move files from diferent locations using Unicore API
-                Returns one object with the information about transfer and
-                    inside another 'destinationJob' object with info about destination job
-                @param {Object} moveObject
-                {
-                    'from': {
-                        'workingDirectory' = origin job working directory
-                            e.g: "https://hbp-unic.fz-juelich.de:7112/HBP_JURECA/rest/core/ +
-                            storages/262788e5-571b-4965-8726-a337564f434d-uspace"
-                        'computer' = computer name e.g: JUQUEEN
-                    },
-                    'to': {
-                        'workingDirectory' = (this will be created and fill in here)
-                        'computer': computer name e.g: JURECA
-                    }
-                    'files' = array with name of files to copy
-                    'nodes' = number of nodes used to run the analysis
-                    'title' = title of the job
-                    // the following params should be in a new config file to upload
-                    // so the script reads that file before to start the analysis
-                    'checkedAnalysis' = list with the analysis to be run
-                    'numberOfCells' = % cells to visualize
-                    'target' = target where the analysis should be applied
-                }
-            */
+        Create a new job so we have working space where to copy files for analysis
+          and upload the script to run analysis after the files are move
+        Move files from diferent locations using Unicore API
+        Returns one object with the information about transfer and
+          inside another 'destinationJob' object with info about destination job
+        @param {Object} moveObject
+        {
+          'from': {
+            'workingDirectory' = origin job working directory
+              e.g: "https://hbp-unic.fz-juelich.de:7112/HBP_JURECA/rest/core/ +
+              storages/262788e5-571b-4965-8726-a337564f434d-uspace"
+            'computer' = computer name e.g: JUQUEEN
+          },
+          'to': {
+            'workingDirectory' = (this will be created and fill in here)
+            'computer': computer name e.g: JURECA
+          }
+          'files' = array with name of files to copy
+          'nodes' = number of nodes used to run the analysis
+          'title' = title of the job
+          // the following params should be in a new config file to upload
+          // so the script reads that file before to start the analysis
+          'checkedAnalysis' = list with the analysis to be run
+          'numberOfCells' = % cells to visualize
+          'target' = target where the analysis should be applied,
+          'reportForAnalysis' = the report for the traces plot
+        }
+      */
       let jobSpec = {
         'ApplicationName': 'Bash shell',
         'Parameters': {'SOURCE': 'input.sh'},
@@ -445,16 +326,22 @@ module.exports = (function() {
         'Resources': {'Nodes': moveObject.nodes},
         'haveClientStageIn': 'true',
       };
+      // create analysis_config
       let analysisParamsConfig = {
         'list_analysis': moveObject.checkedAnalysis,
         'number_of_cells': moveObject.numberOfCells,
         'target_analysis': moveObject.target,
+        'report_analysis': moveObject.reportForAnalysis,
       };
+      let scriptReplaced = '';
+      // this bool will determine if the files will be copied or referenced
+      let sameMachine = false;
+      // change input sh {{origin}} for the from computer in case
+      // from and to are the same (you have the same user)
+      if (moveObject.from.computer === moveObject.to.computer) {
+        sameMachine = true;
+      }
       let inputs = [
-        {
-          'To': 'input.sh',
-          'Data': script,
-        },
         {
           'To': configName,
           'Data': JSON.stringify(analysisParamsConfig),
@@ -462,28 +349,49 @@ module.exports = (function() {
       ];
       let transferArray = [];
       let newJobDestination = {};
-      return this.submitJob(moveObject.to.computer, jobSpec, inputs)
+
+      this.submitJob(moveObject.to.computer, jobSpec, inputs)
       .then((destinationJobObject) => {
         newJobDestination = destinationJobObject;
-        return generateUpdatedAssociatedFile(
+        let prom = [];
+        // fill the destination and pass it to transfer
+        moveObject.to['workingDirectory'] = newJobDestination._links.workingDirectory.href;
+        if (sameMachine) {
+          let originPath = workingDirToMachinePath(moveObject.from.workingDirectory);
+          let destinationPath = workingDirToMachinePath(moveObject.to.workingDirectory);
+          // replace blueconfig path and output path
+          scriptReplaced = script.join('\n')
+          .replace(/{{origin}}/, originPath)
+          .replace(/{{origin}}/, destinationPath);
+        } else {
+          scriptReplaced = script.join('\n').replace(/{{origin}}/g, '.');
+        }
+        let input = {
+          'To': 'input.sh',
+          'Data': scriptReplaced,
+        };
+        let upload = uploadData(input, moveObject.to.workingDirectory + '/files');
+        prom.push(upload);
+        let association = generateUpdatedAssociatedFile(
           moveObject.from.workingDirectory,
           destinationJobObject
         );
+        prom.push(association);
+        return Promise.all(prom);
       })
-      .then(() => {
+      .then(([uploaded, assocFile]) => {
+        // avoid copying files but return something for the last element in the chain
+        if (sameMachine) return '';
         // get all the files to be copied
         console.log('getting files to be copied ...');
         return this.getFilesToCopy(`${moveObject.from.workingDirectory}/files`);
       })
       .then((files) => {
-        // fill the destination and pass it to transfer
-        moveObject.to['workingDirectory'] = newJobDestination._links.workingDirectory.href;
+        // avoid copying files but return something for the last element in the chain
+        if (sameMachine) return '';
         files.forEach(function(fileName, i) {
           // change the object so transferFile transfers each individual file
           // this is for have each object with its own information becasue async calls
-          if (filesToAvoidCopy.includes(fileName)) {
-            return;
-          }
           console.log('coping ...', fileName);
           moveObject['fileName'] = fileName;
           transferArray.push(transferFiles(moveObject));
@@ -491,13 +399,13 @@ module.exports = (function() {
         return Promise.all(transferArray);
       })
       .then(([upload, transfer]) => {
+        if (sameMachine) {
+          transfer = {'avoidCopy': true};
+        };
         // add this field so we have the info to start the job
         transfer['destinationJob'] = newJobDestination;
         return resolve(transfer);
-      }, (error) => {
-        console.error('Transfer failed: ', error);
-        reject(error);
-      });
+      }, reject);
     });
   };
   let submitJob = function(site, jobDefinition, inputs) {
@@ -511,7 +419,7 @@ module.exports = (function() {
         return createJob(unicoreURL, jobDefinition);
       })
       .then((job) => {
-        this.jobURL = job.headers.get('location');
+        this.jobURL = job.headers.location;
         console.log('getting job properties...');
         return getJobProperties(this.jobURL);
       })
@@ -539,24 +447,23 @@ module.exports = (function() {
           },
         };
         resolve(jobDetails);
-      });
+      }, reject);
     });
   };
   let transferFiles = function(moveObject) {
     /**
-            Returns object with the information about transfer but not job
-        */
+      Returns object with the information about transfer but not job
+    */
     // this transferFile will be done when the poll find DONE or FAILED
     let getTransferInfo = function(trasferURL) {
       let headers = createHeaders(token);
-      return fetch(trasferURL, {
-        'method': 'GET',
+      return axios({
+        'url': trasferURL,
+        'method': 'get',
         'headers': headers,
       })
-      .then(handleErrors)
-      .then((response) => {
-        return response.json();
-      }, Promise.reject);
+      .then((response) => (response.data))
+      .catch((e) => {throw Error('getTransferInfo ' + e);});
     };
     let polling = function(transferLocation, resolve, reject) {
       getTransferInfo(transferLocation)
@@ -573,7 +480,7 @@ module.exports = (function() {
             polling(transferLocation, resolve, reject);
           }, 10 * 1000);
         }
-      });
+      }, reject);
     };
     return new Promise((resolve, reject) => {
       // TODO: have in mind that this api of StorageManagement?res could change
@@ -588,17 +495,17 @@ module.exports = (function() {
       };
       // post to move files request and check with poll
       let headers = createHeaders(token);
-      fetch(destURL, {
-        'method': 'POST',
-        'body': JSON.stringify(payload),
+      axios({
+        'url': destURL,
+        'method': 'post',
+        'data': JSON.stringify(payload),
         'headers': headers,
       })
-      .then(handleErrors)
       .then((transfer) => {
-        let transferLocation = transfer.headers.get('location');
+        let transferLocation = transfer.headers.location;
         // passing the resolve so the poll is who finish the transterFiles
         polling(transferLocation, resolve, reject);
-      });
+      }, reject);
     });
   };
   let uploadData = function(dataToUpload, uploadURL) {
@@ -606,11 +513,23 @@ module.exports = (function() {
     headers['Content-Type'] = 'application/octet-stream';
     let data = dataToUpload.Data;
     let target = dataToUpload.To;
-    return fetch(uploadURL + '/' + target, {
-      'method': 'PUT',
-      'body': data,
+    return axios({
+      'url': uploadURL + '/' + target,
+      'method': 'put',
+      'data': data,
       'headers': headers,
-    }).then(handleErrors);
+    });
+  };
+  let workingDirToMachinePath = function(workingDirectory) {
+    if (workingDirectory.indexOf('JURECA') > 0) {
+      try {
+        let id = workingDirectory.match('storages\/(.*)-uspace')[1];
+        let base = analysisConfig.workDirectoyBase.JURECA;
+        return base + id;
+      } catch (e) {
+        console.error('Error parsing workingDirToMachinePath', e);
+      }
+    }
   };
   return {
     getAssociatedLocation,
@@ -628,7 +547,6 @@ module.exports = (function() {
     getFilesToCopy,
     getImage,
     getConfig,
-    getResourcesAvailable,
     init,
     submitAnalysis,
     transferFiles,

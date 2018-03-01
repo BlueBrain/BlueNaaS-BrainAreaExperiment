@@ -39,6 +39,15 @@
                         v-model="checkedAnalysis"
                     >
                     <label :for="analysis.param">{{ analysis.name }}</label>
+                    <select
+                      v-if="analysis['report_select']"
+                      v-model="reportForAnalysis"
+                      class="margin-subitem"
+                    >
+                      <option v-for="report in getReports()">
+                        {{report}}
+                      </option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -69,8 +78,16 @@
     import 'assets/css/simulation.css';
     import targetAutocomplete from 'components/shared/autocomplete-targets.vue';
     import utils from 'assets/utils.js';
+    import Vue from 'vue';
+    import Autocomplete from 'v-autocomplete';
+    import autocompleteTemplate from 'components/shared/autocomplete-template.vue';
+    // You need a specific loader for CSS files like https://github.com/webpack/css-loader
+    import 'v-autocomplete/dist/v-autocomplete.css';
+    Vue.use(Autocomplete);
+    import targetList from 'assets/targetList.json';
+
     export default {
-      'props': ['defaultAnalysisConfig'],
+      'props': ['defaultAnalysisConfig', 'jobSelectedForValidation'],
       'data': function() {
         return {
           'from': {
@@ -86,16 +103,21 @@
           'title': '',
           'analysisToRun': this.defaultAnalysisConfig.analysisAvailable,
           'checkedAnalysis': [],
+          'reportForAnalysis': '',
           'numberOfCells': 5,
           'tipTexts': [
             `To run the Analysis we need to copy the output from the Simulation to ${this.defaultAnalysisConfig.to} (because that machine has the analysis packages installed) and run the new Analysis Job.`,
             'The results of the Analysis will be shown in the detailed page.',
           ],
-          'target': '',
+          'target': 'slice-4',
+          'autocompleteTemplate': autocompleteTemplate,
+          'targetList': targetList,
+          'filteredTargets': [],
         };
       },
       'components': {
         'target-autocomplete': targetAutocomplete,
+        'v-autocomplete': Autocomplete,
       },
       'mounted': function() {
         if (localStorage.getItem('showAnalysisTip') === 'false') {
@@ -118,6 +140,17 @@
         'targetChanged': function(newTarget) {
           this.target = newTarget;
         },
+        'getReports': function() {
+          let reports = [];
+          this.jobSelectedForValidation.children.map((file) => {
+            if (file.endsWith('.bbp')) {
+              // removes the / and .bbp
+              reports.push(file.substr(1, file.length - 5));
+            }
+          });
+          this.reportForAnalysis = reports[0];
+          return reports;
+        },
       },
     };
 </script>
@@ -130,16 +163,17 @@
         flex-direction: column;
     }
     .analysis-list .checkbox-container {
-        display: flex;
-        align-items: center;
         border-style: solid;
         border-radius: 5px;
         border-width: 1px;
         border-color: lightgray;
         margin-bottom: 5px;
+        padding: 5px;
     }
     .analysis-list .small {
-        width: 10%;
-        margin: 3px 5px 0 0;
+        width: 15px;
+    }
+    .margin-subitem {
+        margin-left: 25px;
     }
 </style>

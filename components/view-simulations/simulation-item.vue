@@ -30,7 +30,7 @@ This will only display the item. It knows where to put all the information.
                 <i
                     class="material-icons colored"
                     v-for="analysisStatus in job.multipleAnalysisStatus"
-                    :title="getAnalysisStatus"
+                    :title="getAnalysisStatus(analysisStatus)"
                 >
                     {{ getStatusIcon(analysisStatus) }}
                 </i>
@@ -101,7 +101,7 @@ export default {
     'itemSelected': function(event) {
       // check if the id for example is not selected so we can copy it.
       if (event.target.classList.contains('clickable') &&
-                window.getSelection().toString() === '') {
+          window.getSelection().toString() === '') {
         this.$emit('showDetails', this.job);
       }
     },
@@ -130,10 +130,23 @@ export default {
     'showAnalysisStatus': function() {
       // show analysis button in the middle
       if (this.job.multipleAnalysisStatus &&
-                this.job.multipleAnalysisStatus.length > 0) {
+          this.job.multipleAnalysisStatus.length > 0) {
         return true;
       }
       return false;
+    },
+    'getAnalysisStatus': function(analysisStatus) {
+      if (this.job.status === FAILED_STATUS) {
+        return 'Simulation failed. No analysis can be run';
+      }
+      if (this.job.noOut) {
+        return 'Simulation did not produce results. No analysis can be run';
+      }
+      if (this.job.status === RUNNING_STATUS ||
+          this.job.status === QUEUED_STATUS) {
+        return 'Waiting for the simulation to finish';
+      }
+      return analysisStatus;
     },
   },
   'computed': {
@@ -160,19 +173,6 @@ export default {
         return false;
       }
       return true;
-    },
-    'getAnalysisStatus': function() {
-      if (this.job.status === FAILED_STATUS) {
-        return 'Simulation failed. No analysis can be run';
-      }
-      if (this.job.noOut) {
-        return 'Simulation did not produce results. No analysis can be run';
-      }
-      if (this.job.status === RUNNING_STATUS ||
-          this.job.status === QUEUED_STATUS) {
-        return 'Waiting for the simulation to finish';
-      }
-      return this.job.status;
     },
   },
   'watch': {

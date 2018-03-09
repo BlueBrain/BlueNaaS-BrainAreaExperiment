@@ -23,20 +23,29 @@ Vue.use(Autocomplete);
 import targetList from 'assets/targetList.json';
 
 export default {
-  'props': ['targetSelected'],
+  'props': ['targetSelected', 'itemsAvailable'],
   'data': function() {
     return {
       'autocompleteTemplate': autocompleteTemplate,
       'targetList': targetList,
       'filteredTargets': [],
-      'modelSelected': this.targetSelected || null,
+      'modelSelected': null,
     };
   },
   'components': {
     'v-autocomplete': Autocomplete,
   },
   'mounted': function() {
-    this.filteredTargets = this.getSomeTargets();
+    if (this.itemsAvailable) {
+      this.targetList = this.itemsAvailable;
+    }
+    if (this.targetSelected) {
+      this.modelSelected = this.targetSelected;
+    }
+    this.$nextTick(() => {
+      // otherwise overwrite modelSelected
+      this.filteredTargets = this.getSomeTargets();
+    });
   },
   'methods': {
     'getSomeTargets': function() {
@@ -56,6 +65,8 @@ export default {
         });
       } else {
         this.filteredTargets = this.getSomeTargets();
+        // notify target = ''
+        this.$emit('targetChanged', text);
       }
     },
     'itemSelected': function(selection) {

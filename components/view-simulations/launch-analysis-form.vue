@@ -9,9 +9,11 @@
 
         <div class="form-group">
             <label class="control-label">Target:</label>
-            <div class="controls">
+            <div class="controls" id="targetSelector">
                 <target-autocomplete
                     @targetChanged="targetChanged"
+                    :targetSelected="getTargetsBasedBlueConfig[0]"
+                    :itemsAvailable="getTargetsBasedBlueConfig"
                 ></target-autocomplete>
             </div>
         </div>
@@ -44,7 +46,7 @@
                       v-model="reportForAnalysis"
                       class="margin-subitem"
                     >
-                      <option v-for="report in getReports()">
+                      <option v-for="report in getReports">
                         {{report}}
                       </option>
                     </select>
@@ -127,6 +129,14 @@
       'methods': {
         'editItem': function() {
           this.title = utils.filterName(this.title);
+          if (!this.target) {
+            let targetInput = this.$el.querySelector('#targetSelector');
+            targetInput.classList.toggle('alert');
+            setTimeout(() => {
+              targetInput.classList.toggle('alert');
+            }, 1500);
+            return;
+          }
           this.$emit('analysisConfigReady', this.$data);
         },
         'closeForm': function() {
@@ -140,6 +150,8 @@
         'targetChanged': function(newTarget) {
           this.target = newTarget;
         },
+      },
+      'computed': {
         'getReports': function() {
           let reports = [];
           this.jobSelectedForValidation.children.map((file) => {
@@ -150,6 +162,17 @@
           });
           this.reportForAnalysis = reports[0];
           return reports;
+        },
+        'getTargetsBasedBlueConfig': function() {
+          let targetsNames = [];
+          this.getReports.map((reportName) => {
+            let matched = reportName.match('(.*)_report');
+            if (matched && matched.length > 1) {
+              let target = matched[1];
+              targetsNames.push(target);
+            }
+          });
+          return targetsNames;
         },
       },
     };
@@ -175,5 +198,8 @@
     }
     .margin-subitem {
         margin-left: 25px;
+    }
+    .alert {
+      background-color: red;
     }
 </style>

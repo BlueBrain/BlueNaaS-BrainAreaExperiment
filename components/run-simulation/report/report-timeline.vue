@@ -124,7 +124,7 @@ export default {
       report.ReportOn = 'voltage';
       report.Unit = 'mV';
       report.Target = 'slice-4';
-      report.Type = 'Compartment';
+      report.Type = 'Soma';
       report.Format = 'Bin';
       report.Dt = 0.1;
       return report;
@@ -155,7 +155,7 @@ export default {
         if (report.ReportOn === 'voltage') {
           report.ReportOn = 'v';
         }
-        if (report.Type === 'Compartment') {
+        if (report.Type === 'Soma') {
           report.Type = 'compartment';
         }
         let repName = this.changeConnectionName(report.Target, 'report', i);

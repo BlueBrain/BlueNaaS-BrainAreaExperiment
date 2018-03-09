@@ -95,7 +95,7 @@ export default {
     return {
       'report': this.reportEditableObject.item.reportInfo,
       'item': this.reportEditableObject.item,
-      'typesFull': ['Compartment', 'Synapse'],
+      'typesFull': ['Synapse', 'Soma'],
       'filteredTypes': [],
     };
   },

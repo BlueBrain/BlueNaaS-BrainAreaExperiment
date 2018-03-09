@@ -7,6 +7,7 @@
             <div class="controls autocomplete-container">
                 <autocomplete-targets
                     @targetChanged="targetChanged"
+                    :targetSelected="item.stimulusInfo.Target"
                 ></autocomplete-targets>
             </div>
         </div>

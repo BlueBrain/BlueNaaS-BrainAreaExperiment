@@ -152,11 +152,11 @@ module.exports = (function() {
   };
   let getConfig = function(configParams, blueConfig, shellCommand) {
     /**
-        * @params
-        *   configParams {applicationName, title, nodes}
-        *   BlueConfig
-        *   shellCommand to be used when the job starts
-        */
+      * @params
+      *   configParams {applicationName, title, nodes}
+      *   BlueConfig
+      *   shellCommand to be used when the job starts
+      */
     let jobSpec = {
       'ApplicationName': configParams.applicationName,
       'Name': configParams.title || 'unnamed job',

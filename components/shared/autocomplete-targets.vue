@@ -23,12 +23,13 @@ Vue.use(Autocomplete);
 import targetList from 'assets/targetList.json';
 
 export default {
+  'props': ['targetSelected'],
   'data': function() {
     return {
       'autocompleteTemplate': autocompleteTemplate,
       'targetList': targetList,
       'filteredTargets': [],
-      'modelSelected': null,
+      'modelSelected': this.targetSelected || null,
     };
   },
   'components': {

@@ -20,7 +20,8 @@ This will only display the item. It knows where to put all the information.
             >
                 warning
             </i>
-            <i  class="material-icons colored"
+            <i  v-else
+                class="material-icons colored"
                 :title="getStatusString(job.status)">
                 {{ getStatusIcon(job.status) }}</i>
         </div>

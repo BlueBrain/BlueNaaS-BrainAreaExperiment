@@ -4,16 +4,26 @@
             <div class="app-content" v-if="!loading">
                 <!-- header params -->
                 <div class="duration-skip">
+
+                    <div class="border-container model-container">
+                      <h2>Model</h2>
+                      <div class="subtitle">Defines the model to be loaded</div>
+                      <autocomplete-targets
+                        @targetChanged="modelTargetChanged"
+                        :targetSelected="modelSelected"
+                      ></autocomplete-targets>
+                    </div>
+
                     <span title="Time length of stimulus duration, given in milliseconds(ms)">Duration(ms):</span>
                     <input v-model="endTime" type="number" min="0" placeholder="Duration" class="form-control" @blur="checkNegative">
                     <span title="Run without Stimulus or Report for a given duration using a large timestep. This is to get the cells past any initial transience">ForwardSkip(ms):</span>
                     <input v-model="forwardSkip" type="number" min="0" placeholder="Duration" class="form-control" @blur="checkNegative">
                     <span id="errors" class="errors" v-show="errors">{{errors}}</span>
-                    <span class="right-margin">
-                        <a class="button-with-icon" @click="viewList">
-                            <i class="material-icons">list</i>View Simulations
-                        </a>
-                    </span>
+
+                    <span class="grow-space"></span>
+                    <a class="button-with-icon" @click="viewList">
+                        <i class="material-icons">list</i>View Simulations
+                    </a>
                 </div>
                 <!-- END header params -->
 
@@ -25,6 +35,7 @@
                         <stimulation-timeline
                             :endTime="endTime"
                             :forwardSkip="forwardSkip"
+                            :defaultTarget="defaultTarget"
                             ref="stimulation"
                             class="timeline"></stimulation-timeline>
                         <target-selection @targetSelected="stimulationTargetSelected"></target-selection>
@@ -40,6 +51,7 @@
                         <report-timeline
                             :endTime="endTime"
                             :forwardSkip="forwardSkip"
+                            :defaultTarget="defaultTarget"
                             ref="report"
                             class="report"></report-timeline>
                         <target-selection @targetSelected="reportTargetSelected"></target-selection>
@@ -70,7 +82,6 @@
                 <launch-form
                     @runConfigReady="runConfigReady"
                     @previewConfig="previewConfig"
-                    @circuitTargetChanged="circuitTargetChanged"
                     @computerChanged="computerChanged"
                     @changeModalVisibility="toggleModal">
                 </launch-form>
@@ -90,6 +101,8 @@ import TargetSelection from 'components/target-selection/target-selection.vue';
 import LaunchForm from 'components/run-simulation/launch-form.vue';
 import Modal from 'components/shared/modal-component.vue';
 import launchConfiguration from 'assets/simulation-config.json';
+import autocompleteTargets from 'components/shared/autocomplete-targets.vue';
+import utils from 'assets/utils.js';
 export default {
   'name': 'run_simulation',
   'mixins': [CollabAuthentication],
@@ -101,9 +114,11 @@ export default {
       'blueConfig': {},
       'loading': true,
       'unicore': Unicore,
+      'modelSelected': launchConfiguration.defaultTarget,
       'header': {},
       'showRunForm': false,
       'currentComputer': launchConfiguration.default,
+      'defaultTarget': launchConfiguration.defaultTarget,
       'tipTexts': [
         'You can scroll in the timeline to zoom in/out',
         'Drag the stimuli to modify its duration',
@@ -116,6 +131,7 @@ export default {
     'target-selection': TargetSelection,
     'launch-form': LaunchForm,
     'modal': Modal,
+    'autocomplete-targets': autocompleteTargets,
   },
   'methods': {
     'toggleModal': function(value) {
@@ -145,8 +161,8 @@ export default {
         }
       });
     },
-    'circuitTargetChanged': function(circuitTarget) {
-      this.blueConfig.Run.Default.CircuitTarget = circuitTarget;
+    'modelTargetChanged': function(modelTarget) {
+      this.modelSelected = utils.blueConfigMapper(modelTarget);
     },
     'closeTip': function() {
       let tipElement = this.$el.querySelector('#tip');
@@ -155,18 +171,51 @@ export default {
     },
     'runSimulation': function() {
       this.createConfig();
-      if (
-        Object.keys(this.blueConfig.Report).length === 0 ||
-        Object.keys(this.blueConfig.StimulusInject).length === 0
-      ) {
+      this.blueConfig.Run.Default.CircuitTarget = this.modelSelected;
+      if (this.checkSimulationConsistancy()) {
+        this.toggleModal();
+      }
+    },
+    'checkSimulationConsistancy': function() {
+      // this will check if the model, stimulations and reports have coherence
+      // only one stimulus and one report -> compare with Model
+      let reportKeys = Object.keys(this.blueConfig.Report);
+      let stimulusKeys = Object.keys(this.blueConfig.StimulusInject);
+      let model = this.modelSelected;
+      if (reportKeys.length === 0 || stimulusKeys.length === 0) {
         swal(
           'Missing parameter(s)',
           'Select at least one stimulus and one report.',
           'error'
         );
-        return;
+        return false;
       }
-      this.toggleModal();
+
+      if (reportKeys.length < 2 && stimulusKeys.length < 2) {
+        // only one stimuli and report. compare targets
+        let union = utils.unionTargets(
+          [this.blueConfig.Report[reportKeys[0]]],
+          [this.blueConfig.StimulusInject[stimulusKeys[0]]],
+          [{'Target': this.modelSelected}]
+        );
+        if (union.length > 1) {
+          // stimulus - report diff -> use Mosaic
+          if (!checkModel()) {return false;}
+        }
+      } else {
+        // multiple slices -> model = Mosaic
+        if (!checkModel()) {return false;}
+      }
+
+      function checkModel() {
+        if (model !== utils.blueConfigMapper('FullCA1')) {
+          swal('Incorrect Model', 'Select the model as FullCA1.', 'error');
+          return false;
+        }
+        return true;
+      }
+
+      return true;
     },
     'fillToken': function(renew) {
       let that = this;
@@ -216,7 +265,8 @@ export default {
       this.toggleModal();
       swal.enableLoading();
       let submittedJob = {};
-      return this.unicore.submitJob(runConfig, this.blueConfig)
+      let files = [{'To': 'blueconfig.json', 'Data': this.blueConfig}];
+      return this.unicore.submitJob(runConfig, files)
       .then((jobObject) => {
         submittedJob = jobObject;
         console.log('starting job...');
@@ -281,7 +331,6 @@ export default {
         letter-spacing: .5px;
         cursor: pointer;
         padding: 5px 10px;
-        margin: 0 15px;
         border-radius: 3px;
         display: flex;
         align-items: center;
@@ -289,7 +338,11 @@ export default {
         max-height: 30px;
     }
     .duration-skip {
-        padding: 10px 5px;
+        padding-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
     }
     .duration-skip input {
         width: 100px;
@@ -320,7 +373,7 @@ export default {
         background-color: rgba(216, 223, 239, 0.38);
         border-radius: 5px;
         padding: 20px 10px;
-        margin: 30px 15px;
+        margin: 30px 0;
     }
     .fade-enter-active, .fade-leave-active {
       transition: opacity .5s
@@ -330,6 +383,9 @@ export default {
     }
     .right-margin a {
         margin: 0 15px 0 0;
+    }
+    .app-content {
+      padding: 0 15px;
     }
     .app-content .duration-skip + .border-container {
         /* the first block simulation */
@@ -381,6 +437,25 @@ export default {
         display: flex;
         justify-content: space-between;
         margin-left: 15px;
+    }
+    .model-container {
+      width: 25%;
+      min-width: 500px;
+      display: flex;
+      justify-content: space-between;
+      margin: 0;
+      align-items: center;
+      z-index: 2;
+      padding: 10px;
+    }
+    .model-container h2, .model-container .v-autocomplete {
+      width: auto;
+    }
+    .model-container .subtitle {
+      white-space: nowrap;
+    }
+    .grow-space {
+      flex-grow: 1;
     }
 </style>
 

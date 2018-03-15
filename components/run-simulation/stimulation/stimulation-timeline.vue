@@ -24,10 +24,11 @@ import Modal from 'components/shared/modal-component.vue';
 import StimulationForm from 'components/run-simulation/stimulation/stimulation-form.vue';
 import mixin from 'mixins/simulationTimeline.js';
 import EditButtons from 'components/run-simulation/edit-buttons.vue';
+import utils from 'assets/utils.js';
 import 'assets/css/simulation.css';
 export default {
   'name': 'stimulation-timeline',
-  'props': ['endTime', 'forwardSkip', 'blueConfig'],
+  'props': ['endTime', 'forwardSkip', 'blueConfig', 'defaultTarget'],
   'mixins': [mixin],
   'data': function() {
     return {
@@ -119,7 +120,7 @@ export default {
     'createNewStimulus': function() {
       let stim = {};
       stim.Pattern = 'Poisson';
-      stim.Target = 'slice-4';
+      stim.Target = this.defaultTarget;
       stim.Mode = 'Current';
       stim.Duration = parseInt(this.endTime);
       stim.Delay = 0;
@@ -152,12 +153,8 @@ export default {
         // fill stimulus
         let stimulus = Object.assign({}, this.items[i].stimulusInfo);
         // workarounds for the GUI to match the user.target and BlueConfig
-        if (stimulus.Pattern === 'Poisson') {
-          stimulus.Pattern = 'NPoisson';
-        }
-        if (stimulus.Target === 'FullCA1') {
-          stimulus.Target = 'Mosaic';
-        }
+        stimulus.Pattern = utils.blueConfigMapper(stimulus.Pattern);
+        stimulus.Target = utils.blueConfigMapper(stimulus.Target);
         let target = stimulus.Target;
         delete stimulus.Target;
         let stimName = this.changeConnectionName(stimulus.Pattern, 'stimulus', i);

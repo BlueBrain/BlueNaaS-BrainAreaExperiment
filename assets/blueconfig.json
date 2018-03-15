@@ -16,7 +16,7 @@
       "gitPath": "ssh://bbpgit.epfl.ch/sim/neurodamus/bbp",
       "CircuitTarget": "slice-4",
       "Dt": "0.025",
-      "Duration": "300",
+      "Duration": "10",
       "ForwardSkip": "5000",
       "NumSynapseFiles": "2048",
       "BaseSeed": "10"

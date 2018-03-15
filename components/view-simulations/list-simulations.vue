@@ -42,12 +42,12 @@ This component manage each job (delete, start, create, etc).
                 </option>
             </select>
             <span class="space-flex"></span>
-            <router-link to="/" class="create-simulation-button">
-                <a class="button-with-icon colored"><i class="material-icons">add</i>Create Simulation</a>
-            </router-link>
             <span class="refresh" @click="refreshJobs">
                 <a class="button-with-icon"><i class="material-icons">refresh</i>Reload</a>
             </span>
+            <router-link to="/" class="create-simulation-button">
+                <a class="button-with-icon colored"><i class="material-icons">add</i>Create Simulation</a>
+            </router-link>
         </div>
         <div class="table-header">
             <span class="id">Name</span>
@@ -200,7 +200,6 @@ This component manage each job (delete, start, create, etc).
             this.$router.replace({
               'name': 'view',
               'params': {
-                'computerParam': this.computerFilter,
                 'statusSearch': this.statusFilter,
               },
             });
@@ -279,7 +278,7 @@ This component manage each job (delete, start, create, etc).
           }
           this.jobs = [];
           let computerRequested = this.computerFilter;
-          this.unicoreAPI.getAllJobsExapandedWithChildren(this.computerFilter)
+          this.unicoreAPI.getAllJobsExpandedWithChildren(this.computerFilter)
           .then((resultsArray) => {
             let onlySimulations = resultsArray.filter((simulation) => {
               if (simulation.children.includes(`/${analysisConfig.configFileName}`)) {
@@ -453,6 +452,12 @@ This component manage each job (delete, start, create, etc).
         },
         'computerFilter': function(newVal, oldVal) {
           if (newVal !== oldVal) {
+            this.$router.replace({
+              'name': 'view',
+              'params': {
+                'computerParam': this.computerFilter,
+              },
+            });
             this.refreshJobs();
           }
         },

@@ -75,7 +75,7 @@ module.exports = (function() {
     .then((response) => (response.data))
     .catch((e) => {throw Error('Getting all jobs - ' + e);});
   };
-  function getAllJobsExapandedWithChildren(site) {
+  function getAllJobsExpandedWithChildren(site) {
     // get the information of all jobs asociated with key + the children
     let jobsList = [];
     let chainPromise = [];
@@ -93,7 +93,7 @@ module.exports = (function() {
           return getFilesList(url);
         })
         .then((childrenInfo) => {
-          jobExapandedInfo['children'] = childrenInfo.children;
+          jobExapandedInfo['children'] = childrenInfo.children || [];
           let id = getLastJobId(job);
           jobExapandedInfo['id'] = id;
           output.push(jobExapandedInfo);
@@ -133,7 +133,10 @@ module.exports = (function() {
       'headers': headers,
     })
     .then((r) => (r.data))
-    .catch((e) => {throw Error('getting file list ' + e);});
+    .catch((e) => {
+      console.error('getting file list ' + e);
+      return Promise.resolve({});
+    });
   };
   function getFilesToCopy(filesURL) {
     return this.getFilesList(filesURL)
@@ -152,18 +155,18 @@ module.exports = (function() {
       return allowed;
     });
   };
-  function getConfig(configParams, blueConfig) {
+  function getConfig(configParams) {
     /**
       * @params
       *   configParams {applicationName, title, nodes, computer}
-      *   BlueConfig
       */
-    return getPatition(configParams.computer)
+    let computer = configParams.computer || configParams.to.computer;
+    return getPatition(computer)
     .then((partition) => {
-      let shellCommand = simulationConfig[configParams.computer].script.join('\n');
       let jobSpec = {
-        'ApplicationName': configParams.applicationName,
+        'ApplicationName': 'Bash shell',
         'Name': configParams.title || 'unnamed job',
+        'Parameters': {'SOURCE': 'input.sh'},
         'haveClientStageIn': 'true',
         'Resources': {
           'Nodes': configParams.nodes,
@@ -171,26 +174,9 @@ module.exports = (function() {
           'Queue': partition,
         },
       };
-      let inputs = [];
-
-      // this is a workaround for running simulations using shell instead of BSP.
-      if (configParams.applicationName === 'Bash shell') {
-        jobSpec['Parameters'] = {'SOURCE': 'input.sh'};
-
-        let inputShContent = '';
-        if (shellCommand) {
-          inputShContent = shellCommand;
-        }
-        inputs = [
-          {'To': 'input.sh', 'Data': inputShContent},
-          {'To': 'blueconfig.json', 'Data': JSON.stringify(blueConfig)},
-        ];
-      }
+      // remove the nulls
       jobSpec.Resources = utils.default.compact(jobSpec.Resources);
-      return {
-        'jobSpec': jobSpec,
-        'inputs': inputs,
-      };
+      return jobSpec;
     });
   };
   function getImage(imageURL) {
@@ -324,7 +310,6 @@ module.exports = (function() {
     }, (error) => {throw Error('init ' + e);});
   };
   function submitAnalysis(moveObject, script) {
-    let configName = analysisConfig.configFileName;
     return new Promise((resolve, reject) => {
       /**
         Create a new job so we have working space where to copy files for analysis
@@ -355,13 +340,6 @@ module.exports = (function() {
           'reportForAnalysis' = the report for the traces plot
         }
       */
-      let jobSpec = {
-        'ApplicationName': 'Bash shell',
-        'Parameters': {'SOURCE': 'input.sh'},
-        'Name': moveObject.title || 'unnamed job',
-        'Resources': {'Nodes': moveObject.nodes},
-        'haveClientStageIn': 'true',
-      };
       // create analysis_config
       let analysisParamsConfig = {
         'list_analysis': moveObject.checkedAnalysis,
@@ -379,14 +357,14 @@ module.exports = (function() {
       }
       let inputs = [
         {
-          'To': configName,
-          'Data': JSON.stringify(analysisParamsConfig),
+          'To': analysisConfig.configFileName,
+          'Data': analysisParamsConfig,
         },
       ];
       let transferArray = [];
       let newJobDestination = {};
 
-      this.submitJob(moveObject.to.computer, jobSpec, inputs)
+      this.submitJob(moveObject, inputs)
       .then((destinationJobObject) => {
         newJobDestination = destinationJobObject;
         let prom = [];
@@ -444,20 +422,26 @@ module.exports = (function() {
       }, reject);
     });
   };
-  // function submitJob(site, jobDefinition, inputs) {
-  function submitJob(runConfig, blueConfig) {
+  function submitJob(runConfig, inputs) {
     // TODO: these variables are now global for unicore. use submit job scope.
-    let unicoreURL = getSites()[runConfig.computer.toUpperCase()]['url'];
+    /**
+      * inputs [{ To: '', Data: {} }]
+      */
+    let computer = runConfig.computer || runConfig.to.computer;
+    computer = computer.toUpperCase();
+    let unicoreURL = getSites()[computer]['url'];
     this.jobURL = this.actionStartURL = this.workingDirectory = '';
-    let inputs = [];
     return init()
     .then(() => {
-      return getConfig(runConfig, blueConfig);
+      return getConfig(runConfig);
     })
     .then((launchParams) => {
-      inputs = launchParams.inputs;
+      let shellCommand = simulationConfig[computer].script.join('\n');
+      if (shellCommand) {
+        inputs.push({'To': 'input.sh', 'Data': shellCommand});
+      }
       console.log('creating job...');
-      return createJob(unicoreURL, launchParams.jobSpec);
+      return createJob(unicoreURL, launchParams);
     })
     .then((job) => {
       this.jobURL = job.headers.location;
@@ -579,7 +563,7 @@ module.exports = (function() {
     submitJob,
     actionJob,
     getAllJobs,
-    getAllJobsExapandedWithChildren,
+    getAllJobsExpandedWithChildren,
     getJobById,
     getJobProperties,
     getFiles,

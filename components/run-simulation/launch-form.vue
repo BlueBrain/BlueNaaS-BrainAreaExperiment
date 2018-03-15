@@ -71,17 +71,6 @@
           </div>
         </div>
         <div class="form-group">
-            <label class="control-label">Circuit Target:</label>
-            <div class="controls">
-                <input
-                    type="text"
-                    name="Circuit Target"
-                    class="circuit-target"
-                    v-model="circuitTarget"
-                    placeholder="(slice-4)">
-            </div>
-        </div>
-        <div class="form-group">
             <div colspan="2">
                 <div
                     class="preview-config"
@@ -112,7 +101,6 @@
           'nodes': 1,
           'runtime': 86400,
           'cpus': '',
-          'circuitTarget': 'slice-4',
         };
       },
       'methods': {
@@ -148,9 +136,6 @@
           this.changeValues(newVal);
           this.computer = newVal;
           this.$emit('computerChanged', newVal);
-        },
-        'circuitTarget': function(newVal) {
-          this.$emit('circuitTargetChanged', newVal);
         },
       },
     };

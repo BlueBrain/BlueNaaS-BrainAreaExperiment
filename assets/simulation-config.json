@@ -5,8 +5,9 @@
             "module use /homec/bp0/bp000022/modulesfiles",
             "module load nix/hpc/neuron",
             "module load nix/hpc/neurodamus-hippocampus",
+            "export FULL_CPU_PER_NODE=16",
             "mkdir -p output",
-            "python /homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /homeb/pra098/pra09809/test/user.target.mod --output output"
+            "python /homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /homeb/pra098/pra09809/test/user.target --output output"
         ],
         "time": "36000",
         "nodes": "130",
@@ -22,10 +23,11 @@
             "module use /gpfs/work/pcp0/pcp0085/x64/modulefiles",
             "module load nix/hpc/neuron-hippocampus/7.5-201707 nix/dev-env-gcc/09.2016",
             "module load nix/python/2.7-full",
+            "export FULL_CPU_PER_NODE=64",
             "mkdir -p output",
-            "python /gpfs/homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /gpfs/homeb/pra098/pra09809/test/user.target.mod --output output"
+            "python /gpfs/homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /gpfs/homeb/pra098/pra09809/test/user.target --output output"
         ],
-        "time": "86400",
+        "time": "1800",
         "nodes": "1",
         "cpus": "64",
         "pathWork": "/gpfs/work"
@@ -36,15 +38,18 @@
             "module purge",
             "module use /homec/bp0/bp000022/modulesfiles-x64",
             "module load nix/hpc/neurodamus-hippocampus/1.9.0-201710",
+            "module load nix/python/2.7-full",
+            "export FULL_CPU_PER_NODE=68",
             "mkdir -p output",
-            "python /homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /homeb/pra098/pra09809/test/user.target.mod --output output"
+            "python /homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /homeb/pra098/pra09809/test/user.target --output output"
         ],
-        "time": "3600",
+        "time": "1800",
         "nodes": "1",
         "cpus": "68",
         "pathWork": "/work",
         "partitions": {"vsk25": "booster"}
     },
     "default": "JURECA",
-    "available": ["JULIA", "JUQUEEN", "JURECA"]
+    "available": ["JULIA", "JUQUEEN", "JURECA"],
+    "defaultTarget": "slice-4"
 }

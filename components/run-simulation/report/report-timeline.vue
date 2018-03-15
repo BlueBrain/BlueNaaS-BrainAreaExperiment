@@ -23,9 +23,10 @@ import modal from 'components/shared/modal-component.vue';
 import ReportForm from 'components/run-simulation/report/report-form.vue';
 import EditButtons from 'components/run-simulation/edit-buttons.vue';
 import mixin from 'mixins/simulationTimeline.js';
+import utils from 'assets/utils.js';
 export default {
   'name': 'report-timeline',
-  'props': ['endTime', 'forwardSkip', 'blueConfig'],
+  'props': ['endTime', 'forwardSkip', 'blueConfig', 'defaultTarget'],
   'mixins': [mixin],
   'data': function() {
     return {
@@ -123,7 +124,7 @@ export default {
       report.EndTime = parseInt(this.endTime);
       report.ReportOn = 'voltage';
       report.Unit = 'mV';
-      report.Target = 'slice-4';
+      report.Target = this.defaultTarget;
       report.Type = 'Soma';
       report.Format = 'Bin';
       report.Dt = 0.1;
@@ -149,15 +150,9 @@ export default {
       for (let i=0; i<this.items.length; i++) {
         let report = Object.assign({}, this.items[i].reportInfo);
         // workarounds for the GUI to match the user.target and BlueConfig
-        if (report.Target === 'FullCA1') {
-          report.Target = 'Mosaic';
-        }
-        if (report.ReportOn === 'voltage') {
-          report.ReportOn = 'v';
-        }
-        if (report.Type === 'Soma') {
-          report.Type = 'compartment';
-        }
+        report.Target = utils.blueConfigMapper(report.Target);
+        report.ReportOn = utils.blueConfigMapper(report.ReportOn);
+        report.Type = utils.blueConfigMapper(report.Type);
         let repName = this.changeConnectionName(report.Target, 'report', i);
         config['Report'][repName] = report;
       }

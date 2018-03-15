@@ -26,8 +26,8 @@
             "python /gpfs/homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /gpfs/homeb/pra098/pra09809/test/user.target.mod --output output"
         ],
         "time": "86400",
-        "nodes": "16",
-        "cpus": "1",
+        "nodes": "1",
+        "cpus": "64",
         "pathWork": "/gpfs/work"
     },
     "JURECA": {
@@ -39,11 +39,12 @@
             "mkdir -p output",
             "python /homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /homeb/pra098/pra09809/test/user.target.mod --output output"
         ],
-        "time": "1800",
-        "nodes": "16",
-        "cpus": "1",
-        "pathWork": "/work"
+        "time": "3600",
+        "nodes": "1",
+        "cpus": "68",
+        "pathWork": "/work",
+        "partitions": {"vsk25": "booster"}
     },
-    "default": "JUQUEEN",
+    "default": "JURECA",
     "available": ["JULIA", "JUQUEEN", "JURECA"]
 }

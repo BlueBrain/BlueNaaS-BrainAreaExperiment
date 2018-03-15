@@ -54,10 +54,21 @@
                 <input
                     type="number"
                     name="CPUs per node"
-                    class="cpus"
+                    class="cpus disabled"
                     v-model="cpus"
-                    placeholder="(optional)">
+                    disabled="disabled">
             </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Total Processors:</label>
+            <div class="controls">
+                <input
+                    type="number"
+                    name="Total processors"
+                    class="cpus disabled"
+                    :value="nodes * cpus"
+                    disabled="disabled">
+          </div>
         </div>
         <div class="form-group">
             <label class="control-label">Circuit Target:</label>
@@ -162,5 +173,8 @@
         border-radius: 15px;
         border-width: 2px;
         padding: 5px 15px;
+    }
+    .disabled {
+      background-color: #e2e0e0;
     }
 </style>

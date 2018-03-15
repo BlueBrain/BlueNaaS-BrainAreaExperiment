@@ -4,8 +4,10 @@ module.exports = (function() {
   let axios = require('axios');
   let hello = require('assets/hbp.hello.js').hellojs;
   let analysisConfig = require('assets/analysis-config.json');
+  let simulationConfig = require('assets/simulation-config.json');
   let token = '';
-  let actionJob = function(actionURL) {
+  let utils = require('assets/utils.js');
+  function actionJob(actionURL) {
     // actions like start, restart, abort
     let headers = createHeaders(token);
     return axios({
@@ -15,14 +17,14 @@ module.exports = (function() {
       'headers': headers,
     });
   };
-  let createHeaders = function(token) {
+  function createHeaders(token) {
     return {
       'Authorization': 'Bearer ' + token,
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     };
   };
-  let createJob = function(url, jobDefinition) {
+  function createJob(url, jobDefinition) {
     let headers = createHeaders(token);
     return axios({
       'url': url + '/jobs',
@@ -31,7 +33,7 @@ module.exports = (function() {
       'headers': headers,
     });
   };
-  let deleteJob = function(url) {
+  function deleteJob(url) {
     let headers = createHeaders(token);
     return axios({
       'url': url,
@@ -40,7 +42,7 @@ module.exports = (function() {
       'headers': headers,
     });
   };
-  let deleteJobFromAssociatedFile = function(simulationWorkDir, idToDelete) {
+  function deleteJobFromAssociatedFile(simulationWorkDir, idToDelete) {
     return getAssociatedLocation(simulationWorkDir)
     .then((associationFile) => {
       let newAssociationFile = [];
@@ -62,7 +64,7 @@ module.exports = (function() {
       return uploadData(input, simulationWorkDir + '/files');
     });
   };
-  let getAllJobs = function(site) {
+  function getAllJobs(site) {
     let unicoreURL = getSites()[site.toUpperCase()]['url'];
     let headers = createHeaders(token);
     return axios({
@@ -73,7 +75,7 @@ module.exports = (function() {
     .then((response) => (response.data))
     .catch((e) => {throw Error('Getting all jobs - ' + e);});
   };
-  let getAllJobsExapandedWithChildren = function(site) {
+  function getAllJobsExapandedWithChildren(site) {
     // get the information of all jobs asociated with key + the children
     let jobsList = [];
     let chainPromise = [];
@@ -104,7 +106,7 @@ module.exports = (function() {
       return output;
     }, (error) => {throw Error('getAllJobsExapandedWithChildren - ' + error);});
   };
-  let getAssociatedLocation = function(workingDirectory) {
+  function getAssociatedLocation(workingDirectory) {
     let analysisPath = analysisConfig.analysisConnectionPath;
     let url = `${workingDirectory}/files/${analysisPath}`;
     return getFiles(url)
@@ -112,7 +114,7 @@ module.exports = (function() {
     // even if the file is not there it will be updated later
     .catch((e) => ([]));
   };
-  let getFiles = function(jobURL) {
+  function getFiles(jobURL) {
     let headers = createHeaders(token);
     headers['Accept'] = 'application/octet-stream';
     return axios({
@@ -123,7 +125,7 @@ module.exports = (function() {
     .then((r) => (r.data))
     .catch((e) => {throw Error('getFiles ' + e);});
   };
-  let getFilesList = function(jobURL) {
+  function getFilesList(jobURL) {
     let headers = createHeaders(token);
     return axios({
       'url': jobURL,
@@ -133,7 +135,7 @@ module.exports = (function() {
     .then((r) => (r.data))
     .catch((e) => {throw Error('getting file list ' + e);});
   };
-  let getFilesToCopy = function(filesURL) {
+  function getFilesToCopy(filesURL) {
     return this.getFilesList(filesURL)
     .then((files) => {
       let allowed = [];
@@ -150,47 +152,48 @@ module.exports = (function() {
       return allowed;
     });
   };
-  let getConfig = function(configParams, blueConfig, shellCommand) {
+  function getConfig(configParams, blueConfig) {
     /**
       * @params
-      *   configParams {applicationName, title, nodes}
+      *   configParams {applicationName, title, nodes, computer}
       *   BlueConfig
-      *   shellCommand to be used when the job starts
       */
-    let jobSpec = {
-      'ApplicationName': configParams.applicationName,
-      'Name': configParams.title || 'unnamed job',
-      'haveClientStageIn': 'true',
-      'Resources': {
-        'Nodes': configParams.nodes,
-        'Runtime': configParams.runtime,
-        'CPUsPerNode': configParams.cpus,
-      },
-    };
-    if (configParams.runtime === '') {
-      delete jobSpec.Resources.Runtime;
-    }
-    let inputs = [];
+    return getPatition(configParams.computer)
+    .then((partition) => {
+      let shellCommand = simulationConfig[configParams.computer].script.join('\n');
+      let jobSpec = {
+        'ApplicationName': configParams.applicationName,
+        'Name': configParams.title || 'unnamed job',
+        'haveClientStageIn': 'true',
+        'Resources': {
+          'Nodes': configParams.nodes,
+          'Runtime': configParams.runtime,
+          'Queue': partition,
+        },
+      };
+      let inputs = [];
 
-    // this is a workaround for running simulations using shell instead of BSP.
-    if (configParams.applicationName === 'Bash shell') {
-      jobSpec['Parameters'] = {'SOURCE': 'input.sh'};
+      // this is a workaround for running simulations using shell instead of BSP.
+      if (configParams.applicationName === 'Bash shell') {
+        jobSpec['Parameters'] = {'SOURCE': 'input.sh'};
 
-      let inputShContent = '';
-      if (shellCommand) {
-        inputShContent = shellCommand;
+        let inputShContent = '';
+        if (shellCommand) {
+          inputShContent = shellCommand;
+        }
+        inputs = [
+          {'To': 'input.sh', 'Data': inputShContent},
+          {'To': 'blueconfig.json', 'Data': JSON.stringify(blueConfig)},
+        ];
       }
-      inputs = [
-        {'To': 'input.sh', 'Data': inputShContent},
-        {'To': 'blueconfig.json', 'Data': JSON.stringify(blueConfig)},
-      ];
-    }
-    return {
-      'jobSpec': jobSpec,
-      'inputs': inputs,
-    };
+      jobSpec.Resources = utils.default.compact(jobSpec.Resources);
+      return {
+        'jobSpec': jobSpec,
+        'inputs': inputs,
+      };
+    });
   };
-  let getImage = function(imageURL) {
+  function getImage(imageURL) {
     let headers = createHeaders(token);
     headers['Accept'] = 'application/octet-stream';
     delete headers['Content-Type'];
@@ -207,13 +210,13 @@ module.exports = (function() {
       throw String('Image not found');
     });
   };
-  let getJobById = function(jobId, computer) {
+  function getJobById(jobId, computer) {
     computer = computer.toUpperCase();
     let site = getSites()[computer].url;
     let url = site + '/jobs/' + jobId;
     return getJobProperties(url);
   };
-  let getJobProperties = function(jobURL) {
+  function getJobProperties(jobURL) {
     let headers = createHeaders(token);
     return axios({
       'url': jobURL,
@@ -223,10 +226,10 @@ module.exports = (function() {
     .then((response) => (response.data))
     .catch((e) => {throw Error('Error getting job properties');});
   };
-  let getLastJobId = function(url) {
+  function getLastJobId(url) {
     return url.split('/').pop();
   };
-  let getSites = function() {
+  function getSites() {
     let sites = {};
     sites['JUQUEEN'] = {'name': 'JUQUEEN (JSC)', 'id': 'JUQUEEN',
       'url': 'https://hbp-unic.fz-juelich.de:7112/HBP_JUQUEEN/rest/core'};
@@ -252,7 +255,40 @@ module.exports = (function() {
       'url': 'https://unicore.data.kit.edu:8080/HBP-KIT/rest/core'};
     return sites;
   };
-  let generateUpdatedAssociatedFile = function(simulationWorkDirectory, analysisObject) {
+  function getUser(site) {
+    let unicoreURL = getSites()[site.toUpperCase()]['url'];
+    let headers = createHeaders(token);
+    return axios({
+      'url': unicoreURL,
+      'method': 'get',
+      'headers': headers,
+    })
+    .then((response) => (response.data))
+    .catch((e) => {throw Error('Error getting user information');});
+  };
+  function getPatition(site) {
+    return getUser(site).then((user) => {
+      let userMappedAccount = user.client.xlogin.UID;
+      let computerConfig = simulationConfig[site.toUpperCase()];
+      if (computerConfig && computerConfig.partitions) {
+        let partition = filterPartition(computerConfig, userMappedAccount);
+        if (partition) {
+          return partition;
+        }
+      }
+      return null;
+    });
+    function filterPartition(computerConfig, account) {
+      let partitions = Object.keys(computerConfig.partitions);
+      let selectedProject = partitions.find((partition) => {
+        return account.indexOf(partition) >= 0;
+      });
+      let selectedPartition = computerConfig.partitions[selectedProject];
+      console.debug('selectedPartition', selectedPartition);
+      return selectedPartition;
+    }
+  };
+  function generateUpdatedAssociatedFile(simulationWorkDirectory, analysisObject) {
     return getAssociatedLocation(simulationWorkDirectory)
     .then((associationFile) => {
       let newAssociationFile = [];
@@ -273,7 +309,7 @@ module.exports = (function() {
       throw Error('generateUpdatedAssociatedFile ' + e);
     });
   };
-  let init = function() {
+  function init() {
     hello.init({
       // 'hbp': '7a9b6bb2-2f6d-4624-9045-d1f12d9dedaa',
       'hbp': 'c292031c-c91f-43fa-b1a9-72e65eb18e44',
@@ -287,7 +323,7 @@ module.exports = (function() {
       token = data.authResponse.access_token;
     }, (error) => {throw Error('init ' + e);});
   };
-  let submitAnalysis = function(moveObject, script) {
+  function submitAnalysis(moveObject, script) {
     let configName = analysisConfig.configFileName;
     return new Promise((resolve, reject) => {
       /**
@@ -408,54 +444,58 @@ module.exports = (function() {
       }, reject);
     });
   };
-  let submitJob = function(site, jobDefinition, inputs) {
-    return new Promise((resolve, reject) => {
-      let unicoreURL = getSites()[site.toUpperCase()]['url'];
-      // TODO: these variables are now global for unicore. use submit job scope.
-      this.jobURL = this.actionStartURL = this.workingDirectory = '';
-      init()
-      .then(() => {
-        console.log('creating job...');
-        return createJob(unicoreURL, jobDefinition);
-      })
-      .then((job) => {
-        this.jobURL = job.headers.location;
-        console.log('getting job properties...');
-        return getJobProperties(this.jobURL);
-      })
-      .then((properties) => {
-        this.workingDirectory = properties._links.workingDirectory.href;
-        this.actionStartURL = properties._links['action:start'].href;
-        return Promise.all(inputs.map((input) => {
-          console.log('uploading files...');
-          return uploadData(input, this.workingDirectory + '/files');
-        }));
-      })
-      .then(() => {
-        // make it compatible with the job structure
-        let jobDetails = {
-          '_links': {
-            'self': {
-              'href': this.jobURL,
-            },
-            'workingDirectory': {
-              'href': this.workingDirectory,
-            },
-            'action:start': {
-              'href': this.actionStartURL,
-            },
+  // function submitJob(site, jobDefinition, inputs) {
+  function submitJob(runConfig, blueConfig) {
+    // TODO: these variables are now global for unicore. use submit job scope.
+    let unicoreURL = getSites()[runConfig.computer.toUpperCase()]['url'];
+    this.jobURL = this.actionStartURL = this.workingDirectory = '';
+    let inputs = [];
+    return init()
+    .then(() => {
+      return getConfig(runConfig, blueConfig);
+    })
+    .then((launchParams) => {
+      inputs = launchParams.inputs;
+      console.log('creating job...');
+      return createJob(unicoreURL, launchParams.jobSpec);
+    })
+    .then((job) => {
+      this.jobURL = job.headers.location;
+      console.log('getting job properties...');
+      return getJobProperties(this.jobURL);
+    })
+    .then((properties) => {
+      this.workingDirectory = properties._links.workingDirectory.href;
+      this.actionStartURL = properties._links['action:start'].href;
+      return Promise.all(inputs.map((input) => {
+        console.log('uploading files...');
+        return uploadData(input, this.workingDirectory + '/files');
+      }));
+    })
+    .then(() => {
+      // make it compatible with the job structure
+      let jobDetails = {
+        '_links': {
+          'self': {
+            'href': this.jobURL,
           },
-        };
-        resolve(jobDetails);
-      }, reject);
-    });
+          'workingDirectory': {
+            'href': this.workingDirectory,
+          },
+          'action:start': {
+            'href': this.actionStartURL,
+          },
+        },
+      };
+      return (jobDetails);
+    }, (e) => {throw Error('Submit job' + e);});
   };
-  let transferFiles = function(moveObject) {
+  function transferFiles(moveObject) {
     /**
       Returns object with the information about transfer but not job
     */
     // this transferFile will be done when the poll find DONE or FAILED
-    let getTransferInfo = function(trasferURL) {
+    function getTransferInfo(trasferURL) {
       let headers = createHeaders(token);
       return axios({
         'url': trasferURL,
@@ -465,7 +505,7 @@ module.exports = (function() {
       .then((response) => (response.data))
       .catch((e) => {throw Error('getTransferInfo ' + e);});
     };
-    let polling = function(transferLocation, resolve, reject) {
+    function polling(transferLocation, resolve, reject) {
       getTransferInfo(transferLocation)
       .then((transfer) => {
         if (transfer.status === 'DONE') {
@@ -508,7 +548,7 @@ module.exports = (function() {
       }, reject);
     });
   };
-  let uploadData = function(dataToUpload, uploadURL) {
+  function uploadData(dataToUpload, uploadURL) {
     let headers = createHeaders(token);
     headers['Content-Type'] = 'application/octet-stream';
     let data = dataToUpload.Data;
@@ -520,7 +560,7 @@ module.exports = (function() {
       'headers': headers,
     });
   };
-  let workingDirToMachinePath = function(workingDirectory) {
+  function workingDirToMachinePath(workingDirectory) {
     if (workingDirectory.indexOf('JURECA') > 0) {
       try {
         let id = workingDirectory.match('storages\/(.*)-uspace')[1];
@@ -547,6 +587,7 @@ module.exports = (function() {
     getFilesToCopy,
     getImage,
     getConfig,
+    getUser,
     init,
     submitAnalysis,
     transferFiles,

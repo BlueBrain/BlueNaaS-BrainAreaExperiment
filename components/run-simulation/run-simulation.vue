@@ -216,13 +216,8 @@ export default {
       this.toggleModal();
       swal.enableLoading();
       let submittedJob = {};
-      let shellCommand = launchConfiguration[runConfig.computer].script.join('\n');
-      let params = this.unicore.getConfig(runConfig, this.blueConfig, shellCommand);
-      this.unicore.submitJob(
-        runConfig.computer,
-        params.jobSpec,
-        params.inputs
-      ).then((jobObject) => {
+      return this.unicore.submitJob(runConfig, this.blueConfig)
+      .then((jobObject) => {
         submittedJob = jobObject;
         console.log('starting job...');
         that.unicore.actionJob(submittedJob._links['action:start'].href);
@@ -233,12 +228,12 @@ export default {
           'confirmButtonText': 'View Job',
           'cancelButtonText': 'OK',
           'type': 'success',
-        })
-        .then((choice) => {
-          if (choice.value) {
-            this.showDetails(submittedJob, runConfig.computer);
-          }
         });
+      })
+      .then((choice) => {
+        if (choice.value) {
+          this.showDetails(submittedJob, runConfig.computer);
+        }
       }, (error) => {
         swal('Error launching the simulation', error.message, 'error');
       });

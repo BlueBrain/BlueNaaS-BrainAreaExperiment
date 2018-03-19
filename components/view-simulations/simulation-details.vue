@@ -424,7 +424,6 @@ export default {
     // poll check. I do the assigment to treat it like first time.
     // Otherwithse the toggle will negate again.
     this.simulationDetails.autorefresh = !this.simulationDetails.autorefresh;
-    this.analysisDetails.autorefresh = !this.analysisDetails.autorefresh;
     this.simulationDetails.refreshFunction = this.refreshJobs;
     this.toggleAutoreload(this.simulationDetails);
   },

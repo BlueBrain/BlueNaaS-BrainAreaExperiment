@@ -56,7 +56,7 @@
         <div class="form-group">
             <label class="control-label">Cells (number): </label>
             <div class="controls">
-                <input type="number" v-model="numberOfCells" placeholder="Cells (number) to visualize">
+                <input type="number" v-model="numberOfCells" placeholder="Cells (number) to visualize" id="cellsNumber">
             </div>
         </div>
         <div class="footer">
@@ -129,15 +129,29 @@
       'methods': {
         'editItem': function() {
           this.title = utils.filterName(this.title);
+          if (this.checkInputs()) {
+            this.$emit('analysisConfigReady', this.$data);
+          }
+        },
+        'checkInputs': function() {
+          let that = this;
           if (!this.target) {
-            let targetInput = this.$el.querySelector('#targetSelector');
+            showAlert('#targetSelector');
+            return false;
+          }
+          if (this.numberOfCells < 1) {
+            showAlert('#cellsNumber');
+            return false;
+          }
+          return true;
+
+          function showAlert(id) {
+            let targetInput = that.$el.querySelector(id);
             targetInput.classList.toggle('alert');
             setTimeout(() => {
               targetInput.classList.toggle('alert');
             }, 1500);
-            return;
           }
-          this.$emit('analysisConfigReady', this.$data);
         },
         'closeForm': function() {
           this.$emit('changeModalVisibility', false);
@@ -172,7 +186,10 @@
               targetsNames.push(target);
             }
           });
-          return targetsNames;
+          if (targetsNames.length > 0) {
+            return targetsNames;
+          }
+          return [this.target];
         },
       },
     };

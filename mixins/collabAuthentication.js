@@ -44,7 +44,7 @@ export default {
         if (localToken) { // token exists
           if (renew) {
             localToken.expires = 1; // to force logout and login
-            console.log('Renew token forced');
+            console.debug('Renew token forced');
           }
           let currentTime = (new Date()).getTime() / 1000;
           if (localToken.expires > currentTime) { // token is not expired and valid

@@ -71,6 +71,21 @@
           </div>
         </div>
         <div class="form-group">
+            <label class="control-label">Project:</label>
+            <div class="controls">
+                <select
+                    class="project"
+                    name="Name of the project to run jobs"
+                    v-model="projectSelected">
+                    <option v-for="project in projectsAvailable">
+                        {{ project }}
+                    </option>
+                </select>
+                <i v-if="!projectSelected"
+                class="material-icons spin">autorenew</i>
+          </div>
+        </div>
+        <div class="form-group">
             <div colspan="2">
                 <div
                     class="preview-config"
@@ -81,7 +96,7 @@
             </div>
         </div>
         <div class="button-container">
-            <input class="ok-button" type="button" @click="editItem" value="Ok">
+            <input class="ok-button" type="button" :disabled="!projectSelected" @click="editItem" value="Ok">
             <input class="cancel-button" type="button" @click="closeForm" value="Cancel">
         </div>
     </table>
@@ -91,6 +106,7 @@
     import 'assets/css/simulation.css';
     import launchConfig from 'assets/simulation-config.json';
     import utils from 'assets/utils.js';
+    import {getUser} from 'mixins/unicore.js';
     export default {
       'data': function() {
         return {
@@ -101,6 +117,10 @@
           'nodes': 1,
           'runtime': 86400,
           'cpus': '',
+          'project': null,
+          'previousConfig': null,
+          'projectsAvailable': [],
+          'projectSelected': null,
         };
       },
       'methods': {
@@ -108,11 +128,7 @@
           this.title = utils.filterName(this.title);
           let filtered = Object.assign({}, this.$data);
           // remove the empty items
-          Object.keys(filtered).forEach((key) => {
-            if (!filtered[key]) {
-              delete filtered[key];
-            }
-          });
+          filtered = utils.compact(filtered);
           this.$emit('runConfigReady', filtered);
         },
         'closeForm': function() {
@@ -127,12 +143,46 @@
           this.nodes = launchConfig[computer].nodes;
           this.cpus = launchConfig[computer].cpus;
         },
+        'loadPreviousConfig': function() {
+          let lastConfigString = localStorage.getItem('lastLaunchConfig');
+          try {
+            if (lastConfigString) {
+              let lastConfig = JSON.parse(lastConfigString);
+              if (lastConfig.blueConfig && lastConfig.runConfig) {
+                this.runtime = lastConfig.runConfig.runtime;
+                this.nodes = lastConfig.runConfig.nodes;
+                this.cpus = lastConfig.runConfig.cpus;
+                this.computer = lastConfig.runConfig.computer;
+                this.previousConfig = lastConfig.runConfig;
+                this.projectsAvailable = lastConfig.runConfig.projectsAvailable;
+                this.projectSelected = lastConfig.runConfig.projectSelected;
+              } else {throw String('No all params in previous config');}
+            } else {throw String('No previous config');}
+          } catch (e) {
+            console.debug('error loading previous Run Config loading default', e);
+            this.getUserProjects();
+            this.changeValues(this.computer);
+          }
+        },
+        'getUserProjects': function() {
+          console.debug('Getting user projects');
+          this.projectSelected = null;
+          getUser(this.computer).then((user) => {
+            this.projectsAvailable = user.client.xlogin.availableUIDs;
+            this.projectSelected = this.projectsAvailable[0];
+          });
+        },
       },
       'mounted': function() {
-        this.changeValues(this.computer);
+        this.loadPreviousConfig();
       },
       'watch': {
         'computer': function(newVal) {
+          this.getUserProjects();
+          if (this.previousConfig &&
+              newVal === this.previousConfig.computer) {
+            return; // the prev config changed computer
+          }
           this.changeValues(newVal);
           this.computer = newVal;
           this.$emit('computerChanged', newVal);
@@ -161,5 +211,12 @@
     }
     .disabled {
       background-color: #e2e0e0;
+    }
+    .spin {
+      -webkit-animation: spin 2s infinite linear;
+    }
+    @-webkit-keyframes spin {
+      0%  {-webkit-transform: rotate(0deg);}
+      100% {-webkit-transform: rotate(360deg);}
     }
 </style>

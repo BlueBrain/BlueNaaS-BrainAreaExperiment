@@ -208,7 +208,8 @@ This component manage each job (delete, start, create, etc).
         'getAnalysisInfo': function(simulationJob) {
           /*  get the location of the analysis based on the mapping file
             that we save in the simulation and then the validation image */
-          this.unicoreAPI.getAssociatedLocation(simulationJob._links.workingDirectory.href)
+          let project = this.unicoreAPI.getProjectSelectedByLog(simulationJob.log);
+          this.unicoreAPI.getAssociatedLocation(simulationJob._links.workingDirectory.href, project)
           .then((analysisObject) => {
             if (typeof(analysisObject) === 'object' &&
               analysisObject.length === 0) {
@@ -367,12 +368,13 @@ This component manage each job (delete, start, create, etc).
           swal.enableLoading();
           let analysisInfo = {};
           analysisConfig.from.workingDirectory = this.jobSelectedForValidation._links.workingDirectory.href;
-
+          console.debug('submiting analysis');
           this.unicoreAPI.submitAnalysis(
             analysisConfig,
             this.defaultAnalysisConfig.script,
             this.defaultAnalysisConfig.filesToAvoidCopy
           ).then((analysis) => {
+            console.debug('changing blueconfig paths');
             analysisInfo = analysis;
             if (analysisInfo.avoidCopy) return;
             return this.changeBlueConfigPaths(
@@ -382,7 +384,7 @@ This component manage each job (delete, start, create, etc).
           })
           .then(() => {
             let startURL = analysisInfo.destinationJob._links['action:start'].href;
-            console.log('starting analysis...');
+            console.debug('starting analysis...');
             this.unicoreAPI.actionJob(startURL);
             // pool the status of the analysis
             this.startReloadJob(this.jobSelectedForValidation);
@@ -438,6 +440,7 @@ This component manage each job (delete, start, create, etc).
           this.checkFilterIcon();
         }
         this.computerFilter = this.computerParam.toUpperCase();
+        this.refreshJobs();
       },
       'watch': {
         'statusFilter': function() {
@@ -457,8 +460,14 @@ This component manage each job (delete, start, create, etc).
               'params': {
                 'computerParam': this.computerFilter,
               },
+            }, (onComplete) => {
+              if (oldVal !== '' && this.loading) {
+                // avoid waiting promises from the old computer to finish
+                location.reload();
+              } else {
+                this.refreshJobs();
+              }
             });
-            this.refreshJobs();
           }
         },
       },

@@ -36,6 +36,7 @@
                             :endTime="endTime"
                             :forwardSkip="forwardSkip"
                             :defaultTarget="defaultTarget"
+                            :blueConfig="blueConfig"
                             ref="stimulation"
                             class="timeline"></stimulation-timeline>
                         <target-selection @targetSelected="stimulationTargetSelected"></target-selection>
@@ -52,6 +53,7 @@
                             :endTime="endTime"
                             :forwardSkip="forwardSkip"
                             :defaultTarget="defaultTarget"
+                            :blueConfig="blueConfig"
                             ref="report"
                             class="report"></report-timeline>
                         <target-selection @targetSelected="reportTargetSelected"></target-selection>
@@ -162,7 +164,7 @@ export default {
       });
     },
     'modelTargetChanged': function(modelTarget) {
-      this.modelSelected = utils.blueConfigMapper(modelTarget);
+      this.modelSelected = utils.mapAll(modelTarget);
     },
     'closeTip': function() {
       let tipElement = this.$el.querySelector('#tip');
@@ -208,7 +210,7 @@ export default {
       }
 
       function checkModel() {
-        if (model !== utils.blueConfigMapper('FullCA1')) {
+        if (model !== utils.mapAll('FullCA1')) {
           swal('Incorrect Model', 'Select the model as FullCA1.', 'error');
           return false;
         }
@@ -264,12 +266,16 @@ export default {
       let that = this;
       this.toggleModal();
       swal.enableLoading();
+      // save config for future use
+      localStorage.setItem('lastLaunchConfig', JSON.stringify({
+        'blueConfig': this.blueConfig, 'runConfig': runConfig,
+      }));
       let submittedJob = {};
       let files = [{'To': 'blueconfig.json', 'Data': this.blueConfig}];
       return this.unicore.submitJob(runConfig, files)
       .then((jobObject) => {
         submittedJob = jobObject;
-        console.log('starting job...');
+        console.debug('starting job...');
         that.unicore.actionJob(submittedJob._links['action:start'].href);
         swal.disableLoading();
         return swal({
@@ -297,11 +303,28 @@ export default {
         'computerParam': computer,
       }});
     },
+    'loadPreviousConfig': function() {
+      let lastConfigString = localStorage.getItem('lastLaunchConfig');
+      let bc = {}; // blueConfig (template or previous one)
+      try {
+        if (lastConfigString) {
+          let lastConfig = JSON.parse(lastConfigString);
+          if (lastConfig.blueConfig && lastConfig.runConfig) {
+            bc = lastConfig.blueConfig;
+            this.modelSelected = utils.unMapAll(bc.Run.Default.CircuitTarget);
+          } else {throw String('No all params in previous config');}
+        } else {throw String('No previous config');}
+      } catch (e) {
+        console.debug('error loading previous BlueConfig loading default', e);
+        bc = JSON.parse(JSON.stringify( templateBluepyConfig ));
+      } finally {
+        this.$set(this.$data, 'blueConfig', bc);
+      }
+    },
   },
   'mounted': function() {
     document.getElementById('frameTemplateTitle').innerText = 'Configure & Launch Simulations';
-    // Object.assign does not work for deep copy
-    this.blueConfig = JSON.parse(JSON.stringify( templateBluepyConfig ));
+    this.loadPreviousConfig();
     let loadingComp = document.querySelector('#loading-component');
     if (loadingComp) {
       loadingComp.style.display = 'none';

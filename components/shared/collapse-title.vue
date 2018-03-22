@@ -1,6 +1,6 @@
 <template>
   <div class="collapse-title">
-    <div class="item" @click="toggleCollapse = !toggleCollapse" :class="{sublevel: sublevel}">
+    <div class="item" @click="toggle" :class="{sublevel: sublevel}">
       <i class="material-icons toggle-arrow" :class="{collapsed: toggleCollapse}">keyboard_arrow_right</i>
       <i>{{ title }}</i>
     </div>
@@ -23,6 +23,14 @@
       return {
         'toggleCollapse': Boolean, // this is to avoid mutiating the prop
       };
+    },
+    'methods': {
+      'toggle': function() {
+        this.toggleCollapse = !this.toggleCollapse;
+        if (this.toggleCollapse === false) {
+          this.$emit('expanded');
+        }
+      },
     },
     'mounted': function() {
       if (this.collapsed === undefined) {

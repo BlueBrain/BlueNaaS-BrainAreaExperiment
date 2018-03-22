@@ -151,14 +151,12 @@ export default {
       config['StimulusInject'] = {};
       for (let i=0; i<this.items.length; i++) {
         // fill stimulus
-        let stimulus = Object.assign({}, this.items[i].stimulusInfo);
         // workarounds for the GUI to match the user.target and BlueConfig
-        stimulus.Pattern = utils.blueConfigMapper(stimulus.Pattern);
-        stimulus.Target = utils.blueConfigMapper(stimulus.Target);
-        let target = stimulus.Target;
-        delete stimulus.Target;
-        let stimName = this.changeConnectionName(stimulus.Pattern, 'stimulus', i);
-        config['Stimulus'][stimName] = stimulus;
+        let stimulusMapped = utils.mapAll(this.items[i].stimulusInfo);
+        let target = stimulusMapped.Target;
+        delete stimulusMapped.Target;
+        let stimName = this.changeConnectionName(stimulusMapped.Pattern, 'stimulus', i);
+        config['Stimulus'][stimName] = stimulusMapped;
         // fill stimulusinject
         let stimInjName = this.changeConnectionName(target, 'stimulusinject', i);
         config['StimulusInject'][stimInjName] = {
@@ -168,19 +166,38 @@ export default {
       }
       return config;
     },
+    'setNewItem': function(newItem, id = 0) {
+      let item = this.createItem( // id, group, content, start, end, connection
+        id,
+        newItem.Target,
+        newItem.Pattern,
+        newItem.Delay,
+        newItem.Duration, // TODO: change this to duration
+        newItem
+      );
+
+      this.setupGroups(newItem.Target);
+      this.items.push(item);
+    },
+    'loadPrevConfig': function() {
+      let itemsInBlueConfig = Object.keys(this.config.StimulusInject);
+      if (itemsInBlueConfig.length < 1) {
+        // no previous BlueConfig
+        let stimulus = this.createNewStimulus();
+        this.setNewItem(stimulus);
+        return;
+      }
+      itemsInBlueConfig.forEach((stimulusInject, index) => {
+        let item = this.config.StimulusInject[stimulusInject];
+        let target = {'Target': item.Target};
+        let stimulus = this.config.Stimulus[item.Stimulus];
+        let a = utils.unMapAll(Object.assign({}, target, stimulus));
+        this.setNewItem(a, index);
+      });
+    },
   },
   'mounted': function() {
-    let stimulus = this.createNewStimulus();
-    let item = this.createItem(
-      0, // id
-      stimulus.Target,
-      stimulus.Pattern,
-      stimulus.Delay,
-      stimulus.Duration, // TODO: change this to duration
-      stimulus
-    );
-    this.setupGroups(stimulus.Target);
-    this.items.push(item);
+    this.loadPrevConfig(); // if there is prev load otherwise, create
     this.createTimeline(); // from the simulationTimeline.js
 
     this.$parent.$on('stimulationTargetSelected', (target) => {

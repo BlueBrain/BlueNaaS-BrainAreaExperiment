@@ -25,17 +25,9 @@ This will display the details of a certain simulation and the analysis.
                 </span>
             </div>
             <div class="detail-content">
-                <collapse-title title="Analysis" :collapsed="false">
+                <collapse-title title="Analysis" :collapsed="false" @expanded="getAnalysisInfo()">
                     <div slot="element">
-                        <a
-                            v-if="
-                              analysisDetails.length === 0 &&
-                              simulationDetails.intervalReference
-                            "
-                            title="Loading"
-                        >
-                            <i class="material-icons spin">autorenew</i>
-                        </a>
+                        {{getAnalysisOverallStatus}}
                         <div v-for="analysis in analysisDetails" class="block">
                             <item-summary :itemDetails="analysis">
                                 <a
@@ -48,7 +40,8 @@ This will display the details of a certain simulation and the analysis.
                                 </a>
                             </item-summary>
                             <i
-                              v-if="analysis.status === QUEUED_STATUS"
+                              v-if="analysis.status === QUEUED_STATUS ||
+                              analysis.status === RUNNING_STATUS"
                               class="material-icons spin">autorenew
                             </i>
                             <analysis
@@ -59,59 +52,43 @@ This will display the details of a certain simulation and the analysis.
                     </div>
                 </collapse-title>
 
-                <collapse-title title="BlueConfig" :collapsed="true">
+                <collapse-title title="BlueConfig" :collapsed="true" @expanded="getBlueConfig()">
                     <div slot="element">
-                        <div v-for="log in simulationDetails.blueconfig" class="log-item">
-                            {{ log }}
-                        </div>
-                        <a class="button-with-icon" v-if="simulationDetails.intervalReference" title="Loading">
-                            <i class="material-icons spin">autorenew</i>
-                        </a>
-                        <a @click="save('BlueConfig.txt', simulationDetails.BlueConfig)" class="button-with-icon colored"><i class="material-icons download-file">file_download</i>Download File</a>
+                        <display-or-download
+                          name="blueconfig"
+                          :fileContent="simulationDetails.blueconfig"
+                          :isLoadingObj="isLoading">
+                        </display-or-download>
                     </div>
                 </collapse-title>
 
                 <collapse-title title="Unicore Logs" :collapsed="true">
                     <div slot="element">
-                        <!-- {{job.logParsed}} -->
-                        <div v-for="log in job.logParsed" class="log-item">
-                            <div v-if="typeof(log) === 'object'">
-                              <div v-for="logItem in log" class="indent">
-                                {{ logItem }}
-                              </div>
-                            </div>
-                            <div v-else>
-                              {{log}}
-                            </div>
-                        </div>
-                        <a class="button-with-icon" v-if="simulationDetails.intervalReference" title="Loading">
-                            <i class="material-icons">autorenew</i>
-                        </a>
-                        <a @click="save('Unicore_Logs.txt', job.log)" class="button-with-icon colored"><i class="material-icons download-file">file_download</i>Download File</a>
+                        <display-or-download
+                          name="unicore_log"
+                          :fileContent="simulationDetails.logParsed"
+                          :isLoadingObj="isLoading">
+                        </display-or-download>
                     </div>
                 </collapse-title>
 
-                <collapse-title title="Stderr" :collapsed="true">
-                    <div slot="element" class="log-item">
-                        <div v-for="error in simulationDetails.stderr" class="log-item">
-                            {{ error }}
-                        </div>
-                        <a class="button-with-icon" v-if="simulationDetails.intervalReference" title="Loading">
-                            <i class="material-icons spin">autorenew</i>
-                        </a>
-                        <a @click="save('Stderr.txt', simulationDetails.stderr)" class="button-with-icon colored"><i class="material-icons download-file">file_download</i>Download File</a>
+                <collapse-title title="Stderr" :collapsed="true" @expanded="getFiles('stderr', simulationDetails)">
+                    <div slot="element" class="log-item" >
+                        <display-or-download
+                          name="stderr"
+                          :fileContent="simulationDetails.stderr"
+                          :isLoadingObj="isLoading">
+                        </display-or-download>
                     </div>
                 </collapse-title>
 
-                <collapse-title title="Stdout" :collapsed="true">
+                <collapse-title title="Stdout" :collapsed="true" @expanded="getFiles('stdout', simulationDetails)">
                     <div slot="element" class="log-item">
-                        <div v-for="out in simulationDetails.stdout" class="log-item">
-                            {{ out }}
-                        </div>
-                        <a class="button-with-icon" v-if="simulationDetails.intervalReference" title="Loading">
-                            <i class="material-icons spin">autorenew</i>
-                        </a>
-                        <a @click="save('Stdout.txt', simulationDetails.stdout)" class="button-with-icon colored"><i class="material-icons download-file">file_download</i>Download File</a>
+                        <display-or-download
+                          name="stdout"
+                          :fileContent="simulationDetails.stdout"
+                          :isLoadingObj="isLoading">
+                        </display-or-download>
                     </div>
                 </collapse-title>
             </div>
@@ -129,7 +106,9 @@ import CollapseTitle from 'components/shared/collapse-title.vue';
 import ItemSummary from 'components/view-simulations/simulation-details/item-summary.vue';
 import Analysis from 'components/view-simulations/simulation-details/analysis.vue';
 import analysisConfig from 'assets/analysis-config.json';
+import displayOrDownload from 'components/shared/display-or-download.vue';
 const QUEUED_STATUS = 'QUEUED';
+const RUNNING_STATUS = 'RUNNING';
 export default {
   'name': 'simulationDetails',
   'props': ['jobParam', 'jobId', 'computerParam'],
@@ -137,10 +116,12 @@ export default {
     return {
       'loading': true,
       'QUEUED_STATUS': QUEUED_STATUS,
+      'RUNNING_STATUS': RUNNING_STATUS,
       'computer': 'JUQUEEN',
       'unicoreAPI': Unicore,
       'job': null,
-      'pollInterval': 10, // seconds
+      'pollInterval': 5 * 1000, // seconds
+      'isLoading': {}, // for save the timeout of the stderr, stdout
       // add more accesible information to the simulation
       'simulationDetails': {
         // depending of the status change the icon
@@ -152,11 +133,8 @@ export default {
         'id': '',
         'name': '',
         'url': '',
-        'stderr': [],
         'files': '',
-        'stdout': [],
         'status': '',
-        'BlueConfig': [],
         'refreshFunction': null,
       },
       'analysisDetailTemplate': {
@@ -169,12 +147,14 @@ export default {
         'status': '',
       },
       'analysisDetails': [],
+      'simulationUserProject': '',
     };
   },
   'components': {
     'collapse-title': CollapseTitle,
     'item-summary': ItemSummary,
     'analysis': Analysis,
+    'display-or-download': displayOrDownload,
   },
   'methods': {
     'deleteJob': function(url) {
@@ -212,30 +192,54 @@ export default {
       if (loadingComp) {
         loadingComp.style.display = 'none';
       }
-      this.getFiles('stderr', this.simulationDetails);
-      this.getFiles('stdout', this.simulationDetails);
-      // this.getFiles('BlueConfig', this.simulationDetails);
-      this.getBlueConfig(this.simulationDetails);
-      this.getAnalysisInfo();
-      this.job.logParsed = this.parseLog(this.job);
+      if (this.job && this.simulationDetails.status === 'SUCCESSFUL') {
+        setTimeout(() => this.getAnalysisInfo(), 500);
+      }
+      if (!this.simulationDetails.logParsed || !this.simulationUserProject) {
+        this.$set(this.isLoading, 'unicore_log', false);
+        this.$set(this.simulationDetails, 'logParsed', this.parseLog(this.job));
+        this.simulationUserProject = this.unicoreAPI.getProjectSelectedByLog(this.job.log);
+        console.debug('Using project for details', this.simulationUserProject);
+      }
     },
     'getFiles': function(fileName, destination) {
       let url = this.simulationDetails.files + '/files/' + fileName;
-      this.unicoreAPI.getFiles(url).then((output) => {
-        destination[fileName] = output.split('\n');
-      }, () => {console.error(`No file ${fileName} found`);});
+      this.$set(this.isLoading, fileName, true);
+      console.debug('Loading content', fileName);
+      return this.unicoreAPI.getFiles(url, this.simulationUserProject)
+      .then((output) => {
+        this.setFileContent(destination, fileName, output);
+      }, () => {
+        if (this.simulationDetails.intervalReference) {
+          setTimeout(() => {
+            this.getFiles(fileName, destination);
+          }, this.pollInterval);
+        } else {
+          let e = [`No file ${fileName} found`];
+          destination[fileName] = e;
+          console.error(e);
+        }
+      });
     },
-    'getBlueConfig': function(destination) {
+    'getBlueConfig': function() {
+      let destination = this.simulationDetails;
       let fileName = 'BlueConfig';
+      let attributeName = 'blueconfig';
       let url = this.simulationDetails.files + '/files/' + fileName;
-      this.unicoreAPI.getFiles(url).then((output) => {
-        destination.blueconfig = output.split('\n');
+      console.debug('Loading content', fileName);
+      this.$set(this.isLoading, attributeName, true);
+      this.unicoreAPI.getFiles(url, this.simulationUserProject)
+      .then((output) => {
+        this.setFileContent(destination, attributeName, output);
+        // destination.blueconfig = output.split('\n');
       }, (error) => {
         fileName = 'blueconfig.json';
         url = this.simulationDetails.files + '/files/' + fileName;
-        this.unicoreAPI.getFiles(url).then((output) => {
-          destination.blueconfig = JSON.stringify(output, null, 2).split('\n');
-        });
+        this.unicoreAPI.getFiles(url, this.simulationUserProject)
+        .then((output) => {
+          this.setFileContent(destination, attributeName, output);
+          // destination.blueconfig = JSON.stringify(output, null, 2).split('\n');
+        }, (error) => {destination.blueconfig = ['No BlueConfig available'];});
       });
     },
     'getAnalysisInfo': function() {
@@ -243,7 +247,7 @@ export default {
           that we save in the simulation and then the analysis image */
       if (this.job && this.simulationDetails.status === 'SUCCESSFUL') {
         this.analysisDetails = []; // reset all the analysis
-        this.unicoreAPI.getAssociatedLocation(this.simulationDetails.files)
+        this.unicoreAPI.getAssociatedLocation(this.simulationDetails.files, this.simulationUserProject)
         .then((analysisObject) => {
           // an array of all the analysis associated with simulation
           if (analysisObject === '') { // no analysis
@@ -261,35 +265,36 @@ export default {
       }
     },
     'refreshAnalysis': function(analysisConfig, childAnalysis) {
-      analysisConfig.plots.forEach((plot) => {
-        this.getAnalysisImage(
-          childAnalysis.workingDirectory,
-          plot,
-          childAnalysis
-        );
+      this.getAnalysisStatus(childAnalysis.jobURL, childAnalysis)
+      .then(() => {
+        if (childAnalysis.status === '' ||
+            childAnalysis.status === QUEUED_STATUS ||
+            childAnalysis.status === RUNNING_STATUS) {
+          setTimeout(() => {
+            this.refreshAnalysis(analysisConfig, childAnalysis);
+          }, this.pollInterval);
+          return;
+        }
+        analysisConfig.plots.forEach((plot) => {
+          this.getAnalysisImage(
+            childAnalysis.workingDirectory,
+            plot,
+            childAnalysis
+          );
+        });
       });
-      this.getAnalysisStatus(childAnalysis.jobURL, childAnalysis);
-      if (childAnalysis.status === '' ||
-          childAnalysis.status === QUEUED_STATUS) {
-        setTimeout(() => {
-          this.refreshAnalysis(analysisConfig, childAnalysis);
-        }, this.pollInterval * 500);
-      }
     },
     'getAnalysisImage': function(analysisURL, plotName, childAnalysis) {
       this.unicoreAPI.getImage(`${analysisURL}/files/${plotName}.png`)
       .then((plot) => {
-        let reader = new FileReader();
-        reader.onloadend = () => {
-          this.$set(childAnalysis, plotName, reader.result);
-        };
-        reader.readAsDataURL(plot);
+        // is a blob content
+        this.setFileContent(childAnalysis, plotName, plot, true);
       }, (error) => {
-        console.log('No analysis image available yet');
+        console.debug('No analysis image available yet');
       });
     },
     'getAnalysisStatus': function(analysisURL, childAnalysis) {
-      this.unicoreAPI.getJobProperties(analysisURL)
+      return this.unicoreAPI.getJobProperties(analysisURL)
       .then((jobInfo) => {
         childAnalysis.status = jobInfo.status;
         childAnalysis.submissionTime = jobInfo.submissionTime;
@@ -298,9 +303,10 @@ export default {
     },
     'getAnalysisLog': function(childAnalysis) {
       let url = `${childAnalysis.workingDirectory}/files/stderr`;
+      console.debug('Get analysis log');
       this.unicoreAPI.getFiles(url)
       .then((stderr) => {
-        this.$set(childAnalysis, 'log', stderr.split('\n'));
+        this.setFileContent(childAnalysis, 'log', stderr);
       })
       .catch((noFile) => {
         let log = [];
@@ -356,23 +362,21 @@ export default {
         },
       });
     },
-    'save': function(filename, data) {
-      let stringFormat = null;
-      if (data && Array.isArray(data)) {
-        stringFormat = data.join('\n');
+    'setFileContent': function(destination, name, fileContent, isBlob = false) {
+      if (!isBlob) {
+        if (typeof fileContent === 'object') {
+          fileContent = JSON.stringify(fileContent, null, 2);
+        }
+        this.$set(destination, name, fileContent.split('\n'));
+        this.$set(this.isLoading, name, false);
+        console.debug('++ Loaded content', name);
       } else {
-        stringFormat = data;
-      }
-      let blob = new Blob([stringFormat], {'type': 'text/plain'});
-      if (window.navigator.msSaveOrOpenBlob) {
-        window.navigator.msSaveBlob(blob, filename);
-      } else {
-        let elem = window.document.createElement('a');
-        elem.href = window.URL.createObjectURL(blob);
-        elem.download = filename;
-        document.body.appendChild(elem);
-        elem.click();
-        document.body.removeChild(elem);
+        let reader = new FileReader();
+        reader.onloadend = () => {
+          this.$set(destination, name, reader.result);
+          this.$set(this.isLoading, name, false);
+        };
+        reader.readAsDataURL(fileContent);
       }
     },
     'toggleAutoreload': function(obj) {
@@ -389,7 +393,7 @@ export default {
           } else {
             obj.refreshFunction();
           }
-        }, this.pollInterval * 1000);
+        }, this.pollInterval);
       } else {
         obj.intervalReference = clearTimeout(obj.intervalReference);
       }
@@ -425,7 +429,24 @@ export default {
     // Otherwithse the toggle will negate again.
     this.simulationDetails.autorefresh = !this.simulationDetails.autorefresh;
     this.simulationDetails.refreshFunction = this.refreshJobs;
+    this.$set(this.isLoading, 'unicore_log', true);
     this.toggleAutoreload(this.simulationDetails);
+  },
+  'computed': {
+    'getAnalysisOverallStatus': function() {
+      if (this.simulationDetails.status === QUEUED_STATUS ||
+        this.simulationDetails.status === RUNNING_STATUS) {
+        return 'Simulation not finished yet';
+      }
+      if (this.analysisDetails.length === 0 &&
+        this.simulationDetails.intervalReference) {
+        return 'Loading ...';
+      }
+      if (this.analysisDetails.length === 0 &&
+        !this.simulationDetails.intervalReference) {
+        return 'No analysis run';
+      }
+    },
   },
   'beforeDestroy': function() {
     clearTimeout(this.simulationDetails.intervalReference);
@@ -434,77 +455,62 @@ export default {
 </script>
 
 <style scoped>
-    .simulation-details {
-        padding: 0 15px;
-    }
-    a.button-with-icon {
-        letter-spacing: .5px;
-        cursor: pointer;
-        padding: 5px 10px;
-        border-radius: 3px;
-        display: flex;
-        align-items: center;
-    }
-    a.button-with-icon.colored {
-        color: #fff;
-        background-color: #879fcb;
-    }
-    .collapse-title a.button-with-icon.colored {
-        margin-top: 10px;
-        display: inline-flex;
-    }
-    .log-item {
-        padding: 5px 0;
-        word-break: break-word;
-    }
-    a.no-link-style.router-link-active {
-        text-decoration: none;
-    }
-    .detail-header {
-        padding: 10px 5px;
-        display: flex;
-        justify-content: space-between;
-        align-items: end;
-        flex-wrap: wrap;
-    }
-    .detail-content {
-        margin: 0 10px;
-    }
-    .space-flex {
-        flex-grow: 1;
-    }
-    .button-with-icon i.material-icons {
-        margin-right: 5px;
-    }
-    .item-summary {
-        margin-left: 5px;
-    }
-    .block {
-        border-style: solid;
-        border-color: lightgray;
-        border-width: 1px;
-        margin-bottom: 5px;
-        padding: 5px;
-    }
-    .block .delete {
-        min-width: 90px;
-        color: #b0686f;
-        cursor: pointer;
-    }
-    .indent {
-      margin-left: 20px;
-    }
-    div.indent:first-child {
-      margin-left: 0;
-    }
-</style>
-
-<style>
-    .spin {
-      animation: spin 2s infinite linear;
-    }
-    @keyframes spin {
-      from {transform: rotate(0deg);}
-      to {transform: rotate(359deg);}
-    }
+  .simulation-details {
+      padding: 0 15px;
+  }
+  a.button-with-icon {
+      letter-spacing: .5px;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+  }
+  a.button-with-icon.colored {
+      color: #fff;
+      background-color: #879fcb;
+      text-decoration: none;
+  }
+  .collapse-title a.button-with-icon.colored {
+      margin-top: 10px;
+      display: inline-flex;
+  }
+  .detail-header {
+      padding: 10px 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      flex-wrap: wrap;
+  }
+  .detail-content {
+      margin: 0 10px;
+  }
+  .space-flex {
+      flex-grow: 1;
+  }
+  .button-with-icon i.material-icons {
+      margin-right: 5px;
+  }
+  .item-summary {
+      margin-left: 5px;
+  }
+  .block {
+      border-style: solid;
+      border-color: lightgray;
+      border-width: 1px;
+      margin-bottom: 5px;
+      padding: 5px;
+  }
+  .block .delete {
+      min-width: 90px;
+      color: #b0686f;
+      cursor: pointer;
+  }
+  .spin {
+    animation: spin 2s infinite linear;
+  }
+  @keyframes spin {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(359deg);}
+  }
 </style>

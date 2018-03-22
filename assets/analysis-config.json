@@ -1,15 +1,20 @@
 {
   "to": "JURECA",
   "script": [
+    "OMP_NUM_THREADS=1",
+    "export OMP_NUM_THREADS",
     "/homec/bp0/bp000037/analysis/analysis_launch_params.py --blueconfig {{origin}}/blueconfig.json --output {{origin}} -vv"
   ],
   "filesToAvoidCopy": [
     "BlueConfig",
+    "analysis_path",
     "input.sh",
     "stderr",
     "stdout",
     "output/",
     "UNICORE_SCRIPT_EXIT_CODE",
+    "UNICORE_Job_",
+    "bss_submit",
     "BlueConfig.backup",
     "cx_",
     "TSI_temp_file",

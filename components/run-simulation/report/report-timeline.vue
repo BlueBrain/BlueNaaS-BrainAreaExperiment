@@ -148,33 +148,44 @@ export default {
       // clean the default configuration
       config['Report'] = {};
       for (let i=0; i<this.items.length; i++) {
-        let report = Object.assign({}, this.items[i].reportInfo);
         // workarounds for the GUI to match the user.target and BlueConfig
-        report.Target = utils.blueConfigMapper(report.Target);
-        report.ReportOn = utils.blueConfigMapper(report.ReportOn);
-        report.Type = utils.blueConfigMapper(report.Type);
-        let repName = this.changeConnectionName(report.Target, 'report', i);
-        config['Report'][repName] = report;
+        let reportMapped = utils.mapAll(this.items[i].reportInfo);
+        let repName = this.changeConnectionName(reportMapped.Target, 'report', i);
+        config['Report'][repName] = reportMapped;
       }
       return config;
     },
+    'setNewItem': function(newItem, id = 0) {
+      let item = this.createItem( // id, group, content, start, end, connection
+        id,
+        newItem.Target,
+        newItem.ReportOn,
+        newItem.StartTime,
+        newItem.EndTime, // TODO: change this to duration
+        newItem
+      );
+
+      this.setupGroups(newItem.Target);
+      this.items.push(item);
+    },
+    'loadPrevConfig': function() {
+      let itemsInBlueConfig = Object.keys(this.config.Report);
+      if (itemsInBlueConfig.length < 1) {
+        // no previous BlueConfig
+        let reportInfo = this.createNewReport();
+        this.setNewItem(reportInfo);
+        return;
+      }
+      itemsInBlueConfig.forEach((report, index) => {
+        let item = this.config.Report[report];
+        let a = utils.unMapAll(item);
+        this.setNewItem(a, index);
+      });
+    },
   },
   'mounted': function() {
-    // create a dataset with items
-    let reportInfo = this.createNewReport();
-    let item = this.createItem( // id, group, content, start, end, connection
-      0,
-      reportInfo.Target,
-      reportInfo.ReportOn,
-      reportInfo.StartTime,
-      reportInfo.EndTime, // TODO: change this to duration
-      reportInfo
-    );
-
-    this.setupGroups(reportInfo.Target);
-    this.items.push(item);
+    this.loadPrevConfig(); // if there is prev load otherwise, create
     this.createTimeline(); // from the simulationTimeline.js
-
     this.$parent.$on('reportTargetSelected', (target) => {
       this.itemAdd({'group': target.name});
     });

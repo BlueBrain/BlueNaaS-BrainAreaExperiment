@@ -17,15 +17,63 @@
                 ></target-autocomplete>
             </div>
         </div>
-
-        <div class="form-group">
+        <span v-if="!sameComputer">
+          <div class="form-group">
             <label class="control-label">Origin:</label>
             <div class="controls">{{ from.computer }}</div>
-        </div>
-        <div class="form-group">
-            <label class="control-label">Destination: </label>
-            <div class="controls">{{ to.computer }}</div>
-        </div>
+          </div>
+          <div class="form-group">
+              <label class="control-label">Project:</label>
+              <div class="controls">
+                  <select
+                      class="project"
+                      name="Name of the project to run jobs"
+                      v-model="from.projectSelected">
+                      <option v-for="project in from.projectsAvailable">
+                          {{ project }}
+                      </option>
+                  </select>
+                  <i v-if="from.projectsAvailable.length < 1"
+                  class="material-icons spin">autorenew</i>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="control-label">Destination: </label>
+              <div class="controls">{{ to.computer }}</div>
+          </div>
+          <div class="form-group">
+              <label class="control-label">Project:</label>
+              <div class="controls">
+                  <select
+                      class="project"
+                      name="Name of the project to run jobs"
+                      v-model="to.projectSelected">
+                      <option v-for="project in to.projectsAvailable">
+                          {{ project }}
+                      </option>
+                  </select>
+                  <i v-if="to.projectsAvailable.length < 1"
+                  class="material-icons spin">autorenew</i>
+              </div>
+          </div>
+        </span>
+        <span v-else>
+          <div class="form-group">
+            <label class="control-label">Project:</label>
+            <div class="controls">
+                <select
+                    class="project"
+                    name="Name of the project to run jobs"
+                    v-model="to.projectSelected">
+                    <option v-for="project in to.projectsAvailable">
+                        {{ project }}
+                    </option>
+                </select>
+                <i v-if="to.projectsAvailable.length < 1"
+                class="material-icons spin">autorenew</i>
+            </div>
+          </div>
+        </span>
         <div class="form-group">
             <label class="control-label">Analysis: </label>
             <div class="controls analysis-list">
@@ -70,7 +118,9 @@
             </div>
         </div>
         <div class="button-container">
-            <input class="ok-button" type="button" @click="editItem" value="Ok">
+            <input
+              :disabled="!from.projectSelected || !to.projectSelected"
+              class="ok-button" type="button" @click="editItem" value="Ok">
             <input class="cancel-button" type="button" @click="closeForm" value="Cancel">
         </div>
     </table>
@@ -87,6 +137,7 @@
     import 'v-autocomplete/dist/v-autocomplete.css';
     Vue.use(Autocomplete);
     import targetList from 'assets/targetList.json';
+    import {getUser} from 'mixins/unicore.js';
 
     export default {
       'props': ['defaultAnalysisConfig', 'jobSelectedForValidation'],
@@ -95,13 +146,18 @@
           'from': {
             'workingDirectory': null,
             'computer': this.defaultAnalysisConfig.from,
+            'projectsAvailable': [],
+            'projectSelected': null,
           },
           'to': {
             'workingDirectory': null, // create a new one
             'computer': this.defaultAnalysisConfig.to,
+            'projectsAvailable': [],
+            'projectSelected': null,
           },
           'files': [], // this will be filled in later in UnicoreAPI
           'nodes': 1,
+          'runtime': 300,
           'title': '',
           'analysisToRun': this.defaultAnalysisConfig.analysisAvailable,
           'checkedAnalysis': [],
@@ -125,6 +181,7 @@
         if (localStorage.getItem('showAnalysisTip') === 'false') {
           this.$nextTick(() => this.closeTip());
         }
+        this.getUserProjects();
       },
       'methods': {
         'editItem': function() {
@@ -164,6 +221,16 @@
         'targetChanged': function(newTarget) {
           this.target = newTarget;
         },
+        'getUserProjects': function() {
+          getUser(this.defaultAnalysisConfig.from).then((user) => {
+            this.from.projectsAvailable = user.client.xlogin.availableUIDs;
+            this.from.projectSelected = this.from.projectsAvailable[0];
+          });
+          getUser(this.defaultAnalysisConfig.to).then((user) => {
+            this.to.projectsAvailable = user.client.xlogin.availableUIDs;
+            this.to.projectSelected = this.to.projectsAvailable[0];
+          });
+        },
       },
       'computed': {
         'getReports': function() {
@@ -190,6 +257,14 @@
             return targetsNames;
           }
           return [this.target];
+        },
+        'sameComputer': function() {
+          return (this.from.computer === this.to.computer);
+        },
+      },
+      'watch': {
+        'to.projectSelected': function(newVal) {
+          this.from.projectSelected = newVal;
         },
       },
     };
@@ -218,5 +293,12 @@
     }
     .alert {
       background-color: red;
+    }
+    .spin {
+      -webkit-animation: spin 2s infinite linear;
+    }
+    @-webkit-keyframes spin {
+      0%  {-webkit-transform: rotate(0deg);}
+      100% {-webkit-transform: rotate(360deg);}
     }
 </style>

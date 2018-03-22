@@ -16,33 +16,74 @@ module.exports = (function() {
       'data': JSON.stringify({}),
       'headers': headers,
     });
-  };
-  function createHeaders(token) {
-    return {
-      'Authorization': 'Bearer ' + token,
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    };
-  };
-  function createJob(url, jobDefinition) {
-    let headers = createHeaders(token);
+  }
+  function createHeaders(token, userProject) {
+    let headers = {};
+    headers['Authorization'] = 'Bearer ' + token;
+    headers['Accept'] = 'application/json';
+    headers['Content-Type'] = 'application/json';
+    if (userProject) {
+      headers['X-UNICORE-User-Preferences'] = 'uid:' + userProject;
+    }
+    return headers;
+  }
+  function getProjectSelectedByLog(log) {
+    /* this will search for the user that submitted the job
+     * so we are able to get the files from that user **/
+    if (!log || log.length < 3) return;
+    console.debug('Set project by log');
+    let multiple = new RegExp('Xlogin.*active=(.+)].*]');
+    let result = test(multiple);
+    if (!result) {
+      let unique = new RegExp('uid: \\[(.*)\\], gids');
+      result = test(unique);
+    }
+    return result;
+    function test(reg) {
+      let m = log[2].match(reg);
+      if (m && m[1]) {
+        return m[1];
+      }
+      return false;
+    }
+  }
+  function createJob(url, jobDefinition, userProject) {
+    let headers = createHeaders(token, userProject);
     return axios({
       'url': url + '/jobs',
       'method': 'post',
       'data': JSON.stringify(jobDefinition),
       'headers': headers,
     });
-  };
+  }
   function deleteJob(url) {
-    let headers = createHeaders(token);
-    return axios({
-      'url': url,
-      'method': 'delete',
-      'data': JSON.stringify({}),
-      'headers': headers,
+    return getPermissions(url)
+    .then((userProject) => {
+      let headers = createHeaders(token, userProject);
+      return axios({
+        'url': url,
+        'method': 'delete',
+        'data': JSON.stringify({}),
+        'headers': headers,
+      });
     });
-  };
+    function getPermissions(url) {
+      let m = url.match(new RegExp('HBP_(.*)/rest'));
+      if (m && m[1]) {
+        return getUser(m[1])
+        .then((user) => {
+          return getJobProperties(url, user.client.xlogin.UID);
+        })
+        .then((jobInfo) => {
+          return getProjectSelectedByLog(jobInfo.log);
+        });
+      } else {
+        throw String('Getting permissions for deleting');
+      }
+    }
+  }
   function deleteJobFromAssociatedFile(simulationWorkDir, idToDelete) {
+    console.debug('Delete job from associationFile');
     return getAssociatedLocation(simulationWorkDir)
     .then((associationFile) => {
       let newAssociationFile = [];
@@ -63,7 +104,7 @@ module.exports = (function() {
       // upload the analysis_path.json file
       return uploadData(input, simulationWorkDir + '/files');
     });
-  };
+  }
   function getAllJobs(site) {
     let unicoreURL = getSites()[site.toUpperCase()]['url'];
     let headers = createHeaders(token);
@@ -74,7 +115,7 @@ module.exports = (function() {
     })
     .then((response) => (response.data))
     .catch((e) => {throw Error('Getting all jobs - ' + e);});
-  };
+  }
   function getAllJobsExpandedWithChildren(site) {
     // get the information of all jobs asociated with key + the children
     let jobsList = [];
@@ -89,8 +130,9 @@ module.exports = (function() {
         let chain = getJobProperties(job)
         .then((jobInfo) => {
           jobExapandedInfo = jobInfo;
+          let project = getProjectSelectedByLog(jobInfo.log);
           let url = `${jobInfo._links.workingDirectory.href}/files`;
-          return getFilesList(url);
+          return getFilesList(url, project);
         })
         .then((childrenInfo) => {
           jobExapandedInfo['children'] = childrenInfo.children || [];
@@ -105,17 +147,20 @@ module.exports = (function() {
     .then(() => {
       return output;
     }, (error) => {throw Error('getAllJobsExapandedWithChildren - ' + error);});
-  };
-  function getAssociatedLocation(workingDirectory) {
+  }
+  function getAssociatedLocation(workingDirectory, userProject) {
     let analysisPath = analysisConfig.analysisConnectionPath;
     let url = `${workingDirectory}/files/${analysisPath}`;
-    return getFiles(url)
+    return getFiles(url, userProject)
     .then((analysisObject) => (analysisObject))
     // even if the file is not there it will be updated later
     .catch((e) => ([]));
-  };
-  function getFiles(jobURL) {
-    let headers = createHeaders(token);
+  }
+  function getFiles(jobURL, userProject) {
+    let reg = new RegExp('7112/(.*)/rest/.*files/(.+)');
+    let m = jobURL.match(reg);
+    console.debug(`Getting from ${m[1]} file ${m[2]} using ${userProject}`);
+    let headers = createHeaders(token, userProject);
     headers['Accept'] = 'application/octet-stream';
     return axios({
       'url': jobURL,
@@ -124,9 +169,9 @@ module.exports = (function() {
     })
     .then((r) => (r.data))
     .catch((e) => {throw Error('getFiles ' + e);});
-  };
-  function getFilesList(jobURL) {
-    let headers = createHeaders(token);
+  }
+  function getFilesList(jobURL, userProject) {
+    let headers = createHeaders(token, userProject);
     return axios({
       'url': jobURL,
       'method': 'get',
@@ -137,9 +182,9 @@ module.exports = (function() {
       console.error('getting file list ' + e);
       return Promise.resolve({});
     });
-  };
-  function getFilesToCopy(filesURL) {
-    return this.getFilesList(filesURL)
+  }
+  function getFilesToCopy(filesURL, userProject) {
+    return this.getFilesList(filesURL, userProject)
     .then((files) => {
       let allowed = [];
       let avoidFilesList = analysisConfig.filesToAvoidCopy;
@@ -154,14 +199,14 @@ module.exports = (function() {
       });
       return allowed;
     });
-  };
+  }
   function getConfig(configParams) {
     /**
       * @params
       *   configParams {applicationName, title, nodes, computer}
       */
     let computer = configParams.computer || configParams.to.computer;
-    return getPatition(computer)
+    return getPatition(computer, configParams.projectSelected)
     .then((partition) => {
       let jobSpec = {
         'ApplicationName': 'Bash shell',
@@ -178,7 +223,7 @@ module.exports = (function() {
       jobSpec.Resources = utils.default.compact(jobSpec.Resources);
       return jobSpec;
     });
-  };
+  }
   function getImage(imageURL) {
     let headers = createHeaders(token);
     headers['Accept'] = 'application/octet-stream';
@@ -195,15 +240,15 @@ module.exports = (function() {
     .catch((e) => {
       throw String('Image not found');
     });
-  };
+  }
   function getJobById(jobId, computer) {
     computer = computer.toUpperCase();
     let site = getSites()[computer].url;
     let url = site + '/jobs/' + jobId;
     return getJobProperties(url);
-  };
-  function getJobProperties(jobURL) {
-    let headers = createHeaders(token);
+  }
+  function getJobProperties(jobURL, userProject) {
+    let headers = createHeaders(token, userProject);
     return axios({
       'url': jobURL,
       'method': 'get',
@@ -211,10 +256,10 @@ module.exports = (function() {
     })
     .then((response) => (response.data))
     .catch((e) => {throw Error('Error getting job properties');});
-  };
+  }
   function getLastJobId(url) {
     return url.split('/').pop();
-  };
+  }
   function getSites() {
     let sites = {};
     sites['JUQUEEN'] = {'name': 'JUQUEEN (JSC)', 'id': 'JUQUEEN',
@@ -240,7 +285,7 @@ module.exports = (function() {
     sites['KIT'] = {'name': 'Cloud storage (KIT)', 'id': 'S3-KIT',
       'url': 'https://unicore.data.kit.edu:8080/HBP-KIT/rest/core'};
     return sites;
-  };
+  }
   function getUser(site) {
     let unicoreURL = getSites()[site.toUpperCase()]['url'];
     let headers = createHeaders(token);
@@ -251,10 +296,20 @@ module.exports = (function() {
     })
     .then((response) => (response.data))
     .catch((e) => {throw Error('Error getting user information');});
-  };
-  function getPatition(site) {
-    return getUser(site).then((user) => {
-      let userMappedAccount = user.client.xlogin.UID;
+  }
+  function getPatition(site, projectSelected = null) {
+    let userAccountPromise = [];
+    if (projectSelected) {
+      let t = Promise.resolve(projectSelected);
+      userAccountPromise.push(t);
+    } else {
+      let t = getUser(site).then((user) => (user.client.xlogin.UID));
+      userAccountPromise.push(t);
+    }
+
+    return Promise.all(userAccountPromise)
+    .then((userMappedAccount) => {
+      userMappedAccount = userMappedAccount[0];
       let computerConfig = simulationConfig[site.toUpperCase()];
       if (computerConfig && computerConfig.partitions) {
         let partition = filterPartition(computerConfig, userMappedAccount);
@@ -273,9 +328,9 @@ module.exports = (function() {
       console.debug('selectedPartition', selectedPartition);
       return selectedPartition;
     }
-  };
-  function generateUpdatedAssociatedFile(simulationWorkDirectory, analysisObject) {
-    return getAssociatedLocation(simulationWorkDirectory)
+  }
+  function generateUpdatedAssociatedFile(simulationWorkDirectory, analysisObject, userProject) {
+    return getAssociatedLocation(simulationWorkDirectory, userProject)
     .then((associationFile) => {
       let newAssociationFile = [];
       let analysisPath = analysisConfig.analysisConnectionPath;
@@ -289,12 +344,13 @@ module.exports = (function() {
         'Data': JSON.stringify(newAssociationFile),
       };
       // upload the analysis_path.json file
-      return uploadData(input, simulationWorkDirectory + '/files');
+      console.debug('Uploading associationFile');
+      return uploadData(input, simulationWorkDirectory + '/files', userProject);
     })
     .catch((e) => {
       throw Error('generateUpdatedAssociatedFile ' + e);
     });
-  };
+  }
   function init() {
     hello.init({
       // 'hbp': '7a9b6bb2-2f6d-4624-9045-d1f12d9dedaa',
@@ -308,7 +364,7 @@ module.exports = (function() {
     .then((data) => {
       token = data.authResponse.access_token;
     }, (error) => {throw Error('init ' + e);});
-  };
+  }
   function submitAnalysis(moveObject, script) {
     return new Promise((resolve, reject) => {
       /**
@@ -323,11 +379,13 @@ module.exports = (function() {
             'workingDirectory' = origin job working directory
               e.g: "https://hbp-unic.fz-juelich.de:7112/HBP_JURECA/rest/core/ +
               storages/262788e5-571b-4965-8726-a337564f434d-uspace"
-            'computer' = computer name e.g: JUQUEEN
+            'computer' = computer name e.g: JUQUEEN,
+            'projectSelected' = userid of the project to launch job
           },
           'to': {
             'workingDirectory' = (this will be created and fill in here)
-            'computer': computer name e.g: JURECA
+            'computer': computer name e.g: JURECA,
+            'projectSelected' = userid of the project to launch job
           }
           'files' = array with name of files to copy
           'nodes' = number of nodes used to run the analysis
@@ -363,9 +421,12 @@ module.exports = (function() {
       ];
       let transferArray = [];
       let newJobDestination = {};
-
-      this.submitJob(moveObject, inputs)
+      console.debug('submiting job');
+      // avoid copy the simulation input
+      let onlyInputs = true;
+      this.submitJob(moveObject, inputs, onlyInputs)
       .then((destinationJobObject) => {
+        console.debug('job created');
         newJobDestination = destinationJobObject;
         let prom = [];
         // fill the destination and pass it to transfer
@@ -384,21 +445,30 @@ module.exports = (function() {
           'To': 'input.sh',
           'Data': scriptReplaced,
         };
-        let upload = uploadData(input, moveObject.to.workingDirectory + '/files');
+        let upload = uploadData(
+          input,
+          moveObject.to.workingDirectory + '/files',
+          moveObject.to.projectSelected
+        );
         prom.push(upload);
         let association = generateUpdatedAssociatedFile(
           moveObject.from.workingDirectory,
-          destinationJobObject
+          destinationJobObject,
+          moveObject.from.projectSelected
         );
         prom.push(association);
         return Promise.all(prom);
       })
       .then(([uploaded, assocFile]) => {
+        console.debug('after after associationFile');
         // avoid copying files but return something for the last element in the chain
         if (sameMachine) return '';
         // get all the files to be copied
-        console.log('getting files to be copied ...');
-        return this.getFilesToCopy(`${moveObject.from.workingDirectory}/files`);
+        console.debug('getting files to be copied ...');
+        return this.getFilesToCopy(
+          `${moveObject.from.workingDirectory}/files`,
+          moveObject.from.projectSelected
+        );
       })
       .then((files) => {
         // avoid copying files but return something for the last element in the chain
@@ -406,7 +476,7 @@ module.exports = (function() {
         files.forEach(function(fileName, i) {
           // change the object so transferFile transfers each individual file
           // this is for have each object with its own information becasue async calls
-          console.log('coping ...', fileName);
+          console.debug('coping ...', fileName);
           moveObject['fileName'] = fileName;
           transferArray.push(transferFiles(moveObject));
         });
@@ -421,13 +491,14 @@ module.exports = (function() {
         return resolve(transfer);
       }, reject);
     });
-  };
-  function submitJob(runConfig, inputs) {
+  }
+  function submitJob(runConfig, inputs, onlyInputs = false) {
     // TODO: these variables are now global for unicore. use submit job scope.
     /**
       * inputs [{ To: '', Data: {} }]
       */
     let computer = runConfig.computer || runConfig.to.computer;
+    let userProject = runConfig.projectSelected || runConfig.to.projectSelected;
     computer = computer.toUpperCase();
     let unicoreURL = getSites()[computer]['url'];
     this.jobURL = this.actionStartURL = this.workingDirectory = '';
@@ -437,23 +508,23 @@ module.exports = (function() {
     })
     .then((launchParams) => {
       let shellCommand = simulationConfig[computer].script.join('\n');
-      if (shellCommand) {
+      if (!onlyInputs && shellCommand) {
         inputs.push({'To': 'input.sh', 'Data': shellCommand});
       }
-      console.log('creating job...');
-      return createJob(unicoreURL, launchParams);
+      console.debug('creating job...');
+      return createJob(unicoreURL, launchParams, userProject);
     })
     .then((job) => {
       this.jobURL = job.headers.location;
-      console.log('getting job properties...');
-      return getJobProperties(this.jobURL);
+      console.debug('getting job properties...');
+      return getJobProperties(this.jobURL, userProject);
     })
     .then((properties) => {
       this.workingDirectory = properties._links.workingDirectory.href;
       this.actionStartURL = properties._links['action:start'].href;
       return Promise.all(inputs.map((input) => {
-        console.log('uploading files...');
-        return uploadData(input, this.workingDirectory + '/files');
+        console.debug('uploading files...');
+        return uploadData(input, this.workingDirectory + '/files', userProject);
       }));
     })
     .then(() => {
@@ -472,8 +543,8 @@ module.exports = (function() {
         },
       };
       return (jobDetails);
-    }, (e) => {throw Error('Submit job' + e);});
-  };
+    }, (e) => {throw Error('Submit job ' + e);});
+  }
   function transferFiles(moveObject) {
     /**
       Returns object with the information about transfer but not job
@@ -502,7 +573,7 @@ module.exports = (function() {
           console.log('transfer polling');
           setTimeout(function() {
             polling(transferLocation, resolve, reject);
-          }, 10 * 1000);
+          }, 5 * 1000);
         }
       }, reject);
     };
@@ -531,9 +602,9 @@ module.exports = (function() {
         polling(transferLocation, resolve, reject);
       }, reject);
     });
-  };
-  function uploadData(dataToUpload, uploadURL) {
-    let headers = createHeaders(token);
+  }
+  function uploadData(dataToUpload, uploadURL, userProject = '') {
+    let headers = createHeaders(token, userProject);
     headers['Content-Type'] = 'application/octet-stream';
     let data = dataToUpload.Data;
     let target = dataToUpload.To;
@@ -543,7 +614,7 @@ module.exports = (function() {
       'data': data,
       'headers': headers,
     });
-  };
+  }
   function workingDirToMachinePath(workingDirectory) {
     if (workingDirectory.indexOf('JURECA') > 0) {
       try {
@@ -574,6 +645,7 @@ module.exports = (function() {
     getUser,
     init,
     submitAnalysis,
+    getProjectSelectedByLog,
     transferFiles,
   };
 }());

@@ -156,6 +156,7 @@
                 this.previousConfig = lastConfig.runConfig;
                 this.projectsAvailable = lastConfig.runConfig.projectsAvailable;
                 this.projectSelected = lastConfig.runConfig.projectSelected;
+                this.$emit('computerChanged', this.computer);
               } else {throw String('No all params in previous config');}
             } else {throw String('No previous config');}
           } catch (e) {

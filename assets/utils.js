@@ -68,4 +68,17 @@ export default {
       document.body.removeChild(elem);
     }
   },
+  'matchFiles': function(jobURL, userProject) {
+    let reg = new RegExp('7112/(.*)/rest/.*files/(.+)');
+    let m = jobURL.match(reg);
+    console.debug(`Getting from ${m[1]} file ${m[2]} using ${userProject}`);
+  },
+  'urlToId': function(jobURL) {
+    // a.match(new RegExp('7112/HBP_(.+)/rest.*jobs/(.*)'))
+    let reg = new RegExp('7112/HBP_(.+)/rest.*jobs/(.*)');
+    let m = jobURL.match(reg);
+    if (m.length > 2) {
+      return {'computer': m[1], 'id': m[2]};
+    }
+  },
 };

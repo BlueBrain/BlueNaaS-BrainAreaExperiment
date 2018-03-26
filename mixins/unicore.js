@@ -6,7 +6,8 @@ module.exports = (function() {
   let analysisConfig = require('assets/analysis-config.json');
   let simulationConfig = require('assets/simulation-config.json');
   let token = '';
-  let utils = require('assets/utils.js');
+  let utils = require('assets/utils.js').default;
+  let jobsDB = require('assets/jobs-db.js').default;
   function actionJob(actionURL) {
     // actions like start, restart, abort
     let headers = createHeaders(token);
@@ -31,7 +32,6 @@ module.exports = (function() {
     /* this will search for the user that submitted the job
      * so we are able to get the files from that user **/
     if (!log || log.length < 3) return;
-    console.debug('Set project by log');
     let multiple = new RegExp('Xlogin.*active=(.+)].*]');
     let result = test(multiple);
     if (!result) {
@@ -126,19 +126,26 @@ module.exports = (function() {
       jobsList = parsed.jobs;
       if (jobsList.length <= 0) return;
       jobsList.forEach((job) => {
+        let id = getLastJobId(job);
         let jobExapandedInfo = {};
         let chain = getJobProperties(job)
         .then((jobInfo) => {
           jobExapandedInfo = jobInfo;
+          if (jobExapandedInfo.children) {
+            return null; // avoid assign in then
+          }
           let project = getProjectSelectedByLog(jobInfo.log);
           let url = `${jobInfo._links.workingDirectory.href}/files`;
           return getFilesList(url, project);
         })
         .then((childrenInfo) => {
-          jobExapandedInfo['children'] = childrenInfo.children || [];
-          let id = getLastJobId(job);
-          jobExapandedInfo['id'] = id;
+          if (childrenInfo) {
+            jobExapandedInfo['children'] = childrenInfo.children || [];
+            jobExapandedInfo['id'] = id;
+            jobsDB.addJob(jobExapandedInfo); // updated the children information
+          }
           output.push(jobExapandedInfo);
+          return jobExapandedInfo;
         });
         chainPromise.push(chain);
       });
@@ -157,9 +164,8 @@ module.exports = (function() {
     .catch((e) => ([]));
   }
   function getFiles(jobURL, userProject) {
-    let reg = new RegExp('7112/(.*)/rest/.*files/(.+)');
-    let m = jobURL.match(reg);
-    console.debug(`Getting from ${m[1]} file ${m[2]} using ${userProject}`);
+    // display logs
+    utils.matchFiles(jobURL, userProject);
     let headers = createHeaders(token, userProject);
     headers['Accept'] = 'application/octet-stream';
     return axios({
@@ -220,7 +226,7 @@ module.exports = (function() {
         },
       };
       // remove the nulls
-      jobSpec.Resources = utils.default.compact(jobSpec.Resources);
+      jobSpec.Resources = utils.compact(jobSpec.Resources);
       return jobSpec;
     });
   }
@@ -248,14 +254,25 @@ module.exports = (function() {
     return getJobProperties(url);
   }
   function getJobProperties(jobURL, userProject) {
-    let headers = createHeaders(token, userProject);
-    return axios({
-      'url': jobURL,
-      'method': 'get',
-      'headers': headers,
+    return jobsDB.getJobByUrl(jobURL)
+    .then((job) => {
+      console.debug('Getting job from DB');
+      return job.details;
     })
-    .then((response) => (response.data))
-    .catch((e) => {throw Error('Error getting job properties');});
+    .catch((notFound) => {
+      console.debug('Getting job from network', jobURL);
+      let headers = createHeaders(token, userProject);
+      return axios({
+        'url': jobURL,
+        'method': 'get',
+        'headers': headers,
+      })
+      .then((response) => {
+        jobsDB.addJob(response.data);
+        return response.data;
+      })
+      .catch((e) => {throw Error('Error getting job properties');});
+    });
   }
   function getLastJobId(url) {
     return url.split('/').pop();

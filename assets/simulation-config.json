@@ -7,7 +7,7 @@
             "module load nix/hpc/neurodamus-hippocampus",
             "export FULL_CPU_PER_NODE=16",
             "mkdir -p output",
-            "python /homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /homeb/pra098/pra09809/test/user.target --output output"
+            "python /homeb/pra098/pra09809/simulation/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /homeb/pra098/pra09809/simulation/user.target --output output"
         ],
         "time": "36000",
         "nodes": "130",
@@ -26,7 +26,7 @@
             "module load nix/python/2.7-full",
             "export FULL_CPU_PER_NODE=64",
             "mkdir -p output",
-            "python /gpfs/homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /gpfs/homeb/pra098/pra09809/test/user.target --output output"
+            "python /gpfs/homeb/pra098/pra09809/simulation/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /gpfs/homeb/pra098/pra09809/simulation/user.target --output output"
         ],
         "time": "18000",
         "nodes": "8",
@@ -42,7 +42,7 @@
             "export FULL_CPU_PER_NODE=68",
             "mkdir -p output",
             "touch change_circuit_julia",
-            "python /homeb/pra098/pra09809/test/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /homeb/pra098/pra09809/test/user.target --output output"
+            "python /homeb/pra098/pra09809/simulation/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /homeb/pra098/pra09809/simulation/user.target --output output"
         ],
         "time": "10800",
         "nodes": "10",

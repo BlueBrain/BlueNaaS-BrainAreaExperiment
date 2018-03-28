@@ -196,7 +196,7 @@
             showAlert('#targetSelector');
             return false;
           }
-          if (this.numberOfCells < 1) {
+          if (this.numberOfCells < 2) {
             showAlert('#cellsNumber');
             return false;
           }

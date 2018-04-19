@@ -96,7 +96,6 @@
 <script>
 import StimulationTimeline from 'components/run-simulation/stimulation/stimulation-timeline.vue';
 import ReportTimeline from 'components/run-simulation/report/report-timeline.vue';
-import CollabAuthentication from 'mixins/collabAuthentication.js';
 import templateBluepyConfig from 'assets/blueconfig.json';
 import Unicore from 'mixins/unicore.js';
 import TargetSelection from 'components/target-selection/target-selection.vue';
@@ -107,7 +106,6 @@ import autocompleteTargets from 'components/shared/autocomplete-targets.vue';
 import utils from 'assets/utils.js';
 export default {
   'name': 'run_simulation',
-  'mixins': [CollabAuthentication],
   'data': function() {
     return {
       'endTime': 50,

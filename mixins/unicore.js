@@ -2,10 +2,10 @@
 module.exports = (function() {
   'use strict';
   let axios = require('axios');
-  let hello = require('assets/hbp.hello.js').hellojs;
+  let hello = require('assets/hbp.hello.js');
   let analysisConfig = require('assets/analysis-config.json');
   let simulationConfig = require('assets/simulation-config.json');
-  let token = '';
+  let token = null;
   let utils = require('assets/utils.js').default;
   let jobsDB = require('assets/jobs-db.js').default;
   function actionJob(actionURL) {
@@ -368,20 +368,6 @@ module.exports = (function() {
       throw Error('generateUpdatedAssociatedFile ' + e);
     });
   }
-  function init() {
-    hello.init({
-      // 'hbp': '7a9b6bb2-2f6d-4624-9045-d1f12d9dedaa',
-      'hbp': 'c292031c-c91f-43fa-b1a9-72e65eb18e44',
-    });
-    return hello.login('hbp', {
-      'display': 'page',
-      'force': false,
-      'page_uri': window.location.href,
-    })
-    .then((data) => {
-      token = data.authResponse.access_token;
-    }, (error) => {throw Error('init ' + e);});
-  }
   function submitAnalysis(moveObject, script) {
     return new Promise((resolve, reject) => {
       /**
@@ -643,6 +629,11 @@ module.exports = (function() {
       }
     }
   };
+  function init() {
+    return hello.isAuth().then(() => {
+      token = hello.token;
+    });
+  }
   return {
     getAssociatedLocation,
     deleteJob,

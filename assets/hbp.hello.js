@@ -8,6 +8,7 @@ let token = null;
 
 hello.init({
   'simlauncher': {
+    'id': 'c292031c-c91f-43fa-b1a9-72e65eb18e44',
     'name': 'Human Brain Project',
     'oauth': {
       'version': '2',
@@ -53,28 +54,29 @@ function _logout(callback, p) {
 }
 
 function init() {
-  hello.init({
-    'simlauncher': 'c292031c-c91f-43fa-b1a9-72e65eb18e44',
-  });
   return hello.login('simlauncher', {
     'display': 'page',
-    'force': false,
-    'page_uri': window.location.href,
+    // 'force': false,
+    'page_uri': window.location.href.replace(/#(.*)/, '#/login'),
   })
-  .then((data) => {
-    token = data.authResponse.access_token;
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  }, (error) => {throw Error('init ' + e);});
+  .then(
+    (data) => {setHeader(data);},
+    (error) => {throw Error('init ' + e);}
+  );
 }
 
 function isAuth() {
-  // if was not assigned yet
-  if (!token) return init();
   // if we have already check expiration
   let session = hello('simlauncher').getAuthResponse();
-  let valid = session.expires > (new Date).getTime()/1000;
+  let valid = session && session.expires > (new Date).getTime()/1000;
   if (!valid) return init();
+  if (!token) setHeader({'authResponse': session});
   return Promise.resolve();
+}
+
+function setHeader(data) {
+  token = data.authResponse.access_token;
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 }
 
 export {

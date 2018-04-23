@@ -32,6 +32,9 @@
     'methods': {
       'showText': function() {
         if (this.fileContent && this.fileContent.length < 10000) {
+          if (this.fileContent.length === 1 && this.fileContent[0] === '') {
+            this.fileContent = ['NO FILE CONTENT FOUND'];
+          }
           return true;
         }
         return false;

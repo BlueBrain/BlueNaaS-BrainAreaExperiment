@@ -189,11 +189,15 @@ module.exports = (function() {
       return Promise.resolve({});
     });
   }
-  function getFilesToCopy(filesURL, userProject) {
+  function getFilesToCopy(filesURL, userProject, listFilesToAvoid) {
     return this.getFilesList(filesURL, userProject)
     .then((files) => {
       let allowed = [];
-      let avoidFilesList = analysisConfig.filesToAvoidCopy;
+      let avoidFilesList = [];
+      if (!listFilesToAvoid) {
+        avoidFilesList = analysisConfig.filesToAvoidCopy;
+      } else {avoidFilesList = listFilesToAvoid;}
+
       files.children.map((file) => {
         // remove the '/'
         let fileName = file.substr(1);
@@ -217,7 +221,10 @@ module.exports = (function() {
       let jobSpec = {
         'ApplicationName': 'Bash shell',
         'Name': configParams.title || 'unnamed job',
-        'Parameters': {'SOURCE': 'input.sh'},
+        'Parameters': {
+          'SOURCE': 'input.sh',
+          'UC_PREFER_INTERACTIVE_EXECUTION': configParams.isViz,
+        },
         'haveClientStageIn': 'true',
         'Resources': {
           'Nodes': configParams.nodes,
@@ -227,6 +234,8 @@ module.exports = (function() {
       };
       // remove the nulls
       jobSpec.Resources = utils.compact(jobSpec.Resources);
+      jobSpec.Parameters = utils.compact(jobSpec.Parameters);
+
       return jobSpec;
     });
   }
@@ -629,6 +638,22 @@ module.exports = (function() {
       }
     }
   };
+  function jobUrlToPhysicalLocation(jobURL, userProject) {
+    let headers = createHeaders(token, userProject);
+    return axios({
+      'url': jobURL,
+      'headers': headers,
+    })
+    .then((jobInfo) => {
+      return axios({
+        'url': jobInfo.data._links.workingDirectory.href,
+        'headers': headers,
+      });
+    })
+    .then((location) => {
+      return location.data.mountPoint;
+    });
+  }
   function init() {
     return hello.isAuth().then(() => {
       token = hello.token;
@@ -652,6 +677,7 @@ module.exports = (function() {
     getConfig,
     getUser,
     init,
+    jobUrlToPhysicalLocation,
     submitAnalysis,
     getProjectSelectedByLog,
     transferFiles,

@@ -18,11 +18,16 @@ This will display the details of a certain simulation and the analysis.
                         </a>
                     </item-summary>
                 </div>
-                <div class="space-flex"></div>
-                <a class="button-with-icon colored" @click="returnList"><i class="material-icons">arrow_back</i>Simulation List</a>
-                <span class="refresh" @click="refreshJobs" title="Poll manually">
-                    <a class="button-with-icon"><i class="material-icons">refresh</i>Reload</a>
-                </span>
+                <div class="tools">
+                  <a class="button-with-icon colored" @click="returnList"><i class="material-icons">arrow_back</i>Simulation List</a>
+                  <!-- <a class="button-with-icon colored small" @click="launchVisualization">
+                      <i class="material-icons">visibility</i>
+                      Visualize Simulation
+                  </a> -->
+                  <a class="button-with-icon refresh" @click="refreshJobs" title="Poll manually">
+                    <i class="material-icons">refresh</i>Reload
+                  </a>
+                </div>
             </div>
             <div class="detail-content">
                 <collapse-title title="Analysis" :collapsed="false" @expanded="getAnalysisInfo()">
@@ -107,6 +112,9 @@ import ItemSummary from 'components/view-simulations/simulation-details/item-sum
 import Analysis from 'components/view-simulations/simulation-details/analysis.vue';
 import analysisConfig from 'assets/analysis-config.json';
 import displayOrDownload from 'components/shared/display-or-download.vue';
+import visualizationConfig from 'assets/visualization-config.json';
+import {urlToId, replaceMultiplePaths, replaceConst} from 'assets/utils.js';
+
 const QUEUED_STATUS = 'QUEUED';
 const RUNNING_STATUS = 'RUNNING';
 export default {
@@ -193,7 +201,7 @@ export default {
         loadingComp.style.display = 'none';
       }
       if (this.job && this.simulationDetails.status === 'SUCCESSFUL') {
-        setTimeout(() => this.getAnalysisInfo(), 500);
+        setTimeout(() => this.getAnalysisInfo(), this.pollInterval / 3);
       }
       if (!this.simulationDetails.logParsed || !this.simulationUserProject) {
         this.$set(this.isLoading, 'unicore_log', false);
@@ -363,6 +371,14 @@ export default {
       });
     },
     'setFileContent': function(destination, name, fileContent, isBlob = false) {
+      // TODO: avoid loading the same file multiple times because of
+      // collaps and expand multiple times
+      if ((this.job.status === RUNNING_STATUS ||
+          this.job.status === QUEUED_STATUS)) {
+        setTimeout(() => {
+          this.getFiles(name, this.simulationDetails);
+        }, this.pollInterval);
+      };
       if (!isBlob) {
         if (typeof fileContent === 'object') {
           fileContent = JSON.stringify(fileContent, null, 2);
@@ -408,6 +424,129 @@ export default {
           return analysis.id !== analysisId;
         });
         this.analysisDetails = listTemp;
+      });
+    },
+    'launchVisualization': function() {
+      swal.enableLoading();
+      let promisePhysicalLocation = this.unicoreAPI.jobUrlToPhysicalLocation(
+        this.job._links.self.href,
+        this.simulationUserProject
+      );
+
+      let promiseGetReport = this.unicoreAPI.getFilesToCopy(
+        `${this.job._links.workingDirectory.href}/files`,
+        this.simulationUserProject,
+        visualizationConfig.filesToAvoidCopy
+      ).then((filesToCopy) => {
+        let reportMap = {};
+        filesToCopy.map((name) => {
+          if (name.endsWith('.bbp')) {
+            name = name.replace('.bbp', '');
+            reportMap[name] = name;
+          }
+        });
+        if (Object.keys(reportMap).length > 1) {
+          // more than one report so select which one
+          return swal({
+            'title': 'Select Report to Visualize',
+            'input': 'select',
+            'inputOptions': reportMap,
+            'inputPlaceholder': 'Select Report',
+            'showCancelButton': true,
+          })
+          .then((selection) => {
+            let finalReport = selection.value;
+            if (selection.value === '') {
+              finalReport = Object.keys(reportMap)[0];
+            }
+            return finalReport;
+          });
+        }
+        return Object.keys(reportMap)[0];
+      });
+
+      let promiseChangeBlueConfigPaths = this.unicoreAPI.getFiles(
+        `${this.job._links.workingDirectory.href}/files/BlueConfig`,
+        this.simulationUserProject
+      ).then((blueConfig) => {
+        return replaceMultiplePaths(blueConfig, visualizationConfig.BlueConfigPath);
+      });
+
+      return Promise.all([promisePhysicalLocation, promiseGetReport, promiseChangeBlueConfigPaths])
+      .then(([physicalLocation, report, blueConfig]) => {
+        console.debug('Visualizing report', report);
+        // add BlueConfig because I had to move the new with new paths for Viz
+        visualizationConfig.scripts['BlueConfig'] = blueConfig;
+        let fileNames = Object.keys(visualizationConfig.scripts);
+        let inputs = [];
+        // avoid copy the simulation input
+        let onlyInputs = true;
+        let moveObject = {
+          'computer': this.computer,
+          'projectSelected': this.simulationUserProject,
+          'nodes': 1,
+          'runtime': 100,
+          'title': 'Vizualization for ' + this.job.name,
+          'isViz': true, // to use the head node that has network for ssh
+        };
+
+        fileNames.forEach((fileName) => {
+          let data = visualizationConfig.scripts[fileName];
+          if (Array.isArray(data)) data = data.join('\n');
+          if (data.includes('{{BASE}}')) {
+            data = data.replace(/{{BASE}}/g, physicalLocation);
+          }
+          if (data.includes('{{REPORTNAME}}')) {
+            data = data.replace(/{{REPORTNAME}}/g, report);
+          }
+          if (data.includes('{{CIRCUITTARGET}}')) {
+            let match = report.match(new RegExp('(.*)_report_'));
+            if (match.length > 1) {
+              data = data.replace(/{{CIRCUITTARGET}}/g, match[1]);
+            }
+          }
+
+          data = replaceConst(data, visualizationConfig.const);
+
+          inputs.push({
+            'To': fileName,
+            'Data': data,
+          });
+        });
+        console.debug('Submiting job for visualization');
+        return this.unicoreAPI.submitJob(moveObject, inputs, onlyInputs);
+      })
+      .then((newJob) => {
+        console.debug('starting job...');
+        let newJobId = urlToId(newJob._links.self.href).id;
+        console.debug('Visualization job id', newJobId);
+        this.unicoreAPI.actionJob(newJob._links['action:start'].href);
+        let input = {
+          'To': 'job_link.txt',
+          'Data': newJobId,
+        };
+        this.unicoreAPI.uploadData(
+          input,
+          this.job._links.workingDirectory.href + '/files',
+          this.simulationUserProject
+        );
+        swal.disableLoading();
+        return swal({
+          'title': 'Visualization Job Was Submitted!',
+          'html': `<p>We are copying the files... </p>
+                  <p>THIS CAN TAKE A WHILE. </p>`,
+          'type': 'success',
+          'showCancelButton': true,
+          'focusConfirm': true,
+          'confirmButtonText': 'Open Brayns',
+        }).then((choice) => {
+          if (choice.value) {
+            window.open(
+              'https://bbp-brayns.epfl.ch/?host=https://brayns.humanbrainproject.org',
+              '_blank'
+            );
+          }
+        });
       });
     },
   },
@@ -465,6 +604,7 @@ export default {
       border-radius: 3px;
       display: flex;
       align-items: center;
+      margin: 5px;
   }
   a.button-with-icon.colored {
       color: #fff;
@@ -475,12 +615,17 @@ export default {
       margin-top: 10px;
       display: inline-flex;
   }
+  .tools {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 5px 10px;
+  }
   .detail-header {
       padding: 10px 5px;
       display: flex;
       justify-content: space-between;
       align-items: end;
-      flex-wrap: wrap;
   }
   .detail-content {
       margin: 0 10px;
@@ -512,5 +657,10 @@ export default {
   @keyframes spin {
     from {transform: rotate(0deg);}
     to {transform: rotate(359deg);}
+  }
+  @media (max-width: 550px) {
+    .detail-header {
+      flex-wrap: wrap;
+    }
   }
 </style>

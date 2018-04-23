@@ -78,7 +78,7 @@
                 </div> -->
             </div>
             <div class="button-container">
-                <input class="ok-button" type="submit" value="OK" @click="editItem">
+                <input class="ok-button" type="button" value="OK" @click="editItem">
                 <button class="cancel-button" @click="closeForm">Cancel</button>
             </div>
         </form>

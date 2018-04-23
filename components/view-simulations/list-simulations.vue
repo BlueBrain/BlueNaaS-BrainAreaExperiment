@@ -286,6 +286,9 @@ This component manage each job (delete, start, create, etc).
                 // it is an analysis that should be removed
                 return false;
               }
+              if (!simulation.children.includes('/blueconfig.json')) {
+                return false;
+              }
               if (!simulation.children.includes('/out.dat') &&
                   simulation.status === SUCCESSFUL_STATUS) {
                 // without out.dat no analysis should be run

@@ -190,21 +190,26 @@ export default {
         );
         return false;
       }
+      return checkMultipleEquals([reportKeys, stimulusKeys, this.modelSelected]);
 
-      if (reportKeys.length < 2 && stimulusKeys.length < 2) {
-        // only one stimuli and report. compare targets
-        let union = utils.unionTargets(
-          [this.blueConfig.Report[reportKeys[0]]],
-          [this.blueConfig.StimulusInject[stimulusKeys[0]]],
-          [{'Target': this.modelSelected}]
-        );
-        if (union.length > 1) {
-          // stimulus - report diff -> use Mosaic
-          if (!checkModel()) {return false;}
+      function checkMultipleEquals(arrays) {
+        let reg = new RegExp('(.+)_(.+)_');
+        let targets = [];
+
+        arrays.forEach((arr) => {
+          // add String like modelSelected
+          if (!Array.isArray(arr)) {targets.push(arr); return;}
+          arr.map((item) => {
+            let match = item.match(reg);
+            if (match && match.length > 1) {
+              targets.push(match[1]);
+            }
+          });
+        });
+        if (utils.unionArray(targets).length > 1) {
+          return checkModel();
         }
-      } else {
-        // multiple slices -> model = Mosaic
-        if (!checkModel()) {return false;}
+        return true;
       }
 
       function checkModel() {
@@ -214,8 +219,6 @@ export default {
         }
         return true;
       }
-
-      return true;
     },
     'fillToken': function(renew) {
       let that = this;
@@ -313,7 +316,7 @@ export default {
           } else {throw String('No all params in previous config');}
         } else {throw String('No previous config');}
       } catch (e) {
-        console.debug('error loading previous BlueConfig loading default', e);
+        console.debug('No previous configuration. Loading default', e);
         bc = JSON.parse(JSON.stringify( templateBluepyConfig ));
       } finally {
         this.$set(this.$data, 'blueConfig', bc);

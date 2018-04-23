@@ -7,8 +7,10 @@ This will only display the item. It knows where to put all the information.
             <div class="id clickable">
                 {{job.name}}
             </div>
-            <div class="details-button">
-                <a class="button-with-icon clickable" title="See Simulation details"><i class="material-icons">zoom_in</i>Details</a>
+            <div class="details-button clickable">
+                <a class="button-with-icon clickable" title="See Simulation details">
+                  <i class="material-icons clickable">zoom_in</i>Details
+                </a>
             </div>
         </div>
         <!-- simulation status icon -->

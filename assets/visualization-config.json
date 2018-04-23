@@ -1,0 +1,45 @@
+{
+  "scripts": {
+    "input.sh": [
+      "scp -i {{KEYLOCATION}} -r ./BlueConfig {{VIZMACHINE}}:{{VIZFOLDER}}/BlueConfig",
+      "scp -i {{KEYLOCATION}} -r {{BASE}}{{REPORTNAME}}.bbp {{VIZMACHINE}}:{{VIZFOLDER}}/{{REPORTNAME}}.bbp",
+      "ssh -i {{KEYLOCATION}} {{VIZMACHINE}} echo STARTING ...",
+      "ssh -i {{KEYLOCATION}} {{VIZMACHINE}} \"VAR1=$(docker ps -f ancestor='bluebrain/brayns' | grep brayns | awk '{print $1}') && VAR1=\"${VAR1:---help}\" && docker stop $VAR1\"",
+      "ssh -i {{KEYLOCATION}} {{VIZMACHINE}} \"docker run -d --rm -p 443:8200 -v /home:/home -v /var:/var bluebrain/brayns braynsrvice --http-server :8200 --circuit-config /home/vizuser/a/BlueConfig --circuit-density 1 --color-scheme neuron-by-id --renderer simulationrenderer --head-light 1 --circuit-report slice-4_report_0 --circuit-targets slice-4\"",
+      "ssh -i {{KEYLOCATION}} {{VIZMACHINE}} echo FINISHING ...",
+      "# ssh root@192.168.1.1 'bash -s' < visualization.sh"
+    ]
+  },
+  "filesToAvoidCopy": [
+    "blueconfig.json",
+    "change_circuit_",
+    "analysis_path",
+    "input.sh",
+    "stderr",
+    "stdout",
+    "output/",
+    "UNICORE_SCRIPT_EXIT_CODE",
+    "UNICORE_Job_",
+    "bss_submit",
+    "BlueConfig.backup",
+    "cx_",
+    "TSI_temp_file",
+    "mcomplex.dat",
+    "cxinfo_",
+    "out.dat"
+  ],
+  "const": {
+    "VIZFOLDER": "/home/vizuser/a",
+    "KEYLOCATION": "/homec/vsk25/vsk2512/.ssh/id_rsa",
+    "VIZMACHINE": "vizuser@148.187.96.74"
+  },
+  "BlueConfigPath": {
+    "CircuitPath": "/var/local/rat.CA1/20180309/slices",
+    "nrnPath": "/var/local/rat.CA1/20180309/connectome/functional",
+    "MorphologyPath": "/var/local/rat.CA1/20180309/slices/MorphologyRelease",
+    "METypePath": "/var/local/rat.CA1/20180309/hoc",
+    "TargetFile": "/var/local/rat.CA1/20180309/slices/user.target.slices",
+    "OutputRoot": "{{VIZFOLDER}}",
+    "CurrentDir": "{{VIZFOLDER}}"
+  }
+}

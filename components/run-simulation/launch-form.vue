@@ -108,6 +108,7 @@
     import utils from 'assets/utils.js';
     import {getUser} from 'mixins/unicore.js';
     export default {
+      'name': 'launch-form',
       'data': function() {
         return {
           'title': '',

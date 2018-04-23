@@ -55,7 +55,7 @@
         </div>
 
         <div class="button-container">
-            <input class="ok-button" type="submit" @click="editItem" value="Ok">
+            <input class="ok-button" type="button" @click="editItem" value="Ok">
             <input class="cancel-button" type="button" @click="closeForm" value="Cancel">
         </div>
 

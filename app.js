@@ -7,12 +7,18 @@ import UnicoreAPI from 'mixins/unicore.js';
 Vue.use(VueRouter);
 
 const router = new VueRouter({
-  // mode: 'history',
+  'mode': 'hash',
   'routes': [
     {
       'path': '',
       'component': function(resolve) {
         require(['components/run-simulation/run-simulation.vue'], resolve);
+      },
+    },
+    {
+      'path': '/login',
+      'component': function(resolve) {
+        require(['components/shared/login.vue'], resolve);
       },
     },
     {
@@ -36,10 +42,16 @@ const router = new VueRouter({
 
 // check the authentication for each page
 router.beforeEach((to, from, next) => {
-  UnicoreAPI.init().then(function() {
+  if (to.path === '/login') {next(); return;}
+  if (to.fullPath.includes('/&ctx') ||
+      to.fullPath.includes('access')) {
+    next({'path': '/login'}); return;
+  }
+  UnicoreAPI.init().then(() => {
     next();
   });
 });
+
 new Vue({
   // We want to target the div with an id of 'events'
   'el': '#app',

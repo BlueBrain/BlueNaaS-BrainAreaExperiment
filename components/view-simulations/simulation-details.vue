@@ -45,8 +45,7 @@ This will display the details of a certain simulation and the analysis.
                                 </a>
                             </item-summary>
                             <i
-                              v-if="analysis.status === QUEUED_STATUS ||
-                              analysis.status === RUNNING_STATUS"
+                              v-if="isRunning(analysis.status)"
                               class="material-icons spin">autorenew
                             </i>
                             <analysis
@@ -113,19 +112,17 @@ import Analysis from 'components/view-simulations/simulation-details/analysis.vu
 import analysisConfig from 'assets/analysis-config.json';
 import displayOrDownload from 'components/shared/display-or-download.vue';
 import visualizationConfig from 'assets/visualization-config.json';
-import {urlToId, replaceMultiplePaths, replaceConst} from 'assets/utils.js';
+import {urlToId, replaceMultiplePaths, replaceConst, isRunning} from 'assets/utils.js';
 
 const QUEUED_STATUS = 'QUEUED';
-const RUNNING_STATUS = 'RUNNING';
+
 export default {
   'name': 'simulationDetails',
   'props': ['jobParam', 'jobId', 'computerParam'],
   'data': function() {
     return {
       'loading': true,
-      'QUEUED_STATUS': QUEUED_STATUS,
-      'RUNNING_STATUS': RUNNING_STATUS,
-      'computer': 'JUQUEEN',
+      'computer': 'JURECA',
       'unicoreAPI': Unicore,
       'job': null,
       'pollInterval': 5 * 1000, // seconds
@@ -156,6 +153,7 @@ export default {
       },
       'analysisDetails': [],
       'simulationUserProject': '',
+      isRunning,
     };
   },
   'components': {
@@ -218,13 +216,13 @@ export default {
       .then((output) => {
         this.setFileContent(destination, fileName, output);
       }, () => {
-        if (this.simulationDetails.intervalReference) {
+        if (isRunning(this.job.status)) {
           setTimeout(() => {
             this.getFiles(fileName, destination);
           }, this.pollInterval);
         } else {
-          let e = [`No file ${fileName} found`];
-          destination[fileName] = e;
+          let e = `No file ${fileName} found`;
+          this.setFileContent(destination, fileName, e);
           console.error(e);
         }
       });
@@ -275,9 +273,7 @@ export default {
     'refreshAnalysis': function(analysisConfig, childAnalysis) {
       this.getAnalysisStatus(childAnalysis.jobURL, childAnalysis)
       .then(() => {
-        if (childAnalysis.status === '' ||
-            childAnalysis.status === QUEUED_STATUS ||
-            childAnalysis.status === RUNNING_STATUS) {
+        if (isRunning(childAnalysis.status)) {
           setTimeout(() => {
             this.refreshAnalysis(analysisConfig, childAnalysis);
           }, this.pollInterval);
@@ -373,8 +369,7 @@ export default {
     'setFileContent': function(destination, name, fileContent, isBlob = false) {
       // TODO: avoid loading the same file multiple times because of
       // collaps and expand multiple times
-      if ((this.job.status === RUNNING_STATUS ||
-          this.job.status === QUEUED_STATUS)) {
+      if (isRunning(this.job.status)) {
         setTimeout(() => {
           this.getFiles(name, this.simulationDetails);
         }, this.pollInterval);
@@ -573,8 +568,7 @@ export default {
   },
   'computed': {
     'getAnalysisOverallStatus': function() {
-      if (this.simulationDetails.status === QUEUED_STATUS ||
-        this.simulationDetails.status === RUNNING_STATUS) {
+      if (isRunning(this.simulationDetails.status)) {
         return 'Simulation not finished yet';
       }
       if (this.analysisDetails.length === 0 &&

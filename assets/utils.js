@@ -4,6 +4,9 @@ import {
   findKey, partial, isEqual, union,
 } from 'lodash';
 
+const QUEUED_STATUS = 'QUEUED';
+const RUNNING_STATUS = 'RUNNING';
+
 let mapper = {
   'FullCA1': 'Mosaic',
   'voltage': 'v',
@@ -109,6 +112,11 @@ let replaceConst = function(inputString, replaceMap) {
   return inputString;
 };
 
+let isRunning = function(status) {
+  return status === QUEUED_STATUS ||
+    status === RUNNING_STATUS ||
+    status === '';
+};
 
 export default {
   getDateLocalTime,
@@ -128,4 +136,5 @@ export {
   replaceMultiplePaths,
   replaceConst,
   unionArray,
+  isRunning,
 };

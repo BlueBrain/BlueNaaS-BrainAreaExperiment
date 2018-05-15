@@ -385,6 +385,7 @@ export default {
     }
     .duration-skip span {
         margin-left: 15px;
+        margin-right: 5px;
     }
     .simulation h2 {
         width: 100%;

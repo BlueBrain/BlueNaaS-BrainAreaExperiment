@@ -2,23 +2,21 @@
     <table class="launch-form">
         <!-- be carefull cause when the popup in swal2 is open the vue models are not related anymore
             so add the functionality in showSimulationParameters -->
-        <div class="form-group">
+        <div class="form-group" title="Title of the Job">
             <label class="control-label">Title: </label>
             <div class="controls">
                 <input
                     type="text"
-                    name="Title of the Job"
                     class="title"
                     v-model="title"
                     placeholder="Job's title">
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" title="Supercomputer">
             <label class="control-label">Computer: </label>
             <div class="controls">
                 <select
                     class="computer"
-                    title="Supercomputer"
                     v-model="computer">
                     <option v-for="resources in computersAvailable">
                         {{ resources }}
@@ -26,56 +24,51 @@
                 </select>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" title="Number of computer resources">
             <label class="control-label">Nodes: </label>
             <div class="controls">
                 <input
                     type="number"
-                    name="Number of computer resources"
                     class="nodes"
                     v-model="nodes"
                     placeholder="Node to allocate">
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" title="Time until timeout">
             <label class="control-label">RunTime:</label>
             <div class="controls">
                 <input
                     type="number"
-                    name="Time until timeout"
                     class="runtime"
                     v-model="runtime"
                     placeholder="(optional)">
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" title="CPUs per node">
             <label class="control-label">CPUs Per Node:</label>
             <div class="controls">
                 <input
                     type="number"
-                    name="CPUs per node"
                     class="cpus disabled"
                     v-model="cpus"
                     disabled="disabled">
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" title="Total processors">
             <label class="control-label">Total Processors:</label>
             <div class="controls">
                 <input
                     type="number"
-                    name="Total processors"
                     class="cpus disabled"
                     :value="nodes * cpus"
                     disabled="disabled">
           </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" title="Name of the project to run jobs">
             <label class="control-label">Project:</label>
             <div class="controls">
                 <select
                     class="project"
-                    name="Name of the project to run jobs"
                     v-model="projectSelected">
                     <option v-for="project in projectsAvailable">
                         {{ project }}

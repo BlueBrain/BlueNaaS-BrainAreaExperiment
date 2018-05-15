@@ -13,7 +13,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="control-label" title="Compartment means that each compartment outputs separately in the report file. Synapse indicates that each synapse will have a separate entry in the report.">Type</label>
+                    <label class="control-label" title="Soma (compartment) means that each compartment outputs separately in the report file. Synapse indicates that each synapse will have a separate entry in the report.">Type</label>
                     <div class="controls">
                         <select class="form-control" v-model="report.Type" type="text" id="Type" placeholder="Type" required>
                             <option
@@ -25,20 +25,20 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label class="control-label" title="The NEURON variable to access.">ReportOn</label>
                     <div class="controls">
-                        <input v-model="report.ReportOn" type="text" id="ReportOn" placeholder="ReportOn" required class="form-control">
+                        <input v-model="report.ReportOn" type="text" id="ReportOn" placeholder="ReportOn" required class="form-control" disabled>
                     </div>
-                </div>
-                <div class="form-group">
+                </div> -->
+                <!-- <div class="form-group">
                     <label class="control-label" title="The unit of the NEURON variable.">Unit</label>
                     <div class="controls">
                         <select v-model="report.Unit" type="text" id="Unit" placeholder="Unit" required class="form-control">
                           <option>mV</option>
                         </select>
                     </div>
-                </div>
+                </div> -->
                 <div class="form-group">
                     <label class="control-label" title="Time to start reporting">StartTime(ms)</label>
                     <div class="controls">
@@ -79,7 +79,6 @@
             </div>
             <div class="button-container">
                 <input class="ok-button" type="button" value="OK" @click="editItem">
-                <button class="cancel-button" @click="closeForm">Cancel</button>
             </div>
         </form>
 </div>

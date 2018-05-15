@@ -27,7 +27,7 @@
         </div>
 
         <div class="form-group" v-if="stimulus.Pattern == 'Poisson'">
-            <label class="control-label" title="Number of synapses to add per neuron">New synapses per cell</label>
+            <label class="control-label" title="Number of synapses to add per neuron">Synapses per cell</label>
             <div class="controls">
                 <input v-model="stimulus.NumOfSynapses" type="number" min="0" id="NumOfSynapses" placeholder="Number of synapses" required class="form-control">
             </div>
@@ -56,7 +56,6 @@
 
         <div class="button-container">
             <input class="ok-button" type="button" @click="editItem" value="Ok">
-            <input class="cancel-button" type="button" @click="closeForm" value="Cancel">
         </div>
 
     </form>

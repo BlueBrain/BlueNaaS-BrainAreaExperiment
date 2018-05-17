@@ -3,7 +3,7 @@
   "script": [
     "OMP_NUM_THREADS=1",
     "export OMP_NUM_THREADS",
-    "/homec/vsk25/vsk2512/analysis/analysis_launch_params.py --blueconfig {{origin}}/blueconfig.json --output {{origin}} --usertarget /homeb/pra098/pra09809/simulation/user.target -vv"
+    "/homec/vsk25/vsk2512/analysis/analysis_launch_params.py --blueconfig {{origin}}/blueconfig.json --output {{origin}} --usertarget /homeb/pra098/pra09809/simulation/user.target --analysisconfig ./analysis_config.json -vv"
   ],
   "filesToAvoidCopy": [
     "BlueConfig",

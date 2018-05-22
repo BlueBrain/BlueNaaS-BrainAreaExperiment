@@ -1,61 +1,61 @@
 <template>
-    <div>
-        <div class="title">Add targets using slices of the Hippocampus</div>
-        <div class="target-selection">
-            <section class="img-container">
-                <img id="currentSliceImg">
-            </section>
-            <section class="autocomplete-container">
-                <p
-                v-for="(item, index) in imagePoll"
-                @mouseover="hoverSelector(item)"
-                @click="targetSelected(item)"
-                class="list-item"
-                >
-                    <i class="plus-icon material-icons hidden">add</i>
-                    <span>{{ item['displayName'] }}</span>
-                </p>
+  <div>
+    <div class="title">Add targets using slices of the Hippocampus</div>
+    <div class="target-selection">
+      <section class="img-container">
+        <img id="currentSliceImg">
+      </section>
+      <section class="autocomplete-container">
+        <p
+          v-for="(item, index) in imagePoll"
+          :key="index"
+          class="list-item"
+          @mouseover="hoverSelector(item)"
+          @click="targetSelected(item)"
+        >
+          <span>{{ item['displayName'] }}</span>
+        </p>
 
-            </section>
-        </div>
+      </section>
     </div>
+  </div>
 </template>
 
 <script>
 const TEST_IMG_URL = 'https://raw.githubusercontent.com/antonelepfl/testvue/master/imgtest/';
 export default {
-  'name': 'target-selection',
-  'data': function() {
+  name: 'TargetSelection',
+  data: function() {
     return {
-      'imagePoll': [
-        {'name': 'slice-6', 'displayName': 'Slice -6', 'src': TEST_IMG_URL + 'slice-6_A.png?raw=true'},
-        {'name': 'slice-5', 'displayName': 'Slice -5', 'src': TEST_IMG_URL + 'slice-5_A.png?raw=true'},
-        {'name': 'slice-4', 'displayName': 'Slice -4', 'src': TEST_IMG_URL + 'slice-4_A.png?raw=true'},
-        {'name': 'slice-3', 'displayName': 'Slice -3', 'src': TEST_IMG_URL + 'slice-3_A.png?raw=true'},
-        {'name': 'slice-2', 'displayName': 'Slice -2', 'src': TEST_IMG_URL + 'slice-2_A.png?raw=true'},
-        {'name': 'slice-1', 'displayName': 'Slice -1', 'src': TEST_IMG_URL + 'slice-1_A.png?raw=true'},
-        {'name': 'slice0', 'displayName': 'Slice 0', 'src': TEST_IMG_URL + 'slice0_A.png?raw=true'},
-        {'name': 'slice1', 'displayName': 'Slice 1', 'src': TEST_IMG_URL + 'slice1_A.png?raw=true'},
-        {'name': 'slice2', 'displayName': 'Slice 2', 'src': TEST_IMG_URL + 'slice2_A.png?raw=true'},
-        {'name': 'slice3', 'displayName': 'Slice 3', 'src': TEST_IMG_URL + 'slice3_A.png?raw=true'},
-        {'name': 'slice4', 'displayName': 'Slice 4', 'src': TEST_IMG_URL + 'slice4_A.png?raw=true'},
-        {'name': 'slice5', 'displayName': 'Slice 5', 'src': TEST_IMG_URL + 'slice5_A.png?raw=true'},
-        {'name': 'slice6', 'displayName': 'Slice 6', 'src': TEST_IMG_URL + 'slice6_A.png?raw=true'},
-        {'name': 'FullCA1', 'displayName': 'FullCA1', 'src': TEST_IMG_URL + 'full_A.png?raw=true'},
+      imagePoll: [
+        {name: 'slice-6', displayName: 'Slice -6', src: TEST_IMG_URL + 'slice-6_A.png?raw=true'},
+        {name: 'slice-5', displayName: 'Slice -5', src: TEST_IMG_URL + 'slice-5_A.png?raw=true'},
+        {name: 'slice-4', displayName: 'Slice -4', src: TEST_IMG_URL + 'slice-4_A.png?raw=true'},
+        {name: 'slice-3', displayName: 'Slice -3', src: TEST_IMG_URL + 'slice-3_A.png?raw=true'},
+        {name: 'slice-2', displayName: 'Slice -2', src: TEST_IMG_URL + 'slice-2_A.png?raw=true'},
+        {name: 'slice-1', displayName: 'Slice -1', src: TEST_IMG_URL + 'slice-1_A.png?raw=true'},
+        {name: 'slice0', displayName: 'Slice 0', src: TEST_IMG_URL + 'slice0_A.png?raw=true'},
+        {name: 'slice1', displayName: 'Slice 1', src: TEST_IMG_URL + 'slice1_A.png?raw=true'},
+        {name: 'slice2', displayName: 'Slice 2', src: TEST_IMG_URL + 'slice2_A.png?raw=true'},
+        {name: 'slice3', displayName: 'Slice 3', src: TEST_IMG_URL + 'slice3_A.png?raw=true'},
+        {name: 'slice4', displayName: 'Slice 4', src: TEST_IMG_URL + 'slice4_A.png?raw=true'},
+        {name: 'slice5', displayName: 'Slice 5', src: TEST_IMG_URL + 'slice5_A.png?raw=true'},
+        {name: 'slice6', displayName: 'Slice 6', src: TEST_IMG_URL + 'slice6_A.png?raw=true'},
+        {name: 'FullCA1', displayName: 'FullCA1', src: TEST_IMG_URL + 'full_A.png?raw=true'},
       ],
-      'selectedSlice': '',
+      selectedSlice: '',
     };
   },
-  'mounted': function() {
+  mounted: function() {
     this.firstImgElement = this.imagePoll[0];
     this.loadImage();
     // this.changeBasedClick();
   },
-  'methods': {
-    'hoverSelector': function(el) {
+  methods: {
+    hoverSelector: function(el) {
       this.loadImage(el);
     },
-    'loadImage': function(element) {
+    loadImage: function(element) {
       if (!element) {
         element = this.firstImgElement;
       }
@@ -67,7 +67,7 @@ export default {
         image.classList.remove('blur');
       };
     },
-    'changeBasedClick': function() {
+    changeBasedClick: function() {
       let changeImg = function(touched) {
         let next = this.getNext(touched.target);
         this.loadImage(next);
@@ -75,7 +75,7 @@ export default {
       let container = this.$el.querySelector('#currentSliceImg');
       container.addEventListener('click', changeImg.bind(this));
     },
-    'getNext': function(element) {
+    getNext: function(element) {
       let indexFound = this.imagePoll.findIndex((pollElements) => {
         return element.src == pollElements.src;
       });
@@ -85,7 +85,7 @@ export default {
       }
       return this.firstImgElement;
     },
-    'targetSelected': function() {
+    targetSelected: function() {
       this.$emit('targetSelected', this.selectedSlice);
     },
   },
@@ -120,10 +120,7 @@ export default {
         overflow: scroll;
     }
     .list-item {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 15px 15px 15px 0;
+        padding: 7px;
         margin: 0;
     }
     .list-item:hover {

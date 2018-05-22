@@ -1,21 +1,25 @@
+
 <template>
   <div class="frame-template">
     <router-link to="/">
-      <div class="title" id="frameTemplateTitle">{{ title }}</div>
+      <div
+        id="frameTemplateTitle"
+        class="title">{{ title }}</div>
     </router-link>
 
     <div class="item-container">
-      <slot name="element"> </slot>
+      <slot name="element"/>
     </div>
   </div>
 </template>
+
 <script>
-  export default {
-    'name': 'frame-template',
-    'props': {
-      'title': {'type': String, 'default': ''},
-    },
-  };
+export default {
+  name: 'FrameTemplate',
+  props: {
+    title: {type: String, default: ''},
+  },
+};
 </script>
 
 <style scoped>

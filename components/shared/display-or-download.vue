@@ -1,49 +1,72 @@
+
 <template>
   <div class="display-download">
     <i v-if="showText()">
-      <div v-for="log in fileContent" class="log-item">
+      <div
+        v-for="log in fileContent"
+        :key="log"
+        class="log-item">
         <div v-if="typeof(log) === 'object'">
-          <div v-for="logItem in log" class="indent">
+          <div
+            v-for="logItem in log"
+            :key="logItem"
+            class="indent">
             {{ logItem }}
           </div>
         </div>
         <div v-else>
-          {{log}}
+          {{ log }}
         </div>
       </div>
     </i>
-
-    <a v-show="isLoadingObj[name]"
-      class="button-with-icon" title="Loading">
-        <i class="material-icons spin">autorenew</i>
+    <a
+      v-show="!fileContent"
+      class="button-with-icon"
+      title="Loading">
+      <i class="material-icons spin">autorenew</i>
     </a>
-    <a v-show="!isLoadingObj[name]" @click="saveFile()"
-      class="button-with-icon colored">
+    <a
+      v-show="isAvailable"
+      class="button-with-icon colored"
+      @click="saveFile()">
       <i class="material-icons download-file">file_download</i>
       Download File
     </a>
   </div>
 </template>
+
 <script>
-  import utils from 'assets/utils.js';
-  export default {
-    'name': 'display-or-download',
-    'props': ['name', 'fileContent', 'isLoadingObj'],
-    'methods': {
-      'showText': function() {
-        if (this.fileContent && this.fileContent.length < 10000) {
-          if (this.fileContent.length === 1 && this.fileContent[0] === '') {
-            this.fileContent = ['NO FILE CONTENT FOUND'];
-          }
-          return true;
-        }
-        return false;
-      },
-      'saveFile': function() {
-        utils.save(this.name, this.fileContent);
-      },
+import {save} from 'assets/utils.js';
+import 'assets/css/style.css';
+
+export default {
+  name: 'DisplayOrDownload',
+  props: ['name', 'fileContent'],
+  computed: {
+    isAvailable() {
+      let hasContent = this.fileContent &&
+        !(this.fileContent.length === 1 &&
+          this.fileContent[0].startsWith('No file')
+        );
+      if (hasContent) return true;
+      return false;
     },
-  };
+  },
+  methods: {
+    showText: function() {
+      if (this.fileContent && this.fileContent.length < 10000) {
+        if (this.fileContent.length === 1 && this.fileContent[0] === '') {
+          this.fileContent = ['No file content found'];
+        }
+        return true;
+      }
+      return false;
+    },
+    saveFile: function() {
+      save(this.name, this.fileContent);
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -76,12 +99,5 @@
   }
   a.no-link-style.router-link-active {
     text-decoration: none;
-  }
-  .spin {
-    animation: spin 2s infinite linear;
-  }
-  @keyframes spin {
-    from {transform: rotate(0deg);}
-    to {transform: rotate(359deg);}
   }
 </style>

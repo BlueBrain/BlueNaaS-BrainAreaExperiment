@@ -1,45 +1,56 @@
 <template>
   <div class="collapse-title">
-    <div class="item" @click="toggle" :class="{sublevel: sublevel}">
-      <i class="material-icons toggle-arrow" :class="{collapsed: toggleCollapse}">keyboard_arrow_right</i>
+    <div
+      :class="{sublevel: sublevel}"
+      class="item"
+      @click="toggle">
+      <i
+        :class="{collapsed: toggleCollapse}"
+        class="material-icons toggle-arrow">keyboard_arrow_right</i>
       <i>{{ title }}</i>
     </div>
-    <div class="item-container" :class="{collapsed: toggleCollapse}" >
-      <transition name="component-fade" mode="out-in">
-        <slot v-if="!toggleCollapse" name="element"></slot>
+    <div
+      :class="{collapsed: toggleCollapse}"
+      class="item-container" >
+      <transition
+        name="component-fade"
+        mode="out-in">
+        <slot
+          v-if="!toggleCollapse"
+          name="element"/>
       </transition>
     </div>
   </div>
 </template>
 <script>
-  export default {
-    'name': 'collapse-title',
-    'props': {
-      'title': {'type': String, 'default': 'Notes'},
-      'collapsed': {'type': Boolean, 'default': true},
-      'sublevel': {'type': Boolean, 'default': false},
-    },
-    'data': function() {
-      return {
-        'toggleCollapse': Boolean, // this is to avoid mutiating the prop
-      };
-    },
-    'methods': {
-      'toggle': function() {
-        this.toggleCollapse = !this.toggleCollapse;
-        if (this.toggleCollapse === false) {
-          this.$emit('expanded');
-        }
-      },
-    },
-    'mounted': function() {
-      if (this.collapsed === undefined) {
-        this.toggleCollapse = true;
-      } else {
-        this.toggleCollapse = this.collapsed;
+export default {
+  name: 'CollapseTitle',
+  props: {
+    title: {type: String, default: 'Notes'},
+    collapsed: {type: Boolean, default: true},
+    sublevel: {type: Boolean, default: false},
+  },
+  data: function() {
+    return {
+      toggleCollapse: Boolean, // this is to avoid mutiating the prop
+    };
+  },
+  mounted: function() {
+    if (this.collapsed === undefined) {
+      this.toggleCollapse = true;
+    } else {
+      this.toggleCollapse = this.collapsed;
+    }
+  },
+  methods: {
+    toggle: function() {
+      this.toggleCollapse = !this.toggleCollapse;
+      if (this.toggleCollapse === false) {
+        this.$emit('expanded');
       }
     },
-  };
+  },
+};
 </script>
 
 <style scoped>

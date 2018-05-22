@@ -1,4 +1,5 @@
-import unicoreAPI from 'mixins/unicore.js';
+import * as unicoreAPI from 'mixins/unicore.js';
+import Vue from 'vue';
 import visualizationConfig from 'assets/visualization-config.json';
 import {urlToId, replaceMultiplePaths, replaceConst} from 'assets/utils.js';
 
@@ -24,11 +25,11 @@ function launchVisualization(job, simulationUserProject, computer) {
     if (Object.keys(reportMap).length > 1) {
       // more than one report so select which one
       return swal({
-        'title': 'Select Report to Visualize',
-        'input': 'select',
-        'inputOptions': reportMap,
-        'inputPlaceholder': 'Select Report',
-        'showCancelButton': true,
+        title: 'Select Report to Visualize',
+        input: 'select',
+        inputOptions: reportMap,
+        inputPlaceholder: 'Select Report',
+        showCancelButton: true,
       })
       .then((selection) => {
         let finalReport = selection.value;
@@ -58,12 +59,12 @@ function launchVisualization(job, simulationUserProject, computer) {
     // avoid copy the simulation input
     let onlyInputs = true;
     let moveObject = {
-      'computer': computer,
-      'projectSelected': simulationUserProject,
-      'nodes': 1,
-      'runtime': 100,
-      'title': 'Vizualization for ' + job.name,
-      'isViz': true, // to use the head node that has network for ssh
+      computer: computer,
+      projectSelected: simulationUserProject,
+      nodes: 1,
+      runtime: 100,
+      title: 'Vizualization for ' + job.name,
+      isViz: true, // to use the head node that has network for ssh
     };
 
     fileNames.forEach((fileName) => {
@@ -85,8 +86,8 @@ function launchVisualization(job, simulationUserProject, computer) {
       data = replaceConst(data, visualizationConfig.const);
 
       inputs.push({
-        'To': fileName,
-        'Data': data,
+        To: fileName,
+        Data: data,
       });
     });
     console.debug('Submiting job for visualization');
@@ -98,8 +99,8 @@ function launchVisualization(job, simulationUserProject, computer) {
     console.debug('Visualization job id', newJobId);
     unicoreAPI.actionJob(newJob._links['action:start'].href);
     let input = {
-      'To': 'job_link.txt',
-      'Data': newJobId,
+      To: 'job_link.txt',
+      Data: newJobId,
     };
     unicoreAPI.uploadData(
       input,
@@ -108,13 +109,13 @@ function launchVisualization(job, simulationUserProject, computer) {
     );
     swal.disableLoading();
     return swal({
-      'title': 'Visualization Job Was Submitted!',
-      'html': `<p>We are copying the files... </p>
+      title: 'Visualization Job Was Submitted!',
+      html: `<p>We are copying the files... </p>
               <p>THIS CAN TAKE A WHILE. </p>`,
-      'type': 'success',
-      'showCancelButton': true,
-      'focusConfirm': true,
-      'confirmButtonText': 'Open Brayns',
+      type: 'success',
+      showCancelButton: true,
+      focusConfirm: true,
+      confirmButtonText: 'Open Brayns',
     }).then((choice) => {
       if (choice.value) {
         window.open(
@@ -126,6 +127,25 @@ function launchVisualization(job, simulationUserProject, computer) {
   });
 }
 
+function setFileContent(destination, name, fileContent, isBlob = false) {
+  // TODO: avoid loading the same file multiple times because of
+  // collaps and expand multiple times
+  if (!isBlob) {
+    if (typeof fileContent === 'object') {
+      fileContent = JSON.stringify(fileContent, null, 2);
+    }
+    Vue.set(destination, name, fileContent.split('\n'));
+    console.debug('++ Loaded content', name);
+  } else {
+    let reader = new FileReader();
+    reader.onloadend = () => {
+      Vue.set(destination, name, reader.result);
+    };
+    reader.readAsDataURL(fileContent);
+  }
+}
+
 export {
   launchVisualization,
+  setFileContent,
 };

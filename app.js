@@ -2,40 +2,40 @@
 import Vue from 'vue/dist/vue.min.js';
 import VueRouter from 'vue-router';
 import FrameTemplate from 'components/shared/frame-template.vue';
-import UnicoreAPI from 'mixins/unicore.js';
+import * as UnicoreAPI from 'mixins/unicore.js';
 
 Vue.use(VueRouter);
 
 const router = new VueRouter({
-  'mode': 'hash',
-  'routes': [
+  mode: 'hash',
+  routes: [
     {
-      'path': '',
-      'component': function(resolve) {
-        require(['components/run-simulation/run-simulation.vue'], resolve);
+      path: '',
+      component: function(resolve) {
+        require(['components/run-simulation/index.vue'], resolve);
       },
     },
     {
-      'path': '/login',
-      'component': function(resolve) {
+      path: '/login',
+      component: function(resolve) {
         require(['components/shared/login.vue'], resolve);
       },
     },
     {
-      'path': '/view/:computerParam/status/:statusSearch',
-      'component': function(resolve) {
+      path: '/view/:computerParam/status/:statusSearch',
+      component: function(resolve) {
         require(['components/view-simulations/view-simulations.vue'], resolve);
       },
-      'props': true,
-      'name': 'view',
+      props: true,
+      name: 'view',
     },
     {
-      'path': '/view/:computerParam/:jobId',
-      'component': function(resolve) {
-        require(['components/view-simulations/simulation-details.vue'], resolve);
+      path: '/view/:computerParam/:jobId',
+      component: function(resolve) {
+        require(['components/view-simulations/simulation-details/index.vue'], resolve);
       },
-      'props': true,
-      'name': 'details',
+      props: true,
+      name: 'details',
     },
   ],
 });
@@ -45,7 +45,7 @@ router.beforeEach((to, from, next) => {
   if (to.path === '/login') {next(); return;}
   if (to.fullPath.includes('/&ctx') ||
       to.fullPath.includes('access')) {
-    next({'path': '/login'}); return;
+    next({path: '/login'}); return;
   }
   UnicoreAPI.init().then(() => {
     next();
@@ -54,9 +54,9 @@ router.beforeEach((to, from, next) => {
 
 new Vue({
   // We want to target the div with an id of 'events'
-  'el': '#app',
+  el: '#app',
   router,
-  'components': {
+  components: {
     'frame-template': FrameTemplate,
   },
 });

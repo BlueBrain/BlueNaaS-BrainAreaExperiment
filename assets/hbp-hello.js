@@ -7,19 +7,19 @@ let authUrl = ( window.bbpConfig &&
 let token = null;
 
 hello.init({
-  'simlauncher': {
-    'id': 'c292031c-c91f-43fa-b1a9-72e65eb18e44',
-    'name': 'Human Brain Project',
-    'oauth': {
-      'version': '2',
-      'auth': authUrl + '/authorize',
-      'grant': authUrl + '/token',
+  simlauncher: {
+    id: 'c292031c-c91f-43fa-b1a9-72e65eb18e44',
+    name: 'Human Brain Project',
+    oauth: {
+      version: '2',
+      auth: authUrl + '/authorize',
+      grant: authUrl + '/token',
     },
     // API base URL
-    'base': authUrl + '/',
-    'scope_delim': ' ', // eslint-disable-line camelcase
-    'login': _login,
-    'logout': _logout,
+    base: authUrl + '/',
+    scope_delim: ' ', // eslint-disable-line camelcase
+    login: _login,
+    logout: _logout,
   },
 });
 
@@ -47,7 +47,7 @@ function _logout(callback, p) {
     oReq.open('post', authUrl + '/slo', true);
     oReq.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
     oReq.withCredentials = true;
-    oReq.send(JSON.stringify({'token': token}));
+    oReq.send(JSON.stringify({token: token}));
   } else {
     callback();
   }
@@ -55,9 +55,9 @@ function _logout(callback, p) {
 
 function init() {
   return hello.login('simlauncher', {
-    'display': 'page',
+    display: 'page',
     // 'force': false,
-    'page_uri': window.location.href.replace(/#(.*)/, '#/login'),
+    page_uri: window.location.href.replace(/#(.*)/, '#/login'),
   })
   .then(
     (data) => {setHeader(data);},
@@ -70,7 +70,7 @@ function isAuth() {
   let session = hello('simlauncher').getAuthResponse();
   let valid = session && session.expires > (new Date).getTime()/1000;
   if (!valid) return init();
-  if (!token) setHeader({'authResponse': session});
+  if (!token) setHeader({authResponse: session});
   return Promise.resolve();
 }
 

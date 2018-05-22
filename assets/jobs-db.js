@@ -1,28 +1,24 @@
 
 import PouchDB from 'pouchdb-browser';
-import utils from 'assets/utils';
+import {urlToId} from 'assets/utils';
+import {jobStatus} from 'assets/job-status';
 let db = new PouchDB('my_database');
-const STATUS = {
-  'successful': 'SUCCESSFUL',
-  'failed': 'FAILED',
-  'ready': 'READY',
-};
 
 function addJob(job) {
   checkJob(job);
   let jobToPush = {};
   let options = {};
-  if (job.status === STATUS.successful ||
-      job.status === STATUS.failed) {
+  if (job.status === jobStatus.successful ||
+      job.status === jobStatus.failed) {
     jobToPush = {
-      '_id': job.id,
-      'computer': job.computer,
-      'details': job,
+      _id: job.id,
+      computer: job.computer,
+      details: job,
     };
   } else {
     if (job._rev) { // already exists, update
       jobToPush = job;
-      options = {'force': true};
+      options = {force: true};
     } else {return;}
   }
 
@@ -42,7 +38,7 @@ function addJob(job) {
   function checkJob(job) {
     // will (if it is the case) parse full URL to job format
     if ((!job.id || !job.computer) && job._links) {
-      let info = utils.urlToId(job._links.self.href);
+      let info = urlToId(job._links.self.href);
       job.id = info.id;
       job.computer = info.computer;
     }
@@ -59,7 +55,7 @@ function addJob(job) {
 }
 
 function getJobByUrl(url) {
-  let info = utils.urlToId(url);
+  let info = urlToId(url);
   return getJob(info.id, info.computer);
 }
 
@@ -75,7 +71,7 @@ function getJob(id, computer) {
   });
 }
 
-export default {
+export {
   addJob,
   getJob,
   getJobByUrl,

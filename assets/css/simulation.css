@@ -1,8 +1,4 @@
 /* --------- form ---------- */
-.modal-form {
-    max-width: 400px;
-    margin: 0 auto;
-}
 .form-group {
     margin: 10px 0;
     display: flex;
@@ -14,7 +10,7 @@
 }
 .control-label {
     display: inline-flex;
-    width: 40%;
+    width: 45%;
 }
 div.controls {
     display: inline-flex;

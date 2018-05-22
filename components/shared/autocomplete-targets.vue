@@ -1,16 +1,16 @@
 <template>
-    <v-autocomplete
-        class="full-width"
-        :items="filteredTargets"
-        min-len="0"
-        wait="0"
-        placeholder="Target"
-        :component-item="autocompleteTemplate"
-        v-model="modelSelected"
-        @update-items="updateItems"
-        @item-selected="itemSelected"
-        @item-clicked="itemSelected"
-    ></v-autocomplete>
+  <v-autocomplete
+    :items="filteredTargets"
+    :component-item="autocompleteTemplate"
+    v-model="modelSelected"
+    class="full-width"
+    min-len="0"
+    wait="0"
+    placeholder="Target"
+    @update-items="updateItems"
+    @item-selected="itemSelected"
+    @item-clicked="itemSelected"
+  />
 </template>
 
 <script>
@@ -20,22 +20,22 @@ import autocompleteTemplate from 'components/shared/autocomplete-template.vue';
 // You need a specific loader for CSS files like https://github.com/webpack/css-loader
 import 'v-autocomplete/dist/v-autocomplete.css';
 Vue.use(Autocomplete);
-import targetList from 'assets/targetList.json';
+import targetList from 'assets/target-list.json';
 
 export default {
-  'props': ['targetSelected', 'itemsAvailable'],
-  'data': function() {
-    return {
-      'autocompleteTemplate': autocompleteTemplate,
-      'targetList': targetList,
-      'filteredTargets': [],
-      'modelSelected': null,
-    };
-  },
-  'components': {
+  components: {
     'v-autocomplete': Autocomplete,
   },
-  'mounted': function() {
+  props: ['targetSelected', 'itemsAvailable'],
+  data: function() {
+    return {
+      autocompleteTemplate: autocompleteTemplate,
+      targetList: targetList,
+      filteredTargets: [],
+      modelSelected: null,
+    };
+  },
+  mounted: function() {
     if (this.itemsAvailable) {
       this.targetList = this.itemsAvailable;
     }
@@ -47,18 +47,16 @@ export default {
       this.filteredTargets = this.getSomeTargets();
     });
   },
-  'methods': {
-    'getSomeTargets': function() {
+  methods: {
+    getSomeTargets: function() {
       // show max 50 elements
       return this.targetList.slice(0, 50);
     },
-    'getLabel': function(item) {
-      if (item) {
-        return item;
-      }
+    getLabel: function(item) {
+      if (item) return item;
       return '';
     },
-    'updateItems': function(text) {
+    updateItems: function(text) {
       if (text) {
         this.filteredTargets = this.targetList.filter((target) => {
           return target.toLowerCase().indexOf(text.toLowerCase()) >= 0;
@@ -69,7 +67,7 @@ export default {
         this.$emit('targetChanged', text);
       }
     },
-    'itemSelected': function(selection) {
+    itemSelected: function(selection) {
       this.$emit('targetChanged', selection);
     },
   },
@@ -77,7 +75,7 @@ export default {
 </script>
 
 <style scoped>
-    .full-width {
-        width: 100%;
-    }
+  .full-width {
+    width: 100%;
+  }
 </style>

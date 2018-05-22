@@ -2,14 +2,14 @@
 export default {
   'data'() {
     return {
-      'header': {},
+      header: {},
     };
   },
-  'methods': {
-    'toggleModal': function(value) {
+  methods: {
+    toggleModal: function(value) {
       this.showModal = value;
     },
-    'setupGroups': function(target) {
+    setupGroups: function(target) {
       // given a target returns an group object
       let i = 0;
       for (i; i<this.groups.length; i++) {
@@ -18,11 +18,11 @@ export default {
           return group;
         }
       }
-      let newGroup = {'id': target, 'content': target};
+      let newGroup = {id: target, content: target};
       this.groups.push(newGroup); // add element
       return newGroup;
     },
-    'cleanGroups': function() {
+    cleanGroups: function() {
       // check if there are no items in the group so it can remove the group
       let tempGroups = this.groups.slice(0);
       this.groups.forEach((group) => {
@@ -44,35 +44,35 @@ export default {
       this.timeline.setGroups(new vis.DataSet(this.groups));
       return this.groups;
     },
-    'prettyAlert': function(title, text) {
+    prettyAlert: function(title, text) {
       swal({
-        'title': title,
-        'text': text,
-        'type': 'info',
-        'confirmButtonColor': '#879fcb',
+        title: title,
+        text: text,
+        type: 'info',
+        confirmButtonColor: '#879fcb',
       });
     },
-    'prettyConfirm': function(title, text, callback) {
+    prettyConfirm: function(title, text, callback) {
       swal({
-        'title': title,
-        'text': text,
-        'type': 'warning',
-        'showCancelButton': true,
-        'confirmButtonColor': '#ac6067',
-        'cancelButtonColor': '#879fcb',
-        'confirmButtonText': 'Delete',
-        'focusCancel': true,
+        title: title,
+        text: text,
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ac6067',
+        cancelButtonColor: '#879fcb',
+        confirmButtonText: 'Delete',
+        focusCancel: true,
       }).then(callback);
     },
-    'onAdd': function(item, callback) {
+    onAdd: function(item, callback) {
       this.itemAdd.call(this, item, callback);
     },
-    'onMove': function(item, callback) {
+    onMove: function(item, callback) {
       // sync in the respectives stimulation/report components
       this.updateTimes(item);
       this.checkMove(item, callback);
     },
-    'onRemove': function(item, callback) {
+    onRemove: function(item, callback) {
       let that = this;
       this.prettyConfirm(
         'Remove item',
@@ -83,14 +83,14 @@ export default {
             that.groups = that.cleanGroups(item.group);
             // sync the timeline
             that.timeline.setData({
-              'groups': new vis.DataSet(that.groups),
-              'items': new vis.DataSet(that.items),
+              groups: new vis.DataSet(that.groups),
+              items: new vis.DataSet(that.items),
             });
           }
         }
       );
     },
-    'updateOrAdd': function(originalArray, newItem) {
+    updateOrAdd: function(originalArray, newItem) {
       // this will update the object or add a new one
       for (let i = 0; i < originalArray.length; i++) {
         if (originalArray[i].id === newItem.id) {
@@ -102,7 +102,7 @@ export default {
       return originalArray;
     },
     // it comes from the onUpdate and the form calls this function
-    'editItem': function(editedItem) {
+    editItem: function(editedItem) {
       // change the  items
       this.items = this.updateOrAdd(this.items, editedItem.item);
       let newGroupInfo = this.setupGroups(editedItem.item.group);
@@ -118,7 +118,7 @@ export default {
       this.cleanGroups();
       this.toggleModal(false);
     },
-    'changeConnectionName': function(target, pattern, newId) {
+    changeConnectionName: function(target, pattern, newId) {
       let temp = [];
       temp.push(target);
       temp.push(pattern);
@@ -134,11 +134,11 @@ export default {
 
       return temp.join('_');
     },
-    'itemAdd': function(item, callback) {
+    itemAdd: function(item, callback) {
       let oldItem = item || null;
       this.createNewItem(oldItem, callback);
     },
-    'itemDelete': function() {
+    itemDelete: function() {
       let deleteId = this.timeline.getSelection()[0];
       if (deleteId === undefined) {
         console.error('Please select an item in the timeline');
@@ -149,7 +149,7 @@ export default {
         this.onRemove.call(this, item);
       }
     },
-    'itemEdit': function() {
+    itemEdit: function() {
       let editId = this.timeline.getSelection()[0];
       if (editId === undefined) {
         this.prettyAlert('Unable to edit', 'No item was selected');
@@ -160,7 +160,7 @@ export default {
         this.onUpdate.call(this, item, undefined);
       }
     },
-    'getItemId': function() {
+    getItemId: function() {
       let ids = this.timeline.itemsData.getIds();
       let max = Math.max(...ids) + 1;
       if (max < 0) {
@@ -168,29 +168,29 @@ export default {
       }
       return max;
     },
-    'createTimeline': function() {
+    createTimeline: function() {
       let container = this.$el.querySelector('#visualization');
       let that = this;
       let options = {
-        'selectable': true,
-        'timeAxis': {'scale': 'millisecond', 'step': 50},
-        'showMajorLabels': false,
-        'showCurrentTime': false,
-        'format': {
-          'minorLabels': function(date, scale, step) {
+        selectable: true,
+        timeAxis: {scale: 'millisecond', step: 50},
+        showMajorLabels: false,
+        showCurrentTime: false,
+        format: {
+          minorLabels: function(date, scale, step) {
             if (scale === 'millisecond') {
               return new Date(date).getTime() + 'ms';
             }
           },
         },
-        'start': 0,
-        'end': this.endTime * 1.5,
-        'editable': true,
-        'onAdd': this.onAdd,
-        'onMove': this.onMove,
-        'onUpdate': this.onUpdate,
-        'onRemove': this.onRemove,
-        'zoomMax': 1000 * 3, // 5s limit zoom out
+        start: 0,
+        end: this.endTime * 1.5,
+        editable: true,
+        onAdd: this.onAdd,
+        onMove: this.onMove,
+        onUpdate: this.onUpdate,
+        onRemove: this.onRemove,
+        zoomMax: 1000 * 3, // 5s limit zoom out
       };
 
       this.timeline = new vis.Timeline(container);
@@ -212,7 +212,7 @@ export default {
       setTimeout(this.createCustomTimeLabel, 100); // waits until timeline draws
       this.changeCustomTimeLabelOnResize();
     },
-    'showTooltip': function(event, output) {
+    showTooltip: function(event, output) {
       // comes from the timeline.on('itemover')
       let x = event.event.clientX;
       let y = event.event.clientY;
@@ -221,7 +221,7 @@ export default {
       this.tooltipElem.style.display = 'block';
       this.tooltipElem.innerText = output;
     },
-    'createCustomTimeLabel': function(properties) {
+    createCustomTimeLabel: function(properties) {
       // this redraw the label for indicate the end of simulation
       let customTime = this.$el.querySelector('.vis-custom-time');
       let customLabel = this.$el.querySelector('.custom-time-label');
@@ -230,7 +230,7 @@ export default {
         customLabel.style.left = (left + 71) + 'px';
       }
     },
-    'changeCustomTimeLabelOnResize': function() {
+    changeCustomTimeLabelOnResize: function() {
       let timeout = false; // holder for timeout id
       let delay = 250; // delay after event is "complete" to run callback
       let that = this;
@@ -240,7 +240,7 @@ export default {
         timeout = setTimeout(that.createCustomTimeLabel, delay);
       });
     },
-    'removeFrom': function(originalArray, deletedItem) {
+    removeFrom: function(originalArray, deletedItem) {
       originalArray = originalArray.filter(function(item) {
         return item.id !== deletedItem.id;
       });

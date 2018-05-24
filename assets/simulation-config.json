@@ -1,19 +1,4 @@
 {
-    "JUQUEEN": {
-        "script": [
-            "source /homec/bp0/bp000022/modulecmd/3.2.10/init/bash",
-            "module use /homec/bp0/bp000022/modulesfiles",
-            "module load nix/hpc/neuron",
-            "module load nix/hpc/neurodamus-hippocampus",
-            "export FULL_CPU_PER_NODE=16",
-            "mkdir -p output",
-            "python /homeb/pra098/pra09809/simulation/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /homeb/pra098/pra09809/simulation/user.target --output output"
-        ],
-        "time": "36000",
-        "nodes": "130",
-        "cpus": "16",
-        "pathWork": "/work"
-    },
     "JULIA": {
         "script": [
             "#!/bin/sh",
@@ -51,6 +36,6 @@
         "partitions": {"vsk25": "booster"}
     },
     "default": "JURECA",
-    "available": ["JULIA", "JUQUEEN", "JURECA"],
+    "available": ["JULIA", "JURECA"],
     "defaultTarget": "slice-4"
 }

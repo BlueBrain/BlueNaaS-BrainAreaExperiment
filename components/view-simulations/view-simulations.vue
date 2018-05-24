@@ -11,6 +11,7 @@ This component will be the frame for view the simulations.
 
 <script>
 import ListSimulations from 'components/view-simulations/list-simulations.vue';
+import simulationConfig from 'assets/simulation-config.json';
 export default {
   name: 'ViewSimulation',
   components: {
@@ -19,7 +20,7 @@ export default {
   props: ['computerParam', 'statusSearch'],
   created: function() {
     if (!this.computerParam) {
-      this.computerParam = 'JUQUEEN';
+      this.computerParam = simulationConfig.default;
     }
     document.getElementById('frameTemplateTitle').innerText = 'View Simulations';
   },

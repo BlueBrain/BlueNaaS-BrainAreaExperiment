@@ -4,6 +4,7 @@
       <div
         v-for="plot in analysisConfig.plots"
         :key="plot"
+        class="columns-is30"
       >
         <div
           v-if="itemDetails[plot]"
@@ -81,22 +82,25 @@ export default {
 </script>
 
 <style scoped>
-    .analysis-plot {
-        max-width: 400px;
-        height: 400px;
-    }
-    .all-plots-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
-    }
-    .plot-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .plot-label {
-        font-size: 24px;
-        margin: 5px 0;
-    }
+  .analysis-plot {
+    max-width: 400px;
+    height: 400px;
+  }
+  .all-plots-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  .plot-container {
+      display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .plot-label {
+    font-size: 24px;
+    margin: 5px 0;
+  }
+  .columns-is30 {
+    width: 33%;
+  }
 </style>

@@ -25,8 +25,9 @@ This will display the details of a certain simulation and the analysis.
             <i class="material-icons">arrow_back</i>Simulation List
           </a>
           <a
+            id="visualizationLauncherButton"
             class="button-with-icon colored small"
-            @click="launchVisualization(job, simulationUserProject, computer)">
+            @click="launchVisualizationJob(job, simulationUserProject, computer)">
             <i class="material-icons">visibility</i>
             Visualize Simulation
           </a>
@@ -67,6 +68,7 @@ This will display the details of a certain simulation and the analysis.
         <collapse-title
           :collapsed="true"
           title="Stderr"
+          @collapsed="cleanPolling('stderr', simulationDetails)"
           @expanded="getFiles('stderr', simulationDetails)">
           <div
             slot="element"
@@ -80,6 +82,7 @@ This will display the details of a certain simulation and the analysis.
         <collapse-title
           :collapsed="true"
           title="Stdout"
+          @collapsed="cleanPolling('stdout', simulationDetails)"
           @expanded="getFiles('stdout', simulationDetails)">
           <div
             slot="element"
@@ -107,6 +110,7 @@ import displayOrDownload from 'components/shared/display-or-download.vue';
 import {isRunning, isEnded} from 'assets/job-status.js';
 import {launchVisualization, setFileContent} from 'mixins/simulation-details.js';
 import 'assets/css/style.css';
+const BRAYNS_URL = 'https://bbp-brayns.epfl.ch/?host=https://brayns.humanbrainproject.org';
 
 export default {
   name: 'SimulationDetails',
@@ -140,7 +144,6 @@ export default {
         refreshFunction: null,
       },
       simulationUserProject: '',
-      launchVisualization,
     };
   },
   created: function() {
@@ -191,22 +194,35 @@ export default {
     },
     getFiles: function(fileName, destination) {
       let url = this.simulationDetails.workingDirectory + '/files/' + fileName;
+      let that = this;
       this.$set(destination, fileName, false);
+
       console.debug('Loading content', fileName);
-      return unicoreAPI.getFiles(url, this.simulationUserProject)
-      .then((output) => {
-        setFileContent(destination, fileName, output);
-      }, () => {
-        if (isRunning(this.job.status)) {
-          setTimeout(() => {
-            this.getFiles(fileName, destination);
-          }, this.pollInterval);
-        } else {
+      if (destination[`${fileName}Polling`]) return;
+      destination[`${fileName}Polling`] = setInterval(getFilePolling, 2000);
+
+      function getFilePolling() {
+        console.debug('---))))))) Polling file', fileName);
+        console.debug('Unicore', unicoreAPI);
+        unicoreAPI.getFiles(url, that.simulationUserProject)
+        .then((output) => {
+          setFileContent(destination, fileName, output);
+          if (!isRunning(that.job.status)) {
+            that.cleanPolling(fileName, destination);
+          }
+        })
+        .catch((fileNotFound) => {
           let e = `No file ${fileName} found`;
           setFileContent(destination, fileName, e);
           console.error(e);
-        }
-      });
+          that.cleanPolling(fileName, destination);
+        });
+      }
+    },
+    cleanPolling(fileName, destination) {
+      console.debug('Cleaning polling', fileName);
+      clearInterval(destination[`${fileName}Polling`]);
+      destination[`${fileName}Polling`] = null;
     },
     getBlueConfig: function() {
       let destination = this.simulationDetails;
@@ -286,6 +302,22 @@ export default {
       } else {
         obj.intervalReference = clearTimeout(obj.intervalReference);
       }
+    },
+    launchVisualizationJob: function(job, simulationUserProject, computer) {
+      return swal({
+        title: 'Visualization',
+        html: `<p>THIS CAN TAKE A WHILE (5~10 minutes). </p>
+               <p><a href="${BRAYNS_URL}">BRAYNS</a>
+                  will open automatically after it has been configured</p>`,
+        type: 'info',
+        showLoaderOnConfirm: true,
+        confirmButtonText: 'Setup BRAYNS',
+        preConfirm: () => launchVisualization(job, simulationUserProject, computer),
+        allowOutsideClick: () => !swal.isLoading(),
+      }).then((choice) => {
+        if (!choice.value) return;
+        window.open(BRAYNS_URL, '_blank');
+      });
     },
   },
 };

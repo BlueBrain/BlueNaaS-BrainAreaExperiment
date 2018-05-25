@@ -47,6 +47,8 @@ export default {
       this.toggleCollapse = !this.toggleCollapse;
       if (this.toggleCollapse === false) {
         this.$emit('expanded');
+      } else {
+        this.$emit('collapsed');
       }
     },
   },

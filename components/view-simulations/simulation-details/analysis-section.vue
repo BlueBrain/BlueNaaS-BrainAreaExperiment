@@ -97,7 +97,7 @@ export default {
             let childAnalysis = Object.assign({}, this.analysisDetailTemplate);
             childAnalysis.jobURL = analysis._links.self.href;
             childAnalysis.workingDirectory = analysis._links.workingDirectory.href;
-            childAnalysis.id = analysis._links.self.href.split('/').pop();
+            childAnalysis.id = childAnalysis.jobURL.split('/').pop();
             childAnalysis.type = 'Analysis';
             childAnalysis.submissionTime = analysis.submissionTime;
             childAnalysis.statusIcon = analysis.status;

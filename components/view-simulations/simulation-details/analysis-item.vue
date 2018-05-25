@@ -4,18 +4,20 @@
       <div
         v-for="plot in analysisConfig.plots"
         :key="plot"
-        class="plot-container"
       >
-        <span class="plot-label">{{ fullName(plot) }}</span>
-        <a
+        <div
           v-if="itemDetails[plot]"
-          :download="plot +'.png'"
-          :href="itemDetails[plot]"
-        >
-          <img
-            :src="itemDetails[plot]"
-            class="analysis-plot">
-        </a>
+          class="plot-container">
+          <span class="plot-label">{{ fullName(plot) }}</span>
+          <a
+            :download="plot +'.png'"
+            :href="itemDetails[plot]"
+          >
+            <img
+              :src="itemDetails[plot]"
+              class="analysis-plot">
+          </a>
+        </div>
         <div v-else>{{ noValidationText }}</div>
       </div>
     </div>
@@ -60,12 +62,6 @@ export default {
     noValidationText: function() {
       if (this.itemDetails.isLoading) {
         return 'Loading...';
-      } else {
-        if (this.itemDetails.id) {
-          return 'No available image yet';
-        } else {
-          return 'No Analysis was run yet';
-        }
       }
     },
   },

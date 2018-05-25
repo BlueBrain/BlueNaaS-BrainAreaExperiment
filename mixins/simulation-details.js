@@ -2,9 +2,9 @@ import * as unicoreAPI from 'mixins/unicore.js';
 import Vue from 'vue';
 import visualizationConfig from 'assets/visualization-config.json';
 import {urlToId, replaceMultiplePaths, replaceConst} from 'assets/utils.js';
+import {isRunning} from 'assets/job-status.js';
 
 function launchVisualization(job, simulationUserProject, computer) {
-  swal.enableLoading();
   let promisePhysicalLocation = unicoreAPI.jobUrlToPhysicalLocation(
     job._links.self.href,
     simulationUserProject
@@ -98,32 +98,37 @@ function launchVisualization(job, simulationUserProject, computer) {
     let newJobId = urlToId(newJob._links.self.href).id;
     console.debug('Visualization job id', newJobId);
     unicoreAPI.actionJob(newJob._links['action:start'].href);
+
     let input = {
-      To: 'job_link.txt',
-      Data: newJobId,
+      To: 'viz_link.txt',
+      Data: newJob._links.self.href,
     };
+
     unicoreAPI.uploadData(
       input,
       job._links.workingDirectory.href + '/files',
       simulationUserProject
     );
-    swal.disableLoading();
-    return swal({
-      title: 'Visualization Job Was Submitted!',
-      html: `<p>We are copying the files... </p>
-              <p>THIS CAN TAKE A WHILE. </p>`,
-      type: 'success',
-      showCancelButton: true,
-      focusConfirm: true,
-      confirmButtonText: 'Open Brayns',
-    }).then((choice) => {
-      if (choice.value) {
-        window.open(
-          'https://bbp-brayns.epfl.ch/?host=https://brayns.humanbrainproject.org',
-          '_blank'
-        );
-      }
-    });
+
+    return pollingVizPromise(newJob, simulationUserProject);
+  });
+}
+
+function pollingVizPromise(vizJobUrl, simulationUserProject) {
+  return new Promise((resolve) => {
+    let pollingViz = setInterval(getVizStatus, 3000);
+
+    function getVizStatus() {
+      console.debug('check viz status');
+      unicoreAPI.getJobProperties(vizJobUrl, simulationUserProject)
+      .then((properties) => {
+        if (!isRunning(properties.status)) {
+          clearInterval(pollingViz);
+          console.debug('Viz polling done');
+          resolve(vizJobUrl);
+        }
+      });
+    }
   });
 }
 

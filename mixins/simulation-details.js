@@ -110,16 +110,16 @@ function launchVisualization(job, simulationUserProject, computer) {
       simulationUserProject
     );
 
-    return pollingVizPromise(newJob, simulationUserProject);
+    return pollingVizPromise(newJob._links.self.href, simulationUserProject);
   });
 }
 
 function pollingVizPromise(vizJobUrl, simulationUserProject) {
   return new Promise((resolve) => {
-    let pollingViz = setInterval(getVizStatus, 3000);
+    let pollingViz = setInterval(getVizStatus, 5000);
 
     function getVizStatus() {
-      console.debug('check viz status');
+      console.debug('Polling vizualization job status');
       unicoreAPI.getJobProperties(vizJobUrl, simulationUserProject)
       .then((properties) => {
         if (!isRunning(properties.status)) {

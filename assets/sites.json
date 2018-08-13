@@ -1,0 +1,62 @@
+{
+  "JUQUEEN": {
+    "name": "JUQUEEN (JSC)",
+    "id": "JUQUEEN",
+    "url": "https://hbp-unic.fz-juelich.de:7112/HBP_JUQUEEN/rest/core"
+  },
+  "JURECA": {
+    "name": "JURECA (JSC)",
+    "id": "JURECA",
+    "url": "https://zam2125.zam.kfa-juelich.de:9112/FZJ_JURECA/rest/core"
+  },
+  "JURON": {
+    "name": "JURON (JSC)",
+    "id": "JURON",
+    "url": "https://hbp-unic.fz-juelich.de:7112/HBP_JURON/rest/core"
+  },
+  "JULIA": {
+    "name": "JULIA (JSC)",
+    "id": "JULIA",
+    "url": "https://hbp-unic.fz-juelich.de:7112/HBP_JULIA/rest/core"
+  },
+  "VIZ_CSCS": {
+    "name": "VIZ (CSCS)",
+    "id": "VIS",
+    "url": "https://contra.cscs.ch:8080/VIS-CSCS/rest/core"
+  },
+  "BGQ_CSCS": {
+    "name": "BGQ (CSCS)",
+    "id": "BGQ",
+    "url": "https://contra.cscs.ch:8080/BGQ-CSCS/rest/core"
+  },
+  "MARE_NOSTRUM": {
+    "name": "Mare Nostrum (BSC)",
+    "id": "MN",
+    "url": "https://unicore-hbp.bsc.es:8080/BSC-MareNostrum/rest/core"
+  },
+  "PICO": {
+    "name": "PICO (CINECA)",
+    "id": "PICO",
+    "url": "https://grid.hpc.cineca.it:9111/CINECA-PICO/rest/core"
+  },
+  "GALILEO": {
+    "name": "GALILEO (CINECA)",
+    "id": "GALILEO",
+    "url": "https://grid.hpc.cineca.it:9111/CINECA-GALILEO/rest/core"
+  },
+  "FERMI": {
+    "name": "FERMI (CINECA)",
+    "id": "FERMI",
+    "url": "https://grid.hpc.cineca.it:9111/CINECA-FERMI/rest/core"
+  },
+  "KIT": {
+    "name": "Cloud storage (KIT)",
+    "id": "S3-Kt",
+    "url": "https://unicore.data.kit.edu:8080/HBP-KIT/rest/core"
+  },
+  "NUVLA": {
+    "name": "NUVLA",
+    "id": "NUVlA",
+    "url": "https://hbp-unic.fz-juelich.de:7112/NUVLA/rest/core"
+  }
+}

@@ -1,6 +1,6 @@
 
 import PouchDB from 'pouchdb-browser';
-import {urlToId} from 'assets/utils';
+import {urlToComputerAndId} from 'mixins/unicore';
 import {jobStatus} from 'assets/job-status';
 let db = new PouchDB('my_database');
 
@@ -38,7 +38,7 @@ function addJob(job) {
   function checkJob(job) {
     // will (if it is the case) parse full URL to job format
     if ((!job.id || !job.computer) && job._links) {
-      let info = urlToId(job._links.self.href);
+      let info = urlToComputerAndId(job._links.self.href);
       job.id = info.id;
       job.computer = info.computer;
     }
@@ -55,7 +55,7 @@ function addJob(job) {
 }
 
 function getJobByUrl(url) {
-  let info = urlToId(url);
+  let info = urlToComputerAndId(url);
   return getJob(info.id, info.computer);
 }
 

@@ -1,8 +1,8 @@
 {
   "scripts": {
     "input.sh": [
-      "ls -lh {{BASE}}{{REPORTNAME}}.bbp",
-      "curl -X POST http://148.187.96.74/viz   -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'   -F BlueConfig=@./BlueConfig   -F {{REPORTNAME}}.bbp=@{{BASE}}{{REPORTNAME}}.bbp   -F ReportName={{REPORTNAME}}"
+      "ls -lh {{BASE}}{{REPORT_NAME}}.bbp",
+      "curl -X POST http://148.187.96.74/viz -F BlueConfig=@./BlueConfig -F {{REPORT_NAME}}.bbp=@{{BASE}}{{REPORT_NAME}}.bbp -F ReportName={{REPORT_NAME}} -F CircuitTarget={{CIRCUIT_TARGET}}"
     ]
   },
   "filesToAvoidCopy": [
@@ -24,9 +24,9 @@
     "out.dat"
   ],
   "const": {
-    "VIZFOLDER": "/home/vizuser/files",
-    "KEYLOCATION": "/homec/vsk25/vsk2512/.ssh/id_rsa",
-    "VIZMACHINE": "vizuser@148.187.96.74"
+    "VIZ_FOLDER": "/home/vizuser/files",
+    "KEY_LOCATION": "/homec/vsk25/vsk2512/.ssh/id_rsa",
+    "VIZ_MACHINE": "vizuser@148.187.96.74"
   },
   "BlueConfigPath": {
     "CircuitPath": "/var/local/rat.CA1/20180309/slices",
@@ -34,7 +34,7 @@
     "MorphologyPath": "/var/local/rat.CA1/20180309/slices/MorphologyRelease",
     "METypePath": "/var/local/rat.CA1/20180309/hoc",
     "TargetFile": "/var/local/rat.CA1/20180309/slices/user.target.slices",
-    "OutputRoot": "{{VIZFOLDER}}",
-    "CurrentDir": "{{VIZFOLDER}}"
+    "OutputRoot": "{{VIZ_FOLDER}}",
+    "CurrentDir": "{{VIZ_FOLDER}}"
   }
 }

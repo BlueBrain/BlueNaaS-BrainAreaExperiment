@@ -41,7 +41,6 @@ import analysisConfig from 'assets/analysis-config.json';
 import {isRunning, jobStatus} from 'assets/job-status.js';
 import * as unicoreAPI from 'mixins/unicore.js';
 import {setFileContent} from 'mixins/simulation-details.js';
-import {deleteJobByUrl} from 'assets/utils.js';
 
 export default {
   name: 'AnalysisSection',
@@ -179,7 +178,7 @@ export default {
       });
     },
     deleteJob: function(url) {
-      deleteJobByUrl(url).then((localRemove) => {
+      unicoreAPI.deleteJobByUrl(url).then((localRemove) => {
         if (localRemove) {
           let id = url.split('/').pop();
           return this.removeFromList(id);

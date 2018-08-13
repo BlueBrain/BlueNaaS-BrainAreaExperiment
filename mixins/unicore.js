@@ -5,6 +5,9 @@ import analysisConfig from 'assets/analysis-config.json';
 import simulationConfig from 'assets/simulation-config.json';
 import * as utils from 'assets/utils.js';
 import * as jobsDB from 'assets/jobs-db.js';
+import find from 'lodash/find';
+import sites from 'assets/sites.json';
+
 let token = null;
 
 function actionJob(actionURL) {
@@ -124,10 +127,10 @@ function getAllJobsExpandedWithChildren(site) {
   .then((parsed) => {
     jobsList = parsed.jobs;
     if (jobsList.length <= 0) return;
-    jobsList.forEach((job) => {
-      let id = getLastJobId(job);
+    jobsList.forEach((jobUrl) => {
+      let id = urlToComputerAndId(jobUrl).id;
       let jobExapandedInfo = {};
-      let chain = getJobProperties(job)
+      let chain = getJobProperties(jobUrl)
       .then((jobInfo) => {
         jobExapandedInfo = jobInfo;
         if (jobExapandedInfo.children) {
@@ -280,33 +283,7 @@ function getJobProperties(jobURL, userProject) {
     .catch((e) => {throw Error('Error getting job properties');});
   });
 }
-function getLastJobId(url) {
-  return url.split('/').pop();
-}
 function getSites() {
-  let sites = {};
-  sites['JUQUEEN'] = {name: 'JUQUEEN (JSC)', id: 'JUQUEEN',
-    url: 'https://hbp-unic.fz-juelich.de:7112/HBP_JUQUEEN/rest/core'};
-  sites['JURECA'] = {name: 'JURECA (JSC)', id: 'JURECA',
-    url: 'https://hbp-unic.fz-juelich.de:7112/HBP_JURECA/rest/core'};
-  sites['JURON'] = {name: 'JURON (JSC)', id: 'JURON',
-    url: 'https://hbp-unic.fz-juelich.de:7112/HBP_JURON/rest/core'};
-  sites['JULIA'] = {name: 'JULIA (JSC)', id: 'JULIA',
-    url: 'https://hbp-unic.fz-juelich.de:7112/HBP_JULIA/rest/core'};
-  sites['VIZ_CSCS'] = {name: 'VIZ (CSCS)', id: 'VIS',
-    url: 'https://contra.cscs.ch:8080/VIS-CSCS/rest/core'};
-  sites['BGQ_CSCS'] = {name: 'BGQ (CSCS)', id: 'BGQ',
-    url: 'https://contra.cscs.ch:8080/BGQ-CSCS/rest/core'};
-  sites['MARE_NOSTRUM'] = {name: 'Mare Nostrum (BSC)', id: 'MN',
-    url: 'https://unicore-hbp.bsc.es:8080/BSC-MareNostrum/rest/core'};
-  sites['PICO'] = {name: 'PICO (CINECA)', id: 'PICO',
-    url: 'https://grid.hpc.cineca.it:9111/CINECA-PICO/rest/core'};
-  sites['GALILEO'] = {name: 'GALILEO (CINECA)', id: 'GALILEO',
-    url: 'https://grid.hpc.cineca.it:9111/CINECA-GALILEO/rest/core'};
-  sites['FERMI'] = {name: 'FERMI (CINECA)', id: 'FERMI',
-    url: 'https://grid.hpc.cineca.it:9111/CINECA-FERMI/rest/core'};
-  sites['KIT'] = {name: 'Cloud storage (KIT)', id: 'S3-KIT',
-    url: 'https://unicore.data.kit.edu:8080/HBP-KIT/rest/core'};
   return sites;
 }
 function getUser(site) {
@@ -651,6 +628,36 @@ function jobUrlToPhysicalLocation(jobURL, userProject) {
     return location.data.mountPoint;
   });
 }
+
+function urlToComputerAndId(jobURL) {
+  const result = find(getSites(), (elem) => {
+    return jobURL.startsWith(elem.url);
+  });
+
+  let m = jobURL.match(new RegExp('/rest/core/jobs/(.*)'));
+  return {computer: result.id, id: m[1]};
+}
+
+function deleteJobByUrl(url) {
+  return swal({
+    title: 'Are you sure?',
+    text: 'You won\'t be able to revert this!',
+    type: 'warning',
+    showCancelButton: true,
+    focusCancel: true,
+    confirmButtonColor: '#ac6067',
+    cancelButtonColor: '#879fcb',
+    confirmButtonText: 'Yes, delete it!',
+  }).then((choice) => {
+    if (choice.value === true) {
+      return deleteJob(url).then(() => (Promise.resolve(true)));
+    } else {
+      return Promise.resolve(false);
+    }
+  })
+  .catch(handleError);
+}
+
 function init() {
   return hello.isAuth().then(() => {
     token = hello.token;
@@ -660,6 +667,7 @@ function init() {
 export {
   getAssociatedLocation,
   deleteJob,
+  deleteJobByUrl,
   deleteJobFromAssociatedFile,
   uploadData,
   submitJob,
@@ -679,4 +687,5 @@ export {
   submitAnalysis,
   getProjectSelectedByLog,
   transferFiles,
+  urlToComputerAndId,
 };

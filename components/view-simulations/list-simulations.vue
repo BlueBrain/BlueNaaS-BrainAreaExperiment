@@ -126,7 +126,7 @@ import LaunchAnalysisForm from 'components/view-simulations/launch-analysis-form
 import Modal from 'components/shared/modal-component.vue';
 import templateBluepyConfig from 'assets/blueconfig.json';
 import {statesFilter, jobStatus} from 'assets/job-status.js';
-import {deleteJobByUrl, handleError} from 'assets/utils.js';
+import {handleError} from 'assets/utils.js';
 import 'assets/css/style.css';
 
 export default {
@@ -303,7 +303,7 @@ export default {
       this.filter();
     },
     deleteJob: function(url) {
-      deleteJobByUrl(url).then((localRemove) => {
+      unicoreAPI.deleteJobByUrl(url).then((localRemove) => {
         if (localRemove) this.removeFromList(url);
       });
     },

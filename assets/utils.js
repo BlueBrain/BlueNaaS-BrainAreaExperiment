@@ -3,7 +3,6 @@ import {
   pickBy, forEach, cloneDeep,
   findKey, partial, isEqual, union,
 } from 'lodash';
-import {deleteJob} from 'mixins/unicore';
 
 let mapper = {
   FullCA1: 'Mosaic',
@@ -75,15 +74,6 @@ function save(name, fileContent) {
   }
 }
 
-function urlToId(jobURL) {
-  // a.match(new RegExp('7112/HBP_(.+)/rest.*jobs/(.*)'))
-  let reg = new RegExp('7112/HBP_(.+)/rest.*jobs/(.*)');
-  let m = jobURL.match(reg);
-  if (m.length > 2) {
-    return {computer: m[1], id: m[2]};
-  }
-}
-
 function replaceMultiplePaths(inputString, replaceMap) {
   forEach(replaceMap, (value, key) => {
     let regex = new RegExp(`${key}.(.*)\\n`);
@@ -95,50 +85,18 @@ function replaceMultiplePaths(inputString, replaceMap) {
   return inputString;
 }
 
-function replaceConst(inputString, replaceMap) {
-  forEach(replaceMap, (value, key) => {
-    if (inputString.includes(`{{${key}}}`)) {
-      inputString = inputString.replace(new RegExp(`{{${key}}}`, 'g'), value);
-    }
-  });
-  return inputString;
-}
-
-function deleteJobByUrl(url) {
-  return swal({
-    title: 'Are you sure?',
-    text: 'You won\'t be able to revert this!',
-    type: 'warning',
-    showCancelButton: true,
-    focusCancel: true,
-    confirmButtonColor: '#ac6067',
-    cancelButtonColor: '#879fcb',
-    confirmButtonText: 'Yes, delete it!',
-  }).then((choice) => {
-    if (choice.value === true) {
-      return deleteJob(url).then(() => (Promise.resolve(true)));
-    } else {
-      return Promise.resolve(false);
-    }
-  })
-  .catch(handleError);
-}
-
 function handleError(error) {
   swal('Error', error.message, 'error');
 }
 
 export {
   compact,
-  deleteJobByUrl,
   filterName,
   getDateLocalTime,
   handleError,
   mapAll,
-  replaceConst,
   replaceMultiplePaths,
   save,
-  urlToId,
   unMapAll,
   unionArray,
 };

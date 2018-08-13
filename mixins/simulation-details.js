@@ -1,8 +1,14 @@
 import * as unicoreAPI from 'mixins/unicore.js';
 import Vue from 'vue';
 import visualizationConfig from 'assets/visualization-config.json';
-import {urlToId, replaceMultiplePaths, replaceConst} from 'assets/utils.js';
+import {replaceMultiplePaths} from 'assets/utils.js';
+import {urlToComputerAndId} from 'mixins/unicore';
 import {isRunning} from 'assets/job-status.js';
+import template from 'lodash/template';
+import templateSettings from 'lodash/templateSettings';
+
+// Use mustache style in templates
+templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 function launchVisualization(job, simulationUserProject, computer) {
   let promisePhysicalLocation = unicoreAPI.jobUrlToPhysicalLocation(
@@ -68,26 +74,26 @@ function launchVisualization(job, simulationUserProject, computer) {
     };
 
     fileNames.forEach((fileName) => {
-      let data = visualizationConfig.scripts[fileName];
-      if (Array.isArray(data)) data = data.join('\n');
-      if (data.includes('{{BASE}}')) {
-        data = data.replace(/{{BASE}}/g, physicalLocation);
-      }
-      if (data.includes('{{REPORTNAME}}')) {
-        data = data.replace(/{{REPORTNAME}}/g, report);
-      }
-      if (data.includes('{{CIRCUITTARGET}}')) {
-        let match = report.match(new RegExp('(.*)_report_'));
-        if (match.length > 1) {
-          data = data.replace(/{{CIRCUITTARGET}}/g, match[1]);
-        }
-      }
+      let scriptStr = visualizationConfig.scripts[fileName];
+      // compatible with BlueConfig
+      if (Array.isArray(scriptStr)) scriptStr = scriptStr.join('\n');
 
-      data = replaceConst(data, visualizationConfig.const);
+      const circuitTarget = report.match(new RegExp('(.*)_report_'))[1];
+
+      const scriptTemplate = template(scriptStr);
+
+      const script = scriptTemplate(Object.assign(
+        {
+          BASE: physicalLocation,
+          REPORT_NAME: report,
+          CIRCUIT_TARGET: circuitTarget,
+        },
+        visualizationConfig.const
+      ));
 
       inputs.push({
         To: fileName,
-        Data: data,
+        Data: script,
       });
     });
     console.debug('Submiting job for visualization');
@@ -95,7 +101,7 @@ function launchVisualization(job, simulationUserProject, computer) {
   })
   .then((newJob) => {
     console.debug('starting job...');
-    let newJobId = urlToId(newJob._links.self.href).id;
+    let newJobId = urlToComputerAndId(newJob._links.self.href).id;
     console.debug('Visualization job id', newJobId);
     unicoreAPI.actionJob(newJob._links['action:start'].href);
 

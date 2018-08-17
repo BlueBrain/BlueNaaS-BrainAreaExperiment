@@ -86,7 +86,7 @@ function replaceMultiplePaths(inputString, replaceMap) {
 }
 
 function handleError(error) {
-  swal('Error', error.message, 'error');
+  swal('Error', error.message || error, 'error');
 }
 
 export {

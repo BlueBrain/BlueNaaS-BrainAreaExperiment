@@ -327,6 +327,7 @@ export default {
       unicoreAPI.getAllJobsExpandedWithChildren(this.computerFilter)
       .then((resultsArray) => {
         let onlySimulations = resultsArray.filter((simulation) => {
+          // filter to only show simulations
           if (simulation.children.includes(`/${analysisConfig.configFileName}`)) {
             // it is an analysis that should be removed
             return false;

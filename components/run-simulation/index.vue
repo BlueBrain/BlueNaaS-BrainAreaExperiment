@@ -395,25 +395,6 @@ export default {
       align-items: center;
       flex-wrap: wrap;
   }
-  .duration-skip input {
-      width: 100px;
-      margin: 0px 0;
-      display: inline-block;
-      border: 1px solid #ccc;
-      box-shadow: inset 0 1px 3px #ddd;
-      border-radius: 4px;
-      -webkit-box-sizing: border-box;
-      -moz-box-sizing: border-box;
-      box-sizing: border-box;
-      padding-left: 15px;
-      padding-right: 15px;
-      padding-top: 9px;
-      padding-bottom: 9px;
-  }
-  .duration-skip span {
-      margin-left: 15px;
-      margin-right: 5px;
-  }
   .simulation h2 {
       width: 100%;
       background-color: transparent;
@@ -512,6 +493,25 @@ export default {
 </style>
 
 <style>
+  .duration-skip input {
+      width: 100px;
+      margin: 0px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      box-shadow: inset 0 1px 3px #ddd;
+      border-radius: 4px;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      padding-left: 15px;
+      padding-right: 15px;
+      padding-top: 9px;
+      padding-bottom: 9px;
+  }
+  .duration-skip span {
+      margin-left: 15px;
+      margin-right: 5px;
+  }
   /* disable the bounce effect sweetalerts*/
   @-webkit-keyframes showSweetAlert {
       0% {

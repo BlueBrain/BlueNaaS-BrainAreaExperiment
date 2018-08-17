@@ -59,30 +59,12 @@ function createJob(url, jobDefinition, userProject) {
   });
 }
 function deleteJob(url) {
-  return getPermissions(url)
-  .then((userProject) => {
-    let headers = createHeaders(token, userProject);
-    return axios({
-      url: url,
-      method: 'delete',
-      data: JSON.stringify({}),
-      headers: headers,
-    });
+  return axios({
+    url: url,
+    method: 'delete',
+    data: JSON.stringify({}),
+    headers: createHeaders(token),
   });
-  function getPermissions(url) {
-    let m = url.match(new RegExp('HBP_(.*)/rest'));
-    if (m && m[1]) {
-      return getUser(m[1])
-      .then((user) => {
-        return getJobProperties(url, user.client.xlogin.UID);
-      })
-      .then((jobInfo) => {
-        return getProjectSelectedByLog(jobInfo.log);
-      });
-    } else {
-      throw String('Getting permissions for deleting');
-    }
-  }
 }
 function deleteJobFromAssociatedFile(simulationWorkDir, idToDelete) {
   console.debug('Delete job from associationFile');
@@ -216,11 +198,12 @@ function getConfig(configParams) {
     *   configParams {applicationName, title, nodes, computer}
     */
   let computer = configParams.computer || configParams.to.computer;
-  return getPatition(computer, configParams.projectSelected)
+  return getPartition(computer, configParams.projectSelected)
   .then((partition) => {
     let jobSpec = {
-      ApplicationName: 'Bash shell',
+      // ApplicationName: 'Bash shell',
       Name: configParams.title || 'unnamed job',
+      Executable: 'Bash shell',
       Parameters: {
         SOURCE: 'input.sh',
         UC_PREFER_INTERACTIVE_EXECUTION: configParams.isViz,
@@ -297,7 +280,7 @@ function getUser(site) {
   .then((response) => (response.data))
   .catch((e) => {throw Error('Error getting user information');});
 }
-function getPatition(site, projectSelected = null) {
+function getPartition(site, projectSelected = null) {
   let userAccountPromise = [];
   if (projectSelected) {
     let t = Promise.resolve(projectSelected);
@@ -319,6 +302,7 @@ function getPatition(site, projectSelected = null) {
     }
     return null;
   });
+
   function filterPartition(computerConfig, account) {
     let partitions = Object.keys(computerConfig.partitions);
     let selectedProject = partitions.find((partition) => {
@@ -655,7 +639,7 @@ function deleteJobByUrl(url) {
       return Promise.resolve(false);
     }
   })
-  .catch(handleError);
+  .catch(utils.handleError);
 }
 
 function init() {

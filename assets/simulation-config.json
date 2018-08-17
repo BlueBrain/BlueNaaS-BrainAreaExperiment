@@ -1,23 +1,4 @@
 {
-    "JULIA": {
-        "script": [
-            "#!/bin/sh",
-            "unset LD_LIBRARY_PATH",
-            "export LD_LIBRARY_PATH=/global/opt/slurm/default/lib64/",
-            "module purge",
-            "module use /gpfs/work/pcp0/pcp0085/x64/modulefiles",
-            "module load nix/hpc/neurodamus-hippocampus",
-            "module load nix/dev-env-gcc/09.2016",
-            "module load nix/python/2.7-full",
-            "export FULL_CPU_PER_NODE=64",
-            "mkdir -p output",
-            "python /gpfs/homeb/pra098/pra09809/simulation/simulation_launch.py -vv --blueconfig blueconfig.json --usertarget /gpfs/homeb/pra098/pra09809/simulation/user.target --output output"
-        ],
-        "time": "18000",
-        "nodes": "8",
-        "cpus": "64",
-        "pathWork": "/gpfs/work"
-    },
     "JURECA": {
         "script": [
             "#!/bin/sh",
@@ -36,6 +17,6 @@
         "partitions": {"vsk25": "booster"}
     },
     "default": "JURECA",
-    "available": ["JULIA", "JURECA"],
+    "available": ["JURECA"],
     "defaultTarget": "slice-4"
 }

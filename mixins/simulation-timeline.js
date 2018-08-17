@@ -185,6 +185,7 @@ export default {
         },
         start: 0,
         end: this.endTime * 1.5,
+        minHeight: 80,
         editable: true,
         onAdd: this.onAdd,
         onMove: this.onMove,

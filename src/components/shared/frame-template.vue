@@ -1,0 +1,32 @@
+
+<template>
+  <layout class="frame-template">
+    <i-header>
+      <i-menu mode="horizontal" theme="dark" active-name="1">
+        <div class="layout-nav">
+          <menu-item name="1">
+            <router-link to="/" class="no-link">
+              <h1>{{ pageTitle }}</h1>
+            </router-link>
+          </menu-item>
+        </div>
+      </i-menu>
+    </i-header>
+
+    <Content>
+      <router-view/>
+    </Content>
+  </layout>
+</template>
+
+
+<script>
+export default {
+  name: 'FrameTemplate',
+  computed: {
+    pageTitle() {
+      return this.$store.state.title;
+    },
+  },
+};
+</script>

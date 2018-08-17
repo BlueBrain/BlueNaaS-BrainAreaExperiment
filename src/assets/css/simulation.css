@@ -1,0 +1,61 @@
+
+/* --------- Tips styles --------- */
+.run-configuration-component .tip {
+    background-color: #cef1fc;
+    border-color: #9ee3f9;
+    color: #12718f;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 2px 3px rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.1);
+    box-shadow: 0 2px 3px rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.1);
+    display: block;
+    padding: 1rem;
+    font-size: 12px;
+    display: flex;
+}
+.run-configuration-component .tip i.centered {
+    vertical-align: middle;
+    cursor: pointer;
+    margin-left: 5px;
+}
+.hidden {
+    visibility: hidden;
+}
+
+/* --------- timeline ---------- */
+.vis-item.voltage {
+    background-color: #F6D5ED;
+    border-color: #F797E0;
+}
+/*.vis-item.Noise {
+    background-color: #d5ddf6;
+    border-color: #97B0F8;
+}
+.vis-item.NPoisson {
+    background-color: #F6EED5;
+    border-color: #F7Df97;
+}*/
+/*.vis-item.vis-selected {
+    -webkit-transition: background-color 0.25s linear;
+    border-color: #FFC200;
+    background-color: #FFF785;
+    z-index: 2;
+}*/
+.tooltip-span {
+    z-index: 2;
+    background-color: #8393b7;
+    color: white;
+    border-radius: 7px;
+    font-size: 14px;
+    padding: 8px;
+    display: none;
+    position: fixed;
+}
+
+/* ----------- timeline + target selection ----------- */
+.timeline-target-container.available {
+    display: flex;
+}
+.timeline-target-container.available .timeline-container {
+    /*width: 80%;*/
+    flex-grow: 1;
+}

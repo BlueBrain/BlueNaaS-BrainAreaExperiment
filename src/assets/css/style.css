@@ -1,0 +1,57 @@
+
+body {
+  margin: 0;
+}
+
+.spin {
+  animation: spin 2s infinite linear;
+}
+@keyframes spin {
+  from {transform: rotate(359deg);}
+  to {transform: rotate(0deg);}
+}
+
+.no-link {
+  text-decoration: none;
+  color: white;
+}
+
+.ivu-tooltip-inner {
+  white-space: normal !important;
+}
+
+.grow-space {
+  flex-grow: 1;
+}
+
+.app-content {
+  padding: 5px 15px;
+  min-height: 93vh;
+}
+
+form.ivu-form .target-autocomplete,
+form.ivu-form .ivu-input-number,
+form.ivu-form .ivu-input-wrapper,
+form.ivu-form .ivu-select {
+  width: 120px;
+}
+form.ivu-form .ivu-form-item {
+  margin-bottom: 15px;
+}
+form.ivu-form .ivu-form-item-error-tip {
+   padding-top: 0;
+}
+
+/* icon color in list simulation */
+.list-simulations .ivu-icon-md-checkmark-circle {
+  color: #006a44;
+}
+.list-simulations .ivu-icon-ios-warning {
+  color: #fdb913;
+}
+.list-simulations .ivu-icon-ios-close-circle {
+  color: #c1272d;
+}
+.list-simulations .ivu-icon-md-sync {
+  animation: spin 2s infinite linear;
+}

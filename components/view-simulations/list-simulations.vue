@@ -156,6 +156,7 @@ export default {
       filterOn: false,
       pollInterval: 10,
       jobSelectedForValidation: null,
+      showFullListOfUnicoreJobs: false,
       statesFilter,
     };
   },
@@ -199,6 +200,10 @@ export default {
     if (this.statusSearch) {
       this.statusFilter = this.statusSearch.toUpperCase();
       this.checkFilterIcon();
+      // Hack to show all the jobs not only simulation
+      if (this.statusSearch === 'ALLJOBS') {
+        this.showFullListOfUnicoreJobs = true;
+      }
     }
     this.computerFilter = this.computerParam.toUpperCase();
     this.refreshJobs();
@@ -229,7 +234,8 @@ export default {
       }
       this.jobs.map((job) => {
         // filter items first by status
-        if (job.status === this.statusFilter) {
+        if (job.status === this.statusFilter
+            || this.showFullListOfUnicoreJobs) {
           filteredByStatus.push(job);
         }
       });
@@ -238,6 +244,7 @@ export default {
       // used filtered status to continue filtering by id
       filteredByStatus.map((job) => {
         let name = job.name.toUpperCase();
+
         if (name.search(this.nameFilter.toUpperCase()) !== -1) {
           filteredById.push(job);
         }
@@ -328,12 +335,14 @@ export default {
       .then((resultsArray) => {
         let onlySimulations = resultsArray.filter((simulation) => {
           // filter to only show simulations
-          if (simulation.children.includes(`/${analysisConfig.configFileName}`)) {
+          if (simulation.children.includes(`/${analysisConfig.configFileName}`)
+              && !this.showFullListOfUnicoreJobs) {
             // it is an analysis that should be removed
             return false;
           }
           // avoid visualization and analysis
-          if (!simulation.children.includes('/blueconfig.json')) {
+          if (!simulation.children.includes('/blueconfig.json')
+              && !this.showFullListOfUnicoreJobs) {
             return false;
           }
           if (!simulation.children.includes('/out.dat') &&

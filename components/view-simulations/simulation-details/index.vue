@@ -199,11 +199,10 @@ export default {
 
       console.debug('Loading content', fileName);
       if (destination[`${fileName}Polling`]) return;
-      destination[`${fileName}Polling`] = setInterval(getFilePolling, 2000);
+      destination[`${fileName}Polling`] = setInterval(getFilePolling, this.pollInterval);
 
       function getFilePolling() {
         console.debug('---))))))) Polling file', fileName);
-        console.debug('Unicore', unicoreAPI);
         unicoreAPI.getFiles(url, that.simulationUserProject)
         .then((output) => {
           setFileContent(destination, fileName, output);

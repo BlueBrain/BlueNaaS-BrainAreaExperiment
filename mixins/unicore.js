@@ -203,9 +203,8 @@ function getConfig(configParams) {
     let jobSpec = {
       // ApplicationName: 'Bash shell',
       Name: configParams.title || 'unnamed job',
-      Executable: 'Bash shell',
+      Executable: '/bin/sh input.sh',
       Parameters: {
-        SOURCE: 'input.sh',
         UC_PREFER_INTERACTIVE_EXECUTION: configParams.isViz,
       },
       haveClientStageIn: 'true',
@@ -222,8 +221,8 @@ function getConfig(configParams) {
     return jobSpec;
   });
 }
-function getImage(imageURL) {
-  let headers = createHeaders(token);
+function getImage(imageURL, userProject) {
+  let headers = createHeaders(token, userProject);
   headers['Accept'] = 'application/octet-stream';
   delete headers['Content-Type'];
   return axios({

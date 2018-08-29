@@ -127,7 +127,10 @@ export default {
       });
     },
     getAnalysisImage: function(analysisURL, plotName, childAnalysis) {
-      unicoreAPI.getImage(`${analysisURL}/files/${plotName}.png`)
+      unicoreAPI.getImage(
+        `${analysisURL}/files/${plotName}.png`,
+        this.simulationUserProject
+      )
       .then((plot) => {
         // is a blob content
         setFileContent(childAnalysis, plotName, plot, true);
@@ -149,7 +152,7 @@ export default {
     getAnalysisLog: function(childAnalysis) {
       let url = `${childAnalysis.workingDirectory}/files/stderr`;
       console.debug('Get analysis log');
-      unicoreAPI.getFiles(url)
+      unicoreAPI.getFiles(url, this.simulationUserProject)
       .then((stderr) => {
         setFileContent(childAnalysis, 'log', stderr);
       })

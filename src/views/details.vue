@@ -32,6 +32,8 @@ This will display the details of a certain simulation and the analysis.
       :loading="vizRunning"
     >Visualize</i-button>
 
+    <analysis-in-notebook :simulation-details="simulationDetails"/>
+
     <div class="detail-content" :class="{'full-disable': !simulationDetails.id}">
       <analysis-section
         :simulation-details="simulationDetails"
@@ -121,6 +123,7 @@ import CollapseTitle from '@/components/shared/collapse-title.vue';
 import ItemSummary from '@/components/details-simulation/item-summary.vue';
 import AnalysisSection from '@/components/details-simulation/analysis-section.vue';
 import DisplayOrDownload from '@/components/shared/display-or-download.vue';
+import AnalysisInNotebook from '@/components/details-simulation/analysis-in-notebook.vue';
 import { isRunning } from '@/assets/job-status';
 import { submitVisualization } from '@/services/helper/visualization-helper';
 // import { isRunning, isEnded } from '@/assets/job-status.js';
@@ -135,6 +138,7 @@ export default {
     ItemSummary,
     DisplayOrDownload,
     AnalysisSection,
+    AnalysisInNotebook,
   },
   props: ['jobId', 'computerParam'],
   data() {
@@ -343,5 +347,6 @@ export default {
   }
   .in-corner {
     float: right;
+    margin-left: 5px;
   }
 </style>

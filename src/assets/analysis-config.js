@@ -39,4 +39,6 @@ export default {
   analysisConnectionFileName: 'analysis_path.json',
   nodes: 1,
   runtime: 500,
+  externalDynamicAnalysisConfig: 'https://raw.githubusercontent.com/antonelepfl/testvue/master/notebooks/dynamic_analysis_config.json',
+  usecasesCreationForm: 'https://bbp.epfl.ch/public/dev.usecases-wizard/index.html#/entitydashboard?',
 };

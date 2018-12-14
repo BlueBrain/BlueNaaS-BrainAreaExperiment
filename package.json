@@ -1,5 +1,6 @@
 {
   "name": "sim-launcher-gui",
+  "description": "Configure and launch simulations in HPC using Uncore API",
   "version": "0.1.3",
   "private": true,
   "scripts": {

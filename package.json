@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build_doc": "echo"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -22,6 +23,14 @@
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"
   },
+    "repository": {
+    "url": "https://bbpcode.epfl.ch/browse/code/nse%2Fsimulationapp/log/?h=refs%2Fheads%2Fmaster",
+    "issuesurl": "",
+    "doc_url": "https://lbologna.github.io/hbp-sp6-guidebook/online_usecases/brain_area_circuit_in_silico_experiments/hippocampus/configure_run_brainregion_preconf_model_data/configure_run_brainregion_preconf_model_data.html"
+  },
+  "author": "Antonel Stefano",
+  "contributors": ["NSE Team"],
+  "license": "",
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.5",
     "@vue/cli-plugin-eslint": "^3.0.5",

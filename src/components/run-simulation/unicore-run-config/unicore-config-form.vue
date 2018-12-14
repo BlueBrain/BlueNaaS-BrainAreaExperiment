@@ -241,7 +241,6 @@ export default {
     async checkForm() {
       const isValid = await this.$refs.formValidate.validate();
       if (isValid) {
-        console.log('Form valid');
         this.runParameters.computerSelected = this.computerSelected;
         this.runParameters.projectSelected = this.projectSelected;
         // to start spinner

@@ -91,7 +91,6 @@ export default {
 
       try {
         const submittedJob = await unicore.submitJob(newRunConfig, files);
-        console.log(submittedJob);
 
         hideModalFn();
         setTimeout(() => {

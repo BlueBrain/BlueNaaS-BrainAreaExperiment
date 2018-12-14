@@ -365,7 +365,6 @@ export default {
     async editItem() {
       const isValid = await this.$refs.formValidate.validate();
       if (isValid) {
-        console.log('Form valid');
         this.$emit('analysisConfigReady', this.generateAnalysisObjectToRun());
         return;
       }

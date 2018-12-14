@@ -223,7 +223,6 @@ export default {
       // this.form = this.$el.querySelector('form');
       const isValid = await this.$refs.formValidate.validate();
       if (isValid) {
-        console.log('Form valid');
         this.$emit('itemEdited', this.stimulusInfo);
         this.formInvalid = false;
         return;

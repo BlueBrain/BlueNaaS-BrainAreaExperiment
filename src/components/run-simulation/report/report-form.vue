@@ -246,7 +246,6 @@ export default {
       console.debug('editItem', event);
       const isValid = await this.$refs.formValidate.validate();
       if (isValid) {
-        console.log('Form valid');
         this.$emit('itemEdited', this.reportInfo);
         this.formInvalid = false;
         return;

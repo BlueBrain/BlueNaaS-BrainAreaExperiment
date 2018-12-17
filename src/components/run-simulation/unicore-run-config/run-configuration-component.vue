@@ -86,7 +86,6 @@ export default {
 
     async generatePartialBlueConfig() {
       // generate stimulus and report in BlueConfig.json format NO PATH
-      console.debug('generatePartialBlueConfig');
       const generateStimuli = new Promise((resolve) => {
         eventBus.$emit('createStimulusConfig', resolve);
       });
@@ -120,7 +119,7 @@ export default {
       const blueConfigStr = await this.generateFinalBlueConfigJSON();
       this.blueConfig = JSON.parse(blueConfigStr);
 
-      console.log('finalBlueConfig', this.blueConfig);
+      console.log('FinalBlueConfig', this.blueConfig);
       db.saveSimConfiguration(this.blueConfig, unicoreConfig);
       // we have already checked the simulation consistancy
       this.isLaunchingSim = true;

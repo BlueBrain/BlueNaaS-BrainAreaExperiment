@@ -116,7 +116,6 @@ export default {
   },
   methods: {
     toggleModal(value) {
-      console.debug('toggleModal');
       if (value) {
         this.showAnalysisForm = value;
         return;
@@ -322,11 +321,10 @@ export default {
 
     async analysisConfigReady(analysisParamsEdited) {
       this.isRunningAnalysis = true;
-      console.log(analysisParamsEdited);
 
       const newAnalysisParamsEdited = analysisParamsEdited;
       newAnalysisParamsEdited.from.workingDirectory = this.jobSelectedForAnalysis._links.workingDirectory.href;
-      console.debug('submiting analysis...');
+      console.debug('Submiting analysis...');
 
       const { script } = analysisConfig[analysisParamsEdited.from.computer];
 
@@ -337,7 +335,7 @@ export default {
       );
 
       const startURL = analysis.destinationJob._links['action:start'].href;
-      console.debug('starting analysis...');
+      console.debug('Starting analysis...');
       unicore.actionJob(startURL);
 
       // poll the status of the analysis

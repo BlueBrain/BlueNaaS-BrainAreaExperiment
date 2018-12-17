@@ -274,12 +274,12 @@ async function getUserProjects() {
      userProjectsMap.includes(store.state.currentComputer))
   ) {
     const available = userProjectsMap.split('-')[1].split(',');
-    console.debug('setup available projects from localStorage');
+    console.debug('Setup available projects from localStorage');
     store.commit('setUserProjectAvailable', available);
     return store.state.userProject;
   }
 
-  console.debug('get user accounts from network');
+  console.debug('Get user accounts from network');
   if (store.state.userProject && store.state.userProject !== 'null') {
     // reset user project to fetch information
     store.commit('setUserProject', null);
@@ -352,6 +352,11 @@ async function generateUnicoreConfig(configParams) {
     return environment;
   }
 
+  function getNodeType() {
+    // multicore nodes in Piz-Daint
+    return configParams.computerSelected === 'PIZ_DAINT' ? 'mc' : null;
+  }
+
   // generate and remove the nulls
   const jobSpec = cleanDeep({
     Name: configParams.title || 'unnamed job',
@@ -366,10 +371,11 @@ async function generateUnicoreConfig(configParams) {
       Nodes: configParams.nodes,
       Runtime: configParams.runtime,
       Queue: getPatition(configParams.computerSelected),
+      NodeConstraints: getNodeType(),
     },
     Imports: configParams.imports,
   });
-  console.log('jobSpec', jobSpec);
+  console.debug('JobSpec', jobSpec);
   return jobSpec;
 }
 
@@ -407,7 +413,7 @@ async function submitJob(runConfig, inputs, startLater = false) {
     *
     * inputs [{ To: '', Data: '' }]
     */
-  console.log('submitJob', runConfig);
+  console.debug('SubmitJob', runConfig);
   const newRunConfig = runConfig;
 
   newRunConfig.computerSelected = (runConfig.computerSelected || runConfig.to.computer).toUpperCase();
@@ -416,11 +422,11 @@ async function submitJob(runConfig, inputs, startLater = false) {
 
   try {
     const launchParams = await generateUnicoreConfig(newRunConfig);
-    console.debug('creating job...');
+    console.debug('Creating job...');
     const job = await createJob(unicoreURL, launchParams);
 
     const jobURL = job.headers.location;
-    console.debug('getting job properties...');
+    console.debug('Getting job properties...');
     const jobProperties = await getJobProperties(jobURL);
     /* eslint-disable no-underscore-dangle */
     const workingDirectory = jobProperties._links.workingDirectory.href;
@@ -429,7 +435,7 @@ async function submitJob(runConfig, inputs, startLater = false) {
 
     // upload all the inputs
     await Promise.all(inputs.map((input) => {
-      console.debug('uploading files...');
+      console.debug('Uploading files...');
       return uploadData(input, `${workingDirectory}/files`);
     }));
 
@@ -453,7 +459,7 @@ async function submitJob(runConfig, inputs, startLater = false) {
       return jobDetails;
     }
 
-    console.debug('starting job...');
+    console.debug('Starting job...');
     await actionJob(actionStartURL);
     return jobDetails;
   } catch (err) {
@@ -474,13 +480,12 @@ async function workingDirToMachinePath(workingDirectory) {
 
 function getComputersAvailableForCurrentModel() {
   // will filter the computers that actually can run the circuit
-  console.log('getComputersAvailableForCurrentModel');
   const storedComputer = localStorage.getItem('userComputer');
   const computersCanRunCircuit = Object.keys(store.state.currentCircuitConfig.prefix);
   const computersAllowedToRun = simulationConfig.available.filter(computer => (
     computersCanRunCircuit.includes(computer)
   ));
-  console.log('computersAllowedToRun', computersAllowedToRun);
+  console.debug('ComputersAllowedToRun', computersAllowedToRun);
   // const storedComputer = '';
   const computerToSet = computersAllowedToRun.includes(storedComputer) ? storedComputer : computersAllowedToRun[0];
   store.commit('setCurrentComputer', computerToSet);

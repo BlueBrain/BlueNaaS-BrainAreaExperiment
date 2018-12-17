@@ -336,7 +336,7 @@ export default {
       this.$set(this.to, 'computer', analysisConfig[this.$store.state.currentComputer].to);
 
       if (this.from.computer === this.to.computer) {
-        console.log('[analysis] same computer');
+        console.debug('[analysis] same computer');
         this.$set(this.from, 'projectsAvailable', this.$store.state.userProjectsAvailable);
         this.$set(this.from, 'projectSelected', this.$store.state.userProject);
         this.$set(this.to, 'projectsAvailable', this.$store.state.userProjectsAvailable);
@@ -366,9 +366,7 @@ export default {
       const isValid = await this.$refs.formValidate.validate();
       if (isValid) {
         this.$emit('analysisConfigReady', this.generateAnalysisObjectToRun());
-        return;
       }
-      console.log('Form not valid');
     },
     targetChanged(newTarget) {
       // TODO: is there any way you want to analyze another slice?

@@ -23,7 +23,7 @@ localStorage.setItem('userComputer', computerToUse);
 
 const savedProject = localStorage.getItem('userProject');
 // savedProject = savedProject === 'null' ? null : savedProject;
-console.log(`stored project ${savedProject} - computer ${computerToUse}`);
+console.log(`LocalStored: project: ${savedProject} - computer: ${computerToUse}`);
 
 const store = new Vuex.Store({
   state: {
@@ -48,7 +48,7 @@ const store = new Vuex.Store({
       state.title = newTitle;
     },
     setCurrentComputer(state, newComputer) {
-      console.debug('setCurrentComputer', newComputer);
+      console.debug('SetCurrentComputer', newComputer);
       state.currentComputer = newComputer;
       if (!newComputer || newComputer === 'undefined') {
         localStorage.removeItem('userComputer');
@@ -69,7 +69,7 @@ const store = new Vuex.Store({
       state.token = newToken;
     },
     setUserProject(state, newUserProject) {
-      console.debug('setUserProject', newUserProject);
+      console.debug('SetUserProject', newUserProject);
       state.userProject = newUserProject;
       if (!newUserProject || newUserProject === 'null' || newUserProject === 'undefined') {
         localStorage.removeItem('userProject');
@@ -78,11 +78,11 @@ const store = new Vuex.Store({
       }
     },
     setUserProjectTmp(state, newUserProject) {
-      console.warn('setUserProjectTmp', newUserProject);
+      console.warn('SetUserProjectTmp', newUserProject);
       state.userProjectTmp = newUserProject;
     },
     setUserProjectAvailable(state, projectsList) {
-      console.debug('setUserProjectAvailable', projectsList);
+      console.debug('SetUserProjectAvailable', projectsList);
       state.userProjectsAvailable = projectsList;
     },
     setIsLoading(state, value) {

@@ -208,26 +208,20 @@ export default {
   },
   watch: {
     showModal(newVal) {
-      console.log('showModal watcher', newVal);
-      this.formInvalid = this.showModal;
-      console.log(this.stimulusInfo);
+      this.formInvalid = newVal;
     },
   },
   methods: {
-    onCancel(event) {
+    onCancel() {
       this.$emit('hideModal');
-      console.debug('on-cancel', event);
     },
-    async editItem(event) {
-      console.debug('editItem', event);
+    async editItem() {
       // this.form = this.$el.querySelector('form');
       const isValid = await this.$refs.formValidate.validate();
       if (isValid) {
         this.$emit('itemEdited', this.stimulusInfo);
         this.formInvalid = false;
-        return;
       }
-      console.log('Form not valid');
     },
     targetChanged(newTarget) {
       if (this.stimulusInfo.Target !== newTarget) {

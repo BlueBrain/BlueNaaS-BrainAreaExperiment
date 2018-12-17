@@ -134,7 +134,6 @@ export default {
     },
 
     async refreshAnalysis(childAnalysis) {
-      console.log('[analysis section] refreshAnalysis');
       const analysisJobInfo = await unicore.getJobProperties(childAnalysis.jobURL);
 
       this.$set(childAnalysis, 'submissionTime', analysisJobInfo.submissionTime);

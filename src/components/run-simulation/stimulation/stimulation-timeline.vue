@@ -96,7 +96,6 @@ export default {
     // before running the simulation create BlueConfig
     eventBus.$on('createStimulusConfig', (resolve) => {
       const stimulusBlueConfig = this.createConfig();
-      console.debug('Stimuli BC created', stimulusBlueConfig);
       resolve(stimulusBlueConfig);
     });
     eventBus.$on('simulationDurationChanged', (newDuration) => {
@@ -155,7 +154,6 @@ export default {
 
     createNewItem(newItem, callback) {
       const stimInfo = Object.assign({}, this.createNewStimulus());
-      console.debug(newItem);
       const id = simTimelineLib.getItemId(this.timeline.itemsData);
 
       const newObj = this.createItem(

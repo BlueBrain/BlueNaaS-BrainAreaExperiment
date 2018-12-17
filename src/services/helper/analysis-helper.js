@@ -63,7 +63,7 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
    *     'title' = title of the job
    *   }
    */
-  console.log('start submit analysis');
+  console.debug('Start submit analysis');
 
   // this bool will determine if the files will be copied or referenced
   const sameMachine = (analysisAndTransferInfo.from.computer === analysisAndTransferInfo.to.computer);
@@ -76,7 +76,7 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
      * Dependecy files for a new job
      * --------------------------------------------------------------------- */
     // get all the files to be copied
-    console.debug('getting files to be copied ...');
+    console.debug('Getting files to be copied ...');
     const files = await getFilesToCopy(`${newAnalysisAndTransferInfo.from.workingDirectory}/files`);
     // const transferArrayProm = [];
 
@@ -103,14 +103,14 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
   const inputs = [
     { To: analysisConfig.configFileName, Data: analysisParamsConfig },
   ];
-  console.debug('submiting job...');
+  console.debug('Submiting job...');
   // create a new job with analysis info but don't start it yet
   if (!sameMachine) {
     store.commit('setUserProjectTmp', analysisAndTransferInfo.to.projectSelected);
   }
   const startLater = true;
   const destinationJobObject = await unicore.submitJob(newAnalysisAndTransferInfo, inputs, startLater);
-  console.debug('job created');
+  console.debug('Job created');
 
   // fill the destination and pass it to transfer
   newAnalysisAndTransferInfo.to.workingDirectory = destinationJobObject._links.workingDirectory.href;
@@ -118,7 +118,7 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
   const parallelRequests = [];
 
   if (script) {
-    console.debug('[analysis-helper] has script ... creating input.sh');
+    console.debug('[analysis-helper] Has script ... creating input.sh');
 
     /* ---------------------------------------------------------------------
      * Generate input.sh analysis script
@@ -154,7 +154,7 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
       newAnalysisAndTransferInfo.to.projectSelected,
     ));
   } else {
-    console.debug('[analysis-helper] no script. skipping input.sh');
+    console.debug('[analysis-helper] No script. skipping input.sh');
   }
   // reset user project tmp
   if (store.state.userProjectTmp) { store.commit('setUserProjectTmp', null); }
@@ -168,7 +168,7 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
     destinationJobObject,
     newAnalysisAndTransferInfo.from.projectSelected,
   ));
-  console.log('create promises upload and generate association file');
+
   await Promise.all(parallelRequests);
 
   const transfer = {};

@@ -18,7 +18,6 @@ function init() {
 
   const authorization = client.getToken();
   authorization.then((session) => {
-    console.debug('Setting token');
     store.commit('setToken', session.access_token);
     axios.defaults.headers.common.Authorization = `Bearer ${session.access_token}`;
   });

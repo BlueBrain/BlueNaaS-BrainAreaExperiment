@@ -60,7 +60,6 @@ function updatedItem(item, callback, context) {
     currentItem = currentContext.timeline.itemsData.get(editId);
   }
 
-  console.debug('onUpdate');
   currentContext.editableItem = { item: currentItem, callback };
   currentContext.showModal = true;
 }

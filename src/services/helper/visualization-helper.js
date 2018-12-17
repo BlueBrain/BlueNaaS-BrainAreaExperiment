@@ -35,7 +35,7 @@ async function pollingVizIp() {
 }
 
 async function submitVisualization(simulationDetails) {
-  console.log('start submit visualization');
+  console.debug('Start submit visualization');
   const vizConfig = visualizationConfig[store.state.currentComputer];
 
   const files = await getFilesToCopy(`${simulationDetails.workingDirectory}/files`);

@@ -280,11 +280,11 @@ export default {
       this.$store.dispatch('hideLoader');
 
       if (isRunning(this.job.status)) {
-        console.debug('simulation is running - polling info...');
+        console.debug('Simulation is running - polling info...');
         console.debug('');
         setTimeout(() => { this.getJobById(jobId); }, this.$store.state.pollInterval);
       } else {
-        console.debug('simulation finished. stopping polling...');
+        console.debug('Simulation finished. stopping polling...');
       }
     },
 
@@ -321,16 +321,10 @@ export default {
     launchVisualization() {
       this.$Message.loading({
         content: 'Visualization is starting. This could take up to 10 min...',
-        // duration: 10,
-        // closable: true,
         duration: 60,
       });
-      // setTimeout(msg, 3000);
-      console.log('job', this.job);
-      console.log('simulationDetails', this.simulationDetails);
       submitVisualization(this.simulationDetails);
       this.vizRunning = true;
-      // console.log(submitVisualization);
     },
   },
 };

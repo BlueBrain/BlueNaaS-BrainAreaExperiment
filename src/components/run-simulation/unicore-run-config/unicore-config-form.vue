@@ -245,9 +245,7 @@ export default {
         this.runParameters.projectSelected = this.projectSelected;
         // to start spinner
         this.$emit('runSimulation', this.runParameters);
-        return;
       }
-      console.log('Form not valid');
     },
 
     loadDefaultValues() {

@@ -226,31 +226,22 @@ export default {
   },
   watch: {
     showModal(newVal) {
-      console.log('showModal watcher', newVal);
       this.formInvalid = newVal;
-      console.log(this.reportInfo);
-    },
-    reportInfo(newVal) {
-      console.debug('reportInfo', newVal);
     },
   },
   mounted() {
     this.filteredTypes = this.typesFull;
   },
   methods: {
-    onCancel(event) {
+    onCancel() {
       this.$emit('hideModal');
-      console.debug('on-cancel', event);
     },
-    async editItem(event) {
-      console.debug('editItem', event);
+    async editItem() {
       const isValid = await this.$refs.formValidate.validate();
       if (isValid) {
         this.$emit('itemEdited', this.reportInfo);
         this.formInvalid = false;
-        return;
       }
-      console.log('Form not valid');
     },
 
     targetChanged(newTarget) {

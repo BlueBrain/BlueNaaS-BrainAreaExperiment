@@ -26,88 +26,6 @@
             />
           </form-item>
 
-          <span v-if="!sameComputer">
-            <form-item prop="originComputer">
-              <tooltip
-                slot="label"
-                content="Where move data from"
-              >Origin:</tooltip>
-              <i-input
-                v-model="from.computer"
-                readonly
-                size="small"
-                placeholder="Origin computer"
-              />
-            </form-item>
-
-            <form-item prop="originProject" label="Project:">
-              <i-select
-                v-model="from.projectSelected"
-                placeholder="Origin project"
-                size="small"
-              >
-                <i-option
-                  v-for="project in from.projectsAvailable"
-                  :value="project"
-                  :key="project"
-                >{{ project }}</i-option>
-              </i-select>
-            </form-item>
-
-            <form-item prop="destinationComputer">
-              <tooltip
-                slot="label"
-                content="Where move data to"
-              >Destination:</tooltip>
-              <i-input
-                required
-                readonly
-                size="small"
-                v-model="to.computer"
-                placeholder="Destination computer"
-              />
-            </form-item>
-
-            <form-item prop="destinationProject" label="Project:">
-              <i-select
-                v-model="to.projectSelected"
-                placeholder="Destination project"
-                size="small"
-              >
-                <i-option
-                  v-for="project in to.projectsAvailable"
-                  :value="project"
-                  :key="project"
-                >{{ project }}</i-option>
-              </i-select>
-            </form-item>
-          </span>
-
-          <span v-else>
-            <!-- not possible to run analysis with different project without copying the files -->
-            <!-- <form-item prop="destinationProject">
-              <tooltip
-                slot="label"
-                content="Project to run the analysis"
-              >
-                Destination Project:
-              </tooltip>
-              <i-select
-                v-model="to.projectSelected"
-                placeholder="Destination project"
-                size="small"
-              >
-                <i-option
-                  v-for="project in to.projectsAvailable"
-                  :value="project"
-                  :key="project"
-                >
-                  {{ project }}
-                </i-option>
-              </i-select>
-            </form-item> -->
-          </span>
-
           <form-item prop="typesAnalysis" label="Analysis:">
             <checkbox-group v-model="checkedAnalysis">
               <checkbox
@@ -128,7 +46,6 @@
               Target:
             </tooltip>
             <i-select
-              v-if="!analyzeOutsideUnicore"
               v-model="target"
               size="small"
             >
@@ -138,17 +55,10 @@
                 :value="targetElem"
               >{{ targetElem }}</i-option>
             </i-select>
-            <i-input
-              v-else
-              required
-              size="small"
-              v-model="target"
-            />
           </form-item>
 
           <form-item prop="report" label="Report">
-             <i-select
-              v-if="!analyzeOutsideUnicore"
+           <i-select
               v-model="reportForAnalysis"
               size="small"
             >
@@ -158,12 +68,6 @@
                 :value="report"
               >{{ report }}</i-option>
             </i-select>
-            <i-input
-              v-else
-              required
-              size="small"
-              v-model="reportForAnalysis"
-            />
           </form-item>
 
           <form-item prop="cellsNumber" label="Cells (number):">
@@ -175,17 +79,6 @@
               placeholder="Cells (number) to visualize"
             />
           </form-item>
-
-
-          <div v-if="analizeNonUnicore">
-            <form-item label="Path to BlueConfig">
-              <i-input
-                required
-                size="small"
-                v-model="nonUnicoreSimPath"
-              />
-            </form-item>
-          </div>
 
         </i-form>
       </div>
@@ -208,32 +101,20 @@
 
 <script>
 import analysisConfig from '@/assets/analysis-config';
-import { getUser } from '@/services/unicore';
 
 export default {
   name: 'AnalysisForm',
-  props: ['jobSelectedForAnalysis', 'showModal', 'isRunningAnalysis', 'analizeNonUnicore'],
+  props: ['jobSelectedForAnalysis', 'showModal', 'isRunningAnalysis'],
   data() {
     return {
       formInvalid: false,
-      from: {
-        computer: null,
-        projectsAvailable: [],
-        projectSelected: null,
-      },
-      to: {
-        computer: null,
-        projectsAvailable: [],
-        projectSelected: null,
-      },
+      from: {},
       title: '',
       analysisToRun: analysisConfig.analysisAvailable,
       checkedAnalysis: [],
       reportForAnalysis: null,
       numberOfCells: 5,
       target: null,
-      // allow run analysis outside unicore https://github.com/cnr-ibf-pa/hbp-bsp-issues/issues/335
-      nonUnicoreSimPath: null,
 
       ruleValidate: {
         target: [{
@@ -297,9 +178,6 @@ export default {
       [this.target] = targetsNames;
       return targetsNames;
     },
-    sameComputer() {
-      return this.from.computer === this.to.computer;
-    },
     reports() {
       if (!this.jobSelectedForAnalysis) return [];
       const filteredNames = [];
@@ -325,36 +203,9 @@ export default {
       });
       return analysisCheckCorrect;
     },
-    analyzeOutsideUnicore() {
-      return this.analizeNonUnicore && this.sameComputer;
-    },
   },
   watch: {
     showModal(newVal) {
-      // TODO: check this projects based on the TO computer
-      this.$set(this.from, 'computer', this.$store.state.currentComputer);
-      this.$set(this.to, 'computer', analysisConfig[this.$store.state.currentComputer].to);
-
-      if (this.from.computer === this.to.computer) {
-        console.debug('[analysis] same computer');
-        this.$set(this.from, 'projectsAvailable', this.$store.state.userProjectsAvailable);
-        this.$set(this.from, 'projectSelected', this.$store.state.userProject);
-        this.$set(this.to, 'projectsAvailable', this.$store.state.userProjectsAvailable);
-        this.$set(this.to, 'projectSelected', this.$store.state.userProject);
-      } else {
-        console.warn('this.from.computer !== this.to.computer');
-        this.$set(this.from, 'projectsAvailable', this.$store.state.userProjectsAvailable);
-        this.$set(this.from, 'projectSelected', this.$store.state.userProject);
-
-        // get the projects available for the destination computer
-        getUser(this.to.computer)
-          .then((userInfo) => {
-            if (!userInfo) { console.error('getUserProjects'); }
-
-            this.$set(this.to, 'projectsAvailable', userInfo.client.xlogin.availableUIDs);
-            this.$set(this.to, 'projectSelected', userInfo.client.xlogin.availableUIDs[0]);
-          });
-      }
       this.formInvalid = newVal;
     },
     reports(newVal) {
@@ -374,7 +225,7 @@ export default {
     },
     generateAnalysisObjectToRun() {
       return {
-        to: this.to,
+        computerSelected: this.$store.state.currentComputer,
         from: this.from,
         nodes: analysisConfig.nodes,
         runtime: analysisConfig.runtime,
@@ -383,8 +234,6 @@ export default {
         checkedAnalysis: this.checkedAnalysis,
         reportForAnalysis: this.reportForAnalysis,
         target: this.target,
-        analizeNonUnicore: this.analizeNonUnicore,
-        nonUnicoreSimPath: this.nonUnicoreSimPath,
       };
     },
   },

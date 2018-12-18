@@ -1,12 +1,8 @@
 
-import template from 'lodash/template';
-import templateSettings from 'lodash/templateSettings';
-
 import unicore from '@/services/unicore';
 import analysisConfig from '@/assets/analysis-config';
 import store from '@/services/store';
 
-templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 async function generateUpdatedAssociatedFile(simulationWorkDirectory, analysisObject, userProject) {
   try {
@@ -48,48 +44,34 @@ async function getFilesToCopy(filesURL, userProject) {
 async function submitAnalysis(analysisAndTransferInfo, script) {
   // TODO add transfer option
   /*
-   *   Move files using Unicore API if needed and start the job.
    *   Returns one object with the information about transfer and the destination job
    *
    *   @param {Object} analysisAndTransferInfo
    *   {
-   *     'from': {
-   *       'workingDirectory' = origin job working directory
-   *       'computer' = computer name e.g: JUQUEEN,
-   *       'projectSelected' = userid of the project to launch job
-   *     },
-   *     'to': {} // same fields than from
+   *     'from': { 'workingDirectory' = origin job working directory },
+   *     'computerSelected' = computer used for the analysis,
    *     'nodes' = number of nodes used to run the analysis
    *     'title' = title of the job
    *   }
    */
   console.debug('Start submit analysis');
 
-  // this bool will determine if the files will be copied or referenced
-  const sameMachine = (analysisAndTransferInfo.from.computer === analysisAndTransferInfo.to.computer);
   const newAnalysisAndTransferInfo = analysisAndTransferInfo;
-  newAnalysisAndTransferInfo.executable = analysisConfig[analysisAndTransferInfo.to.computer].executable;
-  const { needsTransfer } = analysisConfig[analysisAndTransferInfo.to.computer];
+  const computer = store.state.currentComputer;
+  newAnalysisAndTransferInfo.executable = analysisConfig[computer].executable;
 
-  if (!sameMachine || needsTransfer) {
-    /* ---------------------------------------------------------------------
-     * Dependecy files for a new job
-     * --------------------------------------------------------------------- */
-    // get all the files to be copied
-    console.debug('Getting files to be copied ...');
-    const files = await getFilesToCopy(`${newAnalysisAndTransferInfo.from.workingDirectory}/files`);
-    // const transferArrayProm = [];
+  // get all the files to be copied
+  console.debug('Getting files to be copied ...');
+  const filesToCopy = await getFilesToCopy(`${newAnalysisAndTransferInfo.from.workingDirectory}/files`);
+  const siteUrl = unicore.getSites()[computer.toUpperCase()].url;
+  const originalSM = siteUrl.replace('rest/core', 'services/StorageManagement?res=');
+  const originalWorkId = newAnalysisAndTransferInfo.from.workingDirectory.split('/').pop();
 
-    const siteUrl = unicore.getSites()[newAnalysisAndTransferInfo.from.computer.toUpperCase()].url;
-    const originalSM = siteUrl.replace('rest/core', 'services/StorageManagement?res=');
-    const originalWorkId = newAnalysisAndTransferInfo.from.workingDirectory.split('/').pop();
-
-    const imports = files.map(fileName => ({
-      From: `BFT:${originalSM}${originalWorkId}#/${fileName}`,
-      To: fileName,
-    }));
-    newAnalysisAndTransferInfo.imports = imports;
-  }
+  const imports = filesToCopy.map(fileName => ({
+    From: `BFT:${originalSM}${originalWorkId}#/${fileName}`,
+    To: fileName,
+  }));
+  newAnalysisAndTransferInfo.imports = imports;
 
   /* ---------------------------------------------------------------------
    * Create analysis job
@@ -103,77 +85,27 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
   const inputs = [
     { To: analysisConfig.configFileName, Data: analysisParamsConfig },
   ];
-  console.debug('Submiting job...');
-  // create a new job with analysis info but don't start it yet
-  if (!sameMachine) {
-    store.commit('setUserProjectTmp', analysisAndTransferInfo.to.projectSelected);
-  }
-  const startLater = true;
-  const destinationJobObject = await unicore.submitJob(newAnalysisAndTransferInfo, inputs, startLater);
-  console.debug('Job created');
-
-  // fill the destination and pass it to transfer
-  newAnalysisAndTransferInfo.to.workingDirectory = destinationJobObject._links.workingDirectory.href;
-
-  const parallelRequests = [];
 
   if (script) {
     console.debug('[analysis-helper] Has script ... creating input.sh');
-
-    /* ---------------------------------------------------------------------
-     * Generate input.sh analysis script
-     * --------------------------------------------------------------------- */
-    let startAnalysisScript = '';
-    const startScriptTemplate = template(script.join('\n'));
-    if (sameMachine) {
-      const originPath = await unicore.workingDirToMachinePath(newAnalysisAndTransferInfo.from.workingDirectory);
-      const destinationPath = await unicore.workingDirToMachinePath(newAnalysisAndTransferInfo.to.workingDirectory);
-      // replace blueconfig path and output path
-      if (analysisAndTransferInfo.analizeNonUnicore && analysisAndTransferInfo.nonUnicoreSimPath) {
-        startAnalysisScript = startScriptTemplate({
-          ORIGIN: analysisAndTransferInfo.nonUnicoreSimPath,
-          DESTINATION: destinationPath,
-        });
-      } else {
-        startAnalysisScript = startScriptTemplate({
-          ORIGIN: originPath,
-          DESTINATION: destinationPath,
-        });
-      }
-    } else {
-      console.warn('Analysis in different machine');
-      startAnalysisScript = startScriptTemplate({ ORIGIN: '.', DESTINATION: '.' });
-    }
-
     /* ---------------------------------------------------------------------
      * Create file to start analysis
      * --------------------------------------------------------------------- */
-    parallelRequests.push(unicore.uploadData(
-      { To: 'input.sh', Data: startAnalysisScript },
-      `${newAnalysisAndTransferInfo.to.workingDirectory}/files`,
-      newAnalysisAndTransferInfo.to.projectSelected,
-    ));
+    inputs.push({ To: 'input.sh', Data: script.join('\n') });
   } else {
     console.debug('[analysis-helper] No script. skipping input.sh');
   }
-  // reset user project tmp
-  if (store.state.userProjectTmp) { store.commit('setUserProjectTmp', null); }
 
+  console.debug('Submiting job...');
+  const destinationJobObject = await unicore.submitJob(newAnalysisAndTransferInfo, inputs);
+  console.debug('Job created');
 
   /* ---------------------------------------------------------------------
    * Create association file in the simulation
    * --------------------------------------------------------------------- */
-  parallelRequests.push(generateUpdatedAssociatedFile(
-    newAnalysisAndTransferInfo.from.workingDirectory,
-    destinationJobObject,
-    newAnalysisAndTransferInfo.from.projectSelected,
-  ));
+  await generateUpdatedAssociatedFile(newAnalysisAndTransferInfo.from.workingDirectory, destinationJobObject);
 
-  await Promise.all(parallelRequests);
-
-  const transfer = {};
-  transfer.destinationJob = destinationJobObject;
-  return transfer;
+  return { destinationJob: destinationJobObject };
 }
 
 export default {

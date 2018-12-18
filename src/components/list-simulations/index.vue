@@ -29,7 +29,7 @@ This component manage each job (delete, start, create, etc).
       />
 
       <div
-        v-if="!isLoading && !viewList.length"
+        v-if="emptyList"
         class="really-centered colored-red"
       >List of jobs is empty</div>
 
@@ -46,7 +46,6 @@ This component manage each job (delete, start, create, etc).
       :show-modal="showAnalysisForm"
       :job-selected-for-analysis="jobSelectedForAnalysis"
       :is-running-analysis="isRunningAnalysis"
-      :analize-non-unicore="reusePersonalSimulation"
       @changeModalVisibility="toggleModal"
       @analysisConfigReady="analysisConfigReady"
     />
@@ -89,12 +88,14 @@ export default {
       loadIncrement: 20,
       jobSelectedForAnalysis: null,
       isRunningAnalysis: false,
-      reusePersonalSimulation: false,
     };
   },
   computed: {
     isLoading() {
       return this.$store.state.isLoading;
+    },
+    emptyList() {
+      return !this.$store.state.isLoading && !this.viewList.length;
     },
   },
   mounted() {
@@ -121,7 +122,6 @@ export default {
         return;
       }
       this.showAnalysisForm = !this.showAnalysisForm;
-      this.reusePersonalSimulation = false;
     },
 
     filter(simulations) {
@@ -326,17 +326,13 @@ export default {
       newAnalysisParamsEdited.from.workingDirectory = this.jobSelectedForAnalysis._links.workingDirectory.href;
       console.debug('Submiting analysis...');
 
-      const { script } = analysisConfig[analysisParamsEdited.from.computer];
+      const { script } = analysisConfig[this.$store.state.currentComputer];
 
-      const analysis = await analysisHelper.submitAnalysis(
+      await analysisHelper.submitAnalysis(
         newAnalysisParamsEdited,
         script,
         analysisConfig.filesToAvoidCopy,
       );
-
-      const startURL = analysis.destinationJob._links['action:start'].href;
-      console.debug('Starting analysis...');
-      unicore.actionJob(startURL);
 
       // poll the status of the analysis
       this.$set(this.jobSelectedForAnalysis, 'analysisStatus', jobStatus.loading);

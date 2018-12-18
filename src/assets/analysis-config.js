@@ -1,17 +1,14 @@
 
 export default {
   JURECA: {
-    to: 'JURECA',
     script: [
       'OMP_NUM_THREADS=1',
       'export OMP_NUM_THREADS',
-      '/homec/vsk25/vsk2512/analysis/analysis_launch_0.1.py --blueconfig {{ORIGIN}}/BlueConfig --output {{DESTINATION}} --analysisconfig ./analysis_config.json -vv',
+      '/homec/vsk25/vsk2512/analysis/analysis_launch_0.1.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
     ],
     executable: '/bin/bash input.sh',
   },
   NUVLA: {
-    to: 'NUVLA',
-    needsTransfer: true,
     executable: 'epfl-mooc/analysis/launch_analysis',
   },
   filesToAvoidCopy: [

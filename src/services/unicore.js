@@ -416,8 +416,7 @@ async function submitJob(runConfig, inputs, startLater = false) {
   console.debug('SubmitJob', runConfig);
   const newRunConfig = runConfig;
 
-  newRunConfig.computerSelected = (runConfig.computerSelected || runConfig.to.computer).toUpperCase();
-  // newRunConfig.userProject = runConfig.projectSelected || runConfig.to.projectSelected;
+  newRunConfig.computerSelected = runConfig.computerSelected.toUpperCase();
   const unicoreURL = getSites()[newRunConfig.computerSelected].url;
 
   try {

@@ -33,8 +33,7 @@ async function addJob(jobInfo) {
   function createIdAndDetails(job) {
     const id = job.id || urlToComputerAndId(job._links.self.href).id;
     const computer = job.computer || urlToComputerAndId(job._links.self.href).computer;
-    const project = store.state.userProject;
-    const uniqueId = id + computer + project;
+    const uniqueId = id + computer + store.state.userGroup;
     return {
       id: uniqueId,
       details: job,
@@ -52,7 +51,7 @@ async function addJob(jobInfo) {
 
 function getJobByUrl(url) {
   const info = urlToComputerAndId(url);
-  return getJob(info.id + info.computer + store.state.userProject);
+  return getJob(info.id + info.computer + store.state.userGroup);
 }
 
 async function saveSimConfiguration(bc, unicore) {

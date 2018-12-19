@@ -24,17 +24,17 @@
     />
 
     <i-select size="small" v-model="statusFilter">
-        <i-option
-          v-for="state in statesFilter"
-          :value="state"
-          :key="state"
-        >
-          <icon
-            :type="getStatusIcon(state)"
-            :size="iconSize"
-          />
-          {{ state }}
-        </i-option>
+      <i-option
+        v-for="state in statesFilter"
+        :value="state"
+        :key="state"
+      >
+        <icon
+          :type="getStatusIcon(state)"
+          :size="iconSize"
+        />
+        {{ state }}
+      </i-option>
     </i-select>
 
     <icon
@@ -42,27 +42,29 @@
       :size="iconSize"
       class="icon-spaced"
     />
-    <i-select size="small" v-model="computerFilter">
-        <i-option
-          v-for="computer in simulationConfig.available"
-          :value="computer"
-          :key="computer"
-        >{{ computer }}</i-option>
+    <i-select
+      size="small"
+      v-model="selectedComputer"
+    >
+      <i-option
+        v-for="computer in simulationConfig.available"
+        :value="computer"
+        :key="computer"
+      >{{ computer }}</i-option>
     </i-select>
 
     <icon
-      v-if="projectsAvailable.length"
       type="md-person"
       :size="iconSize"
       class="icon-spaced"
     />
     <i-select
-      v-if="projectsAvailable.length"
+      :disabled="!selectedGroupsAvailable.length"
       size="small"
-      v-model="userProjects"
+      v-model="selectedGroup"
     >
       <i-option
-        v-for="project in projectsAvailable"
+        v-for="project in selectedGroupsAvailable"
         :value="project"
         :key="project"
       >{{ project }}</i-option>
@@ -75,7 +77,6 @@
 <script>
 import { statesFilter, getStatusIcon } from '@/assets/job-status';
 import simulationConfig from '@/assets/simulation-config';
-import { getUserProjects } from '@/services/unicore';
 import eventBus from '@/services/event-bus';
 
 export default {
@@ -94,40 +95,37 @@ export default {
     filterOn() {
       return this.nameFilter || this.statusFilter !== 'ALL';
     },
-    projectsAvailable() {
-      return this.$store.state.userProjectsAvailable;
+    selectedGroupsAvailable() {
+      return this.$store.state.userGroupsAvailable;
     },
-    userProjects: {
+    selectedGroup: {
       get() {
-        return this.$store.state.userProject;
+        return this.$store.state.userGroup;
       },
-      set(newVal = null) {
-        // avoid reloading jobs twice when change computer
-        this.$store.commit('setUserProject', newVal);
-        this.reloadList();
+      set(newGroup) {
+        if (!newGroup) return;
+        eventBus.$emit('changeUserGroup', newGroup, this.reloadList);
+        this.startLoadingList();
       },
     },
-    computerFilter: {
-      get() {
-        return this.$route.params.computerParam;
-      },
-      set(newVal) {
-        this.$store.commit('setCurrentComputer', newVal);
-        // this will call change userProject (computed) and it will take care of reloading
-        if (!this.$store.state.userProject) {
-          // if it does not have any project the reload on the change project is not triggered
-          this.reloadList();
-        }
-        this.$store.commit('setUserProject', null);
+    selectedComputer: {
+      get() { return this.$store.state.currentComputer; },
+      set(newComputer) {
+        if (this.$store.state.currentComputer === newComputer) return;
 
-        this.$router.replace({
-          name: 'view',
-          params: {
-            computerParam: newVal,
-          },
+        this.startLoadingList();
+        eventBus.$emit('changeComputer', newComputer, () => {
+          this.reloadList();
+          this.$router.replace({
+            name: 'view',
+            params: { computerParam: newComputer },
+          });
         });
       },
     },
+  },
+  mounted() {
+    eventBus.$emit('setupFromStorage');
   },
   methods: {
     resetFilter() {
@@ -141,21 +139,20 @@ export default {
       });
     },
     reloadList() {
-      if (this.$store.state.isLoading) {
+      if (
+        this.$store.state.currentComputer !== this.$route.params.computerParam &&
+        this.$store.state.listIsLoading
+      ) {
         // force reload to avoid waiting for previous async calls
         this.$router.go();
       } else {
         // search for projects
-        this.$store.dispatch('showLoader');
-        getUserProjects()
-          .then(() => {
-            eventBus.$emit('reloadJobsList');
-          })
-          .catch((e) => {
-            this.$Message.error(`Error ${e.message}`);
-            console.error(e.message);
-          });
+        eventBus.$emit('reloadJobsList');
       }
+    },
+    startLoadingList() {
+      eventBus.$emit('cleanList');
+      this.$store.dispatch('showLoader');
     },
   },
   watch: {

@@ -11,33 +11,26 @@ Vue.use(Vuex);
 // Circuit
 const circuitToUse = localStorage.getItem('circuitToUse') || 'mooc';
 localStorage.setItem('circuitToUse', circuitToUse);
-console.log('Circuit to use', circuitToUse);
+console.log('[store] Circuit to use', circuitToUse);
 
-// check if the computer can run the circuit
-const computersThatCanRunCircuit = Object.keys(circuitConfig[circuitToUse].prefix);
 const storedComputer = localStorage.getItem('userComputer');
-const computerToUse = computersThatCanRunCircuit.includes(storedComputer) ?
-  storedComputer :
-  computersThatCanRunCircuit[0];
-localStorage.setItem('userComputer', computerToUse);
-
-const savedProject = localStorage.getItem('userProject');
-// savedProject = savedProject === 'null' ? null : savedProject;
-console.log(`LocalStored: project: ${savedProject} - computer: ${computerToUse}`);
+const storedGroup = localStorage.getItem('userGroup');
+console.log(`[store] LocalStored: project: ${storedGroup} - computer: ${storedComputer}`);
 
 const store = new Vuex.Store({
   state: {
     title: 'Run Simulation',
-    currentComputer: computerToUse,
+    currentComputer: null,
     currentCircuitConfig: circuitConfig[circuitToUse],
     simulationModel: circuitConfig[circuitToUse].defaultModel,
     simulationDuration: simConfig.defaultDuration,
     simulationForwardSkip: simConfig.defaultForwardSkip,
+    allComputerAvailable: simConfig.available,
     token: null,
-    userProject: savedProject || null,
-    userProjectTmp: null,
-    userProjectsAvailable: [],
-    isLoading: true,
+    userGroup: null,
+    userGroupTmp: null,
+    userGroupsAvailable: [],
+    listIsLoading: true,
     pollInterval: 10 * 1000,
     // circuit to use in the app (slices, microcircuit, etc) from circuit-config.js
     appCircuitToUse: circuitToUse,
@@ -48,13 +41,20 @@ const store = new Vuex.Store({
       state.title = newTitle;
     },
     setCurrentComputer(state, newComputer) {
-      console.debug('SetCurrentComputer', newComputer);
+      console.debug('[store] SetCurrentComputer', newComputer);
       state.currentComputer = newComputer;
-      if (!newComputer || newComputer === 'undefined') {
-        localStorage.removeItem('userComputer');
-      } else {
-        localStorage.setItem('userComputer', newComputer);
-      }
+    },
+    setUserGroup(state, newUserProject) {
+      console.debug('[store] SetUserGroup', newUserProject);
+      state.userGroup = newUserProject;
+    },
+    setUserGroupTmp(state, newUserProject) {
+      console.warn('[store] SetUserGroupTmp', newUserProject);
+      state.userGroupTmp = newUserProject;
+    },
+    setUserGroupsAvailable(state, projectsList) {
+      console.debug('[store] setUserGroupsAvailable', projectsList);
+      state.userGroupsAvailable = projectsList;
     },
     setSimulationModel(state, newModel) {
       state.simulationModel = newModel;
@@ -68,38 +68,19 @@ const store = new Vuex.Store({
     setToken(state, newToken) {
       state.token = newToken;
     },
-    setUserProject(state, newUserProject) {
-      console.debug('SetUserProject', newUserProject);
-      state.userProject = newUserProject;
-      if (!newUserProject || newUserProject === 'null' || newUserProject === 'undefined') {
-        localStorage.removeItem('userProject');
-      } else {
-        localStorage.setItem('userProject', newUserProject);
-      }
-    },
-    setUserProjectTmp(state, newUserProject) {
-      console.warn('SetUserProjectTmp', newUserProject);
-      state.userProjectTmp = newUserProject;
-    },
-    setUserProjectAvailable(state, projectsList) {
-      console.debug('SetUserProjectAvailable', projectsList);
-      state.userProjectsAvailable = projectsList;
-    },
-    setIsLoading(state, value) {
-      state.isLoading = value;
+    setListIsLoading(state, value) {
+      state.listIsLoading = value;
     },
   },
   actions: {
-    showLoader({ commit }) {
+    showLoader() {
       const squareLoading = document.getElementById('loading-component');
       if (!squareLoading) return;
-      commit('setIsLoading', true);
       squareLoading.style.display = 'block';
     },
-    hideLoader({ commit }) {
+    hideLoader() {
       const squareLoading = document.getElementById('loading-component');
       if (!squareLoading) return;
-      commit('setIsLoading', false);
       squareLoading.style.display = 'none';
     },
   },

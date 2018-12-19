@@ -137,7 +137,8 @@
 
 <script>
 import simulationConfig from '@/assets/simulation-config';
-import { getUserProjects, getComputersAvailableForCurrentModel } from '@/services/unicore';
+import eventBus from '@/services/event-bus';
+import { getComputersAvailableForCurrentModel } from '@/services/helper/computer-group-helper';
 import db from '@/services/db';
 
 export default {
@@ -201,6 +202,10 @@ export default {
   watch: {
     showModal(newVal) {
       this.showModalLocal = newVal;
+      if (newVal) {
+        this.loadPreviousConfig();
+        this.refreshProjects();
+      }
     },
   },
   computed: {
@@ -212,30 +217,24 @@ export default {
       get() {
         return this.$store.state.currentComputer;
       },
-      set(newVal) {
-        if (newVal === this.$store.state.currentComputer) return;
-        this.$store.commit('setCurrentComputer', newVal);
-        // this.projectSelected = null;
-        this.refreshProjects();
+      set(newComputer) {
+        if (!newComputer || newComputer === this.$store.state.currentComputer) return;
         this.loadDefaultValues();
+        this.refreshProjects(newComputer);
       },
     },
     projectSelected: {
       get() {
-        return this.$store.state.userProject;
+        return this.$store.state.userGroup;
       },
-      set(newVal) {
-        if (newVal === this.$store.state.userProject) return;
-        this.$store.commit('setUserProject', newVal);
+      set(newGroup) {
+        if (!newGroup || newGroup === this.$store.state.userGroup) return;
+        eventBus.$emit('changeUserGroup', newGroup);
       },
     },
     projectsAvailable() {
-      return this.$store.state.userProjectsAvailable;
+      return this.$store.state.userGroupsAvailable;
     },
-  },
-  mounted() {
-    this.loadPreviousConfig();
-    this.refreshProjects();
   },
   methods: {
     async checkForm() {
@@ -249,7 +248,7 @@ export default {
     },
 
     loadDefaultValues() {
-      const defaultValues = simulationConfig[this.$store.state.currentComputer];
+      const defaultValues = simulationConfig[this.computersAvailable[0]];
       this.runParameters.runtime = defaultValues.runtime;
       this.runParameters.nodes = defaultValues.nodes;
       this.runParameters.cpus = defaultValues.cpus;
@@ -269,14 +268,13 @@ export default {
         // this.refreshProjects();
         this.loadDefaultValues();
       }
-      await this.refreshProjects();
     },
-    refreshProjects() {
+    refreshProjects(computer) {
       this.projectsFetched = false;
-      getUserProjects().catch((e) => {
-        this.$Message.error(e.message);
-        console.error(e.message);
-      }).then(() => { this.projectsFetched = true; });
+      const computerToFetch = computer || this.computersAvailable[0];
+      eventBus.$emit('changeComputer', computerToFetch, () => {
+        this.projectsFetched = true;
+      });
     },
   },
 };

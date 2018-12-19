@@ -4,30 +4,26 @@ import analysisConfig from '@/assets/analysis-config';
 import store from '@/services/store';
 
 
-async function generateUpdatedAssociatedFile(simulationWorkDirectory, analysisObject, userProject) {
-  try {
-    const associationFile = await unicore.getAssociatedLocation(
-      analysisConfig.analysisConnectionFileName,
-      simulationWorkDirectory,
-    );
-    const newAssociationFile = [];
-    const analysisPath = analysisConfig.analysisConnectionFileName;
-    associationFile.forEach((oldAnalysis) => {
-      newAssociationFile.push(oldAnalysis);
-    });
-    newAssociationFile.push(analysisObject);
-    // mapping in simulation the analysis path.
-    const input = { To: analysisPath, Data: JSON.stringify(newAssociationFile) };
-    // upload the analysis_path.json file
-    console.debug('Uploading associationFile');
-    return unicore.uploadData(input, `${simulationWorkDirectory}/files`, userProject);
-  } catch (e) {
-    return Promise.reject(e);
-  }
+async function generateUpdatedAssociatedFile(simulationWorkDirectory, analysisObject, userGroup) {
+  const associationFile = await unicore.getAssociatedLocation(
+    analysisConfig.analysisConnectionFileName,
+    simulationWorkDirectory,
+  );
+  const newAssociationFile = [];
+  const analysisPath = analysisConfig.analysisConnectionFileName;
+  associationFile.forEach((oldAnalysis) => {
+    newAssociationFile.push(oldAnalysis);
+  });
+  newAssociationFile.push(analysisObject);
+  // mapping in simulation the analysis path.
+  const input = { To: analysisPath, Data: JSON.stringify(newAssociationFile) };
+  // upload the analysis_path.json file
+  console.debug('Uploading associationFile');
+  return unicore.uploadData(input, `${simulationWorkDirectory}/files`, userGroup);
 }
 
-async function getFilesToCopy(filesURL, userProject) {
-  const files = await unicore.getFilesList(filesURL, userProject);
+async function getFilesToCopy(filesURL, userGroup) {
+  const files = await unicore.getFilesList(filesURL, userGroup);
   const avoidFilesList = analysisConfig.filesToAvoidCopy;
 
   const allowed = [];
@@ -63,8 +59,8 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
   // get all the files to be copied
   console.debug('Getting files to be copied ...');
   const filesToCopy = await getFilesToCopy(`${newAnalysisAndTransferInfo.from.workingDirectory}/files`);
-  const siteUrl = unicore.getSites()[computer.toUpperCase()].url;
-  const originalSM = siteUrl.replace('rest/core', 'services/StorageManagement?res=');
+  const computeUrl = unicore.getComputeProviders()[computer.toUpperCase()].url;
+  const originalSM = computeUrl.replace('rest/core', 'services/StorageManagement?res=');
   const originalWorkId = newAnalysisAndTransferInfo.from.workingDirectory.split('/').pop();
 
   const imports = filesToCopy.map(fileName => ({

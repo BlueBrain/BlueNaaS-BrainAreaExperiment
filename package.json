@@ -1,7 +1,7 @@
 {
   "name": "sim-launcher-gui",
   "description": "Configure and launch simulations in HPC using Uncore API",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
@@ -20,17 +20,19 @@
     "pouchdb-browser": "^7.0.0",
     "vis": "^4.21.0",
     "vue": "^2.5.17",
-    "vue-infinite-loading": "^2.4.0",
+    "vue-infinite-loading": "^2.4.3",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"
   },
-    "repository": {
+  "repository": {
     "url": "https://bbpcode.epfl.ch/browse/code/nse%2Fsimulationapp/log/?h=refs%2Fheads%2Fmaster",
     "issuesurl": "",
     "doc_url": "https://lbologna.github.io/hbp-sp6-guidebook/online_usecases/brain_area_circuit_in_silico_experiments/hippocampus/configure_run_brainregion_preconf_model_data/configure_run_brainregion_preconf_model_data.html"
   },
   "author": "Antonel Stefano",
-  "contributors": ["NSE Team"],
+  "contributors": [
+    "NSE Team"
+  ],
   "license": "",
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.5",

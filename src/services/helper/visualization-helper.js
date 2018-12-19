@@ -40,8 +40,8 @@ async function submitVisualization(simulationDetails) {
 
   const files = await getFilesToCopy(`${simulationDetails.workingDirectory}/files`);
 
-  const siteUrl = unicore.getSites()[store.state.currentComputer].url;
-  const originalSM = siteUrl.replace('rest/core', 'services/StorageManagement?res=');
+  const computerUrl = unicore.getComputeProviders()[store.state.currentComputer].url;
+  const originalSM = computerUrl.replace('rest/core', 'services/StorageManagement?res=');
   const originalWorkId = simulationDetails.workingDirectory.split('/').pop();
 
   vizConfig.imports = files.map(fileName => ({
@@ -50,7 +50,7 @@ async function submitVisualization(simulationDetails) {
   }));
 
   vizConfig.computerSelected = store.state.currentComputer;
-  vizConfig.projectSelected = store.state.userProject;
+  vizConfig.projectSelected = store.state.userGroup;
   vizConfig.title = `${visualizationConfig.jobNamePrefix} ${simulationDetails.name}`;
 
   await unicore.submitJob(vizConfig, []);

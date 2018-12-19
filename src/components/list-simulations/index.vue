@@ -16,7 +16,7 @@ This component manage each job (delete, start, create, etc).
 
     <div
       class="simulation-items-container"
-      v-if="!isLoading"
+      v-if="!listIsLoading"
     >
       <simulation-item
         class="item-row"
@@ -35,7 +35,7 @@ This component manage each job (delete, start, create, etc).
 
       <infinite-loading
         @infinite="onInfinite"
-        ref="infiniteLoading"
+        :identifier="infiniteId"
       >
         <span slot="no-more"/>
         <span slot="no-results"/>
@@ -50,7 +50,7 @@ This component manage each job (delete, start, create, etc).
       @analysisConfigReady="analysisConfigReady"
     />
 
-    <DeleteConfirmationModal ref="deletionModal"/>
+    <delete-confirmation-modal ref="deletionModal"/>
 
   </div>
 </template>
@@ -59,7 +59,7 @@ This component manage each job (delete, start, create, etc).
 <script>
 import SimulationItem from '@/components/list-simulations/simulation-item.vue';
 import InfiniteLoading from 'vue-infinite-loading';
-import unicore, { getUserProjects, urlToComputerAndId } from '@/services/unicore';
+import unicore, { urlToComputerAndId } from '@/services/unicore';
 import analysisConfig from '@/assets/analysis-config';
 import LaunchAnalysisForm from '@/components/list-simulations/launch-analysis-form.vue';
 import analysisHelper from '@/services/helper/analysis-helper';
@@ -88,14 +88,18 @@ export default {
       loadIncrement: 20,
       jobSelectedForAnalysis: null,
       isRunningAnalysis: false,
+      infiniteId: +new Date(),
     };
   },
   computed: {
-    isLoading() {
-      return this.$store.state.isLoading;
+    listIsLoading() {
+      return this.$store.state.listIsLoading;
     },
     emptyList() {
-      return !this.$store.state.isLoading && !this.viewList.length;
+      const isEmpty = (this.$store.state.currentComputer === this.$route.params.computerParam) &&
+        !this.$store.state.listIsLoading && !this.viewList.length;
+
+      return isEmpty;
     },
   },
   mounted() {
@@ -105,15 +109,15 @@ export default {
     eventBus.$on('applyFilters', () => {
       this.filter(this.jobs);
     });
-
-    if (this.$route.params.computerParam !== this.$store.state.currentComputer) {
-      this.$store.commit('setCurrentComputer', this.$route.params.computerParam);
-      this.$store.commit('setUserProject', null);
-    }
-
-    getUserProjects().then(() => {
-      this.fetchJobs();
+    eventBus.$on('cleanList', () => {
+      this.viewList = [];
     });
+
+    if (!this.$store.state.currentComputer && this.$route.params.computerParam) {
+      eventBus.$emit('changeComputer', this.$route.params.computerParam, this.fetchJobs);
+    } else {
+      this.fetchJobs();
+    }
   },
   methods: {
     toggleModal(value) {
@@ -147,10 +151,6 @@ export default {
       // put items in the view
       this.viewList = this.filteredSimulations.slice(this.readObjectIndex, this.loadIncrement);
       this.readObjectIndex += this.loadIncrement;
-      this.$nextTick(() => {
-        if (!this.$refs.infiniteLoading) return;
-        this.$refs.infiniteLoading.$emit('$InfiniteLoading:reset');
-      });
     },
 
     deleteJob(url) {
@@ -184,11 +184,8 @@ export default {
     },
 
     async fetchJobs() {
-      this.viewList = [];
       console.debug('Fetching jobs for list');
-
-      // loading spinner
-      this.$store.dispatch('showLoader');
+      this.$store.commit('setListIsLoading', true);
 
       const filterOnlySimulations = ((jobsWithFiles) => {
         // return job information and a list of files as children []
@@ -247,6 +244,7 @@ export default {
         console.log('Filtered simulations', simulations.length);
         this.jobs = simulations.map(this.fetchAnalysisInfo);
         this.filter(this.jobs);
+        this.$store.commit('setListIsLoading', false);
         this.$store.dispatch('hideLoader');
       } catch (e) {
         this.$Message.error(`Error ${e.message}`);
@@ -295,7 +293,7 @@ export default {
     },
 
     onInfinite($state) {
-      if (this.isLoading) return;
+      if (this.listIsLoading) return;
       if (this.readObjectIndex > this.filteredSimulations.length) {
         $state.complete();
         return;

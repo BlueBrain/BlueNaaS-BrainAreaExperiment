@@ -47,7 +47,7 @@
           />
         </div>
 
-        <DeleteConfirmationModal ref="deletionModal"/>
+        <delete-confirmation-modal ref="deletionModal"/>
       </div>
     </collapse-title>
   </div>

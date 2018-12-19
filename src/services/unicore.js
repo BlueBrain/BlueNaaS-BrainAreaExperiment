@@ -3,7 +3,7 @@ import axios from 'axios';
 import find from 'lodash/find';
 import cleanDeep from 'clean-deep';
 
-import sites from '@/assets/sites.json';
+import computeProvider from '@/assets/compute-provider.json';
 import store from '@/services/store';
 import db from '@/services/db';
 import simulationConfig from '@/assets/simulation-config';
@@ -18,12 +18,12 @@ function init() {
     // Do something before request is sent
     const newConfig = config;
 
-    if (store.state.userProjectTmp) {
-      console.warn('using temportal userProject');
+    if (store.state.userGroupTmp) {
+      console.warn('using temportal userGroup');
       // used for temporal calls (when work with multiple user accounts in the same operation)
-      newConfig.headers.common['X-UNICORE-User-Preferences'] = `group:${store.state.userProjectTmp}`;
-    } else if (store.state.userProject) {
-      newConfig.headers.common['X-UNICORE-User-Preferences'] = `group:${store.state.userProject}`;
+      newConfig.headers.common['X-UNICORE-User-Preferences'] = `group:${store.state.userGroupTmp}`;
+    } else if (store.state.userGroup && store.state.userGroup !== '*') {
+      newConfig.headers.common['X-UNICORE-User-Preferences'] = `group:${store.state.userGroup}`;
     }
 
     // Download a file
@@ -46,13 +46,8 @@ function init() {
 }
 init();
 
-function getSites() {
-  return sites;
-}
-
-function getUser(site) {
-  const unicoreURL = getSites()[site.toUpperCase()].url;
-  return axios(unicoreURL).then(r => r.data);
+function getComputeProviders() {
+  return computeProvider;
 }
 
 function actionJob(actionURL) {
@@ -69,7 +64,7 @@ function getInfoByUrl(transferUrl) {
 }
 
 function urlToComputerAndId(jobURL) {
-  const result = find(getSites(), elem => jobURL.startsWith(elem.url));
+  const result = find(getComputeProviders(), elem => jobURL.startsWith(elem.url));
 
   const m = jobURL.match(new RegExp('/rest/core/jobs/(.*)'));
   return { computer: result.id, id: m[1] };
@@ -106,7 +101,7 @@ async function deleteJob(url) {
   });
   const { id } = urlToComputerAndId(url);
   console.debug('Removing from DB...', id);
-  await db.deleteJob(id + store.state.currentComputer + store.state.userProject);
+  await db.deleteJob(id + store.state.currentComputer + store.state.userGroup);
   console.debug('Removed from DB');
 }
 
@@ -120,18 +115,18 @@ function uploadData(dataToUpload, uploadURL) {
   });
 }
 
-async function getAllJobs(site) {
-  const unicoreURL = getSites()[site.toUpperCase()].url;
+async function getAllJobs(computer) {
+  const unicoreURL = getComputeProviders()[computer.toUpperCase()].url;
   const response = await axios(`${unicoreURL}/jobs`);
   return response.data.jobs;
 }
 
-async function getJobProperties(jobURL, userProject) {
+async function getJobProperties(jobURL, userGroup) {
   let result = await db.getJobByUrl(jobURL);
   if (!result) {
     console.debug('Getting job from network');
     try {
-      const job = await getInfoByUrl(jobURL, userProject);
+      const job = await getInfoByUrl(jobURL, userGroup);
       db.addJob(job.data);
       result = job.data;
     } catch (e) {
@@ -153,9 +148,9 @@ async function getFilesList(jobURL) {
   }
 }
 
-async function getAllJobsExpandedWithChildren(site = store.state.currentComputer) {
+async function getAllJobsExpandedWithChildren(computer = store.state.currentComputer) {
   // get the information of all jobs asociated with key + the children
-  const jobsListUrl = await getAllJobs(site);
+  const jobsListUrl = await getAllJobs(computer);
   if (jobsListUrl.length <= 0) return [];
 
   async function expandInfo(jobUrl) {
@@ -265,53 +260,6 @@ async function deleteJobFromAssociatedFile(simulationWorkDir, idToDelete, connec
   console.debug('associationFile updated');
 }
 
-async function getUserProjects() {
-  const userProjectsMap = localStorage.getItem('userProjectsMap') || '';
-  if (
-    store.state.currentComputer &&
-    store.state.userProject &&
-    (userProjectsMap.includes(store.state.userProject) &&
-     userProjectsMap.includes(store.state.currentComputer))
-  ) {
-    const available = userProjectsMap.split('-')[1].split(',');
-    console.debug('Setup available projects from localStorage');
-    store.commit('setUserProjectAvailable', available);
-    return store.state.userProject;
-  }
-
-  console.debug('Get user accounts from network');
-  if (store.state.userProject && store.state.userProject !== 'null') {
-    // reset user project to fetch information
-    store.commit('setUserProject', null);
-  }
-
-  const userInfo = await getUser(store.state.currentComputer);
-  if (!userInfo) {
-    console.error('getUserProjects');
-    return Promise.reject(new Error('retrieving projects for this computer'));
-  }
-
-  if (!userInfo.client.xlogin.availableGroups) {
-    console.error('getting availableGroups');
-    throw Error('Error getting available groups');
-  }
-  const projects = userInfo.client.xlogin.availableGroups.length ? userInfo.client.xlogin.availableGroups : [];
-  store.commit('setUserProjectAvailable', projects);
-  if (!store.state.userProject) {
-    store.commit('setUserProject', store.state.userProjectsAvailable[0]);
-  }
-
-  // mapping projects available for a specific computer
-  if (store.state.currentComputer && projects) {
-    localStorage.setItem(
-      'userProjectsMap',
-      `${store.state.currentComputer}-${projects}`,
-    );
-  }
-
-  return store.state.userProject;
-}
-
 async function generateUnicoreConfig(configParams) {
   /**
     * @params
@@ -319,9 +267,10 @@ async function generateUnicoreConfig(configParams) {
     */
 
   function getPatition(computerSelected) {
-    function filterPartition(partitionsMap, userProject) {
+    function filterPartition(partitionsMap, userGroup) {
       const partitions = Object.keys(partitionsMap);
-      const selectedProject = partitions.find(partition => userProject.indexOf(partition) >= 0);
+      debugger;
+      const selectedProject = partitions.find(partition => userGroup.includes(partition));
       const selectedPartition = partitionsMap[selectedProject];
       console.debug('selectedPartition', selectedPartition);
       return selectedPartition;
@@ -329,7 +278,7 @@ async function generateUnicoreConfig(configParams) {
 
     const partitionsMap = simulationConfig[computerSelected].partitions;
     if (!partitionsMap) return null;
-    return filterPartition(partitionsMap, store.state.userProject);
+    return filterPartition(partitionsMap, store.state.userGroup);
   }
 
   function getExecutable() {
@@ -400,9 +349,8 @@ async function getImage(imageURL) {
 }
 
 function getJobById(jobId) {
-  const computer = store.state.currentComputer.toUpperCase();
-  const site = getSites()[computer].url;
-  const url = `${site}/jobs/${jobId}`;
+  const computer = getComputeProviders()[store.state.currentComputer.toUpperCase()].url;
+  const url = `${computer}/jobs/${jobId}`;
   return getJobProperties(url);
 }
 
@@ -417,7 +365,7 @@ async function submitJob(runConfig, inputs, startLater = false) {
   const newRunConfig = runConfig;
 
   newRunConfig.computerSelected = runConfig.computerSelected.toUpperCase();
-  const unicoreURL = getSites()[newRunConfig.computerSelected].url;
+  const unicoreURL = getComputeProviders()[newRunConfig.computerSelected].url;
 
   try {
     const launchParams = await generateUnicoreConfig(newRunConfig);
@@ -477,21 +425,6 @@ async function workingDirToMachinePath(workingDirectory) {
   }
 }
 
-function getComputersAvailableForCurrentModel() {
-  // will filter the computers that actually can run the circuit
-  const storedComputer = localStorage.getItem('userComputer');
-  const computersCanRunCircuit = Object.keys(store.state.currentCircuitConfig.prefix);
-  const computersAllowedToRun = simulationConfig.available.filter(computer => (
-    computersCanRunCircuit.includes(computer)
-  ));
-  console.debug('ComputersAllowedToRun', computersAllowedToRun);
-  // const storedComputer = '';
-  const computerToSet = computersAllowedToRun.includes(storedComputer) ? storedComputer : computersAllowedToRun[0];
-  store.commit('setCurrentComputer', computerToSet);
-  // localStorage.setItem('userComputer', computerToSet);
-  return computersAllowedToRun;
-}
-
 export default {
   getAssociatedLocation,
   deleteJob,
@@ -499,24 +432,20 @@ export default {
   uploadData,
   submitJob,
   actionJob,
-  getSites,
+  getComputeProviders,
   getAllJobsExpandedWithChildren,
   getJobById,
   getJobProperties,
   getFiles,
   getFilesList,
   getImage,
-  getUser,
   urlToComputerAndId,
   getProjectSelectedByLog,
   getInfoByUrl,
-  getUserProjects,
   workingDirToMachinePath,
 };
 
 export {
-  getUser,
-  getUserProjects,
   urlToComputerAndId,
-  getComputersAvailableForCurrentModel,
+  getComputeProviders,
 };

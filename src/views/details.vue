@@ -124,12 +124,9 @@ import ItemSummary from '@/components/details-simulation/item-summary.vue';
 import AnalysisSection from '@/components/details-simulation/analysis-section.vue';
 import DisplayOrDownload from '@/components/shared/display-or-download.vue';
 import AnalysisInNotebook from '@/components/details-simulation/analysis-in-notebook.vue';
+import eventBus from '@/services/event-bus';
 import { isRunning } from '@/assets/job-status';
 import { submitVisualization } from '@/services/helper/visualization-helper';
-// import { isRunning, isEnded } from '@/assets/job-status.js';
-// import '@/assets/css/style.css';
-
-// const BRAYNS_URL = 'https://bbp-brayns.epfl.ch/?host=https://brayns.humanbrainproject.org';
 
 export default {
   name: 'SimulationDetails',
@@ -152,8 +149,7 @@ export default {
   mounted() {
     this.$store.commit('setAppTitle', 'Simulation Details');
     if (this.computerParam) {
-      this.computer = this.computerParam;
-      this.$store.commit('setCurrentComputer', this.computerParam);
+      eventBus.$emit('changeComputer', this.computerParam);
     }
     this.getJobById(this.jobId);
   },

@@ -59,7 +59,7 @@
       class="icon-spaced"
     />
     <i-select
-      :disabled="!selectedGroupsAvailable.length"
+      :disabled="!hasMultipleProjects"
       size="small"
       v-model="selectedGroup"
     >
@@ -78,6 +78,7 @@
 import { statesFilter, getStatusIcon } from '@/assets/job-status';
 import simulationConfig from '@/assets/simulation-config';
 import eventBus from '@/services/event-bus';
+import isEqual from 'lodash/isEqual';
 
 export default {
   name: 'ListFilters',
@@ -122,6 +123,9 @@ export default {
           });
         });
       },
+    },
+    hasMultipleProjects() {
+      return !isEqual(this.selectedGroupsAvailable, ['*']);
     },
   },
   mounted() {

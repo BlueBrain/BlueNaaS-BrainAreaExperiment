@@ -48,6 +48,7 @@ import ReportTimeline from '@/components/run-simulation/report/report-timeline.v
 import RunConfigurationComponent from '@/components/run-simulation/unicore-run-config/run-configuration-component.vue';
 import unicore, { urlToComputerAndId } from '@/services/unicore';
 import simulationConfig from '@/assets/simulation-config';
+import { getComputersAvailableForCurrentModel } from '@/services/helper/computer-group-helper';
 import '@/assets/css/simulation.css';
 
 export default {
@@ -69,10 +70,12 @@ export default {
   },
   methods: {
     viewList() {
+      const defaultComputer = getComputersAvailableForCurrentModel()[0];
+      const computer = this.$store.state.currentComputer || defaultComputer;
       this.$router.push({
         name: 'view',
         params: {
-          computerParam: this.$store.state.currentComputer,
+          computerParam: computer,
         },
       });
     },

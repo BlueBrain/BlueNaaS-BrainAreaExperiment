@@ -38,16 +38,18 @@ function setupFromStorage(newGroup) {
     if (store.state.currentComputer !== computerSaved) {
       store.commit('setCurrentComputer', computerSaved);
     }
-    if (!store.state.userGroup !== groupSaved) {
+    if (store.state.userGroup !== groupSaved) {
       store.commit('setUserGroup', groupSaved);
     }
+    return true;
   }
+  return false;
 }
 
 async function setupUserProjects(newGroup) {
   if (store.state.currentComputer === localStorage.getItem('userComputer')) {
-    setupFromStorage(newGroup);
-    return store.state.userGroup;
+    const wasSet = setupFromStorage(newGroup);
+    if (wasSet) return store.state.userGroup;
   }
   const computer = store.state.currentComputer;
   console.debug('Get user accounts from network');
@@ -69,7 +71,7 @@ async function setupUserProjects(newGroup) {
   }
 
   const groupsAvailable = userInfo.client.xlogin.availableGroups.length ?
-    userInfo.client.xlogin.availableGroups : [];
+    userInfo.client.xlogin.availableGroups : ['*'];
   const currentGroup = groupsAvailable.length ? groupsAvailable[0] : '*';
   store.commit('setUserGroupsAvailable', groupsAvailable);
   if (!store.state.userGroup) {
@@ -80,10 +82,7 @@ async function setupUserProjects(newGroup) {
 
   // mapping groupsAvailable available for a specific computer
   if (computer && groupsAvailable) {
-    localStorage.setItem(
-      'computerUserGroupsMap',
-      `${computer}-${groupsAvailable}`,
-    );
+    localStorage.setItem('computerUserGroupsMap', `${computer}-${groupsAvailable}`);
   }
 
   return store.state.userGroup;
@@ -101,7 +100,6 @@ eventBus.$on('changeUserGroup', (group, callback) => {
 });
 
 eventBus.$on('changeComputer', (computer, callback) => {
-  if (store.state.currentComputer === computer) return;
   store.commit('setCurrentComputer', computer);
   setupUserProjects().then(() => {
     if (callback) callback();

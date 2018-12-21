@@ -51,11 +51,11 @@
         >Project</tooltip>
         <i-select
           size="small"
-          v-model="projectSelected"
-          :disabled="!projectsAvailable.length"
+          v-model="groupSelected"
+          :disabled="disableGroupSelector"
         >
           <i-option
-            v-for="project in projectsAvailable"
+            v-for="project in groupsAvailable"
             :key="project"
             :value="project"
           >{{ project }}</i-option>
@@ -138,6 +138,7 @@
 <script>
 import simulationConfig from '@/assets/simulation-config';
 import eventBus from '@/services/event-bus';
+import isEqual from 'lodash/isEqual';
 import { getComputersAvailableForCurrentModel } from '@/services/helper/computer-group-helper';
 import db from '@/services/db';
 
@@ -203,8 +204,9 @@ export default {
     showModal(newVal) {
       this.showModalLocal = newVal;
       if (newVal) {
-        this.loadPreviousConfig();
-        this.refreshProjects();
+        this.loadPreviousConfig().then((selectedComputer) => {
+          this.refreshProjects(selectedComputer);
+        });
       }
     },
   },
@@ -213,6 +215,7 @@ export default {
       if (!this.showModalLocal) return [];
       return getComputersAvailableForCurrentModel();
     },
+
     computerSelected: {
       get() {
         return this.$store.state.currentComputer;
@@ -223,7 +226,8 @@ export default {
         this.refreshProjects(newComputer);
       },
     },
-    projectSelected: {
+
+    groupSelected: {
       get() {
         return this.$store.state.userGroup;
       },
@@ -232,8 +236,14 @@ export default {
         eventBus.$emit('changeUserGroup', newGroup);
       },
     },
-    projectsAvailable() {
+
+    groupsAvailable() {
       return this.$store.state.userGroupsAvailable;
+    },
+
+    disableGroupSelector() {
+      const hasOneGroup = isEqual(this.groupsAvailable, ['*']);
+      return !this.groupsAvailable.length || hasOneGroup;
     },
   },
   methods: {
@@ -241,7 +251,7 @@ export default {
       const isValid = await this.$refs.formValidate.validate();
       if (isValid) {
         this.runParameters.computerSelected = this.computerSelected;
-        this.runParameters.projectSelected = this.projectSelected;
+        this.runParameters.groupSelected = this.groupSelected;
         // to start spinner
         this.$emit('runSimulation', this.runParameters);
       }
@@ -261,14 +271,18 @@ export default {
           this.runParameters.runtime = lastConfig.unicore.runtime;
           this.runParameters.nodes = lastConfig.unicore.nodes;
           this.runParameters.title = lastConfig.unicore.title;
-          this.runParameters.cpus = simulationConfig[this.$store.state.currentComputer].cpus;
-        } else { throw String('unicore params missing'); }
+          this.runParameters.cpus = simulationConfig[lastConfig.unicore.computerSelected].cpus;
+          return lastConfig.unicore.computerSelected;
+        }
+        console.error('unicore params missing');
+        return null;
       } catch (e) {
         console.log('- Previous config for run form not found');
-        // this.refreshProjects();
         this.loadDefaultValues();
+        return null;
       }
     },
+
     refreshProjects(computer) {
       this.projectsFetched = false;
       const computerToFetch = computer || this.computersAvailable[0];

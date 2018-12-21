@@ -3,7 +3,7 @@
   <div class="inline-centered">
     <tooltip
       content="Defines the Circuit"
-    >Circuit:</tooltip>
+    >Model:</tooltip>
     <i-select
       v-model="circuitToUse"
       size="small"
@@ -17,8 +17,8 @@
     </i-select>
 
     <tooltip
-      content="Defines the model to be loaded (CircuitTarget)"
-    >Model:</tooltip>
+      content="Subpopulation of neurons to be simulated (CircuitTarget)"
+    >Population:</tooltip>
     <autocomplete-targets
       :target-selected="modelSelected"
       @targetChanged="targetChanged"
@@ -36,18 +36,6 @@
       placeholder="Duration"
     />
 
-    <tooltip
-      content="Run without Stimulus or Report for a given duration using a large timestep.
-      This is to get the cells past any initial transience"
-    >ForwardSkip(ms):</tooltip>
-    <input-number
-      v-model="forwardSkip"
-      :min="1"
-      :step="1"
-      :max="50000"
-      size="small"
-      placeholder="ForwardSkip"
-    />
   </div>
 </template>
 
@@ -78,7 +66,7 @@ export default {
         Run: {
           Default: {
             Duration: this.duration,
-            ForwardSkip: this.forwardSkip,
+            ForwardSkip: this.$store.state.simulationForwardSkip,
             CircuitTarget: mapBlueConfigTerms(this.modelSelected),
           },
         },
@@ -87,10 +75,6 @@ export default {
     });
   },
   computed: {
-    forwardSkip: {
-      get() { return this.$store.state.simulationForwardSkip; },
-      set(newVal) { this.$store.commit('setSimulationForwardSkip', newVal); },
-    },
     duration: {
       get() { return this.$store.state.simulationDuration; },
       set(newVal) {

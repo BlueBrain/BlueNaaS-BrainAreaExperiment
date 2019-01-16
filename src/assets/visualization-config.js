@@ -1,13 +1,12 @@
 
 const config = {
-  // JURECA: {
-  //   to: 'NUVLA',
-  //   script: [
-  //     'OMP_NUM_THREADS=1',
-  //     'export OMP_NUM_THREADS',
-  //   ],
-  //   executable: '/bin/bash input.sh',
-  // },
+  JURECA: {
+    to: 'NUVLA',
+    needsTransfer: true,
+    executable: 'brayns/BraynsUI',
+    nodes: 1,
+    runtime: 500,
+  },
   NUVLA: {
     to: 'NUVLA',
     needsTransfer: true,
@@ -18,7 +17,7 @@ const config = {
   filesToAvoidCopy: [
     'stderr',
     'stdout',
-    'UNICORE_SCRIPT_EXIT_CODE',
+    'UNICORE_',
     'out.dat',
     'analysis_path.json',
     'bss_submit_',

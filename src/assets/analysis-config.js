@@ -4,7 +4,7 @@ export default {
     script: [
       'OMP_NUM_THREADS=1',
       'export OMP_NUM_THREADS',
-      '/homec/vsk25/vsk2512/analysis/analysis_launch_0.1.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
+      '/p/project/cvsk25/vsk2512/analysis/analysis_launch_0.1.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
     ],
     executable: '/bin/bash input.sh',
   },

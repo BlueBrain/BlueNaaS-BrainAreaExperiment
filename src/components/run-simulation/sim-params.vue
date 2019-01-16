@@ -20,7 +20,7 @@
       content="Subpopulation of neurons to be simulated (CircuitTarget)"
     >Population:</tooltip>
     <autocomplete-targets
-      :target-selected="modelSelected"
+      :target-selected="populationSelected"
       @targetChanged="targetChanged"
     />
 
@@ -67,7 +67,7 @@ export default {
           Default: {
             Duration: this.duration,
             ForwardSkip: this.$store.state.simulationForwardSkip,
-            CircuitTarget: mapBlueConfigTerms(this.modelSelected),
+            CircuitTarget: mapBlueConfigTerms(this.populationSelected),
           },
         },
       };
@@ -83,9 +83,9 @@ export default {
         eventBus.$emit('simulationDurationChanged', newVal);
       },
     },
-    modelSelected: {
-      get() { return this.$store.state.simulationModel; },
-      set(newVal) { this.$store.commit('setSimulationModel', newVal); },
+    populationSelected: {
+      get() { return this.$store.state.simulationPopulation; },
+      set(newVal) { this.$store.commit('setSimulationPopulation', newVal); },
     },
     appCircuitsList() {
       return map(circuitConfig, (circuitValue, circuit) => (
@@ -100,14 +100,14 @@ export default {
         if (lastConfig.bc) {
           this.duration = lastConfig.bc.Run.Default.Duration;
           this.forwardSkip = lastConfig.bc.Run.Default.ForwardSkip;
-          this.modelSelected = unmapBlueConfigTerms(lastConfig.bc.Run.Default.CircuitTarget);
+          this.populationSelected = unmapBlueConfigTerms(lastConfig.bc.Run.Default.CircuitTarget);
         } else { throw String('BlueConfig params missing'); }
       } catch (e) {
         console.log('- Previous config for simulation params not found');
       }
     },
     targetChanged(newModel) {
-      this.$store.commit('setSimulationModel', newModel);
+      this.$store.commit('setSimulationPopulation', newModel);
     },
   },
   watch: {

@@ -183,7 +183,7 @@ export default {
     createNewStimulus(target = null) {
       return {
         Pattern: 'Poisson',
-        Target: target || this.$store.state.simulationModel,
+        Target: target || this.$store.state.simulationPopulation,
         Mode: 'Current',
         Duration: parseInt(this.$store.state.simulationDuration, 10),
         Delay: 0,

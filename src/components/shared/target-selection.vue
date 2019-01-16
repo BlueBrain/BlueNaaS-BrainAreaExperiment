@@ -5,7 +5,7 @@
       <section class="img-container">
         <img id="currentSliceImg">
       </section>
-      <section class="autocomplete-container">
+      <section class="labels-container">
         <p
           v-for="(item, index) in imagePoll"
           :key="index"
@@ -38,7 +38,7 @@ export default {
   mounted() {
     if (this.imagePoll && this.imagePoll.length) {
       const indexImgDefaultModel = this.imagePoll.findIndex(target => (
-        target.displayName === this.$store.state.currentCircuitConfig.defaultModel
+        target.displayName === this.$store.state.currentCircuitConfig.defaultPopulation
       ));
       this.firstImgElement = this.imagePoll[indexImgDefaultModel];
       this.loadImage();

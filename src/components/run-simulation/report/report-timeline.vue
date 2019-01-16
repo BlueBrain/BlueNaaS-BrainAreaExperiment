@@ -190,7 +190,7 @@ export default {
         EndTime: parseInt(this.$store.state.simulationDuration, 10),
         ReportOn: 'voltage',
         Unit: 'mV',
-        Target: target || this.$store.state.simulationModel,
+        Target: target || this.$store.state.simulationPopulation,
         Type: 'Soma',
         Format: 'Bin',
         Dt: 0.1,

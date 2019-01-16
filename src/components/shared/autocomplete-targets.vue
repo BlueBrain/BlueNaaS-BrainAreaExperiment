@@ -1,7 +1,7 @@
 
 <template>
   <i-select
-    v-model="modelSelected"
+    v-model="populationSelected"
     filterable
     @on-change="itemSelected"
     size="small"
@@ -26,7 +26,7 @@ export default {
   props: ['targetSelected', 'itemsAvailable'],
   data() {
     return {
-      modelSelected: this.targetSelected || null,
+      populationSelected: this.targetSelected || null,
     };
   },
   methods: {
@@ -52,8 +52,8 @@ export default {
   },
   watch: {
     targetSelected(newTarget) {
-      this.modelSelected = newTarget;
-      this.itemSelected(this.modelSelected);
+      this.populationSelected = newTarget;
+      this.itemSelected(this.populationSelected);
     },
   },
 };

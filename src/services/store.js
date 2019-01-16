@@ -22,7 +22,7 @@ const store = new Vuex.Store({
     title: 'Run Simulation',
     currentComputer: null,
     currentCircuitConfig: circuitConfig[circuitToUse],
-    simulationModel: circuitConfig[circuitToUse].defaultModel,
+    simulationPopulation: null,
     simulationDuration: simConfig.defaultDuration,
     simulationForwardSkip: simConfig.defaultForwardSkip,
     allComputerAvailable: simConfig.available,
@@ -56,8 +56,8 @@ const store = new Vuex.Store({
       console.debug('[store] setUserGroupsAvailable', projectsList);
       state.userGroupsAvailable = projectsList;
     },
-    setSimulationModel(state, newModel) {
-      state.simulationModel = newModel;
+    setSimulationPopulation(state, newModel) {
+      state.simulationPopulation = newModel;
     },
     setSimulationDuration(state, newDuration) {
       state.simulationDuration = newDuration;

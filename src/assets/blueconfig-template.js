@@ -24,7 +24,7 @@ function createBCTemplate() {
         Date: '15:2:16',
         CellLibraryFile: circuitPaths.CellLibraryFile,
         gitPath: 'ssh://bbpgit.epfl.ch/sim/neurodamus/bbp',
-        CircuitTarget: store.state.simulationModel,
+        CircuitTarget: store.state.simulationPopulation,
         Dt: '0.025',
         Duration: store.state.simulationDuration,
         ForwardSkip: store.state.simulationForwardSkip,

@@ -63,7 +63,7 @@ const slices = {
     { name: 'SLM', displayName: 'SLM' },
     { name: 'AllCompartments', displayName: 'AllCompartments' },
   ],
-  defaultModel: 'Slice-4',
+  defaultPopulation: 'Slice-4',
   biggestTarget: 'Full CA1',
   displayName: 'Hippocampus Full CA1',
 };
@@ -99,7 +99,7 @@ const mooc = {
     { name: 'Mosaic', displayName: 'Microcircuit', src: `${moocImgBase}/mosaic.png` },
   ],
   biggestTarget: 'Microcircuit',
-  defaultModel: 'Test1K',
+  defaultPopulation: 'Central Column',
   displayName: 'Hippocampus CA1 microcircuit',
   extraParamsInBC: {
     Projection: {

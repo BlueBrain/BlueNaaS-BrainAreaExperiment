@@ -78,7 +78,8 @@ export default {
     async configureSimulation() {
       // make blueConfig to check if all the params are correct
       const partialBlueConfig = await this.generatePartialBlueConfig();
-      const isConsistant = this.checkSimulationConsistancy(partialBlueConfig, this.$store.state.simulationModel);
+      const populationSelected = this.$store.state.simulationPopulation;
+      const isConsistant = this.checkSimulationConsistancy(partialBlueConfig, populationSelected);
       if (isConsistant) {
         this.showComputerParamsModal = true;
       }
@@ -131,7 +132,7 @@ export default {
       });
     },
 
-    checkSimulationConsistancy(blueConfig, modelSelected) {
+    checkSimulationConsistancy(blueConfig, populationSelected) {
       // this will check if the model, stimulations and reports have coherence
       // only one stimulus and one report -> compare with Model
       const reportKeys = Object.keys(blueConfig.Report);
@@ -145,8 +146,8 @@ export default {
       }
 
       function checkModel() {
-        if (modelSelected !== circuitConf.biggestTarget) {
-          alert.error(`Incorrect Model. Select the model ${circuitConf.biggestTarget}`);
+        if (populationSelected !== circuitConf.biggestTarget) {
+          alert.error(`Incorrect Population. Select ${circuitConf.biggestTarget}`);
           return false;
         }
         return true;
@@ -154,7 +155,7 @@ export default {
 
       function checkMultipleEquals(arraysOfArrays) {
         const reg = new RegExp('(.+)_(report|stimulusinject)_');
-        const targets = [mapBlueConfigTerms(modelSelected)];
+        const targets = [mapBlueConfigTerms(populationSelected)];
 
         // this will extract all the targets in stimulations and reports
         arraysOfArrays.forEach((type) => {

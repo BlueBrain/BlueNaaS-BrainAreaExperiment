@@ -63,10 +63,22 @@ export default {
     this.$store.commit('setAppTitle', 'Run Simulation');
     this.$store.dispatch('hideLoader');
 
-    // set the target that is the defautl for stimulus, reports and circuitTarget in BlueConfig
-    const model = this.$store.state.currentCircuitConfig.defaultModel;
-    console.debug('Using model', model);
-    this.$store.commit('setSimulationModel', model);
+    const allTargets = this.$store.state.currentCircuitConfig.targets;
+
+    // set the targets for stimulations
+    const stimulationRegExp = new RegExp(this.$store.state.currentCircuitConfig.stimulationTargetFilter);
+    const filteredTargetsForStimulation = allTargets.filter(target => stimulationRegExp.test(target.name));
+    this.$store.commit('setStimulationTargets', filteredTargetsForStimulation);
+
+    // set targets for reports
+    const reportRegExp = new RegExp(this.$store.state.currentCircuitConfig.reportsTargetFilter);
+    const filteredTargetsForReport = allTargets.filter(target => reportRegExp.test(target.name));
+    this.$store.commit('setReportTargets', filteredTargetsForReport);
+
+    // set the population to be loaded in the simulation (circuitTarget in BlueConfig)
+    const population = this.$store.state.currentCircuitConfig.defaultPopulation;
+    this.$store.commit('setSimulationPopulation', population);
+    this.$store.commit('setPopulationTargets', filteredTargetsForStimulation);
   },
   methods: {
     viewList() {

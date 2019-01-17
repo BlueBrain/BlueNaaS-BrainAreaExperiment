@@ -20,6 +20,7 @@
 
       <target-selection
         v-if="showTargetSelector"
+        :itemsAvailable="stimulationTargets"
         @targetSelected="targetSelected"
       />
     </div>
@@ -70,7 +71,10 @@ export default {
       return cloneDeep(stimulus) || {};
     },
     showTargetSelector() {
-      return get(this, '$store.state.currentCircuitConfig.targets.length');
+      return get(this, '$store.state.stimulationTargets.length');
+    },
+    stimulationTargets() {
+      return this.$store.state.stimulationTargets;
     },
   },
   async mounted() {

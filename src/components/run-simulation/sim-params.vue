@@ -21,6 +21,7 @@
     >Population:</tooltip>
     <autocomplete-targets
       :target-selected="populationSelected"
+      :itemsAvailable="populationTargets"
       @targetChanged="targetChanged"
     />
 
@@ -91,6 +92,9 @@ export default {
       return map(circuitConfig, (circuitValue, circuit) => (
         { displayName: circuitValue.displayName, circuitRawName: circuit }
       ));
+    },
+    populationTargets() {
+      return this.$store.state.populationTargets;
     },
   },
   methods: {

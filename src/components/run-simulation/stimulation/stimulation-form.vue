@@ -7,7 +7,7 @@
       @on-cancel="onCancel"
       class="stimulation-form"
     >
-      <h3 slot="header">Edit Stimulus</h3>
+      <h3 slot="header">Stimulus Definition</h3>
       <div>
         <i-form
           ref="formValidate"
@@ -24,6 +24,7 @@
             >Target</tooltip>
             <autocomplete-targets
               :target-selected="stimulusInfo.Target"
+              :itemsAvailable="stimulationTargets"
               @targetChanged="targetChanged"
             />
           </form-item>
@@ -209,6 +210,11 @@ export default {
   watch: {
     showModal(newVal) {
       this.formInvalid = newVal;
+    },
+  },
+  computed: {
+    stimulationTargets() {
+      return this.$store.state.stimulationTargets;
     },
   },
   methods: {

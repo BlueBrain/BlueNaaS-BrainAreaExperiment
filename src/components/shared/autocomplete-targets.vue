@@ -43,10 +43,8 @@ export default {
   computed: {
     targets() {
       if (this.itemsAvailable && this.itemsAvailable.length) {
-        console.warn('Using targets passed as param');
         return this.itemsAvailable;
       }
-
       return this.$store.state.currentCircuitConfig.targets;
     },
   },

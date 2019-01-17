@@ -25,6 +25,7 @@
             >Target</tooltip>
             <autocomplete-targets
               :target-selected="reportInfo.Target"
+              :itemsAvailable="reportTargets"
               @targetChanged="targetChanged"
             />
           </form-item>
@@ -227,6 +228,11 @@ export default {
   watch: {
     showModal(newVal) {
       this.formInvalid = newVal;
+    },
+  },
+  computed: {
+    reportTargets() {
+      return this.$store.state.reportTargets;
     },
   },
   mounted() {

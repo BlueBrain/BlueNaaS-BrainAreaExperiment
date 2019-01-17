@@ -22,6 +22,7 @@
 
       <target-selection
         v-if="showTargetSelector"
+        :itemsAvailable="reportTargets"
         @targetSelected="targetSelected"
       />
     </div>
@@ -72,7 +73,10 @@ export default {
       return cloneDeep(report) || {};
     },
     showTargetSelector() {
-      return get(this, '$store.state.currentCircuitConfig.targets.length');
+      return get(this, '$store.state.reportTargets.length');
+    },
+    reportTargets() {
+      return this.$store.state.reportTargets;
     },
   },
   async mounted() {
@@ -97,7 +101,6 @@ export default {
     // before running the simulation create BlueConfig
     eventBus.$on('createReportConfig', (resolve) => {
       const reportBlueconfig = this.createConfig();
-      console.debug('Report BC created', reportBlueconfig);
       resolve(reportBlueconfig);
     });
 

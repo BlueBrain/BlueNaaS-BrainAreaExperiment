@@ -24,6 +24,7 @@
 <script>
 export default {
   name: 'TargetSelection',
+  props: ['itemsAvailable'],
   data() {
     return {
       selectedSlice: '',
@@ -31,6 +32,9 @@ export default {
   },
   computed: {
     imagePoll() {
+      if (this.itemsAvailable) {
+        return this.itemsAvailable.filter(elem => elem.src);
+      }
       const allTargets = this.$store.state.currentCircuitConfig.targets;
       return allTargets.filter(elem => elem.src);
     },
@@ -109,13 +113,14 @@ export default {
     .blur {
         opacity: 0.5;
     }
-    .autocomplete-container {
+    .labels-container {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         height: 130px;
         overflow-y: scroll;
         overflow-x: hidden;
+        max-width: 140px;
     }
     .list-item {
         padding: 2px;

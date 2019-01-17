@@ -34,6 +34,9 @@ const store = new Vuex.Store({
     pollInterval: 10 * 1000,
     // circuit to use in the app (slices, microcircuit, etc) from circuit-config.js
     appCircuitToUse: circuitToUse,
+    stimulationTargets: [],
+    reportTargets: [],
+    populationTargets: [],
   },
   mutations: {
     /* eslint-disable no-param-reassign */
@@ -58,6 +61,15 @@ const store = new Vuex.Store({
     },
     setSimulationPopulation(state, newModel) {
       state.simulationPopulation = newModel;
+    },
+    setStimulationTargets(state, targets) {
+      state.stimulationTargets = targets;
+    },
+    setReportTargets(state, targets) {
+      state.reportTargets = targets;
+    },
+    setPopulationTargets(state, targets) {
+      state.populationTargets = targets;
     },
     setSimulationDuration(state, newDuration) {
       state.simulationDuration = newDuration;

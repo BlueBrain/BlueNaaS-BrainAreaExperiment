@@ -35,9 +35,7 @@ This will display the details of a certain simulation and the analysis.
     <analysis-in-notebook :simulation-details="simulationDetails"/>
 
     <div class="detail-content" :class="{'full-disable': !simulationDetails.id}">
-      <analysis-section
-        :simulation-details="simulationDetails"
-      />
+      <analysis-section :simulation-details="simulationDetails"/>
 
       <collapse-title
         :collapsed="true"
@@ -67,8 +65,7 @@ This will display the details of a certain simulation and the analysis.
       <collapse-title
         :collapsed="true"
         title="Files"
-        @collapsed="cleanPolling('wdfiles', downloadedFiles)"
-        @expanded="getFilesWithPolling('wdfiles', downloadedFiles, '')"
+        @expanded="getFileExpanded('wdfiles', downloadedFiles, '')"
       >
         <div
           slot="element"
@@ -83,8 +80,7 @@ This will display the details of a certain simulation and the analysis.
       <collapse-title
         :collapsed="true"
         title="Stderr"
-        @collapsed="cleanPolling('stderr', downloadedFiles)"
-        @expanded="getFilesWithPolling('stderr', downloadedFiles)"
+        @expanded="getFileExpanded('stderr', downloadedFiles)"
       >
         <div
           slot="element"
@@ -99,8 +95,7 @@ This will display the details of a certain simulation and the analysis.
       <collapse-title
         :collapsed="true"
         title="Stdout"
-        @collapsed="cleanPolling('stdout', downloadedFiles)"
-        @expanded="getFilesWithPolling('stdout', downloadedFiles)"
+        @expanded="getFileExpanded('stdout', downloadedFiles)"
       >
         <div
           slot="element"
@@ -164,56 +159,25 @@ export default {
       details.submissionTime = job.submissionTime;
       details.type = 'Simulation';
 
-      details.logParsed = this.simulationDetails.logParsed ?
-        this.simulationDetails.logParsed :
-        this.parseLog(this.job.log);
+      details.logParsed = this.simulationDetails.logParsed
+        ? this.simulationDetails.logParsed
+        : this.parseLog(this.job.log);
 
       this.simulationDetails = details;
     },
 
-    getFilesWithPolling(attributeName, destination, fileToFetch = attributeName) {
+    async getFileExpanded(attributeName, destination, fileToFetch = attributeName) {
       this.$set(destination, attributeName, false);
-
       console.debug('Loading content', attributeName);
-
-      // avoid load already loading file
-      if (destination[`${attributeName}Polling`]) return;
-
-      const that = this;
-      async function getFilePolling(url) {
-        console.debug('---))))))) Polling file', attributeName);
-
-        try {
-          const fileContent = await unicore.getFiles(url);
-          await that.setVariableContent(destination, attributeName, fileContent);
-
-          if (!isRunning(that.simulationDetails.status)) {
-            that.cleanPolling(attributeName, destination);
-          }
-        } catch (notFound) {
-          const message = 'File not found';
-          const e = new Blob([message]);
-          that.setVariableContent(destination, attributeName, e);
-          console.warn(message);
-          that.cleanPolling(attributeName, destination);
-        }
-      }
-
       const url = `${this.simulationDetails.workingDirectory}/files/${fileToFetch}`;
-      /* eslint-disable no-param-reassign */
-      getFilePolling(url); // fetch the first time inmediately and then if needed polling
-      // add the polling information
-      destination[`${attributeName}Polling`] = setInterval(getFilePolling, this.$store.state.pollInterval, url);
-      /* eslint-enable no-param-reassign */
-    },
-
-    cleanPolling(attributeName, destination) {
-      /* eslint-disable no-param-reassign */
-      // remove the polling information
-      console.debug('Cleaning polling', attributeName);
-      clearInterval(destination[`${attributeName}Polling`]);
-      destination[`${attributeName}Polling`] = null;
-      /* eslint-enable no-param-reassign */
+      let fileContent = null;
+      try {
+        fileContent = await unicore.getFiles(url);
+      } catch (notFound) {
+        const message = 'File not found';
+        fileContent = new Blob([message]);
+      }
+      await this.setVariableContent(destination, attributeName, fileContent);
     },
 
     async getBlueConfig() {

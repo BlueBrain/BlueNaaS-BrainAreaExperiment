@@ -18,7 +18,6 @@ async function generateUpdatedAssociatedFile(simulationWorkDirectory, analysisOb
   // mapping in simulation the analysis path.
   const input = { To: analysisPath, Data: JSON.stringify(newAssociationFile) };
   // upload the analysis_path.json file
-  console.debug('Uploading associationFile');
   return unicore.uploadData(input, `${simulationWorkDirectory}/files`, userGroup);
 }
 
@@ -50,14 +49,12 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
    *     'title' = title of the job
    *   }
    */
-  console.debug('Start submit analysis');
 
   const newAnalysisAndTransferInfo = analysisAndTransferInfo;
   const computer = store.state.currentComputer;
   newAnalysisAndTransferInfo.executable = analysisConfig[computer].executable;
 
   // get all the files to be copied
-  console.debug('Getting files to be copied ...');
   const filesToCopy = await getFilesToCopy(`${newAnalysisAndTransferInfo.from.workingDirectory}/files`);
   const computeUrl = unicore.getComputeProviders()[computer.toUpperCase()].url;
   const originalSM = computeUrl.replace('rest/core', 'services/StorageManagement?res=');
@@ -83,18 +80,13 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
   ];
 
   if (script) {
-    console.debug('[analysis-helper] Has script ... creating input.sh');
     /* ---------------------------------------------------------------------
      * Create file to start analysis
      * --------------------------------------------------------------------- */
     inputs.push({ To: 'input.sh', Data: script.join('\n') });
-  } else {
-    console.debug('[analysis-helper] No script. skipping input.sh');
   }
 
-  console.debug('Submiting job...');
   const destinationJobObject = await unicore.submitJob(newAnalysisAndTransferInfo, inputs);
-  console.debug('Job created');
 
   /* ---------------------------------------------------------------------
    * Create association file in the simulation

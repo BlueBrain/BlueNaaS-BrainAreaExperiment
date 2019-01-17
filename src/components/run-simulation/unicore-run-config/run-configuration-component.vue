@@ -120,7 +120,6 @@ export default {
       const blueConfigStr = await this.generateFinalBlueConfigJSON();
       this.blueConfig = JSON.parse(blueConfigStr);
 
-      console.log('FinalBlueConfig', this.blueConfig);
       db.saveSimConfiguration(this.blueConfig, unicoreConfig);
       // we have already checked the simulation consistancy
       this.isLaunchingSim = true;
@@ -164,7 +163,6 @@ export default {
             if (match && match.length > 1) targets.push(match[1]);
           });
         });
-
         // check if there are some target different
         if (union(targets).length > 1) {
           return checkModel();

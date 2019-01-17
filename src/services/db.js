@@ -25,7 +25,6 @@ function getJob(combinedId) {
 }
 
 function deleteJob(combinedId) {
-  console.log('[db] Deleting job from DB...');
   return localforage.removeItem(combinedId);
 }
 

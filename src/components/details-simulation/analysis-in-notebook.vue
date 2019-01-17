@@ -76,7 +76,6 @@ export default {
       queryParams.append('replaceText', this.simulationDetails.url);
 
       const url = analysisConfig.usecasesCreationForm + queryParams.toString();
-      console.debug('Creating analysis for', this.simulationDetails.id);
       window.open(url, '_blank');
     },
   },

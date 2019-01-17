@@ -117,7 +117,6 @@ export default {
     },
 
     onRemove(item) {
-      console.log('Stimuli deleted', item);
       simTimelineLib.deleteItem(item, this);
     },
 
@@ -221,12 +220,13 @@ export default {
       const config = {};
       config.Stimulus = {};
       config.StimulusInject = {};
-      this.timeline.itemSet.getItems().forEach((stimulus, index) => {
-        // fill stimulus
-        // workarounds for the GUI to match the user.target and BlueConfig
-        const stimulusMapped = mapBlueConfigTerms(stimulus.stimulusInfo);
+      const stimulationItems = this.timeline.getVisibleItems();
+      stimulationItems.forEach((stimulusName, index) => {
+        const stimObj = this.timeline.itemsData.get(stimulusName);
+        const stimulusMapped = mapBlueConfigTerms(stimObj.stimulusInfo);
         const target = stimulusMapped.Target;
         delete stimulusMapped.Target;
+        // fill stimulus
         const stimName = simTimelineLib.joinName(
           stimulusMapped.Pattern,
           'stimulus',
@@ -260,23 +260,17 @@ export default {
 
     async loadPreviousConfig() {
       const lastConfig = await db.retrievePreviousConfig();
-      const prevItems = [];
-      try {
-        if (lastConfig.bc) {
-          let index = 0;
-          forEach(lastConfig.bc.StimulusInject, (stimulusInject) => {
-            const stimulusInfo = lastConfig.bc.Stimulus[stimulusInject.Stimulus];
-            const target = { Target: stimulusInject.Target };
-            const prevStimulus = unmapBlueConfigTerms(Object.assign({}, target, stimulusInfo));
-            prevItems.push(this.setNewItem(prevStimulus, index));
-            index += 1;
-          });
-        } else { throw String('BlueConfig params missing'); }
-        return prevItems;
-      } catch (e) {
-        console.log('- Previous config for timeline not found');
+      if (!lastConfig || !lastConfig.bc || !lastConfig.bc.StimulusInject) {
         return [this.setNewItem(this.createNewStimulus())];
       }
+      const prevItems = [];
+      forEach(lastConfig.bc.StimulusInject, (stimulusInjectObj, stimulusInjectKey) => {
+        const stimulusInfo = lastConfig.bc.Stimulus[stimulusInjectObj.Stimulus];
+        const target = { Target: stimulusInjectObj.Target };
+        const prevStimulus = unmapBlueConfigTerms(Object.assign({}, target, stimulusInfo));
+        prevItems.push(this.setNewItem(prevStimulus, stimulusInjectKey));
+      });
+      return prevItems;
     },
     targetSelected(target) {
       const id = simTimelineLib.getMaxId(this.timeline.itemsData) || 1;

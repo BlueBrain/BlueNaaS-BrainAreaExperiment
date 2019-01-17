@@ -158,17 +158,13 @@ export default {
       details.workingDirectory = job._links.workingDirectory.href;
       details.submissionTime = job.submissionTime;
       details.type = 'Simulation';
-
-      details.logParsed = this.simulationDetails.logParsed
-        ? this.simulationDetails.logParsed
-        : this.parseLog(this.job.log);
+      details.logParsed = this.simulationDetails.logParsed;
 
       this.simulationDetails = details;
     },
 
     async getFileExpanded(attributeName, destination, fileToFetch = attributeName) {
       this.$set(destination, attributeName, false);
-      console.debug('Loading content', attributeName);
       const url = `${this.simulationDetails.workingDirectory}/files/${fileToFetch}`;
       let fileContent = null;
       try {
@@ -184,7 +180,6 @@ export default {
       const attributeName = 'blueconfig';
       const { workingDirectory } = this.simulationDetails;
       if (!workingDirectory) return;
-      console.debug('Getting content of', attributeName);
 
       // initialize with false to show spinner
       this.$set(this.downloadedFiles, attributeName, false);
@@ -204,7 +199,6 @@ export default {
           await fetchAndSetBC('blueconfig.json', this.downloadedFiles);
         } catch (error) {
           this.$Message.error('Error Loading BlueConfig');
-          console.error(e);
           throw new Error(e);
         }
       }
@@ -215,13 +209,10 @@ export default {
       reader.readAsText(fileContent);
       reader.onloadend = () => {
         let content = reader.result;
-        if (!content.startsWith('File not found') && !content.includes('\n')) {
-          // tries to prettify the output if possible
-          try {
-            content = JSON.stringify(JSON.parse(content), null, 2);
-          } catch (e) {
-            console.warn('problem prettifying');
-          }
+        if (content === '') {
+          content = 'Empty File';
+        } else if (!content.startsWith('File not found') && !content.includes('\n')) {
+          content = JSON.stringify(JSON.parse(content), null, 2);
         }
         this.$set(parentObj, variableName, content);
       };
@@ -232,19 +223,24 @@ export default {
       this.job = await unicore.getJobById(jobId);
       if (!this.job) {
         this.$Message.error('Error loading simulation details');
-        console.error('Error loading simulation details');
         return;
       }
+
+      if (
+        !this.simulationDetails.logParsed ||
+        this.simulationDetails.logParsed.length < this.job.log.length
+      ) {
+        this.simulationDetails.logParsed = this.parseLog(this.job.log);
+      } else {
+        this.simulationDetails.logParsed = this.simulationDetails.logParsed;
+      }
+
       this.fillJobs(this.job);
 
       this.$store.dispatch('hideLoader');
 
       if (isRunning(this.job.status)) {
-        console.debug('Simulation is running - polling info...');
-        console.debug('');
         setTimeout(() => { this.getJobById(jobId); }, this.$store.state.pollInterval);
-      } else {
-        console.debug('Simulation finished. stopping polling...');
       }
     },
 

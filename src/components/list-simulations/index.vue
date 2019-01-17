@@ -88,7 +88,8 @@ export default {
       loadIncrement: 20,
       jobSelectedForAnalysis: null,
       isRunningAnalysis: false,
-      infiniteId: +new Date(),
+      infiniteId: Date.now(),
+      pageIsDisplayed: true,
     };
   },
   computed: {
@@ -96,9 +97,8 @@ export default {
       return this.$store.state.listIsLoading;
     },
     emptyList() {
-      const isEmpty = (this.$store.state.currentComputer === this.$route.params.computerParam) &&
-        !this.$store.state.listIsLoading && !this.viewList.length;
-
+      const isEmpty = (this.$store.state.currentComputer === this.$route.params.computerParam)
+        && !this.$store.state.listIsLoading && !this.viewList.length;
       return isEmpty;
     },
   },
@@ -107,13 +107,15 @@ export default {
       this.fetchJobs();
     });
     eventBus.$on('applyFilters', () => {
-      this.filter(this.jobs);
+      this.applyFiltersToSims(this.jobs);
     });
     eventBus.$on('cleanList', () => {
       this.viewList = [];
     });
 
-    if (!this.$store.state.currentComputer && this.$route.params.computerParam) {
+    this.$store.commit('setListIsLoading', true);
+
+    if (this.$route.params.computerParam) {
       eventBus.$emit('changeComputer', this.$route.params.computerParam, this.fetchJobs);
     } else {
       this.fetchJobs();
@@ -128,7 +130,7 @@ export default {
       this.showAnalysisForm = !this.showAnalysisForm;
     },
 
-    filter(simulations) {
+    applyFiltersToSims(simulations) {
       this.filteredSimulations = simulations;
       if (this.statusSearch !== 'ALL') {
         this.filteredSimulations = this.filteredSimulations.filter(job => (
@@ -161,7 +163,7 @@ export default {
             that.jobs.splice(index, 1);
           }
         });
-        that.filter(that.jobs);
+        that.applyFiltersToSims(that.jobs);
       }
 
       this.$refs.deletionModal.changeVisibility();
@@ -184,7 +186,6 @@ export default {
     },
 
     async fetchJobs() {
-      console.debug('Fetching jobs for list');
       this.$store.commit('setListIsLoading', true);
 
       const filterOnlySimulations = ((jobsWithFiles) => {
@@ -194,7 +195,7 @@ export default {
 
         return jobsWithFiles.filter((simulationExpandedInfo) => {
           if (displayEverything) {
-            console.warn('using displayAll flag');
+            this.$Message.info('Using displayAll flag');
             return true;
           }
           const updatedSimulation = simulationExpandedInfo;
@@ -206,22 +207,18 @@ export default {
           if (updatedSimulation.children.length === 0) return false;
 
           let result = false;
-          // filter to only show simulations
+          // filter to only show simulations on the list
           if (updatedSimulation.children.includes(`/${analysisConfig.configFileName}`)) {
             // it is an analysis that should be removed
             updatedSimulation.isAnalysis = true;
             result = false;
           } else if (updatedSimulation.name.startsWith(visualizationConfig.jobNamePrefix)) {
-            // is viz
             updatedSimulation.isVisualization = true;
-            // result = false;
           } else {
-            // is sim
-            // simulation without
             updatedSimulation.isSimulation = true;
             if (
-              !updatedSimulation.children.includes('/out.dat') &&
-              updatedSimulation.status === jobStatus.successful
+              !updatedSimulation.children.includes('/out.dat')
+              && updatedSimulation.status === jobStatus.successful
             ) {
               // do not produce any output file - simulation failed
               updatedSimulation.status = jobStatus.failed;
@@ -237,19 +234,22 @@ export default {
         });
       });
 
+      let jobsWithFiles = [];
       try {
-        const jobsWithFiles = await unicore.getAllJobsExpandedWithChildren(this.$store.state.currentComputer);
-        console.log('Total jobs:', jobsWithFiles.length);
-        const simulations = filterOnlySimulations(jobsWithFiles);
-        console.log('Filtered simulations', simulations.length);
-        this.jobs = simulations.map(this.fetchAnalysisInfo);
-        this.filter(this.jobs);
-        this.$store.commit('setListIsLoading', false);
-        this.$store.dispatch('hideLoader');
+        jobsWithFiles = await unicore.getAllJobsExpandedWithChildren(this.$store.state.currentComputer);
       } catch (e) {
-        this.$Message.error(`Error ${e.message}`);
-        console.error('getAllJobsExpandedWithChildren', e);
+        const message = `getting jobs with files. ${e.message}`;
+        this.$Message.error(message);
+        throw new Error(message);
       }
+      console.log('Total jobs:', jobsWithFiles.length);
+      const simulations = filterOnlySimulations(jobsWithFiles);
+      console.log('Filtered simulations', simulations.length);
+      this.jobs = simulations;
+      simulations.map(this.fetchAnalysisInfo);
+      this.applyFiltersToSims(simulations);
+      this.$store.commit('setListIsLoading', false);
+      this.$store.dispatch('hideLoader');
     },
 
     fetchAnalysisInfo(simulationListWithFiles) {
@@ -310,7 +310,8 @@ export default {
     },
 
     async startReloadJob(simulationJob) {
-      console.debug('Polling info for:', simulationJob.name);
+      // when move to other page, cancel the refresh
+      if (!this.pageIsDisplayed) { return; }
       const updatedSimJob = await unicore.getJobProperties(simulationJob._links.self.href);
       if (isRunning(simulationJob.status)) {
         setTimeout(this.startReloadJob, this.$store.state.pollInterval, updatedSimJob);
@@ -322,13 +323,15 @@ export default {
 
       const newAnalysisParamsEdited = analysisParamsEdited;
       newAnalysisParamsEdited.from.workingDirectory = this.jobSelectedForAnalysis._links.workingDirectory.href;
-      console.debug('Submiting analysis...');
 
-      const { script } = analysisConfig[this.$store.state.currentComputer];
+      const config = analysisConfig[this.$store.state.currentComputer];
+      if (!config || (!config.script && !config.executable)) {
+        this.$Message.error('Error launching analysis');
+      }
 
       await analysisHelper.submitAnalysis(
         newAnalysisParamsEdited,
-        script,
+        config.script,
         analysisConfig.filesToAvoidCopy,
       );
 
@@ -339,6 +342,10 @@ export default {
       this.showAnalysisForm = false;
       this.showDetails(this.jobSelectedForAnalysis);
     },
+  },
+  beforeDestroy() {
+    // stop refreshing the simulations that are running
+    this.pageIsDisplayed = false;
   },
 };
 </script>

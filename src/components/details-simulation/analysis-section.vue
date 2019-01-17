@@ -60,6 +60,8 @@ import ItemSummary from '@/components/details-simulation/item-summary.vue';
 import AnalysisItem from '@/components/details-simulation/analysis-item.vue';
 import analysisConfig from '@/assets/analysis-config';
 import { isRunning, jobStatus } from '@/assets/job-status';
+import db from '@/services/db';
+import set from 'lodash/set';
 import DeleteConfirmationModal from '@/components/shared/delete-confirmation-modal.vue';
 import unicore from '@/services/unicore';
 
@@ -95,9 +97,6 @@ export default {
       }
       return outputText;
     },
-  },
-  mounted() {
-    this.getAnalysisInfo();
   },
   methods: {
     async getAnalysisInfo() {
@@ -140,9 +139,7 @@ export default {
       this.$set(childAnalysis, 'name', analysisJobInfo.name);
 
       if (isRunning(analysisJobInfo.status)) {
-        setTimeout(() => {
-          this.refreshAnalysis(childAnalysis);
-        }, this.$store.state.pollInterval);
+        setTimeout(() => { this.refreshAnalysis(childAnalysis); }, this.$store.state.pollInterval);
         this.$set(childAnalysis, 'status', analysisJobInfo.status);
         return;
       }
@@ -153,8 +150,13 @@ export default {
 
       // check if after finishing produce any plot. if not means an error occurred
       if (!fileList.children.some(file => file.endsWith('.png'))) {
+        this.$Message.info(`Analysis ${childAnalysis.id} did not produce any image`);
         this.$set(childAnalysis, 'status', jobStatus.failed);
         this.$set(childAnalysis, 'fetchingImages', false);
+        // no need to reactivity for next one
+        // childanalysis is only in the view info it is not saved on DB
+        set(analysisJobInfo, 'status', jobStatus.failed);
+        db.addJob(analysisJobInfo);
         return;
       }
       this.$set(childAnalysis, 'status', analysisJobInfo.status);
@@ -166,7 +168,6 @@ export default {
     async getAnalysisImage(analysisURL, plotName, childAnalysis) {
       const plot = await unicore.getImage(`${analysisURL}/files/${plotName}.png`);
       if (plot) {
-        console.debug('Stop loading...');
         this.$set(childAnalysis, plotName, plot);
       }
       this.$set(childAnalysis, 'fetchingImages', false);
@@ -184,7 +185,7 @@ export default {
           this.$set(childAnalysis, 'stderr', [content]);
         };
       } catch (e) {
-        console.warn('error retrieving the analysis log');
+        this.$Message.error('error retrieving the analysis log');
         const stderr = [];
         if (isRunning(childAnalysis.status)) {
           stderr.push('No log available yet');

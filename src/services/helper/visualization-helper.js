@@ -49,12 +49,15 @@ async function submitVisualization(simulationDetails) {
     To: fileName,
   }));
 
-  vizConfig.computerSelected = store.state.currentComputer;
+  vizConfig.computerSelected = vizConfig.to;
   vizConfig.projectSelected = store.state.userGroup;
   vizConfig.title = `${visualizationConfig.jobNamePrefix} ${simulationDetails.name}`;
 
+  const backupGroup = store.state.userGroup;
+  store.commit('setUserGroup', null);
   await unicore.submitJob(vizConfig, []);
   pollingVizIp();
+  store.commit('setUserGroupTmp', backupGroup);
 }
 
 export default {};

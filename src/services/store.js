@@ -59,8 +59,8 @@ const store = new Vuex.Store({
       console.debug('[store] setUserGroupsAvailable', projectsList);
       state.userGroupsAvailable = projectsList;
     },
-    setSimulationPopulation(state, newModel) {
-      state.simulationPopulation = newModel;
+    setSimulationPopulation(state, newPopulation) {
+      state.simulationPopulation = newPopulation;
     },
     setStimulationTargets(state, targets) {
       state.stimulationTargets = targets;

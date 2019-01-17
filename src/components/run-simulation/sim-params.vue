@@ -101,13 +101,13 @@ export default {
     async loadPreviousConfig() {
       const lastConfig = await db.retrievePreviousConfig();
       try {
-        if (lastConfig.bc) {
-          this.duration = lastConfig.bc.Run.Default.Duration;
-          this.forwardSkip = lastConfig.bc.Run.Default.ForwardSkip;
-          this.populationSelected = unmapBlueConfigTerms(lastConfig.bc.Run.Default.CircuitTarget);
-        } else { throw String('BlueConfig params missing'); }
+        this.duration = lastConfig.bc.Run.Default.Duration;
+        this.forwardSkip = lastConfig.bc.Run.Default.ForwardSkip;
+        this.populationSelected = unmapBlueConfigTerms(lastConfig.bc.Run.Default.CircuitTarget);
       } catch (e) {
-        console.log('- Previous config for simulation params not found');
+        this.duration = this.$store.state.simulationDuration;
+        this.forwardSkip = this.$store.state.simulationForwardSkip;
+        this.populationSelected = this.$store.state.simulationPopulation;
       }
     },
     targetChanged(newModel) {

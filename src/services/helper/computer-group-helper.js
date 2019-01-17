@@ -15,7 +15,6 @@ function getComputersAvailableForCurrentModel() {
   const computersAllowedToRun = store.state.allComputerAvailable.filter(computer => (
     computersCanRunCircuit.includes(computer)
   ));
-  console.debug('ComputersAllowedToRun', computersAllowedToRun);
   return computersAllowedToRun;
 }
 
@@ -31,7 +30,6 @@ function setupFromStorage(newGroup) {
      computerUserGroupsMap.includes(computerSaved))
   ) {
     const available = computerUserGroupsMap.split('-')[1].split(',');
-    console.debug('Setup projects param from localStorage');
     if (store.state.userGroupsAvailable.toString() !== available.toString()) {
       store.commit('setUserGroupsAvailable', available);
     }
@@ -52,7 +50,6 @@ async function setupUserProjects(newGroup) {
     if (wasSet) return store.state.userGroup;
   }
   const computer = store.state.currentComputer;
-  console.debug('Get user accounts from network');
 
   if (store.state.userGroup) {
     // reset user project to fetch project information
@@ -62,12 +59,10 @@ async function setupUserProjects(newGroup) {
   const userInfo = await getUser(computer);
 
   if (!userInfo) {
-    console.error('setupUserProjects');
-    throw Error('retrieving projects for this computer');
+    throw new Error('retrieving projects for this computer');
   }
   if (!userInfo.client.xlogin.availableGroups) {
-    console.error('getting availableGroups');
-    throw Error('Error getting available groups');
+    throw new Error('Error getting available groups');
   }
 
   const groupsAvailable = userInfo.client.xlogin.availableGroups.length ?

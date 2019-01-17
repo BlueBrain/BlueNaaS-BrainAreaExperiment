@@ -19,7 +19,6 @@ function init() {
     const newConfig = config;
 
     if (store.state.userGroupTmp) {
-      console.warn('using temportal userGroup');
       // used for temporal calls (when work with multiple user accounts in the same operation)
       newConfig.headers.common['X-UNICORE-User-Preferences'] = `group:${store.state.userGroupTmp}`;
     } else if (store.state.userGroup && store.state.userGroup !== '*') {
@@ -100,9 +99,7 @@ async function deleteJob(url) {
     data: JSON.stringify({}),
   });
   const { id } = urlToComputerAndId(url);
-  console.debug('Removing from DB...', id);
   await db.deleteJob(id + store.state.currentComputer + store.state.userGroup);
-  console.debug('Removed from DB');
 }
 
 function uploadData(dataToUpload, uploadURL) {
@@ -124,7 +121,6 @@ async function getAllJobs(computer) {
 async function getJobProperties(jobURL, userGroup) {
   let result = await db.getJobByUrl(jobURL);
   if (!result) {
-    console.debug('Getting job from network');
     try {
       const job = await getInfoByUrl(jobURL, userGroup);
       db.addJob(job.data);
@@ -132,8 +128,6 @@ async function getJobProperties(jobURL, userGroup) {
     } catch (e) {
       return null;
     }
-  } else {
-    console.debug('Getting job from the DB');
   }
   return result;
 }
@@ -143,7 +137,6 @@ async function getFilesList(jobURL) {
     const response = await getInfoByUrl(jobURL);
     return response.data;
   } catch (e) {
-    console.error(`getting file list ${e}`);
     return {};
   }
 }
@@ -171,7 +164,6 @@ async function getAllJobsExpandedWithChildren(computer = store.state.currentComp
        */
       return jobExapandedInfo;
     }
-    console.debug('Retrieving files list', id);
     const fileList = await getFilesList(url);
 
     if (fileList) {
@@ -183,7 +175,6 @@ async function getAllJobsExpandedWithChildren(computer = store.state.currentComp
 
   const promesesList = jobsListUrl.map(expandInfo);
   const expandedJob = await Promise.all(promesesList);
-  console.debug('getAllJobsExpandedWithChildren DONE');
   return expandedJob;
 }
 
@@ -194,7 +185,7 @@ function getFiles(jobURL) {
     responseType: 'blob',
   })
     .then(r => (r.data))
-    .catch((e) => { throw Error(`getFiles ${e}`); });
+    .catch((e) => { throw new Error(`getFiles ${e}`); });
 }
 
 async function blobToObject(fileContent) {
@@ -205,7 +196,6 @@ async function blobToObject(fileContent) {
         resolve(evt.target.result);
       };
       reader.onerror = (err) => {
-        console.error('Failed to read', file.name, 'due to', err);
         reject(err);
       };
       reader.readAsText(file);
@@ -239,7 +229,6 @@ async function getAssociatedLocation(connectionFileName, workingDirectory) {
 }
 
 async function deleteJobFromAssociatedFile(simulationWorkDir, idToDelete, connectionFileName) {
-  console.debug('Delete job from associationFile');
   const associationFile = await getAssociatedLocation(connectionFileName, simulationWorkDir);
   const newAssociationFile = [];
   if (associationFile) {
@@ -257,7 +246,6 @@ async function deleteJobFromAssociatedFile(simulationWorkDir, idToDelete, connec
   };
   // upload the analysis_path.json file
   await uploadData(input, `${simulationWorkDir}/files`);
-  console.debug('associationFile updated');
 }
 
 async function generateUnicoreConfig(configParams) {
@@ -266,17 +254,14 @@ async function generateUnicoreConfig(configParams) {
     *   configParams { runtime, title, nodes, computerSelected, projectSelected }
     */
 
-  function getPatition(computerSelected) {
+  function getPatition() {
     function filterPartition(partitionsMap, userGroup) {
       const partitions = Object.keys(partitionsMap);
-      debugger;
       const selectedProject = partitions.find(partition => userGroup.includes(partition));
       const selectedPartition = partitionsMap[selectedProject];
-      console.debug('selectedPartition', selectedPartition);
       return selectedPartition;
     }
-
-    const partitionsMap = simulationConfig[computerSelected].partitions;
+    const partitionsMap = simulationConfig[configParams.computerSelected].partitions;
     if (!partitionsMap) return null;
     return filterPartition(partitionsMap, store.state.userGroup);
   }
@@ -302,8 +287,14 @@ async function generateUnicoreConfig(configParams) {
   }
 
   function getNodeType() {
-    // multicore nodes in Piz-Daint
-    return configParams.computerSelected === 'PIZ_DAINT' ? 'mc' : null;
+    // multicore or gpu node
+    const { nodeType } = simulationConfig[store.state.currentComputer];
+    return nodeType;
+  }
+
+  function getMemory() {
+    const { memory } = simulationConfig[store.state.currentComputer];
+    return memory ? `${memory}M` : null;
   }
 
   // generate and remove the nulls
@@ -319,12 +310,12 @@ async function generateUnicoreConfig(configParams) {
     Resources: {
       Nodes: configParams.nodes,
       Runtime: configParams.runtime,
-      Queue: getPatition(configParams.computerSelected),
+      Queue: getPatition(),
       NodeConstraints: getNodeType(),
+      Memory: getMemory(),
     },
     Imports: configParams.imports,
   });
-  console.debug('JobSpec', jobSpec);
   return jobSpec;
 }
 
@@ -361,7 +352,6 @@ async function submitJob(runConfig, inputs, startLater = false) {
     *
     * inputs [{ To: '', Data: '' }]
     */
-  console.debug('SubmitJob', runConfig);
   const newRunConfig = runConfig;
 
   newRunConfig.computerSelected = runConfig.computerSelected.toUpperCase();
@@ -369,11 +359,9 @@ async function submitJob(runConfig, inputs, startLater = false) {
 
   try {
     const launchParams = await generateUnicoreConfig(newRunConfig);
-    console.debug('Creating job...');
     const job = await createJob(unicoreURL, launchParams);
 
     const jobURL = job.headers.location;
-    console.debug('Getting job properties...');
     const jobProperties = await getJobProperties(jobURL);
     /* eslint-disable no-underscore-dangle */
     const workingDirectory = jobProperties._links.workingDirectory.href;
@@ -381,10 +369,7 @@ async function submitJob(runConfig, inputs, startLater = false) {
     /* eslint-enable no-underscore-dangle */
 
     // upload all the inputs
-    await Promise.all(inputs.map((input) => {
-      console.debug('Uploading files...');
-      return uploadData(input, `${workingDirectory}/files`);
-    }));
+    await Promise.all(inputs.map(input => uploadData(input, `${workingDirectory}/files`)));
 
     // make it compatible with the job structure
     const jobDetails = {
@@ -406,12 +391,10 @@ async function submitJob(runConfig, inputs, startLater = false) {
       return jobDetails;
     }
 
-    console.debug('Starting job...');
     await actionJob(actionStartURL);
     return jobDetails;
   } catch (err) {
-    console.error(err);
-    throw Error(`Submit job ${err}`);
+    throw new Error(`Submit job ${err}`);
   }
 }
 
@@ -420,7 +403,6 @@ async function workingDirToMachinePath(workingDirectory) {
     const response = await axios(workingDirectory);
     return response.data.mountPoint;
   } catch (e) {
-    console.error(`getting workingDirToMachinePath ${e}`);
     return Promise.reject(new Error('no mount point'));
   }
 }

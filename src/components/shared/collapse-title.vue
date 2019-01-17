@@ -54,12 +54,8 @@ export default {
   methods: {
     toggle() {
       this.toggleCollapse = !this.toggleCollapse;
-      const result = this.toggleCollapse ? 'collapsed' : 'expanded';
-      this.$emit(result);
+      this.$emit(this.toggleCollapse ? 'collapsed' : 'expanded');
     },
-  },
-  watch: {
-
   },
 };
 </script>

@@ -104,19 +104,20 @@ export default {
       newRunConfig.executable = currentSimConfig.executable;
       newRunConfig.environment = currentSimConfig.environment;
 
+      let submittedJob;
       try {
-        const submittedJob = await unicore.submitJob(newRunConfig, files);
-
-        hideModalFn();
-        setTimeout(() => {
-          /* giving time modal to hide
-            (fix issue not scrolling on details [body overflow: hidden]) */
-          this.showDetails(submittedJob._links.self.href);
-        }, 500);
+        submittedJob = await unicore.submitJob(newRunConfig, files);
       } catch (e) {
         this.$Message.error(e.message);
-        console.error(e.message);
+        throw new Error(e.message);
       }
+
+      hideModalFn();
+      setTimeout(() => {
+        /* giving time modal to hide
+          (fix issue not scrolling on details [body overflow: hidden]) */
+        this.showDetails(submittedJob._links.self.href);
+      }, 500);
     },
     showDetails(jobUrl) {
       const { id, computer } = urlToComputerAndId(jobUrl);

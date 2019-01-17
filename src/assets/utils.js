@@ -13,7 +13,7 @@ const mapper = {
   Poisson: 'NPoisson',
 };
 
-// add targets to mapper
+// add targets to mapper for later conversion to BlueConfig and vice-versa
 store.state.currentCircuitConfig.targets.forEach((targetObj) => {
   mapper[targetObj.displayName] = targetObj.name;
 });

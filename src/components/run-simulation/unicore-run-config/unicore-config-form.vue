@@ -222,8 +222,7 @@ export default {
       },
       set(newComputer) {
         if (!newComputer || newComputer === this.$store.state.currentComputer) return;
-        this.loadDefaultValues();
-        this.refreshProjects(newComputer);
+        this.refreshProjects(newComputer).then(() => { this.loadDefaultValues(); });
       },
     },
 
@@ -258,7 +257,8 @@ export default {
     },
 
     loadDefaultValues() {
-      const defaultValues = simulationConfig[this.computersAvailable[0]];
+      const computer = this.$store.state.currentComputer || this.computersAvailable[0];
+      const defaultValues = simulationConfig[computer];
       this.runParameters.runtime = defaultValues.runtime;
       this.runParameters.nodes = defaultValues.nodes;
       this.runParameters.cpus = defaultValues.cpus;
@@ -266,21 +266,22 @@ export default {
 
     async loadPreviousConfig() {
       const lastConfig = await db.retrievePreviousConfig();
-      try {
-        if (lastConfig.unicore) {
-          this.runParameters.runtime = lastConfig.unicore.runtime;
-          this.runParameters.nodes = lastConfig.unicore.nodes;
-          this.runParameters.title = lastConfig.unicore.title;
-          this.runParameters.cpus = simulationConfig[lastConfig.unicore.computerSelected].cpus;
-          return lastConfig.unicore.computerSelected;
-        }
-        console.error('unicore params missing');
-        return null;
-      } catch (e) {
-        console.log('- Previous config for run form not found');
+      if (
+        !lastConfig ||
+        !lastConfig.unicore ||
+        !lastConfig.unicore.runtime ||
+        !lastConfig.unicore.nodes ||
+        !lastConfig.unicore.title ||
+        !lastConfig.unicore.computerSelected
+      ) {
         this.loadDefaultValues();
         return null;
       }
+      this.runParameters.runtime = lastConfig.unicore.runtime;
+      this.runParameters.nodes = lastConfig.unicore.nodes;
+      this.runParameters.title = lastConfig.unicore.title;
+      this.runParameters.cpus = simulationConfig[lastConfig.unicore.computerSelected].cpus;
+      return lastConfig.unicore.computerSelected;
     },
 
     refreshProjects(computer) {

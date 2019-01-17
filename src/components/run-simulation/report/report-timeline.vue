@@ -119,7 +119,6 @@ export default {
     },
 
     onRemove(item) {
-      console.log('Report deleted', item);
       simTimelineLib.deleteItem(item, this);
     },
 
@@ -219,8 +218,10 @@ export default {
     createConfig() {
       const config = {};
       config.Report = {};
-      this.timeline.itemSet.getItems().forEach((report, index) => {
-        const reportMapped = mapBlueConfigTerms(report.reportInfo);
+      const reportItems = this.timeline.getVisibleItems();
+      reportItems.forEach((reportName, index) => {
+        const reportObj = this.timeline.itemsData.get(reportName);
+        const reportMapped = mapBlueConfigTerms(reportObj.reportInfo);
         const repName = simTimelineLib.joinName(
           reportMapped.Target,
           'report',
@@ -244,21 +245,15 @@ export default {
 
     async loadPreviousConfig() {
       const lastConfig = await db.retrievePreviousConfig();
-      const prevItems = [];
-      try {
-        if (lastConfig.bc) {
-          let index = 0;
-          forEach(lastConfig.bc.Report, (report) => {
-            const prevReport = unmapBlueConfigTerms(report);
-            prevItems.push(this.setNewItem(prevReport, index));
-            index += 1;
-          });
-        } else { throw String('BlueConfig params missing'); }
-        return prevItems;
-      } catch (e) {
-        console.log('- Previous config for report not found');
+      if (!lastConfig || !lastConfig.bc || !lastConfig.bc.Report) {
         return [this.setNewItem(this.createNewReport())];
       }
+      const prevItems = [];
+      forEach(lastConfig.bc.Report, (report, reportFullName) => {
+        const prevReport = unmapBlueConfigTerms(report);
+        prevItems.push(this.setNewItem(prevReport, reportFullName));
+      });
+      return prevItems;
     },
     targetSelected(target) {
       const id = simTimelineLib.getMaxId(this.timeline.itemsData) || 1;

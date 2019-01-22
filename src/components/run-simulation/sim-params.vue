@@ -49,6 +49,7 @@ import circuitConfig from '@/assets/circuit-config';
 import db from '@/services/db';
 import eventBus from '@/services/event-bus';
 import { mapBlueConfigTerms, unmapBlueConfigTerms } from '@/assets/utils';
+import get from 'lodash/get';
 
 export default {
   name: 'sim-params',
@@ -100,14 +101,17 @@ export default {
   methods: {
     async loadPreviousConfig() {
       const lastConfig = await db.retrievePreviousConfig();
-      try {
-        this.duration = lastConfig.bc.Run.Default.Duration;
-        this.forwardSkip = lastConfig.bc.Run.Default.ForwardSkip;
-        this.populationSelected = unmapBlueConfigTerms(lastConfig.bc.Run.Default.CircuitTarget);
-      } catch (e) {
+      const defaultSaved = get(lastConfig, 'bc.Run.Default', {});
+      if (
+        !defaultSaved.ForwardSkip || !defaultSaved.Duration || !defaultSaved.CircuitTarget
+      ) {
         this.duration = this.$store.state.simulationDuration;
         this.forwardSkip = this.$store.state.simulationForwardSkip;
         this.populationSelected = this.$store.state.simulationPopulation;
+      } else {
+        this.duration = lastConfig.bc.Run.Default.Duration;
+        this.forwardSkip = lastConfig.bc.Run.Default.ForwardSkip;
+        this.populationSelected = unmapBlueConfigTerms(lastConfig.bc.Run.Default.CircuitTarget);
       }
     },
     targetChanged(newModel) {

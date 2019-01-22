@@ -45,8 +45,7 @@ export default {
         target.displayName === this.$store.state.currentCircuitConfig.defaultPopulation
       ));
       this.firstImgElement = this.imagePoll[indexImgDefaultModel];
-      this.loadImage();
-      // this.changeBasedClick();
+      if (this.firstImgElement) { this.loadImage(); }
     }
   },
   methods: {
@@ -65,14 +64,6 @@ export default {
       image.onload = () => {
         image.classList.remove('blur');
       };
-    },
-    changeBasedClick() {
-      const changeImg = (touched) => {
-        const next = this.getNext(touched.target);
-        this.loadImage(next);
-      };
-      const container = this.$el.querySelector('#currentSliceImg');
-      container.addEventListener('click', changeImg.bind(this));
     },
     getNext(element) {
       const indexFound = this.imagePoll.findIndex(pollElements => (

@@ -192,10 +192,10 @@ export default {
         // return job information and a list of files as children []
         // hack in case you want to see all the jobs not only simulation from one computer
         const displayEverything = localStorage.getItem('displayAll') === 'true';
+        if (displayEverything) { this.$Message.info('Using displayAll flag'); }
 
         return jobsWithFiles.filter((simulationExpandedInfo) => {
           if (displayEverything) {
-            this.$Message.info('Using displayAll flag');
             return true;
           }
           const updatedSimulation = simulationExpandedInfo;

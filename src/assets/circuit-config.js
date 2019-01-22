@@ -8,16 +8,16 @@ const slicesImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher
 
 const slices = {
   prefix: { // setting prefix allow to know which computer can run the circuit
-    JURECA: '',
-    PIZ_DAINT: '',
+    JURECA: '/p/project/cpcp0/pcp0068/CircuitRelease',
+    PIZ_DAINT: '/apps/hbp/ich002/home/antonel/full_ca1',
   },
   paths: {
-    MorphologyPath: '/p/project/cpcp0/pcp0068/CircuitRelease/r2017.06b/MorphologyRelease/',
-    METypePath: '/p/project/cpcp0/pcp0068/CircuitRelease/r2017.06b/ccells/',
-    CircuitPath: '/p/project/cpcp0/pcp0068/CircuitRelease/r2017.06b/',
-    CurrentDir: '/p/project/cpcp0/pcp0068/CircuitRelease/r2017.06b/',
-    nrnPath: '/p/project/cpcp0/pcp0068/CircuitRelease/r2017.06b/S2F/',
-    TargetFile: '/p/project/cpcp0/pcp0068/CircuitRelease/r2017.06b/user.target',
+    MorphologyPath: '/r2017.06b/MorphologyRelease/',
+    METypePath: '/r2017.06b/ccells/',
+    CircuitPath: '/r2017.06b/',
+    CurrentDir: '/r2017.06b/',
+    nrnPath: '/r2017.06b/S2F/',
+    TargetFile: '/r2017.06b/user.target',
   },
   targets: [
     { name: 'slice-6', displayName: 'Slice-6', src: `${slicesImgBase}/slice-6.png` },

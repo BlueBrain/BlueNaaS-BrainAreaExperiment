@@ -8,6 +8,15 @@ export default {
     ],
     executable: '/bin/bash input.sh',
   },
+  PIZ_DAINT: {
+    script: [
+      '#!/bin/bash',
+      'HDF5_USE_FILE_LOCKING=FALSE',
+      'export HDF5_USE_FILE_LOCKING',
+      '/users/bp000037/analysis/analysis_launch.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
+    ],
+    executable: '/bin/bash input.sh',
+  },
   NUVLA: {
     executable: 'epfl-mooc/analysis/launch_analysis',
   },

@@ -139,23 +139,24 @@ export default {
       const alert = this.$Message;
       const circuitConf = this.$store.state.currentCircuitConfig;
 
-      if (reportKeys.length === 0 || stimulusKeys.length === 0) {
+      if (!reportKeys.length || !stimulusKeys.length) {
         alert.error('Select at least one stimulus and one report');
         return false;
       }
 
       function checkModel() {
         if (populationSelected !== circuitConf.biggestTarget) {
-          alert.error(`Incorrect Population. Select ${circuitConf.biggestTarget}`);
-          return false;
+          alert.warning({
+            content: `This simulation may not run.
+              Check if union between Population, Stimulation and Report is not empty`,
+            duration: 5,
+          });
         }
-        return true;
       }
 
       function checkMultipleEquals(arraysOfArrays) {
         const reg = new RegExp('(.+)_(report|stimulusinject)_');
         const targets = [mapBlueConfigTerms(populationSelected)];
-
         // this will extract all the targets in stimulations and reports
         arraysOfArrays.forEach((type) => {
           type.forEach((item) => {

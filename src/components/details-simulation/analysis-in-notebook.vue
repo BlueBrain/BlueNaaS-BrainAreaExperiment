@@ -1,6 +1,9 @@
 
 <template>
-  <div class="analysis-in-notebook in-corner">
+  <div
+    class="analysis-in-notebook in-corner"
+    v-if="canAnalyse"
+  >
     <i-button
       type="primary"
       icon="md-flask"
@@ -43,6 +46,7 @@
 import analysisConfig from '@/assets/analysis-config';
 import forEach from 'lodash/forEach';
 import pick from 'lodash/pick';
+import get from 'lodash/get';
 
 export default {
   name: 'AnalysisInNotebook',
@@ -63,6 +67,12 @@ export default {
         this.analysisList = config;
         this.configReady = true;
       });
+  },
+  computed: {
+    canAnalyse() {
+      if (!this.$store.state.currentComputer) return false;
+      return get(analysisConfig, `${this.$store.state.currentComputer}.dynamicAnalysis`);
+    },
   },
   methods: {
     prepareAnalysis() {

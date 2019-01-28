@@ -18,6 +18,7 @@ export default {
     executable: '/bin/bash input.sh',
   },
   NUVLA: {
+    dynamicAnalysis: true,
     executable: 'epfl-mooc/analysis/launch_analysis',
   },
   filesToAvoidCopy: [

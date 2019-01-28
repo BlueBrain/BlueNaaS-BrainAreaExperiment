@@ -14,9 +14,10 @@ This component manage each job (delete, start, create, etc).
       <span class="actions">Actions</span>
     </div>
 
-    <div
+    <transition-group
+      name="list"
+      tag="div"
       class="simulation-items-container"
-      v-if="!listIsLoading"
     >
       <simulation-item
         class="item-row"
@@ -30,17 +31,12 @@ This component manage each job (delete, start, create, etc).
 
       <div
         v-if="emptyList"
+        :key="emptyList"
         class="really-centered colored-red"
       >List of jobs is empty</div>
 
-      <infinite-loading
-        @infinite="onInfinite"
-        :identifier="infiniteId"
-      >
-        <span slot="no-more"/>
-        <span slot="no-results"/>
-      </infinite-loading>
-    </div>
+    </transition-group>
+
     <!-- template for configuration -->
     <launch-analysis-form
       :show-modal="showAnalysisForm"
@@ -68,6 +64,9 @@ import eventBus from '@/services/event-bus';
 import db from '@/services/db';
 import visualizationConfig from '@/assets/visualization-config';
 import DeleteConfirmationModal from '@/components/shared/delete-confirmation-modal.vue';
+import chunk from 'lodash/chunk';
+import sortBy from 'lodash/sortBy';
+import isEqual from 'lodash/isEqual';
 
 export default {
   name: 'ListSimulations',
@@ -81,14 +80,11 @@ export default {
   data() {
     return {
       showAnalysisForm: false,
-      filteredSimulations: [],
-      jobs: [],
+      allSimulations: [],
       viewList: [],
-      readObjectIndex: 0,
-      loadIncrement: 20,
+      loadIncrement: 5,
       jobSelectedForAnalysis: null,
       isRunningAnalysis: false,
-      infiniteId: Date.now(),
       pageIsDisplayed: true,
     };
   },
@@ -107,10 +103,11 @@ export default {
       this.fetchJobs();
     });
     eventBus.$on('applyFilters', () => {
-      this.applyFiltersToSims(this.jobs);
+      this.viewList = this.applyFiltersToSims(this.allSimulations);
     });
     eventBus.$on('cleanList', () => {
       this.viewList = [];
+      this.allSimulations = [];
     });
 
     this.$store.commit('setListIsLoading', true);
@@ -131,40 +128,30 @@ export default {
     },
 
     applyFiltersToSims(simulations) {
-      this.filteredSimulations = simulations;
+      let filteredSimulations = simulations;
       if (this.statusSearch !== 'ALL') {
-        this.filteredSimulations = this.filteredSimulations.filter(job => (
+        filteredSimulations = filteredSimulations.filter(job => (
           job.status === this.statusSearch
         ));
       }
       if (this.nameFilter) {
-        this.filteredSimulations = this.filteredSimulations.filter(job => (
+        filteredSimulations = filteredSimulations.filter(job => (
           job.name.toUpperCase().includes(this.nameFilter.toUpperCase())
         ));
       }
-
-      this.readObjectIndex = 0;
-      // sort by date
-      this.filteredSimulations.sort((a, b) => {
-        if (a.submissionTime > b.submissionTime) return -1;
-        return 1;
-      });
-
       // put items in the view
-      this.viewList = this.filteredSimulations.slice(this.readObjectIndex, this.loadIncrement);
-      this.readObjectIndex += this.loadIncrement;
+      return filteredSimulations;
     },
 
     deleteJob(url) {
-      const that = this;
-      function removeFromList() {
-        that.jobs.forEach((job, index) => {
+      const removeFromList = () => {
+        this.viewList.forEach((job, index) => {
           if (job._links.self.href === url) {
-            that.jobs.splice(index, 1);
+            this.viewList.splice(index, 1);
           }
         });
-        that.applyFiltersToSims(that.jobs);
-      }
+        this.viewList = this.applyFiltersToSims(this.viewList);
+      };
 
       this.$refs.deletionModal.changeVisibility();
       this.$refs.deletionModal.setDeleteFn(async () => {
@@ -188,13 +175,13 @@ export default {
     async fetchJobs() {
       this.$store.commit('setListIsLoading', true);
 
-      const filterOnlySimulations = ((jobsWithFiles) => {
+      const displayEverything = localStorage.getItem('displayAll') === 'true';
+      if (displayEverything) { this.$Message.info('Using displayAll flag'); }
+
+      const filterOnlySimulations = (jobsWithFiles =>
         // return job information and a list of files as children []
         // hack in case you want to see all the jobs not only simulation from one computer
-        const displayEverything = localStorage.getItem('displayAll') === 'true';
-        if (displayEverything) { this.$Message.info('Using displayAll flag'); }
-
-        return jobsWithFiles.filter((simulationExpandedInfo) => {
+        jobsWithFiles.filter((simulationExpandedInfo) => {
           if (displayEverything) {
             return true;
           }
@@ -231,30 +218,70 @@ export default {
           }
           db.addJob(updatedSimulation);
           return result;
-        });
+        })
+      );
+
+      const fetchJobsInChunks = (async (jobsToPopulate) => {
+        let jobsWithFiles = [];
+        try {
+          jobsWithFiles = await unicore.populateJobsWithFiles(jobsToPopulate);
+        } catch (e) {
+          const message = `expanding jobs with file info. ${e.message}`;
+          this.$Message.error(message);
+          throw new Error(message);
+        }
+        return jobsWithFiles;
       });
 
-      let jobsWithFiles = [];
+      let allJobsUrl = [];
+      let allJobWithFiles = [];
+
       try {
-        jobsWithFiles = await unicore.getAllJobsExpandedWithChildren(this.$store.state.currentComputer);
+        allJobsUrl = await unicore.getAllJobs(this.$store.state.currentComputer);
       } catch (e) {
-        const message = `getting jobs with files. ${e.message}`;
+        const message = `getting all jobs for list. ${e.message}`;
         this.$Message.error(message);
         throw new Error(message);
       }
-      console.log('Total jobs:', jobsWithFiles.length);
-      const simulations = filterOnlySimulations(jobsWithFiles);
-      console.log('Filtered simulations', simulations.length);
-      this.jobs = simulations;
-      simulations.map(this.fetchAnalysisInfo);
-      this.applyFiltersToSims(simulations);
+
+      // compare saved list and sorted list
+      const savedAllJobUrl = await db.getAllJobsSortedList();
+      // sorting with lodash to avoid mutation
+      const listToFetch = (savedAllJobUrl && isEqual(sortBy(allJobsUrl), sortBy(savedAllJobUrl)))
+        ? savedAllJobUrl
+        : allJobsUrl;
+
+      const chunksJobsUrlArrays = chunk(listToFetch, this.loadIncrement);
+      // load chunks in secuence
+      for (let i = 0; i < chunksJobsUrlArrays.length; i += 1) {
+        const chunkJobsUrl = chunksJobsUrlArrays[i];
+        /* eslint-disable no-await-in-loop */
+        const jobsWithFiles = await fetchJobsInChunks(chunkJobsUrl);
+        /* eslint-enable no-await-in-loop */
+        const simulations = filterOnlySimulations(jobsWithFiles);
+        this.allSimulations = this.allSimulations.concat(simulations);
+        const filteredSimulations = this.applyFiltersToSims(simulations);
+        this.viewList = this.viewList.concat(filteredSimulations);
+        // save for use after to save the list on localstorage
+        allJobWithFiles = allJobWithFiles.concat(jobsWithFiles);
+      }
+
+      this.viewList = sortBy(this.viewList, 'submissionTime').reverse();
+
+      // save full list of all jobs sorted
+      const sortedAllJobWithFiles = sortBy(allJobWithFiles, 'submissionTime').reverse();
+      const sortedJobsUrlToSave = sortedAllJobWithFiles.map(jobPopulated => jobPopulated._links.self.href);
+      if (!savedAllJobUrl || !isEqual(sortBy(sortedJobsUrlToSave), sortBy(savedAllJobUrl))) {
+        db.setAllJobsSortedList(sortedJobsUrlToSave);
+      }
+
+      this.viewList.map(this.fetchAnalysisInfo);
       this.$store.commit('setListIsLoading', false);
       this.$store.dispatch('hideLoader');
     },
 
     fetchAnalysisInfo(simulationListWithFiles) {
-      const that = this;
-      async function fetchAnalysisJob(updatedSimulation) {
+      const fetchAnalysisJob = async (updatedSimulation) => {
         /*
          * get the location of the analysis based on the mapping file
          * that we save in the simulation and then the validation image
@@ -270,19 +297,17 @@ export default {
           const lastAnalysisInfo = await unicore.getJobProperties(url);
           status = lastAnalysisInfo ? lastAnalysisInfo.status : null;
         }
-        // change the status after async function
-        that.$set(updatedSimulation, 'analysisStatus', status);
-      }
+        // change the status after fetching analysis info
+        this.$set(updatedSimulation, 'analysisStatus', status);
+      };
 
-      const updatedSimulation = simulationListWithFiles;
-
+      let newAnalysisStatus = jobStatus.block;
       if (simulationListWithFiles.status === jobStatus.successful) {
-        updatedSimulation.analysisStatus = jobStatus.loading;
-        fetchAnalysisJob(updatedSimulation);
-      } else {
-        updatedSimulation.analysisStatus = jobStatus.block;
+        fetchAnalysisJob(simulationListWithFiles);
+        newAnalysisStatus = jobStatus.loading;
       }
-      return updatedSimulation;
+      this.$set(simulationListWithFiles, 'analysisStatus', newAnalysisStatus);
+      return simulationListWithFiles;
     },
 
     runAnalysis(job) {
@@ -290,23 +315,6 @@ export default {
       // set the origin computer details
       this.jobSelectedForAnalysis = job;
       // after the form will return to analysisConfigReady
-    },
-
-    onInfinite($state) {
-      if (this.listIsLoading) return;
-      if (this.readObjectIndex > this.filteredSimulations.length) {
-        $state.complete();
-        return;
-      }
-      let newItems = [];
-      // obtain the next elements
-      newItems = this.filteredSimulations.slice(
-        this.readObjectIndex,
-        this.readObjectIndex + this.loadIncrement,
-      );
-      this.readObjectIndex += this.loadIncrement;
-      this.viewList = this.viewList.concat(newItems);
-      $state.loaded();
     },
 
     async startReloadJob(simulationJob) {
@@ -352,6 +360,13 @@ export default {
 
 
 <style scoped lang="scss">
+  .list-enter-active, .list-leave-active {
+    transition: all 0.3s;
+  }
+  .list-enter, .list-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
+  }
   .table-header {
     display: flex;
     padding: 0 5px;

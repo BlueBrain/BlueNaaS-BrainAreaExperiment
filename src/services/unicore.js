@@ -141,10 +141,8 @@ async function getFilesList(jobURL) {
   }
 }
 
-async function getAllJobsExpandedWithChildren(computer = store.state.currentComputer) {
-  // get the information of all jobs asociated with key + the children
-  const jobsListUrl = await getAllJobs(computer);
-  if (jobsListUrl.length <= 0) return [];
+async function populateJobsWithFiles(jobsListUrl) {
+  // get the information of some jobs asociated with key + the children
 
   async function expandInfo(jobUrl) {
     const { id } = urlToComputerAndId(jobUrl);
@@ -415,7 +413,7 @@ export default {
   submitJob,
   actionJob,
   getComputeProviders,
-  getAllJobsExpandedWithChildren,
+  populateJobsWithFiles,
   getJobById,
   getJobProperties,
   getFiles,
@@ -425,6 +423,7 @@ export default {
   getProjectSelectedByLog,
   getInfoByUrl,
   workingDirToMachinePath,
+  getAllJobs,
 };
 
 export {

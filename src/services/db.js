@@ -69,11 +69,21 @@ function cleanPreviousConfig() {
   return localforage.removeItem('simConfig');
 }
 
+function getAllJobsSortedList() {
+  return localforage.getItem(`allJobsSorted${store.state.currentComputer}`);
+}
+
+function setAllJobsSortedList(jobUrlList) {
+  localforage.setItem(`allJobsSorted${store.state.currentComputer}`, jobUrlList);
+}
+
 export default {
   addJob,
   getJob,
   getJobByUrl,
+  getAllJobsSortedList,
   saveSimConfiguration,
+  setAllJobsSortedList,
   retrievePreviousConfig,
   deleteJob,
   cleanPreviousConfig,

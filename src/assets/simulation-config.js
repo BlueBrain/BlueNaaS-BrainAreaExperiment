@@ -17,7 +17,7 @@ export default {
     runtime: 10800,
     nodes: 10,
     cpus: 68,
-    partitions: { vsk25: 'largebooster' },
+    partitions: { vsk25: 'booster' },
     executable: '/bin/bash input.sh',
   },
   NUVLA: {

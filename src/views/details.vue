@@ -120,8 +120,9 @@ import AnalysisSection from '@/components/details-simulation/analysis-section.vu
 import DisplayOrDownload from '@/components/shared/display-or-download.vue';
 import AnalysisInNotebook from '@/components/details-simulation/analysis-in-notebook.vue';
 import eventBus from '@/services/event-bus';
-import { isRunning } from '@/assets/job-status';
+import { isRunning, jobStatus } from '@/assets/job-status';
 import { submitVisualization } from '@/services/helper/visualization-helper';
+import db from '@/services/db';
 
 export default {
   name: 'SimulationDetails',
@@ -241,6 +242,16 @@ export default {
 
       if (isRunning(this.job.status)) {
         setTimeout(() => { this.getJobById(jobId); }, this.$store.state.pollInterval);
+      } else {
+        // after the simulation is finished check if the results were correct
+        if (this.job.children || this.job.status !== jobStatus.successful) return;
+        const [simulationWithFiles] = await unicore.populateJobsWithFiles([this.job._links.self.href]);
+        if (!simulationWithFiles.children.includes('/out.dat')) {
+          // do not produce any output file - simulation failed
+          simulationWithFiles.status = jobStatus.failed;
+          this.$set(this.simulationDetails, 'status', jobStatus.failed);
+        }
+        db.addJob(simulationWithFiles);
       }
     },
 

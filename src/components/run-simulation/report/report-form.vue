@@ -21,8 +21,8 @@
           <form-item prop="target">
             <tooltip
               slot="label"
-              content="Defines the region from where the data will be reported"
-            >Target</tooltip>
+              content="Defines the population of cells from where the data will be reported"
+            >Population</tooltip>
             <autocomplete-targets
               :target-selected="reportInfo.Target"
               :itemsAvailable="reportTargets"

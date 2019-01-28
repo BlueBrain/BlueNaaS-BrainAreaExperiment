@@ -67,6 +67,7 @@ import DeleteConfirmationModal from '@/components/shared/delete-confirmation-mod
 import chunk from 'lodash/chunk';
 import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
+import remove from 'lodash/remove';
 
 export default {
   name: 'ListSimulations',
@@ -128,28 +129,17 @@ export default {
     },
 
     applyFiltersToSims(simulations) {
-      let filteredSimulations = simulations;
-      if (this.statusSearch !== 'ALL') {
-        filteredSimulations = filteredSimulations.filter(job => (
-          job.status === this.statusSearch
-        ));
-      }
-      if (this.nameFilter) {
-        filteredSimulations = filteredSimulations.filter(job => (
-          job.name.toUpperCase().includes(this.nameFilter.toUpperCase())
-        ));
-      }
+      // let filteredSimulations = simulations;
+      const filteredSimulations = simulations
+        .filter(job => (this.statusSearch !== 'ALL' ? job.status === this.statusSearch : true))
+        .filter(job => (this.nameFilter ? job.name.toUpperCase().includes(this.nameFilter.toUpperCase()) : true));
       // put items in the view
       return filteredSimulations;
     },
 
     deleteJob(url) {
       const removeFromList = () => {
-        this.viewList.forEach((job, index) => {
-          if (job._links.self.href === url) {
-            this.viewList.splice(index, 1);
-          }
-        });
+        remove(this.viewList, job => job._links.self.href === url);
         this.viewList = this.applyFiltersToSims(this.viewList);
       };
 

@@ -20,8 +20,8 @@
           <form-item prop="target">
             <tooltip
               slot="label"
-              content="Name of a target to receive the stimulation"
-            >Target</tooltip>
+              content="Name of a population of cells to receive the stimulation"
+            >Population</tooltip>
             <autocomplete-targets
               :target-selected="stimulusInfo.Target"
               :itemsAvailable="stimulationTargets"

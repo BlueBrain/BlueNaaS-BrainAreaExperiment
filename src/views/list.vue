@@ -12,13 +12,6 @@ This component will be the frame for view the simulations.
 
       <div class="grow-space"/>
 
-      <!-- <i-button
-        v-if="computerParam === 'JURECA'"
-        size="small"
-        icon="md-flask"
-        class="reuse-simulation"
-        @click="reuseSimulationForAnalysis"
-      >Analyze personal simulation</i-button> -->
       <i-button
         type="primary"
         size="small"
@@ -64,11 +57,6 @@ export default {
     },
     returnRun() {
       this.$router.push({ name: 'run' });
-    },
-    reuseSimulationForAnalysis() {
-      // analyze a personal simulation done without Unicore
-      this.$refs.listSimulationsRef.showAnalysisForm = true;
-      this.$refs.listSimulationsRef.reusePersonalSimulation = true;
     },
   },
 };

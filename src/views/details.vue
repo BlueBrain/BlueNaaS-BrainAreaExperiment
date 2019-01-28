@@ -24,6 +24,7 @@ This will display the details of a certain simulation and the analysis.
     </div>
 
     <i-button
+      v-if="computerHasVisualization()"
       type="primary"
       class="in-corner"
       icon="md-videocam"
@@ -121,7 +122,7 @@ import DisplayOrDownload from '@/components/shared/display-or-download.vue';
 import AnalysisInNotebook from '@/components/details-simulation/analysis-in-notebook.vue';
 import eventBus from '@/services/event-bus';
 import { isRunning, jobStatus } from '@/assets/job-status';
-import { submitVisualization } from '@/services/helper/visualization-helper';
+import { submitVisualization, computerHasVisualization } from '@/services/helper/visualization-helper';
 import db from '@/services/db';
 
 export default {
@@ -140,6 +141,7 @@ export default {
       simulationDetails: {},
       downloadedFiles: {},
       vizRunning: false,
+      computerHasVisualization,
     };
   },
   mounted() {

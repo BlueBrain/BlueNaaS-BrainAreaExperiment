@@ -60,6 +60,13 @@ async function submitVisualization(simulationDetails) {
   store.commit('setUserGroupTmp', backupGroup);
 }
 
+function computerHasVisualization() {
+  return !!visualizationConfig[store.state.currentComputer];
+}
+
 export default {};
 
-export { submitVisualization };
+export {
+  submitVisualization,
+  computerHasVisualization,
+};

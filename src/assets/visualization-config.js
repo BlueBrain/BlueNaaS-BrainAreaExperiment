@@ -1,12 +1,5 @@
 
 const config = {
-  JURECA: {
-    to: 'NUVLA',
-    needsTransfer: true,
-    executable: 'brayns/BraynsUI',
-    nodes: 1,
-    runtime: 500,
-  },
   NUVLA: {
     to: 'NUVLA',
     needsTransfer: true,

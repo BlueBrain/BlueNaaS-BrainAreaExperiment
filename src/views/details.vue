@@ -142,6 +142,7 @@ export default {
       downloadedFiles: {},
       vizRunning: false,
       computerHasVisualization,
+      pageIsDisplayed: true,
     };
   },
   mounted() {
@@ -222,6 +223,7 @@ export default {
     },
 
     async getJobById(jobId) {
+      if (!this.pageIsDisplayed) return;
       // search for the details by id
       this.job = await unicore.getJobById(jobId);
       if (!this.job) {
@@ -295,6 +297,10 @@ export default {
       submitVisualization(this.simulationDetails);
       this.vizRunning = true;
     },
+  },
+  beforeDestroy() {
+    // stop refreshing the simulations that are running
+    this.pageIsDisplayed = false;
   },
 };
 </script>

@@ -166,7 +166,7 @@ export default {
         });
         // check if there are some target different
         if (union(targets).length > 1) {
-          return checkModel();
+          checkModel();
         }
         return true;
       }

@@ -204,7 +204,8 @@ export default {
           }
           // Poll data while running
           if (isRunning(updatedSimulation.status)) {
-            this.startReloadJob(updatedSimulation);
+            const computerProjectCombo = `${this.$store.state.currentComputer}${this.$store.state.userGroup}`;
+            this.startReloadJob(updatedSimulation, computerProjectCombo);
           }
           db.addJob(updatedSimulation);
           return result;
@@ -307,12 +308,13 @@ export default {
       // after the form will return to analysisConfigReady
     },
 
-    async startReloadJob(simulationJob) {
+    async startReloadJob(simulationJob, prevComputerProjectCombo) {
       // when move to other page, cancel the refresh
-      if (!this.pageIsDisplayed) { return; }
+      const computerProjectCombo = `${this.$store.state.currentComputer}${this.$store.state.userGroup}`;
+      if (!this.pageIsDisplayed || prevComputerProjectCombo !== computerProjectCombo) return;
       const updatedSimJob = await unicore.getJobProperties(simulationJob._links.self.href);
       if (isRunning(simulationJob.status)) {
-        setTimeout(this.startReloadJob, this.$store.state.pollInterval, updatedSimJob);
+        setTimeout(this.startReloadJob, this.$store.state.pollInterval, updatedSimJob, computerProjectCombo);
       }
     },
 

@@ -66,9 +66,15 @@ function openContent(content) {
   x.document.close();
 }
 
+function simulationProducedResults(simulationFiles) {
+  const hasReport = simulationFiles.some(file => file.match('.bbp'));
+  return simulationFiles.includes('/out.dat') && hasReport;
+}
+
 export {
   convertToBCFormat,
   openContent,
   mapBlueConfigTerms,
   unmapBlueConfigTerms,
+  simulationProducedResults,
 };

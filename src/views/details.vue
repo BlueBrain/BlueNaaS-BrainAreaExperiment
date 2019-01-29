@@ -123,6 +123,7 @@ import AnalysisInNotebook from '@/components/details-simulation/analysis-in-note
 import eventBus from '@/services/event-bus';
 import { isRunning, jobStatus } from '@/assets/job-status';
 import { submitVisualization, computerHasVisualization } from '@/services/helper/visualization-helper';
+import { simulationProducedResults } from '@/assets/utils';
 import db from '@/services/db';
 
 export default {
@@ -250,7 +251,7 @@ export default {
         // after the simulation is finished check if the results were correct
         if (this.job.children || this.job.status !== jobStatus.successful) return;
         const [simulationWithFiles] = await unicore.populateJobsWithFiles([this.job._links.self.href]);
-        if (!simulationWithFiles.children.includes('/out.dat')) {
+        if (!simulationProducedResults(simulationWithFiles.children)) {
           // do not produce any output file - simulation failed
           simulationWithFiles.status = jobStatus.failed;
           this.$set(this.simulationDetails, 'status', jobStatus.failed);

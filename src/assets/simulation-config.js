@@ -42,7 +42,7 @@ export default {
     cpus: 36,
     executable: '/bin/bash input.sh',
     nodeType: 'mc',
-    memory: 5800,
+    memory: 64000,
   },
   available: ['JURECA', 'PIZ_DAINT', 'NUVLA'],
   defaultDuration: 300,

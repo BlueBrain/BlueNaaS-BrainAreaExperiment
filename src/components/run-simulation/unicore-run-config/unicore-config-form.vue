@@ -222,7 +222,7 @@ export default {
       },
       set(newComputer) {
         if (!newComputer || newComputer === this.$store.state.currentComputer) return;
-        this.refreshProjects(newComputer).then(() => { this.loadDefaultValues(); });
+        this.refreshProjects(newComputer, this.loadDefaultValues);
       },
     },
 
@@ -284,11 +284,12 @@ export default {
       return lastConfig.unicore.computerSelected;
     },
 
-    refreshProjects(computer) {
+    refreshProjects(computer, callback) {
       this.projectsFetched = false;
       const computerToFetch = computer || this.computersAvailable[0];
       eventBus.$emit('changeComputer', computerToFetch, () => {
         this.projectsFetched = true;
+        if (callback) callback();
       });
     },
   },

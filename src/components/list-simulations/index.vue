@@ -141,7 +141,9 @@ export default {
     deleteJob(url) {
       const removeFromList = () => {
         remove(this.viewList, job => job._links.self.href === url);
+        // https://github.com/lodash/lodash/issues/2965 [reactive issue]
         this.viewList = this.applyFiltersToSims(this.viewList);
+        remove(this.allSimulations, job => job._links.self.href === url);
       };
 
       this.$refs.deletionModal.changeVisibility();

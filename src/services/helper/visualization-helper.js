@@ -3,6 +3,7 @@ import unicore from '@/services/unicore';
 import visualizationConfig from '@/assets/visualization-config';
 import store from '@/services/store';
 import collabHelper from '@/services/helper/collab-helper';
+import eventBus from '@/services/event-bus';
 
 // TODO: merge with analaysis_helper getFilesToCopy
 async function getFilesToCopy(filesURL) {
@@ -26,8 +27,7 @@ async function pollingVizIp() {
 
   try {
     const ip = await collabHelper.getIpByName(`${lastCharactersToken}.txt`);
-    console.debug('IP', ip);
-    window.open(`http://${ip}/?host=${ip}:8200`, '_blank');
+    eventBus.$emit('vizReady', ip);
   } catch (e) {
     console.debug('VM IP not found. Retrying...');
     setTimeout(() => pollingVizIp(), store.state.pollInterval);
@@ -53,20 +53,10 @@ async function submitVisualization(simulationDetails) {
   vizConfig.projectSelected = store.state.userGroup;
   vizConfig.title = `${visualizationConfig.jobNamePrefix} ${simulationDetails.name}`;
 
-  const backupGroup = store.state.userGroup;
-  store.commit('setUserGroup', null);
   await unicore.submitJob(vizConfig, []);
   pollingVizIp();
-  store.commit('setUserGroupTmp', backupGroup);
-}
-
-function computerHasVisualization() {
-  return !!visualizationConfig[store.state.currentComputer];
 }
 
 export default {};
 
-export {
-  submitVisualization,
-  computerHasVisualization,
-};
+export { submitVisualization };

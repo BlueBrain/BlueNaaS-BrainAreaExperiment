@@ -23,17 +23,15 @@ This will display the details of a certain simulation and the analysis.
       </div>
     </div>
 
-    <i-button
-      v-if="computerHasVisualization()"
-      type="primary"
-      class="in-corner"
-      icon="md-videocam"
-      size="small"
-      @click="launchVisualization"
-      :loading="vizRunning"
-    >Visualize</i-button>
+    <visualize-launcher
+      v-if="simulationWasSuccessful"
+      :simulation-details="simulationDetails"
+    />
 
-    <analysis-in-notebook :simulation-details="simulationDetails"/>
+    <analysis-in-notebook
+      v-if="simulationWasSuccessful"
+      :simulation-details="simulationDetails"
+    />
 
     <div class="detail-content" :class="{'full-disable': !simulationDetails.id}">
       <analysis-section :simulation-details="simulationDetails"/>
@@ -120,9 +118,10 @@ import ItemSummary from '@/components/details-simulation/item-summary.vue';
 import AnalysisSection from '@/components/details-simulation/analysis-section.vue';
 import DisplayOrDownload from '@/components/shared/display-or-download.vue';
 import AnalysisInNotebook from '@/components/details-simulation/analysis-in-notebook.vue';
+import VisualizeLauncher from '@/components/details-simulation/visualize-launcher.vue';
 import eventBus from '@/services/event-bus';
 import { isRunning, jobStatus } from '@/assets/job-status';
-import { submitVisualization, computerHasVisualization } from '@/services/helper/visualization-helper';
+
 import { simulationProducedResults } from '@/assets/utils';
 import db from '@/services/db';
 
@@ -134,6 +133,7 @@ export default {
     DisplayOrDownload,
     AnalysisSection,
     AnalysisInNotebook,
+    VisualizeLauncher,
   },
   props: ['jobId', 'computerParam'],
   data() {
@@ -142,9 +142,16 @@ export default {
       simulationDetails: {},
       downloadedFiles: {},
       vizRunning: false,
-      computerHasVisualization,
       pageIsDisplayed: true,
     };
+  },
+  computed: {
+    simulationWasSuccessful() {
+      if (!this.job.children) return false;
+      const isSuccessful = this.simulationDetails.status === jobStatus.successful;
+      const hasResults = simulationProducedResults(this.job.children);
+      return isSuccessful && hasResults;
+    },
   },
   mounted() {
     this.$store.commit('setAppTitle', 'Simulation Details');
@@ -288,15 +295,6 @@ export default {
           computerParam: this.computerParam,
         },
       });
-    },
-
-    launchVisualization() {
-      this.$Message.loading({
-        content: 'Visualization is starting. This could take up to 10 min...',
-        duration: 60,
-      });
-      submitVisualization(this.simulationDetails);
-      this.vizRunning = true;
     },
   },
   beforeDestroy() {

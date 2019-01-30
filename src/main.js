@@ -9,7 +9,7 @@ import auth from '@/services/auth';
 import App from '@/components/shared/frame-template.vue';
 import router from '@/services/router';
 import store from '@/services/store';
-
+import '@/assets/sentry';
 
 Vue.config.productionTip = false;
 

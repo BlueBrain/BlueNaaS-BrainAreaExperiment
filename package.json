@@ -10,6 +10,7 @@
     "build_doc": "echo"
   },
   "dependencies": {
+    "@sentry/browser": "^4.5.3",
     "axios": "^0.18.0",
     "clean-deep": "^3.0.2",
     "file-saver": "^2.0.0",

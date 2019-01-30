@@ -104,7 +104,8 @@ export default {
       this.fetchJobs();
     });
     eventBus.$on('applyFilters', () => {
-      this.viewList = this.applyFiltersToSims(this.allSimulations);
+      const filtered = this.applyFiltersToSims(this.allSimulations);
+      this.viewList = sortBy(filtered, 'submissionTime').reverse();
     });
     eventBus.$on('cleanList', () => {
       this.viewList = [];

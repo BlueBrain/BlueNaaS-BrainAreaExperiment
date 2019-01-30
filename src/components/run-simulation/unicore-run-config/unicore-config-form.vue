@@ -74,10 +74,10 @@
         />
       </form-item>
 
-      <form-item prop="runtime">
+      <form-item prop="runtime" v-if="!runtimeIsHidden">
         <tooltip
           slot="label"
-          content="Time until timeout"
+          content="Time until the job is killed"
         >RunTime</tooltip>
         <input-number
           size="small"
@@ -243,6 +243,10 @@ export default {
     disableGroupSelector() {
       const hasOneGroup = isEqual(this.groupsAvailable, ['*']);
       return !this.groupsAvailable.length || hasOneGroup;
+    },
+
+    runtimeIsHidden() {
+      return this.$store.state.currentComputer === 'NUVLA';
     },
   },
   methods: {

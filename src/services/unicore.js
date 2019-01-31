@@ -3,10 +3,10 @@ import axios from 'axios';
 import find from 'lodash/find';
 import cleanDeep from 'clean-deep';
 
-import computeProvider from '@/assets/compute-provider.json';
+import computeProvider from '@/common/compute-provider.json';
 import store from '@/services/store';
 import db from '@/services/db';
-import simulationConfig from '@/assets/simulation-config';
+import simulationConfig from '@/config/simulation-config';
 
 function init() {
   axios.defaults.headers.common.Accept = 'application/json';

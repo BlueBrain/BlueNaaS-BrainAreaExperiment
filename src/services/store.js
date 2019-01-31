@@ -2,8 +2,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import simConfig from '@/assets/simulation-config';
-import circuitConfig from '@/assets/circuit-config';
+import simConfig from '@/config/simulation-config';
+import circuitConfig from '@/config/circuit-config';
 
 Vue.use(Vuex);
 

@@ -49,7 +49,7 @@ import EditButtons from '@/components/run-simulation/edit-buttons.vue';
 import TargetSelection from '@/components/shared/target-selection.vue';
 import simTimelineLib from '@/services/helper/timeline-helper';
 import eventBus from '@/services/event-bus';
-import { mapBlueConfigTerms, unmapBlueConfigTerms } from '@/assets/utils';
+import { mapBlueConfigTerms, unmapBlueConfigTerms } from '@/common/utils';
 import db from '@/services/db';
 
 export default {

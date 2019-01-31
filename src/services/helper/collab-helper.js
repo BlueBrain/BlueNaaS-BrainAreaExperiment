@@ -1,6 +1,6 @@
 
 import axios from 'axios';
-import visualizationConfig from '@/assets/visualization-config';
+import visualizationConfig from '@/config/visualization-config';
 
 const collabStorageEndpoint = 'https://services.humanbrainproject.eu/storage/v1/api';
 // let newAxiosInstance = null; // async assign

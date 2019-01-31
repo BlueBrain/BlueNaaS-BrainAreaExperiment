@@ -58,8 +58,8 @@
 import CollapseTitle from '@/components/shared/collapse-title.vue';
 import ItemSummary from '@/components/details-simulation/item-summary.vue';
 import AnalysisItem from '@/components/details-simulation/analysis-item.vue';
-import analysisConfig from '@/assets/analysis-config';
-import { isRunning, jobStatus } from '@/assets/job-status';
+import analysisConfig from '@/config/analysis-config';
+import { isRunning, jobStatus } from '@/common/job-status';
 import db from '@/services/db';
 import set from 'lodash/set';
 import DeleteConfirmationModal from '@/components/shared/delete-confirmation-modal.vue';

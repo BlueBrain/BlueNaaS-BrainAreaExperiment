@@ -120,9 +120,9 @@ import DisplayOrDownload from '@/components/shared/display-or-download.vue';
 import AnalysisInNotebook from '@/components/details-simulation/analysis-in-notebook.vue';
 import VisualizeLauncher from '@/components/details-simulation/visualize-launcher.vue';
 import eventBus from '@/services/event-bus';
-import { isRunning, jobStatus } from '@/assets/job-status';
+import { isRunning, jobStatus } from '@/common/job-status';
 
-import { simulationProducedResults } from '@/assets/utils';
+import { simulationProducedResults } from '@/common/utils';
 import db from '@/services/db';
 
 export default {

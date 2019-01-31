@@ -136,7 +136,7 @@
 
 
 <script>
-import simulationConfig from '@/assets/simulation-config';
+import simulationConfig from '@/config/simulation-config';
 import eventBus from '@/services/event-bus';
 import isEqual from 'lodash/isEqual';
 import { getComputersAvailableForCurrentModel } from '@/services/helper/computer-group-helper';

@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import analysisConfig from '@/assets/analysis-config';
+import analysisConfig from '@/config/analysis-config';
 
 export default {
   name: 'AnalysisForm',

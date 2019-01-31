@@ -45,10 +45,10 @@ import union from 'lodash/union';
 import merge from 'lodash/merge';
 
 import eventBus from '@/services/event-bus';
-import { createBCTemplate } from '@/assets/blueconfig-template';
+import { createBCTemplate } from '@/common/blueconfig-template';
 import UnicoreConfigForm from '@/components/run-simulation/unicore-run-config/unicore-config-form.vue';
 import db from '@/services/db';
-import { convertToBCFormat, openContent, mapBlueConfigTerms } from '@/assets/utils';
+import { convertToBCFormat, openContent, mapBlueConfigTerms } from '@/common/utils';
 
 
 export default {

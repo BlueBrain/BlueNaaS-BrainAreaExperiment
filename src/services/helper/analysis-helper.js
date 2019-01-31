@@ -1,6 +1,6 @@
 
 import unicore from '@/services/unicore';
-import analysisConfig from '@/assets/analysis-config';
+import analysisConfig from '@/config/analysis-config';
 import store from '@/services/store';
 
 

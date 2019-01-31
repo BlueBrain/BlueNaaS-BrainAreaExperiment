@@ -43,7 +43,7 @@
 
 
 <script>
-import analysisConfig from '@/assets/analysis-config';
+import analysisConfig from '@/config/analysis-config';
 import forEach from 'lodash/forEach';
 import pick from 'lodash/pick';
 import get from 'lodash/get';

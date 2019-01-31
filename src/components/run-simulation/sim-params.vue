@@ -45,10 +45,10 @@
 import map from 'lodash/map';
 
 import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
-import circuitConfig from '@/assets/circuit-config';
+import circuitConfig from '@/config/circuit-config';
 import db from '@/services/db';
 import eventBus from '@/services/event-bus';
-import { mapBlueConfigTerms, unmapBlueConfigTerms } from '@/assets/utils';
+import { mapBlueConfigTerms, unmapBlueConfigTerms } from '@/common/utils';
 import get from 'lodash/get';
 
 export default {

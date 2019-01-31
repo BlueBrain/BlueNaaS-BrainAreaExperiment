@@ -48,7 +48,7 @@
 import find from 'lodash/find';
 
 import collapseTitle from '@/components/shared/collapse-title.vue';
-import analysisConfig from '@/assets/analysis-config';
+import analysisConfig from '@/config/analysis-config';
 
 export default {
   name: 'Analysis',

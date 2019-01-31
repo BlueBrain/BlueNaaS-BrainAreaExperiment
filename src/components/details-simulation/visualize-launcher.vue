@@ -27,7 +27,7 @@
 
 <script>
 import { submitVisualization } from '@/services/helper/visualization-helper';
-import visualizationConfig from '@/assets/visualization-config';
+import visualizationConfig from '@/config/visualization-config';
 import eventBus from '@/services/event-bus';
 
 export default {

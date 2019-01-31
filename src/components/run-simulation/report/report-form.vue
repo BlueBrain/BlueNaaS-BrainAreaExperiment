@@ -17,7 +17,6 @@
           :label-width="150"
           :model="reportInfo"
         >
-
           <form-item prop="target">
             <tooltip
               slot="label"

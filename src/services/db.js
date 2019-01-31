@@ -3,7 +3,7 @@ import localforage from 'localforage';
 
 import packageJson from '@/../package.json';
 import { urlToComputerAndId } from '@/services/unicore';
-import { jobStatus } from '@/assets/job-status';
+import { jobStatus } from '@/common/job-status';
 import store from '@/services/store';
 
 (function cleanStorage() {

@@ -59,7 +59,7 @@ This will only display the item. It knows where to put all the information.
 
 
 <script>
-import { jobStatus, getStatusIcon, isRunning } from '@/assets/job-status';
+import { jobStatus, getStatusIcon, isRunning } from '@/common/job-status';
 
 export default {
   name: 'SimulationItem',

@@ -56,13 +56,13 @@ This component manage each job (delete, start, create, etc).
 import SimulationItem from '@/components/list-simulations/simulation-item.vue';
 import InfiniteLoading from 'vue-infinite-loading';
 import unicore, { urlToComputerAndId } from '@/services/unicore';
-import analysisConfig from '@/assets/analysis-config';
+import analysisConfig from '@/config/analysis-config';
 import LaunchAnalysisForm from '@/components/list-simulations/launch-analysis-form.vue';
 import analysisHelper from '@/services/helper/analysis-helper';
-import { jobStatus, isRunning } from '@/assets/job-status';
+import { jobStatus, isRunning } from '@/common/job-status';
 import eventBus from '@/services/event-bus';
 import db from '@/services/db';
-import visualizationConfig from '@/assets/visualization-config';
+import visualizationConfig from '@/config/visualization-config';
 import DeleteConfirmationModal from '@/components/shared/delete-confirmation-modal.vue';
 import chunk from 'lodash/chunk';
 import sortBy from 'lodash/sortBy';

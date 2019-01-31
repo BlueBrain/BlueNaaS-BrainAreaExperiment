@@ -37,7 +37,7 @@
 
 
 <script>
-import { getStatusIcon } from '@/assets/job-status';
+import { getStatusIcon } from '@/common/job-status';
 
 export default {
   name: 'ItemSummary',

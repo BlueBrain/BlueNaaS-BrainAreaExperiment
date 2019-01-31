@@ -47,7 +47,7 @@ import StimulationTimeline from '@/components/run-simulation/stimulation/stimula
 import ReportTimeline from '@/components/run-simulation/report/report-timeline.vue';
 import RunConfigurationComponent from '@/components/run-simulation/unicore-run-config/run-configuration-component.vue';
 import unicore, { urlToComputerAndId } from '@/services/unicore';
-import simulationConfig from '@/assets/simulation-config';
+import simulationConfig from '@/config/simulation-config';
 import { getComputersAvailableForCurrentModel } from '@/services/helper/computer-group-helper';
 import '@/assets/css/simulation.css';
 

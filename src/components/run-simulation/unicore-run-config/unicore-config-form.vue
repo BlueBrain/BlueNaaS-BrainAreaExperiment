@@ -74,12 +74,13 @@
         />
       </form-item>
 
-      <form-item prop="runtime" v-if="!runtimeIsHidden">
+      <form-item prop="runtime">
         <tooltip
           slot="label"
           content="Time until the job is killed"
         >RunTime</tooltip>
         <input-number
+          :disabled="runtimeIsHidden"
           size="small"
           v-model="runParameters.runtime"
           placeholder="(optional)"

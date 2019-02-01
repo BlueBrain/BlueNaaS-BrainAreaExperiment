@@ -47,4 +47,17 @@ export default {
   available: ['JURECA', 'PIZ_DAINT', 'NUVLA'],
   defaultDuration: 300,
   defaultForwardSkip: 5000,
+  stimuli: [
+    'Linear',
+    'RelativeLinear',
+    'Pulse',
+    'NPoisson',
+    'NPoissonInhomogeneus',
+    'Subthreshold',
+    'Noise',
+    'SynapseReplay',
+    'Hyperpolarizing',
+    'ReplayVoltageTrace',
+    'SEClamp',
+  ],
 };

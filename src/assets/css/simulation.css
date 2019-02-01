@@ -22,7 +22,7 @@
 }
 
 /* --------- timeline ---------- */
-.vis-item.voltage {
+.vis-item.voltage:not(.vis-selected) {
     background-color: #F6D5ED;
     border-color: #F797E0;
 }

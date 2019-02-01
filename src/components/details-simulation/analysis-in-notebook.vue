@@ -13,7 +13,7 @@
 
     <Modal
       v-model="showModal"
-      title="Choose Analysis"
+      title="Choose Analysis Notebook"
       width="250"
     >
       <i-select

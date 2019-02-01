@@ -68,16 +68,24 @@
             />
           </form-item>
 
-          <!-- <form-item>
-            <tooltip content="Type of the stimulus">
-              Pattern
-            </tooltip>
-            <i-input
-              id="Pattern"
+          <form-item>
+            <tooltip
+              slot="label"
+              content="Type of the stimulus"
+            >Pattern</tooltip>
+            <i-select
+              size="small"
               v-model="stimulusInfo.Pattern"
-              value="Poisson"
-            />
-          </form-item> -->
+              placeholder="Pattern"
+            >
+              <i-option
+                v-for="stimulus in stimuliAvailable"
+                :key="stimulus"
+                :value="stimulus"
+              >{{ stimulus }}</i-option>
+            </i-select>
+          </form-item>
+
 
           <form-item prop="lambda">
             <tooltip
@@ -121,6 +129,8 @@
 
 <script>
 import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
+import simulationConfig from '@/config/simulation-config';
+import { unmapBlueConfigTerms } from '@/common/utils';
 
 export default {
   name: 'StimulationForm',
@@ -215,6 +225,9 @@ export default {
   computed: {
     stimulationTargets() {
       return this.$store.state.stimulationTargets;
+    },
+    stimuliAvailable() {
+      return simulationConfig.stimuli.map(stimulus => unmapBlueConfigTerms(stimulus));
     },
   },
   methods: {

@@ -25,7 +25,7 @@
             <autocomplete-targets
               :target-selected="stimulusInfo.Target"
               :itemsAvailable="stimulationTargets"
-              @targetChanged="targetChanged"
+              @target-changed="targetChanged"
             />
           </form-item>
 
@@ -232,13 +232,13 @@ export default {
   },
   methods: {
     onCancel() {
-      this.$emit('hideModal');
+      this.$emit('hide-modal');
     },
     async editItem() {
       // this.form = this.$el.querySelector('form');
       const isValid = await this.$refs.formValidate.validate();
       if (isValid) {
-        this.$emit('itemEdited', this.stimulusInfo);
+        this.$emit('item-edited', this.stimulusInfo);
         this.formInvalid = false;
       }
     },

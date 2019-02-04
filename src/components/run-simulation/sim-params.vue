@@ -22,7 +22,7 @@
     <autocomplete-targets
       :target-selected="populationSelected"
       :itemsAvailable="populationTargets"
-      @targetChanged="targetChanged"
+      @target-changed="targetChanged"
     />
 
     <tooltip

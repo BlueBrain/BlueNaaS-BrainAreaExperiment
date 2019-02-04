@@ -21,15 +21,15 @@
       <target-selection
         v-if="showTargetSelector"
         :itemsAvailable="stimulationTargets"
-        @targetSelected="targetSelected"
+        @target-selected="targetSelected"
       />
     </div>
 
     <stimulation-form
       :show-modal="showModal"
       :stimulus-info="editableStimulusInfo"
-      @itemEdited="stimulusEdited"
-      @hideModal="toggleModal"
+      @item-edited="stimulusEdited"
+      @hide-modal="toggleModal"
     />
 
     <span class="tooltip-span"/> <!-- tooltip hover item -->

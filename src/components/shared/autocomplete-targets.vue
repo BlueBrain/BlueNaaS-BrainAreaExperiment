@@ -34,7 +34,7 @@ export default {
       return targetValue.toLowerCase().indexOf(search.toLowerCase()) >= 0;
     },
     itemSelected(selection) {
-      this.$emit('targetChanged', selection);
+      this.$emit('target-changed', selection);
     },
     getTargetImage(targetObj) {
       return targetObj.src;

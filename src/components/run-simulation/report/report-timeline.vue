@@ -10,9 +10,9 @@
       <div class="timeline-container">
         <edit-buttons
           class="edit-buttons"
-          @itemAdd="onAdd"
-          @itemDelete="onRemove"
-          @itemEdit="onUpdate"
+          @item-add="onAdd"
+          @item-delete="onRemove"
+          @item-edit="onUpdate"
         />
         <div
           id="reportContainer"
@@ -23,15 +23,15 @@
       <target-selection
         v-if="showTargetSelector"
         :itemsAvailable="reportTargets"
-        @targetSelected="targetSelected"
+        @target-selected="targetSelected"
       />
     </div>
 
     <report-form
       :show-modal="showModal"
       :report-info="editableReportInfo"
-      @itemEdited="reportEdited"
-      @hideModal="toggleModal(false)"
+      @item-edited="reportEdited"
+      @hide-modal="toggleModal(false)"
     />
 
     <span class="tooltip-span"/> <!-- tooltip hover item -->

@@ -31,13 +31,13 @@ export default {
   name: 'EditButtons',
   methods: {
     itemAdd() {
-      this.$emit('itemAdd');
+      this.$emit('item-add');
     },
     itemEdit() {
-      this.$emit('itemEdit');
+      this.$emit('item-edit');
     },
     itemDelete() {
-      this.$emit('itemDelete');
+      this.$emit('item-delete');
     },
   },
 };

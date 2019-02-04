@@ -257,7 +257,7 @@ export default {
         this.runParameters.computerSelected = this.computerSelected;
         this.runParameters.groupSelected = this.groupSelected;
         // to start spinner
-        this.$emit('runSimulation', this.runParameters);
+        this.$emit('run-simulation', this.runParameters);
       }
     },
 

@@ -43,7 +43,7 @@ This component manage each job (delete, start, create, etc).
       :job-selected-for-analysis="jobSelectedForAnalysis"
       :is-running-analysis="isRunningAnalysis"
       @changeModalVisibility="toggleModal"
-      @analysisConfigReady="analysisConfigReady"
+      @analysis-config-ready="analysisConfigReady"
     />
 
     <delete-confirmation-modal ref="deletionModal"/>

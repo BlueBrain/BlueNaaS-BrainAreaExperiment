@@ -216,7 +216,7 @@ export default {
     async editItem() {
       const isValid = await this.$refs.formValidate.validate();
       if (isValid) {
-        this.$emit('analysisConfigReady', this.generateAnalysisObjectToRun());
+        this.$emit('analysis-config-ready', this.generateAnalysisObjectToRun());
       }
     },
     targetChanged(newTarget) {

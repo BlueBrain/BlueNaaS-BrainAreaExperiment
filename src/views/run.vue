@@ -42,7 +42,7 @@
       </div>
       <!-- END connection manipulation -->
 
-      <run-configuration-component @launchSim="launchSim"/>
+      <run-configuration-component @launch-sim="launchSim"/>
 
     </div>
   </div>

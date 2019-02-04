@@ -31,14 +31,14 @@ This component allows to create or modify the connections in the circuit for the
             <autocomplete-targets
               :target-selected="connection.source"
               :itemsAvailable="targets"
-              @targetChanged="updateValue(connection, 'source', ...arguments)"
+              @target-changed="updateValue(connection, 'source', ...arguments)"
             />
           </i-col>
           <i-col span="4">
             <autocomplete-targets
               :target-selected="connection.destination"
               :itemsAvailable="targets"
-              @targetChanged="updateValue(connection, 'destination', ...arguments)"
+              @target-changed="updateValue(connection, 'destination', ...arguments)"
             />
           </i-col>
           <i-col span="2">

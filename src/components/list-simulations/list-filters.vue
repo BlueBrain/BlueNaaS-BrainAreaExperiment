@@ -137,7 +137,7 @@ export default {
       this.statusFilter = 'ALL';
     },
     applyFilters() {
-      this.$emit('updateFilters', this.nameFilter, this.statusFilter);
+      this.$emit('update-filters', this.nameFilter, this.statusFilter);
       this.$nextTick(() => {
         eventBus.$emit('applyFilters');
       });

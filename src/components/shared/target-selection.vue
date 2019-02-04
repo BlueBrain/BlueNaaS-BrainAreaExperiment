@@ -76,7 +76,7 @@ export default {
       return this.firstImgElement;
     },
     targetSelected() {
-      this.$emit('targetSelected', this.selectedSlice);
+      this.$emit('target-selected', this.selectedSlice);
     },
   },
 };

@@ -68,7 +68,7 @@ export default {
       return plotInfo.name;
     },
     analysisLogRequest() {
-      this.$emit('analysisLogRequest', this.itemDetails);
+      this.$emit('analysis-log-request', this.itemDetails);
     },
   },
 };

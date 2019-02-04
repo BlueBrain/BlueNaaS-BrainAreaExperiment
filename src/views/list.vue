@@ -7,7 +7,7 @@ This component will be the frame for view the simulations.
     <div class="list-header">
       <list-filters
         class="list-filters"
-        @updateFilters="updateFilters"
+        @update-filters="updateFilters"
       />
 
       <div class="grow-space"/>

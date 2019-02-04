@@ -33,7 +33,7 @@
       :is-launching-sim="isLaunchingSim"
       @previewBlueConfig="previewBlueConfig"
       @closeModal="showComputerParamsModal = false"
-      @runSimulation="runSimulation"
+      @run-simulation="runSimulation"
     />
     <!-- END template for configuration -->
   </div>
@@ -128,7 +128,7 @@ export default {
       this.isLaunchingSim = true;
 
       const finalBlueConfig = convertToBCFormat(blueConfigStr);
-      this.$emit('launchSim', finalBlueConfig, unicoreConfig, () => {
+      this.$emit('launch-sim', finalBlueConfig, unicoreConfig, () => {
         // hideModalFn passed to Run will hide the modal when finish spinning
         this.showComputerParamsModal = false;
       });

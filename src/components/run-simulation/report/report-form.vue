@@ -25,7 +25,7 @@
             <autocomplete-targets
               :target-selected="reportInfo.Target"
               :itemsAvailable="reportTargets"
-              @targetChanged="targetChanged"
+              @target-changed="targetChanged"
             />
           </form-item>
 
@@ -239,12 +239,12 @@ export default {
   },
   methods: {
     onCancel() {
-      this.$emit('hideModal');
+      this.$emit('hide-modal');
     },
     async editItem() {
       const isValid = await this.$refs.formValidate.validate();
       if (isValid) {
-        this.$emit('itemEdited', this.reportInfo);
+        this.$emit('item-edited', this.reportInfo);
         this.formInvalid = false;
       }
     },

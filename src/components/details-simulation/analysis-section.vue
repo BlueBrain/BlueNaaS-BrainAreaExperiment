@@ -43,7 +43,7 @@
 
           <analysis-item
             :item-details="analysis"
-            @analysisLogRequest="getAnalysisLog"
+            @analysis-log-request="getAnalysisLog"
           />
         </div>
 

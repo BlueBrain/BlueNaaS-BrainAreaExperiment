@@ -34,6 +34,14 @@
       </div>
       <!-- END report timeline -->
 
+      <!-- connection manipulation -->
+      <div class="border-container">
+        <h2>Connection Manipulation</h2>
+        <div class="subtitle">Controls the connection between populations</div>
+        <connection-manipulation/>
+      </div>
+      <!-- END connection manipulation -->
+
       <run-configuration-component @launchSim="launchSim"/>
 
     </div>
@@ -46,6 +54,8 @@ import SimulationParams from '@/components/run-simulation/sim-params.vue';
 import StimulationTimeline from '@/components/run-simulation/stimulation/stimulation-timeline.vue';
 import ReportTimeline from '@/components/run-simulation/report/report-timeline.vue';
 import RunConfigurationComponent from '@/components/run-simulation/unicore-run-config/run-configuration-component.vue';
+import ConnectionManipulation from '@/components/run-simulation/connection-manipulation/connection-list.vue';
+
 import unicore, { urlToComputerAndId } from '@/services/unicore';
 import simulationConfig from '@/config/simulation-config';
 import { getComputersAvailableForCurrentModel } from '@/services/helper/computer-group-helper';
@@ -58,6 +68,7 @@ export default {
     SimulationParams,
     StimulationTimeline,
     RunConfigurationComponent,
+    ConnectionManipulation,
   },
   created() {
     this.$store.commit('setAppTitle', 'Run Simulation');
@@ -79,6 +90,9 @@ export default {
     const population = this.$store.state.currentCircuitConfig.defaultPopulation;
     this.$store.commit('setSimulationPopulation', population);
     this.$store.commit('setPopulationTargets', filteredTargetsForStimulation);
+
+    const connectionManipulationTargets = allTargets;
+    this.$store.commit('setConnectionTargets', connectionManipulationTargets);
   },
   methods: {
     viewList() {

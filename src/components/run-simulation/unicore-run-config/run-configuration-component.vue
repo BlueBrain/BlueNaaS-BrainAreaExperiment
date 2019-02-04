@@ -86,22 +86,25 @@ export default {
     },
 
     async generatePartialBlueConfig() {
-      // generate stimulus and report in BlueConfig.json format NO PATH
+      /* it will send an action to each section to generate it's own config
+        and when it received all of them it will merge it into BlueConfig (NO PATH) */
       const generateStimuli = new Promise((resolve) => {
         eventBus.$emit('createStimulusConfig', resolve);
       });
       const generateReport = new Promise((resolve) => {
         eventBus.$emit('createReportConfig', resolve);
       });
+      const generateConnections = new Promise((resolve) => {
+        eventBus.$emit('createConnectionConfig', resolve);
+      });
       const generateSimParams = new Promise((resolve) => {
         eventBus.$emit('createSimParamsConfig', resolve);
       });
-      const [stimulationBC, reportBC, simParamsBC] = await Promise.all([
-        generateStimuli, generateReport, generateSimParams,
+      const [stimulationBC, reportBC, connectionsBC, simParamsBC] = await Promise.all([
+        generateStimuli, generateReport, generateConnections, generateSimParams,
       ]);
-      const extraParams = this.$store.state.currentCircuitConfig.extraParamsInBC || {};
 
-      return merge({}, createBCTemplate(), stimulationBC, simParamsBC, reportBC, extraParams);
+      return merge({}, createBCTemplate(), stimulationBC, simParamsBC, reportBC, connectionsBC);
     },
 
     async generateFinalBlueConfigJSON() {

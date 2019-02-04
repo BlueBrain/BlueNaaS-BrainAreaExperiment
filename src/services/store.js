@@ -37,6 +37,7 @@ const store = new Vuex.Store({
     stimulationTargets: [],
     reportTargets: [],
     populationTargets: [],
+    connectionTargets: [],
   },
   mutations: {
     /* eslint-disable no-param-reassign */
@@ -70,6 +71,9 @@ const store = new Vuex.Store({
     },
     setPopulationTargets(state, targets) {
       state.populationTargets = targets;
+    },
+    setConnectionTargets(state, targets) {
+      state.connectionTargets = targets;
     },
     setSimulationDuration(state, newDuration) {
       state.simulationDuration = newDuration;

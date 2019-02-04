@@ -99,14 +99,10 @@ export default {
     });
 
     // before running the simulation create BlueConfig
-    eventBus.$on('createReportConfig', (resolve) => {
-      const reportBlueconfig = this.createConfig();
-      resolve(reportBlueconfig);
-    });
-
-    eventBus.$on('simulationDurationChanged', (newDuration) => {
-      this.timeline.setCustomTime(newDuration, 'end');
-    });
+    this.creationConfigHandlerBinded = this.creationConfigHandler.bind(this);
+    this.simulationDurationChangedBinded = this.simulationDurationChanged.bind(this);
+    eventBus.$on('createReportConfig', this.creationConfigHandlerBinded);
+    eventBus.$on('simulationDurationChanged', this.simulationDurationChangedBinded);
   },
   methods: {
     onAdd(item, callback) {
@@ -124,6 +120,14 @@ export default {
 
     onUpdate(item, callback) {
       simTimelineLib.updatedItem(item, callback, this);
+    },
+
+    creationConfigHandler(resolve) {
+      const reportBlueConfig = this.createConfig();
+      resolve(reportBlueConfig);
+    },
+    simulationDurationChanged(newDuration) {
+      this.timeline.setCustomTime(newDuration, 'end');
     },
 
     reportEdited(editedItem) {
@@ -262,7 +266,8 @@ export default {
     },
   },
   beforeDestroy() {
-    eventBus.$off('createReportConfig');
+    eventBus.$off('createStimulusConfig', this.creationConfigHandlerBinded);
+    eventBus.$off('simulationDurationChanged', this.simulationDurationChangedBinded);
   },
 };
 </script>

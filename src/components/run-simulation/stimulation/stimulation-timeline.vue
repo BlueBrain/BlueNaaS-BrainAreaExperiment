@@ -98,13 +98,10 @@ export default {
     });
 
     // before running the simulation create BlueConfig
-    eventBus.$on('createStimulusConfig', (resolve) => {
-      const stimulusBlueConfig = this.createConfig();
-      resolve(stimulusBlueConfig);
-    });
-    eventBus.$on('simulationDurationChanged', (newDuration) => {
-      this.timeline.setCustomTime(newDuration, 'end');
-    });
+    this.creationConfigHandlerBinded = this.creationConfigHandler.bind(this);
+    this.simulationDurationChangedBinded = this.simulationDurationChanged.bind(this);
+    eventBus.$on('createStimulusConfig', this.creationConfigHandlerBinded);
+    eventBus.$on('simulationDurationChanged', this.simulationDurationChangedBinded);
   },
   methods: {
     onAdd(item, callback) {
@@ -134,6 +131,13 @@ export default {
       callback(updatedItem);
     },
 
+    creationConfigHandler(resolve) {
+      const stimulusBlueConfig = this.createConfig();
+      resolve(stimulusBlueConfig);
+    },
+    simulationDurationChanged(newDuration) {
+      this.timeline.setCustomTime(newDuration, 'end');
+    },
     toggleModal(value) {
       this.showModal = value || !this.showModal;
     },
@@ -279,7 +283,8 @@ export default {
     },
   },
   beforeDestroy() {
-    eventBus.$off('createStimulusConfig');
+    eventBus.$off('createStimulusConfig', this.creationConfigHandlerBinded);
+    eventBus.$off('simulationDurationChanged', this.simulationDurationChangedBinded);
   },
 };
 </script>

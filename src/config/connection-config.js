@@ -53,4 +53,9 @@ export default {
       delay: 0,
     },
   ],
+  synapseAttributes: [
+    'tau_r_AMPA', 'tau_d_AMPA', 'tau_r_NMDA', 'tau_d_NMDA', 'Use', 'Dep', 'Fac', 'e',
+    'mg', 'mggate', 'gmax', 'u0', 'NMDA_ratio', 'synapseID', 'verboseLevel', 'tau_r_GABAA',
+    'tau_d_GABAA', 'tau_r_GABAB', 'tau_d_GABAB', 'e_GABAA', 'e_GABAB', 'GABAB_ratio',
+  ],
 };

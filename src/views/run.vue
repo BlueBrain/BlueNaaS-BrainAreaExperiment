@@ -36,8 +36,6 @@
 
       <!-- connection manipulation -->
       <div class="border-container">
-        <h2>Connection Manipulation</h2>
-        <div class="subtitle">Controls the connection between populations</div>
         <connection-manipulation/>
       </div>
       <!-- END connection manipulation -->

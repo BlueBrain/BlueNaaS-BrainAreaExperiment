@@ -21,7 +21,6 @@
           content="Title of the Job"
         >Title</tooltip>
         <i-input
-          size="small"
           v-model="runParameters.title"
           placeholder="Title"
         />
@@ -33,7 +32,6 @@
           content="Supercomputer"
         >Computer</tooltip>
         <i-select
-          size="small"
           v-model="computerSelected"
         >
           <i-option
@@ -50,7 +48,6 @@
           content="Name of the project to run jobs"
         >Project</tooltip>
         <i-select
-          size="small"
           v-model="groupSelected"
           :disabled="disableGroupSelector"
         >
@@ -68,7 +65,6 @@
           content="Number of computer resources"
         >Nodes</tooltip>
         <input-number
-          size="small"
           v-model="runParameters.nodes"
           placeholder="Node to allocate"
         />
@@ -81,7 +77,6 @@
         >RunTime</tooltip>
         <input-number
           :disabled="runtimeIsHidden"
-          size="small"
           v-model="runParameters.runtime"
           placeholder="(optional)"
         />
@@ -93,7 +88,6 @@
           content="Number of CPUs per node"
         >CPUs Per Node</tooltip>
         <i-input
-          size="small"
           v-model="runParameters.cpus"
           readonly
         />
@@ -105,7 +99,6 @@
           content="Total number of processors"
         >Total Processors</tooltip>
         <i-input
-          size="small"
           :value="runParameters.nodes * runParameters.cpus"
           readonly
         />
@@ -114,6 +107,7 @@
       <form-item>
         <i-button
           shape="circle"
+          size="default"
           @click="$emit('previewBlueConfig')"
         >Preview BlueConfig</i-button>
       </form-item>
@@ -122,11 +116,13 @@
     <div slot="footer">
       <div class="flex">
         <i-button
+          size="default"
           @click="$emit('closeModal')"
         >Cancel</i-button>
 
         <i-button
           type="success"
+          size="default"
           :loading="isLaunchingSim || !projectsFetched"
           @click="checkForm"
         >Run Simulation</i-button>

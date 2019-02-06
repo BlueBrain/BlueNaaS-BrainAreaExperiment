@@ -39,7 +39,6 @@
             <i-select
               v-model="reportInfo.Type"
               placeholder="Type"
-              size="small"
             >
               <i-option
                 v-for="type in filteredTypes"
@@ -72,7 +71,6 @@
               content="Time to start reporting"
             >StartTime(ms)</tooltip>
             <input-number
-              size="small"
               v-model="reportInfo.StartTime"
               placeholder="Start Time"
             />
@@ -84,7 +82,6 @@
               content="Time to stop reporting"
             >EndTime(ms)</tooltip>
             <input-number
-              size="small"
               v-model="reportInfo.EndTime"
               placeholder="End Time"
             />
@@ -96,7 +93,6 @@
               content="The frequency of reporting in milliseconds(ms)"
             >Dt(ms)</tooltip>
             <input-number
-              size="small"
               v-model="reportInfo.Dt"
               :step="0.01"
               :min="0.01"
@@ -110,7 +106,6 @@
               content="Report output format"
             >Format</tooltip>
             <i-select
-              size="small"
               v-model="reportInfo.Format"
               placeholder="Output Format"
             >
@@ -136,6 +131,7 @@
       <div slot="footer">
         <i-button
           type="primary"
+          size="default"
           @click="editItem"
         >Save</i-button>
       </div>

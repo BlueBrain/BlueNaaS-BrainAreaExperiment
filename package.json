@@ -19,6 +19,7 @@
     "localforage": "^1.7.3",
     "lodash": "^4.17.11",
     "pouchdb-browser": "^7.0.0",
+    "uuid": "^3.3.2",
     "vis": "^4.21.0",
     "vue": "^2.5.22",
     "vue-infinite-loading": "^2.4.3",

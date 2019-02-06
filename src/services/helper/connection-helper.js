@@ -1,28 +1,39 @@
 
 import connectionsConfig from '@/config/connection-config';
 import cloneDeep from 'lodash/cloneDeep';
+import uuidGen from 'uuid';
 
 const getDefaultConnections = () => cloneDeep(connectionsConfig.defaultConnections);
 
-const checkSynapseConfig = (config) => {
-  const attributesList = connectionsConfig.synapseAttributes;
-
-  const regex = new RegExp('%s.(.+?) =', 'g');
-  let error = false;
-  let matches = regex.exec(config);
-  while (matches && !error) {
-    const matchedAttribute = matches[1];
-    if (!attributesList.includes(matchedAttribute)) {
-      error = true;
+const synapseStringToArray = (synapseText) => {
+  const regex = /%s.(.+?) = (-*\d*\.*\d*)/g;
+  let matches = regex.exec(synapseText);
+  const synapseConfigList = [];
+  while (matches) {
+    if (matches.length === 3 && matches[1] && matches[2]) {
+      synapseConfigList.push({
+        attr: matches[1],
+        value: parseFloat(matches[2]),
+        uuid: uuidGen(),
+      });
     }
-    matches = regex.exec(config);
+    matches = regex.exec(synapseText);
   }
-  return error;
+  return synapseConfigList;
+};
+
+const synapseArrayToString = (synapsesArray) => {
+  const synapseString = synapsesArray.reduce((result, synapseParam) => {
+    const configuration = `%s.${synapseParam.attr} = ${synapseParam.value} `;
+    return `${result}${configuration}`;
+  }, '');
+  return synapseString.trim();
 };
 
 export {
   getDefaultConnections,
-  checkSynapseConfig,
+  synapseStringToArray,
+  synapseArrayToString,
 };
 
 export default {};

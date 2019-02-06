@@ -4,7 +4,6 @@
     v-model="populationSelected"
     filterable
     @on-change="itemSelected"
-    size="small"
   >
     <i-option
       v-for="target in targets"

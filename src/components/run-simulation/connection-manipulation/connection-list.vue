@@ -18,7 +18,8 @@ This component allows to create or modify the connections in the circuit for the
 
     <div
       class="custom-table"
-      :class="{ 'table-collapsed': tableCollapsed }">
+      :class="{ 'table-collapsed': tableCollapsed }"
+    >
       <!-- Header for connection manipulation -->
       <Row type="flex" class="connection-table-header" justify="space-between">
         <i-col span="4"><h3>Source</h3></i-col>
@@ -27,10 +28,8 @@ This component allows to create or modify the connections in the circuit for the
         <i-col span="2"><h3>Weight</h3></i-col>
         <i-col span="2"><h3>SpontMinis</h3></i-col>
         <i-col span="7"><h3>Synapse Configuration</h3></i-col>
-        <i-col class="error-indicator"></i-col>
         <i-col span="1">
           <i-button
-            size="small"
             type="success"
             icon="md-add"
             @click="addNewConnection()"
@@ -59,14 +58,12 @@ This component allows to create or modify the connections in the circuit for the
               <input-number
                 :min="0"
                 :step="10"
-                size="small"
                 v-model="connection.delay"
                 :value="connection.delay"
               />
             </i-col>
             <i-col span="2">
               <input-number
-                size="small"
                 :min="1"
                 v-model="connection.weight"
                 :value="connection.weight"
@@ -74,7 +71,6 @@ This component allows to create or modify the connections in the circuit for the
             </i-col>
             <i-col span="2">
               <input-number
-                size="small"
                 :min="0"
                 :step="0.01"
                 v-model="connection.spontMinis"
@@ -82,30 +78,18 @@ This component allows to create or modify the connections in the circuit for the
               />
             </i-col>
             <i-col span="7">
-              <i-input
+              <synapse-configurator
                 v-if="connection.synapseConfigure"
-                v-model="connection.synapseConfigure"
-                size="small"
-                @on-blur="checkSynapseText(connection.synapseConfigure, connection)"
+                :predefined-synapses="connection.synapseConfigure"
+                @on-ready="setNewSynapseString(connection, ...arguments)"
               />
               <Checkbox
                 v-else
-                @on-change="$set(connection, 'synapseConfigure', '%')"
+                @on-change="configureSynapseSelected(connection)"
               >Configure Synapse</Checkbox>
-            </i-col>
-            <i-col class="error-indicator">
-              <Tooltip
-                v-if="connection.synapseError"
-                max-width="200"
-                content="Error in some variable"
-                placement="left"
-              >
-                <Icon type="md-warning"/>
-              </Tooltip>
             </i-col>
             <i-col span="1">
               <i-button
-                size="small"
                 type="primary"
                 ghost
                 icon="md-remove"
@@ -123,15 +107,18 @@ This component allows to create or modify the connections in the circuit for the
 
 <script>
 import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
-import { getDefaultConnections, checkSynapseConfig } from '@/services/helper/connection-helper';
+import SynapseConfigurator from '@/components/run-simulation/connection-manipulation/synapse-configurator.vue';
+import { getDefaultConnections } from '@/services/helper/connection-helper';
 import { mapBlueConfigTerms } from '@/common/utils';
 import eventBus from '@/services/event-bus';
 import cleanDeep from 'clean-deep';
+import uuidGen from 'uuid';
 
 export default {
   name: 'ConnectionManipulation',
   components: {
     AutocompleteTargets,
+    SynapseConfigurator,
   },
   data() {
     return {
@@ -154,12 +141,11 @@ export default {
       this.$set(connection, subitem, newValue);
     },
     configureSynapseSelected(connection) {
-      this.$set(connection, 'hasSynapseConfigure', true);
-      this.$set(connection, 'synapseConfigure', '');
+      this.$set(connection, 'synapseConfigure', ' ');
     },
     addNewConnection() {
       this.connectionsArray.push({
-        id: Date.now(),
+        id: uuidGen(),
         delay: 0,
         spontMinis: 0,
       });
@@ -187,10 +173,8 @@ export default {
       });
       return ({ Connection: prunedConnections });
     },
-
-    checkSynapseText(config, connectionObj) {
-      const textHasError = checkSynapseConfig(config);
-      this.$set(connectionObj, 'synapseError', textHasError);
+    setNewSynapseString(connection, synapseString) {
+      this.$set(connection, 'synapseConfigure', synapseString);
     },
     toggleTable() {
       this.tableCollapsed = !this.tableCollapsed;
@@ -213,13 +197,6 @@ export default {
   }
   .ivu-col label.ivu-checkbox-wrapper {
     vertical-align: sub;
-  }
-  .list-enter-active, .list-leave-active {
-    transition: all 0.3s;
-  }
-  .list-enter, .list-leave-to {
-    opacity: 0;
-    transform: translateY(30px);
   }
   .in-corner {
     float: right;

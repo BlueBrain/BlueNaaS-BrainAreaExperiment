@@ -35,7 +35,6 @@
               content="Time when the stimulus commences. given in milliseconds(ms)"
             >Delay(ms)</tooltip>
             <input-number
-              size="small"
               v-model="stimulusInfo.Delay"
               placeholder="Delay"
             />
@@ -47,7 +46,6 @@
               content="Time length of stimulus duration, given in milliseconds(ms)"
             >Duration(ms)</tooltip>
             <input-number
-              size="small"
               v-model="stimulusInfo.Duration"
               :min="0"
               placeholder="Duration"
@@ -61,7 +59,6 @@
               content="Number of synapses to add per neuron"
             >Synapses per cell</tooltip>
             <input-number
-              size="small"
               v-model="stimulusInfo.NumOfSynapses"
               :min="0"
               placeholder="Number of synapses"
@@ -74,7 +71,6 @@
               content="Type of the stimulus"
             >Pattern</tooltip>
             <i-select
-              size="small"
               v-model="stimulusInfo.Pattern"
               placeholder="Pattern"
             >
@@ -93,7 +89,6 @@
               content="Configure the random distribution"
             >Lambda</tooltip>
             <input-number
-              size="small"
               v-model="stimulusInfo.Lambda"
               :min="1"
               placeholder="Lambda"
@@ -106,7 +101,6 @@
               content="The strengths of the added synapses"
             >Weight</tooltip>
             <input-number
-              size="small"
               v-model="stimulusInfo.Weight"
               :min="0"
               placeholder="Weight"
@@ -119,6 +113,7 @@
       <div slot="footer">
         <i-button
           type="primary"
+          size="default"
           @click="editItem"
         >Save</i-button>
       </div>

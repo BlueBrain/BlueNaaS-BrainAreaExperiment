@@ -6,7 +6,6 @@
     >Model:</tooltip>
     <i-select
       v-model="circuitToUse"
-      size="small"
       class="circuit-name"
     >
       <i-option
@@ -33,7 +32,6 @@
       :min="1"
       :step="1"
       :max="50000"
-      size="small"
       placeholder="Duration"
     />
 

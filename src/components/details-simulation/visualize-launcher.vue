@@ -7,7 +7,6 @@
     <i-button
       v-if="!vizIsReady"
       class="in-corner"
-      size="small"
       type="primary"
       icon="md-videocam"
       :loading="vizRunning"
@@ -16,7 +15,6 @@
     <i-button
       v-else
       class="in-corner"
-      size="small"
       type="success"
       icon="md-open"
       @click="openVisualization()"

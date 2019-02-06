@@ -23,6 +23,7 @@
     <i-button
       icon="md-play"
       type="success"
+      size="default"
       @click="configureSimulation"
       class="baseline-align"
     >Continue</i-button>

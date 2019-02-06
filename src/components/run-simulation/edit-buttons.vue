@@ -5,20 +5,17 @@
       title="Add"
       icon="md-add"
       @click="itemAdd"
-      size="small"
       type="primary"
     />
     <i-button
       title="Edit"
       icon="md-create"
-      size="small"
       type="primary"
       @click="itemEdit"
     />
     <i-button
       title="Delete"
       icon="md-trash"
-      size="small"
       type="primary"
       @click="itemDelete"
     />

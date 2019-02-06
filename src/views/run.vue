@@ -10,7 +10,6 @@
         <span class="grow-space"/>
         <i-button
           type="primary"
-          size="small"
           icon="ios-list"
           @click="viewList"
         >View Simulations</i-button>

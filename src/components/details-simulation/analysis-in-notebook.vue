@@ -7,7 +7,6 @@
     <i-button
       type="primary"
       icon="md-flask"
-      size="small"
       @click="showModal = true"
     >Analyze in Notebook</i-button>
 
@@ -19,7 +18,6 @@
       <i-select
         v-model="analysisSelected"
         placeholder="Select an analysis"
-        size="small"
       >
         <i-option
           v-for="analysis in analysisList"

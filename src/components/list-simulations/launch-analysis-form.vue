@@ -20,7 +20,6 @@
           <form-item prop="title" label="Title:">
             <i-input
               required
-              size="small"
               v-model="title"
               placeholder="Title of the analysis"
             />
@@ -47,7 +46,6 @@
             </tooltip>
             <i-select
               v-model="target"
-              size="small"
             >
               <i-option
                 v-for="targetElem in targetsFromBlueConfig"
@@ -60,7 +58,6 @@
           <form-item prop="report" label="Report">
            <i-select
               v-model="reportForAnalysis"
-              size="small"
             >
               <i-option
                 v-for="report in reports"
@@ -73,7 +70,6 @@
           <form-item prop="cellsNumber" label="Cells (number):">
             <input-number
               v-model="numberOfCells"
-              size="small"
               :min="1"
               :max="200"
               placeholder="Cells (number) to visualize"

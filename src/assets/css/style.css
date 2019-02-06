@@ -55,3 +55,11 @@ form.ivu-form .ivu-form-item-error-tip {
 .list-simulations .ivu-icon-md-sync {
   animation: spin 2s infinite linear;
 }
+
+.list-enter-active, .list-leave-active {
+  transition: all 0.3s;
+}
+.list-enter, .list-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}

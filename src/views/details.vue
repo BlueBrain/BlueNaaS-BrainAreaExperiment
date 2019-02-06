@@ -16,7 +16,6 @@ This will display the details of a certain simulation and the analysis.
       <div class="tools">
         <i-button
           type="primary"
-          size="small"
           icon="ios-arrow-back"
           @click="returnList"
         >Simulation List</i-button>

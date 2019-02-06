@@ -28,7 +28,6 @@ This will only display the item. It knows where to put all the information.
 
     <div class="right-part actions">
       <i-button
-        size="small"
         type="primary"
         icon="ios-search"
         @click="$emit('showDetails', jobUrl)"
@@ -36,7 +35,6 @@ This will only display the item. It knows where to put all the information.
       >View</i-button>
 
       <i-button
-        size="small"
         :disabled="!analysisCanRun"
         type="success"
         icon="md-play"
@@ -45,7 +43,6 @@ This will only display the item. It knows where to put all the information.
       >Analyze</i-button>
 
       <i-button
-        size="small"
         type="error"
         class="delete"
         icon="md-trash"

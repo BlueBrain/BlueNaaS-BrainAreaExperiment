@@ -14,7 +14,6 @@ This component will be the frame for view the simulations.
 
       <i-button
         type="primary"
-        size="small"
         icon="ios-arrow-back"
         @click="returnRun"
       >Launch Simulation</i-button>

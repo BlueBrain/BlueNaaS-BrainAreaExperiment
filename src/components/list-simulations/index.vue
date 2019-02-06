@@ -355,13 +355,6 @@ export default {
 
 
 <style scoped lang="scss">
-  .list-enter-active, .list-leave-active {
-    transition: all 0.3s;
-  }
-  .list-enter, .list-leave-to {
-    opacity: 0;
-    transform: translateY(30px);
-  }
   .table-header {
     display: flex;
     padding: 0 5px;

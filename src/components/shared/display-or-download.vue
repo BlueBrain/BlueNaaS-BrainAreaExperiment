@@ -31,7 +31,6 @@
     <i-button
       v-show="isAvailable"
       type="primary" icon="md-download"
-      size="small"
       @click="saveFile"
     >Download File</i-button>
 

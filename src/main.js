@@ -13,7 +13,10 @@ import '@/common/sentry';
 
 Vue.config.productionTip = false;
 
-Vue.use(iView, { locale });
+Vue.use(iView, {
+  size: 'small',
+  locale,
+});
 
 const app = new Vue({
   router,

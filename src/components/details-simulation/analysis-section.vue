@@ -26,7 +26,6 @@
               @click="deleteJob(analysis.jobURL)"
               type="error"
               icon="md-trash"
-              size="small"
               ghost
             >
               <span>Remove</span>

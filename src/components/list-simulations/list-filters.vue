@@ -6,7 +6,6 @@
       type="primary"
       :ghost="!filterOn"
       icon="ios-funnel"
-      size="small"
       @click="resetFilter"
     >Filter</i-button>
 
@@ -15,7 +14,7 @@
       :size="iconSize"
       class="icon-spaced"
     />
-    <i-input size="small" v-model="nameFilter" />
+    <i-input v-model="nameFilter" />
 
     <icon
       :type="getStatusIcon(statusFilter)"
@@ -23,7 +22,7 @@
       class="icon-spaced"
     />
 
-    <i-select size="small" v-model="statusFilter">
+    <i-select v-model="statusFilter">
       <i-option
         v-for="state in statesFilter"
         :value="state"
@@ -42,9 +41,7 @@
       :size="iconSize"
       class="icon-spaced"
     />
-    <i-select
-      size="small"
-      v-model="selectedComputer"
+    <i-select v-model="selectedComputer"
     >
       <i-option
         v-for="computer in simulationConfig.available"
@@ -60,7 +57,6 @@
     />
     <i-select
       :disabled="!hasMultipleProjects"
-      size="small"
       v-model="selectedGroup"
     >
       <i-option

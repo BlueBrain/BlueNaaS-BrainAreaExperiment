@@ -227,8 +227,7 @@ export default {
   }
   .custom-table {
     transition: max-height 0.3s;
-    max-height: 300px;
-    overflow-y: scroll;
+    max-height: 700px;
   }
   .table-collapsed {
     max-height: 0px;

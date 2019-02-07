@@ -58,7 +58,6 @@ const slices = {
     { name: 'Excitatory', displayName: 'Excitatory' },
     { name: 'Inhibitory', displayName: 'Inhibitory' },
     { name: 'SR', displayName: 'SR' },
-    { name: 'SC', displayName: 'SC' },
     { name: 'SP', displayName: 'SP' },
     { name: 'SO', displayName: 'SO' },
     { name: 'SLM', displayName: 'SLM' },

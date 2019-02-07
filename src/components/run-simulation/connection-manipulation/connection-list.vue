@@ -130,6 +130,9 @@ export default {
     targets() {
       return this.$store.state.connectionTargets;
     },
+    targetsNameList() {
+      return this.$store.state.connectionTargets.map(target => target.displayName);
+    },
   },
   created() {
     this.connectionsArray = getDefaultConnections();
@@ -161,17 +164,25 @@ export default {
       const prunedConnections = {};
       this.connectionsArray.forEach((connectionItem) => {
         const conn = {};
-        if (!connectionItem.destination || !connectionItem.source) return;
+        if (!this.populationExists(connectionItem.source, connectionItem.destination)) return;
         conn.Source = mapBlueConfigTerms(connectionItem.source);
         conn.Destination = mapBlueConfigTerms(connectionItem.destination);
         conn.Delay = connectionItem.delay > 0 ? connectionItem.delay : null;
         conn.SpontMinis = connectionItem.spontMinis;
         conn.SynapseConfigure = connectionItem.synapseConfigure !== '' ? connectionItem.synapseConfigure : null;
         conn.Weight = connectionItem.weight;
-        const name = `${conn.Source}-${conn.Destination}`;
+        let name = `${conn.Source}-${conn.Destination}`;
+        if (prunedConnections[name]) { // avoid overwrite existing connection
+          name = `${name}-${uuidGen()}`;
+        }
         prunedConnections[name] = cleanDeep(conn);
       });
       return ({ Connection: prunedConnections });
+    },
+    populationExists(source, destination) {
+      if (!source || !destination) return false;
+      if (!this.targetsNameList.includes(source) || !this.targetsNameList.includes(destination)) return false;
+      return true;
     },
     setNewSynapseString(connection, synapseString) {
       this.$set(connection, 'synapseConfigure', synapseString);

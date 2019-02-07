@@ -194,7 +194,7 @@ export default {
             result = false;
           } else if (updatedSimulation.name.startsWith(visualizationConfig.jobNamePrefix)) {
             updatedSimulation.isVisualization = true;
-          } else {
+          } else if (updatedSimulation.children.includes('/BlueConfig')) {
             updatedSimulation.isSimulation = true;
             if (
               !updatedSimulation.children.includes('/out.dat')
@@ -204,6 +204,9 @@ export default {
               updatedSimulation.status = jobStatus.failed;
             }
             result = true;
+          } else {
+            // is another type of job run outside sim launcher ui. Not showing it.
+            result = false;
           }
           // Poll data while running
           if (isRunning(updatedSimulation.status)) {

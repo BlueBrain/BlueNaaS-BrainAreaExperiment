@@ -37,7 +37,7 @@ export default {
       'export FULL_CPU_PER_NODE=36',
       '/users/bp000037/simulation/simulation_launch.py -vv --blueconfig BlueConfig',
     ],
-    runtime: 1080,
+    runtime: 10800,
     nodes: 10,
     cpus: 36,
     executable: '/bin/bash input.sh',

@@ -22,12 +22,36 @@ This component allows to create or modify the connections in the circuit for the
     >
       <!-- Header for connection manipulation -->
       <Row type="flex" class="connection-table-header" justify="space-between">
-        <i-col span="4"><h3>Source</h3></i-col>
-        <i-col span="4"><h3>Destination</h3></i-col>
-        <i-col span="2"><h3>Delay (ms)</h3></i-col>
-        <i-col span="2"><h3>Weight</h3></i-col>
-        <i-col span="2"><h3>SpontMinis</h3></i-col>
-        <i-col span="7"><h3>Synapse Configuration</h3></i-col>
+        <i-col span="4">
+          <tooltip content="This target defines presynaptic cells">
+            <h3>Source</h3>
+          </tooltip>
+        </i-col>
+        <i-col span="4">
+          <tooltip content="This target defines postsynaptic cells">
+            <h3>Destination</h3>
+          </tooltip>
+        </i-col>
+        <i-col span="2">
+          <tooltip content="A delay after which the modifications are applied">
+            <h3>Delay (ms)</h3>
+          </tooltip>
+        </i-col>
+        <i-col span="2">
+          <tooltip content="A scaling factor to adjust the synaptic strength (default = 1)">
+            <h3>Weight</h3>
+          </tooltip>
+        </i-col>
+        <i-col span="2">
+          <tooltip content="The Poisson mean rate for spontaneous synaptic activation">
+            <h3>SpontMinis</h3>
+          </tooltip>
+        </i-col>
+        <i-col span="7">
+          <tooltip content="Snippets of hoc code to manipulate additional synaptic parameters">
+            <h3>Synapse Configuration</h3>
+          </tooltip>
+        </i-col>
         <i-col span="1">
           <i-button
             type="success"

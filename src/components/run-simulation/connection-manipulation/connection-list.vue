@@ -88,7 +88,9 @@ This component allows to create or modify the connections in the circuit for the
             </i-col>
             <i-col span="2">
               <input-number
-                :min="1"
+                :min="0"
+                :max="3"
+                :step="0.01"
                 v-model="connection.weight"
                 :value="connection.weight"
               />

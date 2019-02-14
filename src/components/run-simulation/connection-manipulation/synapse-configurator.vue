@@ -2,9 +2,7 @@
 <!-- synapse is composed by 1 or multiple attibutes -->
 <template>
   <div class="flex">
-
     <i-input
-      v-if="predefinedSynapses"
       class="raw-synapse-connection"
       :disabled="true"
       :value="predefinedSynapses"

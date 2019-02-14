@@ -43,8 +43,8 @@ This component allows to create or modify the connections in the circuit for the
           </tooltip>
         </i-col>
         <i-col span="2">
-          <tooltip content="The Poisson mean rate for spontaneous synaptic activation">
-            <h3>SpontMinis</h3>
+          <tooltip content="The Poisson mean rate for miniature events">
+            <h3>MinisFreq</h3>
           </tooltip>
         </i-col>
         <i-col span="7">
@@ -105,14 +105,9 @@ This component allows to create or modify the connections in the circuit for the
             </i-col>
             <i-col span="7">
               <synapse-configurator
-                v-if="connection.synapseConfigure"
                 :predefined-synapses="connection.synapseConfigure"
                 @on-ready="setNewSynapseString(connection, ...arguments)"
               />
-              <Checkbox
-                v-else
-                @on-change="configureSynapseSelected(connection)"
-              >Configure Synapse</Checkbox>
             </i-col>
             <i-col span="1">
               <i-button
@@ -168,9 +163,6 @@ export default {
   methods: {
     updateValue(connection, subitem, newValue) {
       this.$set(connection, subitem, newValue);
-    },
-    configureSynapseSelected(connection) {
-      this.$set(connection, 'synapseConfigure', ' ');
     },
     addNewConnection() {
       this.connectionsArray.push({

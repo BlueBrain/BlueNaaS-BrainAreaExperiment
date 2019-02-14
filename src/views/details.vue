@@ -261,6 +261,9 @@ export default {
           // do not produce any output file - simulation failed
           simulationWithFiles.status = jobStatus.failed;
           this.$set(this.simulationDetails, 'status', jobStatus.failed);
+        } else {
+          // this wlll upload the simulationWasSuccessful and show the analysis and viz buttons
+          this.$set(this.job, 'children', simulationWithFiles.children);
         }
         db.addJob(simulationWithFiles);
       }

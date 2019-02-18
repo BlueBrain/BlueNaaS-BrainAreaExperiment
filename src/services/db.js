@@ -24,10 +24,6 @@ function getJob(combinedId) {
   return localforage.getItem(combinedId);
 }
 
-function deleteJob(combinedId) {
-  return localforage.removeItem(combinedId);
-}
-
 async function addJob(jobInfo) {
   function createIdAndDetails(job) {
     const id = job.id || urlToComputerAndId(job._links.self.href).id;
@@ -74,7 +70,17 @@ function getAllJobsSortedList() {
 }
 
 function setAllJobsSortedList(jobUrlList) {
-  localforage.setItem(`allJobsSorted${store.state.currentComputer}`, jobUrlList);
+  return localforage.setItem(`allJobsSorted${store.state.currentComputer}`, jobUrlList);
+}
+
+function deleteJob(url) {
+  const { id } = urlToComputerAndId(url);
+  const combinedId = id + store.state.currentComputer + store.state.userGroup;
+  getAllJobsSortedList().then((savedList) => {
+    savedList.splice(savedList.findIndex(savedUrl => savedUrl === url), 1);
+    setAllJobsSortedList(savedList);
+  });
+  return localforage.removeItem(combinedId);
 }
 
 export default {

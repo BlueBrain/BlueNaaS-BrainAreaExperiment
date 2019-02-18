@@ -55,18 +55,16 @@ This component manage each job (delete, start, create, etc).
 <script>
 import SimulationItem from '@/components/list-simulations/simulation-item.vue';
 import InfiniteLoading from 'vue-infinite-loading';
-import unicore, { urlToComputerAndId } from '@/services/unicore';
+import unicore from '@/services/unicore';
 import analysisConfig from '@/config/analysis-config';
 import LaunchAnalysisForm from '@/components/list-simulations/launch-analysis-form.vue';
 import analysisHelper from '@/services/helper/analysis-helper';
-import { jobStatus, isRunning } from '@/common/job-status';
+import listJobsHelper from '@/services/helper/list-jobs-helper';
 import eventBus from '@/services/event-bus';
-import db from '@/services/db';
-import visualizationConfig from '@/config/visualization-config';
 import DeleteConfirmationModal from '@/components/shared/delete-confirmation-modal.vue';
-import chunk from 'lodash/chunk';
+import ChunkRequester from '@/services/helper/chunk-requester';
+import { getComputerProjectCombo } from '@/common/utils';
 import sortBy from 'lodash/sortBy';
-import isEqual from 'lodash/isEqual';
 import remove from 'lodash/remove';
 
 export default {
@@ -83,10 +81,9 @@ export default {
       showAnalysisForm: false,
       allSimulations: [],
       viewList: [],
-      loadIncrement: 5,
       jobSelectedForAnalysis: null,
       isRunningAnalysis: false,
-      pageIsDisplayed: true,
+      originalCombo: null,
     };
   },
   computed: {
@@ -100,24 +97,21 @@ export default {
     },
   },
   mounted() {
-    eventBus.$on('reloadJobsList', () => {
-      this.fetchJobs();
-    });
+    eventBus.$on('reloadJobsList', this.reloadJobsListBinded);
+
     eventBus.$on('applyFilters', () => {
       const filtered = this.applyFiltersToSims(this.allSimulations);
       this.viewList = sortBy(filtered, 'submissionTime').reverse();
     });
-    eventBus.$on('cleanList', () => {
-      this.viewList = [];
-      this.allSimulations = [];
-    });
-
-    this.$store.commit('setListIsLoading', true);
 
     if (this.$route.params.computerParam) {
-      eventBus.$emit('changeComputer', this.$route.params.computerParam, this.fetchJobs);
+      eventBus.$emit(
+        'changeComputer',
+        this.$route.params.computerParam,
+        () => eventBus.$emit('reloadJobsList'),
+      );
     } else {
-      this.fetchJobs();
+      eventBus.$emit('reloadJobsList');
     }
   },
   methods: {
@@ -127,6 +121,14 @@ export default {
         return;
       }
       this.showAnalysisForm = !this.showAnalysisForm;
+    },
+
+    reloadJobsListBinded() {
+      this.viewList = [];
+      this.allSimulations = [];
+      this.$nextTick(() => {
+        this.fetchJobs().catch(error => this.$Message.error(error.message));
+      });
     },
 
     applyFiltersToSims(simulations) {
@@ -148,14 +150,20 @@ export default {
 
       this.$refs.deletionModal.changeVisibility();
       this.$refs.deletionModal.setDeleteFn(async () => {
-        await unicore.deleteJob(url);
+        try {
+          await unicore.deleteJob(url);
+        } catch (error) {
+          console.error(error);
+          this.$Message.error(`Could not delete the job ${error.message}`);
+          return;
+        }
         removeFromList();
         this.$Message.info('Simulation was deleted');
       });
     },
 
     showDetails(job) {
-      const id = job.id || urlToComputerAndId(job._links.self.href);
+      const id = job.id || unicore.urlToComputerAndId(job._links.self.href);
       this.$router.push({
         name: 'details',
         params: {
@@ -165,163 +173,11 @@ export default {
       });
     },
 
-    async fetchJobs() {
-      this.$store.commit('setListIsLoading', true);
-
-      const displayEverything = localStorage.getItem('displayAll') === 'true';
-      if (displayEverything) { this.$Message.info('Using displayAll flag'); }
-
-      const filterOnlySimulations = (jobsWithFiles =>
-        // return job information and a list of files as children []
-        // hack in case you want to see all the jobs not only simulation from one computer
-        jobsWithFiles.filter((simulationExpandedInfo) => {
-          if (displayEverything) {
-            return true;
-          }
-          const updatedSimulation = simulationExpandedInfo;
-
-          if (updatedSimulation.isSimulation) return true;
-          if (updatedSimulation.isAnalysis) return false;
-          if (updatedSimulation.isVisualization) return false;
-          // when add a new condition remember to add also into getAllJobsExpandedWithChildren
-          if (updatedSimulation.children.length === 0) return false;
-
-          let result = false;
-          // filter to only show simulations on the list
-          if (updatedSimulation.children.includes(`/${analysisConfig.configFileName}`)) {
-            // it is an analysis that should be removed
-            updatedSimulation.isAnalysis = true;
-            result = false;
-          } else if (updatedSimulation.name.startsWith(visualizationConfig.jobNamePrefix)) {
-            updatedSimulation.isVisualization = true;
-          } else if (updatedSimulation.children.includes('/BlueConfig')) {
-            updatedSimulation.isSimulation = true;
-            if (
-              !updatedSimulation.children.includes('/out.dat')
-              && updatedSimulation.status === jobStatus.successful
-            ) {
-              // do not produce any output file - simulation failed
-              updatedSimulation.status = jobStatus.failed;
-            }
-            result = true;
-          } else {
-            // is another type of job run outside sim launcher ui. Not showing it.
-            result = false;
-          }
-          // Poll data while running
-          if (isRunning(updatedSimulation.status)) {
-            const computerProjectCombo = `${this.$store.state.currentComputer}${this.$store.state.userGroup}`;
-            this.startReloadJob(updatedSimulation, computerProjectCombo);
-          }
-          db.addJob(updatedSimulation);
-          return result;
-        })
-      );
-
-      const fetchJobsInChunks = (async (jobsToPopulate) => {
-        let jobsWithFiles = [];
-        try {
-          jobsWithFiles = await unicore.populateJobsWithFiles(jobsToPopulate);
-        } catch (e) {
-          const message = `expanding jobs with file info. ${e.message}`;
-          this.$Message.error(message);
-          throw new Error(message);
-        }
-        return jobsWithFiles;
-      });
-
-      let allJobsUrl = [];
-      let allJobWithFiles = [];
-
-      try {
-        allJobsUrl = await unicore.getAllJobs(this.$store.state.currentComputer);
-      } catch (e) {
-        const message = `getting all jobs for list. ${e.message}`;
-        this.$Message.error(message);
-        throw new Error(message);
-      }
-
-      // compare saved list and sorted list
-      const savedAllJobUrl = await db.getAllJobsSortedList();
-      // sorting with lodash to avoid mutation
-      const listToFetch = (savedAllJobUrl && isEqual(sortBy(allJobsUrl), sortBy(savedAllJobUrl)))
-        ? savedAllJobUrl
-        : allJobsUrl;
-
-      const chunksJobsUrlArrays = chunk(listToFetch, this.loadIncrement);
-      // load chunks in secuence
-      for (let i = 0; i < chunksJobsUrlArrays.length; i += 1) {
-        const chunkJobsUrl = chunksJobsUrlArrays[i];
-        /* eslint-disable no-await-in-loop */
-        const jobsWithFiles = await fetchJobsInChunks(chunkJobsUrl);
-        /* eslint-enable no-await-in-loop */
-        const simulations = filterOnlySimulations(jobsWithFiles);
-        this.allSimulations = this.allSimulations.concat(simulations);
-        const filteredSimulations = this.applyFiltersToSims(simulations);
-        this.viewList = this.viewList.concat(filteredSimulations);
-        // save for use after to save the list on localstorage
-        allJobWithFiles = allJobWithFiles.concat(jobsWithFiles);
-      }
-
-      this.viewList = sortBy(this.viewList, 'submissionTime').reverse();
-
-      // save full list of all jobs sorted
-      const sortedAllJobWithFiles = sortBy(allJobWithFiles, 'submissionTime').reverse();
-      const sortedJobsUrlToSave = sortedAllJobWithFiles.map(jobPopulated => jobPopulated._links.self.href);
-      if (!savedAllJobUrl || !isEqual(sortBy(sortedJobsUrlToSave), sortBy(savedAllJobUrl))) {
-        db.setAllJobsSortedList(sortedJobsUrlToSave);
-      }
-
-      this.viewList.map(this.fetchAnalysisInfo);
-      this.$store.commit('setListIsLoading', false);
-      this.$store.dispatch('hideLoader');
-    },
-
-    fetchAnalysisInfo(simulationListWithFiles) {
-      const fetchAnalysisJob = async (updatedSimulation) => {
-        /*
-         * get the location of the analysis based on the mapping file
-         * that we save in the simulation and then the validation image
-         */
-        const analysisArray = await unicore.getAssociatedLocation(
-          analysisConfig.analysisConnectionFileName,
-          updatedSimulation._links.workingDirectory.href,
-        );
-
-        let status = null;
-        if (analysisArray.length > 0) {
-          const url = analysisArray[analysisArray.length - 1]._links.self.href;
-          const lastAnalysisInfo = await unicore.getJobProperties(url);
-          status = lastAnalysisInfo ? lastAnalysisInfo.status : null;
-        }
-        // change the status after fetching analysis info
-        this.$set(updatedSimulation, 'analysisStatus', status);
-      };
-
-      let newAnalysisStatus = jobStatus.block;
-      if (simulationListWithFiles.status === jobStatus.successful) {
-        fetchAnalysisJob(simulationListWithFiles);
-        newAnalysisStatus = jobStatus.loading;
-      }
-      this.$set(simulationListWithFiles, 'analysisStatus', newAnalysisStatus);
-      return simulationListWithFiles;
-    },
-
     runAnalysis(job) {
       this.showAnalysisForm = true;
       // set the origin computer details
       this.jobSelectedForAnalysis = job;
       // after the form will return to analysisConfigReady
-    },
-
-    async startReloadJob(simulationJob, prevComputerProjectCombo) {
-      // when move to other page, cancel the refresh
-      const computerProjectCombo = `${this.$store.state.currentComputer}${this.$store.state.userGroup}`;
-      if (!this.pageIsDisplayed || prevComputerProjectCombo !== computerProjectCombo) return;
-      const updatedSimJob = await unicore.getJobProperties(simulationJob._links.self.href);
-      if (isRunning(simulationJob.status)) {
-        setTimeout(this.startReloadJob, this.$store.state.pollInterval, updatedSimJob, computerProjectCombo);
-      }
     },
 
     async analysisConfigReady(analysisParamsEdited) {
@@ -341,17 +197,81 @@ export default {
         analysisConfig.filesToAvoidCopy,
       );
 
-      // poll the status of the analysis
-      this.$set(this.jobSelectedForAnalysis, 'analysisStatus', jobStatus.loading);
-
       this.isRunningAnalysis = false; // form should be closed
       this.showAnalysisForm = false;
       this.showDetails(this.jobSelectedForAnalysis);
     },
+
+    fetchAnalysis() {
+      // start fetching analysis
+      const fetchFn = listJobsHelper.fetchAnalysisInfo;
+      let chunkAnalysisRequester = null;
+      const callbackFn = (analysisAndStatusObj) => {
+        if (this.originalCombo !== getComputerProjectCombo()) {
+          chunkAnalysisRequester.cancelFetching();
+          return;
+        }
+        this.$set(
+          analysisAndStatusObj.simulationWithFiles,
+          'analysisStatus',
+          analysisAndStatusObj.newAnalysisStatus,
+        );
+        // if job is running poll the status
+        listJobsHelper.startReloadJob(
+          analysisAndStatusObj.simulationWithFiles,
+          getComputerProjectCombo(),
+          analysisAndStatusObj.analysisInfo,
+        );
+      };
+
+      chunkAnalysisRequester = new ChunkRequester(fetchFn, callbackFn);
+      chunkAnalysisRequester.addJobs(this.viewList);
+      chunkAnalysisRequester.setOnFinishFn(() => {
+        this.$store.dispatch('hideLoader');
+        this.$store.commit('setListIsLoading', false);
+      });
+    },
+
+    async fetchJobs() {
+      // to avoid saving jobs in the wrong computer
+      this.$store.commit('setListIsLoading', true);
+
+      // this will be used to check if the computer or page changed
+      this.originalCombo = getComputerProjectCombo();
+
+      const listToFetch = await listJobsHelper.getUrlList();
+      const allJobWithFiles = [];
+
+      const fetchFn = unicore.populateJobsWithFiles;
+      let chunkSimulationRequester = null;
+      const callbackFn = (jobWithFiles) => {
+        if (this.originalCombo !== getComputerProjectCombo()) {
+          chunkSimulationRequester.cancelFetching();
+          return;
+        }
+        allJobWithFiles.push(jobWithFiles);
+        const [simulation] = listJobsHelper.filterOnlySimulations([jobWithFiles]);
+        if (!simulation) return;
+        this.allSimulations.push(simulation);
+        const [filteredSimulation] = this.applyFiltersToSims([simulation]);
+        this.viewList.push(filteredSimulation);
+        // if job is running poll the status
+        listJobsHelper.startReloadJob(simulation, getComputerProjectCombo());
+      };
+
+      chunkSimulationRequester = new ChunkRequester(fetchFn, callbackFn);
+      chunkSimulationRequester.addJobs(listToFetch);
+      chunkSimulationRequester.setOnFinishFn(() => {
+        this.viewList = sortBy(this.viewList, 'submissionTime').reverse();
+        // save full list of all jobs sorted for compare next time
+        listJobsHelper.saveFullJobList(allJobWithFiles);
+        this.$store.commit('setListIsLoading', false);
+        this.fetchAnalysis();
+      });
+    },
   },
   beforeDestroy() {
-    // stop refreshing the simulations that are running
-    this.pageIsDisplayed = false;
+    eventBus.$off('reloadJobsList', this.reloadJobsListBinded);
   },
 };
 </script>

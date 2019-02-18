@@ -47,6 +47,7 @@
         v-for="computer in simulationConfig.available"
         :value="computer"
         :key="computer"
+        :disabled="listIsLoading"
       >{{ computer }}</i-option>
     </i-select>
 
@@ -63,6 +64,7 @@
         v-for="project in selectedGroupsAvailable"
         :value="project"
         :key="project"
+        :disabled="listIsLoading"
       >{{ project }}</i-option>
     </i-select>
 
@@ -95,14 +97,17 @@ export default {
     selectedGroupsAvailable() {
       return this.$store.state.userGroupsAvailable;
     },
+    listIsLoading() {
+      return this.$store.state.listIsLoading;
+    },
     selectedGroup: {
       get() {
         return this.$store.state.userGroup;
       },
       set(newGroup) {
         if (!newGroup) return;
-        eventBus.$emit('changeUserGroup', newGroup, this.reloadList);
         this.startLoadingList();
+        eventBus.$emit('changeUserGroup', newGroup, () => eventBus.$emit('reloadJobsList'));
       },
     },
     selectedComputer: {
@@ -112,11 +117,10 @@ export default {
 
         this.startLoadingList();
         eventBus.$emit('changeComputer', newComputer, () => {
-          this.reloadList();
           this.$router.replace({
             name: 'view',
             params: { computerParam: newComputer },
-          });
+          }, () => eventBus.$emit('reloadJobsList'));
         });
       },
     },
@@ -138,20 +142,8 @@ export default {
         eventBus.$emit('applyFilters');
       });
     },
-    reloadList() {
-      if (
-        this.$store.state.currentComputer !== this.$route.params.computerParam &&
-        this.$store.state.listIsLoading
-      ) {
-        // force reload to avoid waiting for previous async calls
-        this.$router.go();
-      } else {
-        // search for projects
-        eventBus.$emit('reloadJobsList');
-      }
-    },
     startLoadingList() {
-      eventBus.$emit('cleanList');
+      this.$store.commit('setListIsLoading', true);
       this.$store.dispatch('showLoader');
     },
   },

@@ -66,9 +66,8 @@ function openContent(content) {
   x.document.close();
 }
 
-function simulationProducedResults(simulationFiles) {
-  const hasReport = simulationFiles.some(file => file.match('.bbp'));
-  return simulationFiles.includes('/out.dat') && hasReport;
+function getComputerProjectCombo() {
+  return store.state.currentComputer + store.state.userGroup + window.location.href;
 }
 
 export {
@@ -76,5 +75,5 @@ export {
   openContent,
   mapBlueConfigTerms,
   unmapBlueConfigTerms,
-  simulationProducedResults,
+  getComputerProjectCombo,
 };

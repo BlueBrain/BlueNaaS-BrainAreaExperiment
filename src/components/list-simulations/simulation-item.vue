@@ -21,7 +21,14 @@ This will only display the item. It knows where to put all the information.
         :type="getStatusIcon(job.analysisStatus)"
         :size="iconSize"
       />
-      <i v-else>No analysis yet</i>
+
+      <i v-else>
+        <icon
+          v-if="listIsLoading"
+          type="md-sync"
+          :size="iconSize"
+        />
+      </i>
     </div>
 
     <div class="middle-part date">{{ submissionDate }}</div>
@@ -93,6 +100,9 @@ export default {
         this.job.status === jobStatus.successful &&
         this.job.analysisStatus === jobStatus.successful
       );
+    },
+    listIsLoading() {
+      return this.$store.state.listIsLoading;
     },
   },
   methods: {

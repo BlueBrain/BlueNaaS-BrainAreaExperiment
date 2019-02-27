@@ -59,10 +59,11 @@ import ItemSummary from '@/components/details-simulation/item-summary.vue';
 import AnalysisItem from '@/components/details-simulation/analysis-item.vue';
 import analysisConfig from '@/config/analysis-config';
 import { isRunning, jobStatus } from '@/common/job-status';
+import { getComputerProjectCombo } from '@/common/utils';
 import db from '@/services/db';
-import set from 'lodash/set';
 import DeleteConfirmationModal from '@/components/shared/delete-confirmation-modal.vue';
 import unicore from '@/services/unicore';
+import { analysisProducedResults } from '@/services/helper/list-jobs-helper';
 
 export default {
   name: 'AnalysisSection',
@@ -124,39 +125,52 @@ export default {
         childAnalysis.workingDirectory = analysis._links.workingDirectory.href;
         childAnalysis.id = childAnalysis.jobURL.split('/').pop();
         childAnalysis.type = 'Analysis';
-        this.refreshAnalysis(childAnalysis);
+        this.refreshAnalysis(childAnalysis, getComputerProjectCombo());
         this.analysisDetails.push(childAnalysis);
       });
       this.overallLoading = false;
       return true;
     },
 
-    async refreshAnalysis(childAnalysis) {
+    async refreshAnalysis(childAnalysis, prevComputerProjectCombo) {
+      if (prevComputerProjectCombo !== getComputerProjectCombo()) return;
       const analysisJobInfo = await unicore.getJobProperties(childAnalysis.jobURL);
 
       this.$set(childAnalysis, 'submissionTime', analysisJobInfo.submissionTime);
       this.$set(childAnalysis, 'name', analysisJobInfo.name);
 
       if (isRunning(analysisJobInfo.status)) {
-        setTimeout(() => { this.refreshAnalysis(childAnalysis); }, this.$store.state.pollInterval);
+        setTimeout(() => {
+          this.refreshAnalysis(childAnalysis, prevComputerProjectCombo);
+        }, this.$store.state.pollInterval);
         this.$set(childAnalysis, 'status', analysisJobInfo.status);
         return;
       }
 
       // to show spinner while loading images
       this.$set(childAnalysis, 'fetchingImages', true);
-      const fileList = await unicore.getFilesList(`${childAnalysis.workingDirectory}/files`);
+      // was not classified and outputs were not checked
+      if (!analysisJobInfo.children) {
+        // check if after finishing produce any plot. if not means an error occurred
+        let analysisWithFiles = null;
+        try {
+          [analysisWithFiles] = await unicore.populateJobsWithFiles([childAnalysis.jobURL]);
+        } catch (error) {
+          this.$Message.error('Error fetching analysis information', error.message);
+          throw error;
+        }
 
-      // check if after finishing produce any plot. if not means an error occurred
-      if (!fileList.children.some(file => file.endsWith('.png'))) {
-        this.$Message.info(`Analysis ${childAnalysis.id} did not produce any image`);
-        this.$set(childAnalysis, 'status', jobStatus.failed);
-        this.$set(childAnalysis, 'fetchingImages', false);
-        // no need to reactivity for next one
-        // childanalysis is only in the view info it is not saved on DB
-        set(analysisJobInfo, 'status', jobStatus.failed);
-        db.addJob(analysisJobInfo);
-        return;
+        if (!await analysisProducedResults(analysisWithFiles)) {
+          this.$Message.info(`Analysis ${childAnalysis.id} did not produce any image`);
+          this.$set(childAnalysis, 'status', jobStatus.failed);
+          this.$set(childAnalysis, 'fetchingImages', false);
+          // no need to reactivity for next one
+          // childanalysis is only in the view info it is not saved on DB
+          analysisJobInfo.status = jobStatus.failed;
+          analysisJobInfo.children = analysisWithFiles.children;
+          db.addJob(analysisJobInfo);
+          return;
+        }
       }
       this.$set(childAnalysis, 'status', analysisJobInfo.status);
       analysisConfig.plots.forEach((plot) => {

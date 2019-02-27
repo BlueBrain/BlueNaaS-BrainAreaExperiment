@@ -119,10 +119,9 @@ import DisplayOrDownload from '@/components/shared/display-or-download.vue';
 import AnalysisInNotebook from '@/components/details-simulation/analysis-in-notebook.vue';
 import VisualizeLauncher from '@/components/details-simulation/visualize-launcher.vue';
 import eventBus from '@/services/event-bus';
-import { isRunning, jobStatus } from '@/common/job-status';
-
-import { simulationProducedResults } from '@/common/utils';
 import db from '@/services/db';
+import { isRunning, jobStatus } from '@/common/job-status';
+import { simulationProducedResults } from '@/services/helper/list-jobs-helper';
 
 export default {
   name: 'SimulationDetails',
@@ -148,7 +147,7 @@ export default {
     simulationWasSuccessful() {
       if (!this.job.children) return false;
       const isSuccessful = this.simulationDetails.status === jobStatus.successful;
-      const hasResults = simulationProducedResults(this.job.children);
+      const hasResults = simulationProducedResults(this.job);
       return isSuccessful && hasResults;
     },
   },
@@ -257,7 +256,7 @@ export default {
         // after the simulation is finished check if the results were correct
         if (this.job.children || this.job.status !== jobStatus.successful) return;
         const [simulationWithFiles] = await unicore.populateJobsWithFiles([this.job._links.self.href]);
-        if (!simulationProducedResults(simulationWithFiles.children)) {
+        if (!simulationProducedResults(simulationWithFiles)) {
           // do not produce any output file - simulation failed
           simulationWithFiles.status = jobStatus.failed;
           this.$set(this.simulationDetails, 'status', jobStatus.failed);

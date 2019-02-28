@@ -27,11 +27,11 @@ function fillMapper() {
 function mapBlueConfigTerms(params) {
   if (!fullMapper) fillMapper();
   if (typeof params === 'string') {
-    return mapper[params] || params;
+    return fullMapper[params] || params;
   }
   const clone = cloneDeep(params);
   forEach(params, (value, key) => {
-    clone[key] = mapper[value] || value;
+    clone[key] = fullMapper[value] || value;
   });
   return clone;
 }
@@ -39,12 +39,12 @@ function mapBlueConfigTerms(params) {
 function unmapBlueConfigTerms(params) {
   if (!fullMapper) fillMapper();
   if (typeof params === 'string') {
-    const keyUnMapped = findKey(mapper, partial(isEqual, params));
+    const keyUnMapped = findKey(fullMapper, partial(isEqual, params));
     return keyUnMapped || params;
   }
   const clone = cloneDeep(params);
   forEach(params, (value, key) => {
-    const keyUnMapped = findKey(mapper, partial(isEqual, value));
+    const keyUnMapped = findKey(fullMapper, partial(isEqual, value));
     clone[key] = keyUnMapped || value;
   });
   return clone;

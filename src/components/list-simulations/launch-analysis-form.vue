@@ -98,6 +98,7 @@
 <script>
 import analysisConfig from '@/config/analysis-config';
 import { getFiles } from '@/services/unicore';
+import { unmapBlueConfigTerms, mapBlueConfigTerms } from '@/common/utils';
 import get from 'lodash/get';
 import intersection from 'lodash/intersection';
 
@@ -251,7 +252,8 @@ export default {
         const blueConfigStr = await getBlueConfigStr();
         targets = intersection(findTargetsInBC(blueConfigStr));
       }
-      this.targetsFromBlueConfig = targets;
+      this.targetsFromBlueConfig = unmapBlueConfigTerms(targets);
+      [this.target] = this.targetsFromBlueConfig;
     },
     generateAnalysisObjectToRun() {
       return {
@@ -263,7 +265,7 @@ export default {
         title: this.title,
         checkedAnalysis: this.checkedAnalysis,
         reportForAnalysis: this.reportForAnalysis,
-        target: this.target,
+        target: mapBlueConfigTerms(this.target),
       };
     },
   },

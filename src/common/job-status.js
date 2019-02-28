@@ -7,6 +7,8 @@ const jobStatus = {
   block: 'BLOCK',
   loading: 'LOADING',
   stagingin: 'STAGINGIN',
+  stagingout: 'STAGINGOUT',
+  undefined: 'UNDEFINED',
 };
 
 function isRunning(status) {
@@ -14,6 +16,8 @@ function isRunning(status) {
     status === jobStatus.running ||
     status === jobStatus.ready ||
     status === jobStatus.stagingin ||
+    status === jobStatus.stagingout ||
+    status === jobStatus.undefined ||
     status === '';
 }
 

@@ -120,6 +120,7 @@ import AnalysisInNotebook from '@/components/details-simulation/analysis-in-note
 import VisualizeLauncher from '@/components/details-simulation/visualize-launcher.vue';
 import eventBus from '@/services/event-bus';
 import db from '@/services/db';
+import { getComputerProjectCombo } from '@/common/utils';
 import { isRunning, jobStatus } from '@/common/job-status';
 import { simulationProducedResults } from '@/services/helper/list-jobs-helper';
 
@@ -140,7 +141,7 @@ export default {
       simulationDetails: {},
       downloadedFiles: {},
       vizRunning: false,
-      pageIsDisplayed: true,
+      computerProjectCombo: getComputerProjectCombo(),
     };
   },
   computed: {
@@ -229,7 +230,6 @@ export default {
     },
 
     async getJobById(jobId) {
-      if (!this.pageIsDisplayed) return;
       // search for the details by id
       this.job = await unicore.getJobById(jobId);
       if (!this.job) {

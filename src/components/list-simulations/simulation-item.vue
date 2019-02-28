@@ -102,7 +102,7 @@ export default {
       );
     },
     listIsLoading() {
-      return this.$store.state.listIsLoading;
+      return this.$store.state.analysisListIsLoading;
     },
   },
   methods: {

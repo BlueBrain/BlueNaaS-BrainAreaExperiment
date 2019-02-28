@@ -48,6 +48,19 @@ async function getUrlList() {
   return listToFetch;
 }
 
+function setJobStatus(simulationJob, isAnalysis, status) {
+  // upload icon in case status has changed
+  if (isAnalysis) {
+    Vue.set(simulationJob, 'analysisStatus', status);
+  } else {
+    Vue.set(simulationJob, 'status', status);
+    if (status === jobStatus.successful) {
+      // show no analysis was run yet
+      Vue.set(simulationJob, 'analysisStatus', null);
+    }
+  }
+}
+
 async function startReloadJob(simulationJob, prevComputerProjectCombo, analysisInfo) {
   /* fetch job information and if it's running use polling until it ends */
   // when move to other page, cancel the refresh
@@ -56,6 +69,7 @@ async function startReloadJob(simulationJob, prevComputerProjectCombo, analysisI
   const jobToUpdate = analysisInfo || simulationJob;
   const jobUrl = get(jobToUpdate, '_links.self.href');
   const updateJobInfo = await unicore.getJobProperties(jobUrl);
+  let newStatus = updateJobInfo.status;
 
   // already classified and saved
   if (updateJobInfo.children) {
@@ -65,42 +79,32 @@ async function startReloadJob(simulationJob, prevComputerProjectCombo, analysisI
 
   if (isRunning(updateJobInfo.status)) {
     setTimeout(() => {
-      this.startReloadJob(simulationJob, prevComputerProjectCombo, analysisInfo);
+      startReloadJob(simulationJob, prevComputerProjectCombo, analysisInfo);
     }, store.state.pollInterval);
-    // upload icon in case status has changed
-    if (analysisInfo) {
-      if (updateJobInfo.status !== simulationJob.analysisStatus) {
-        Vue.set(simulationJob, 'analysisStatus', updateJobInfo.status);
-      }
-    } else if (simulationJob.status !== updateJobInfo.status) {
-      Vue.set(simulationJob, 'status', updateJobInfo.status);
-    }
-  } else {
-    // after the simulation is finished check if the results were correct
-    if (updateJobInfo.status !== jobStatus.successful) return;
+  } else if (updateJobInfo.status === jobStatus.successful) {
+    // after the simulation or analysis is finished check if the results were correct
     const [updatedJobWithFiles] = await unicore.populateJobsWithFiles([jobUrl]);
     const jobProducedResults = analysisInfo
       ? await analysisProducedResults(updatedJobWithFiles)
       : simulationProducedResults(updatedJobWithFiles);
 
-    let newAnalysisStatus = null;
-    let newSimulationStatus = updateJobInfo.status;
-
-    if (analysisInfo) {
-      if (!jobProducedResults) newAnalysisStatus = jobStatus.failed;
-      else { newAnalysisStatus = jobStatus.successful; }
-      Vue.set(simulationJob, 'analysisStatus', newAnalysisStatus);
-    } else if (!jobProducedResults) {
-      newSimulationStatus = jobStatus.failed;
-      newAnalysisStatus = jobStatus.block;
-      Vue.set(simulationJob, 'status', newSimulationStatus);
-    }
-    updatedJobWithFiles.analysisStatus = newAnalysisStatus;
+    newStatus = jobProducedResults ? jobStatus.successful : jobStatus.failed;
     db.addJob(updatedJobWithFiles);
   }
+  setJobStatus(simulationJob, !!analysisInfo, newStatus);
 }
 
 function classifyJob(jobExpandedInfo) {
+  const getSimCorrectStatus = (simulation) => {
+    if (
+      !simulationProducedResults(simulation)
+      && simulation.status === jobStatus.successful
+    ) { // do not produce any output file - simulation failed
+      return jobStatus.failed;
+    }
+    return jobStatus.status;
+  };
+
   const updatedSimulation = jobExpandedInfo;
   if (!Object.keys(updatedSimulation).length) return updatedSimulation;
   if (updatedSimulation.children.includes(`/${analysisConfig.configFileName}`)) {
@@ -110,14 +114,10 @@ function classifyJob(jobExpandedInfo) {
     updatedSimulation.isVisualization = true;
   } else if (updatedSimulation.children.includes('/BlueConfig')) {
     updatedSimulation.isSimulation = true;
-    if (
-      !simulationProducedResults(updatedSimulation)
-      && updatedSimulation.status === jobStatus.successful
-    ) { // do not produce any output file - simulation failed
-      updatedSimulation.status = jobStatus.failed;
-    }
+    updatedSimulation.status = getSimCorrectStatus(updatedSimulation);
   } else if (updatedSimulation.children.includes('/wasImported')) {
     updatedSimulation.isSimulation = true;
+    updatedSimulation.status = getSimCorrectStatus(updatedSimulation);
     if (!isRunning(updatedSimulation.status)) updatedSimulation.status = jobStatus.failed;
   } else {
     // is another type of job run outside sim launcher ui. Not showing it.

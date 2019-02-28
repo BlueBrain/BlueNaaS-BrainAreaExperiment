@@ -1,8 +1,8 @@
 
 import store from '@/services/store';
 
-const defaultConnections = [
-  {
+function getDefaultConnections() {
+  return [{
     id: 1,
     name: 'All-All',
     source: store.state.currentCircuitConfig.biggestTarget,
@@ -40,8 +40,8 @@ const defaultConnections = [
     spontMinis: 0,
     delay: 0,
     // # no GABA_B (so far)
-  },
-];
+  }];
+}
 
 const synapseAttributes = [
   'tau_r_AMPA', 'tau_d_AMPA', 'tau_r_NMDA', 'tau_d_NMDA', 'Use', 'Dep', 'Fac', 'e',
@@ -50,7 +50,7 @@ const synapseAttributes = [
 ];
 
 export default {
-  defaultConnections,
+  getDefaultConnections,
   synapseAttributes,
 };
 

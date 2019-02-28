@@ -1,9 +1,8 @@
 
 import connectionsConfig from '@/config/connection-config';
-import cloneDeep from 'lodash/cloneDeep';
 import uuidGen from 'uuid';
 
-const getDefaultConnections = () => cloneDeep(connectionsConfig.defaultConnections);
+const { getDefaultConnections } = connectionsConfig;
 
 const synapseStringToArray = (synapseText) => {
   const regex = /%s.(.+?) = (-*\d*\.*\d*)/g;

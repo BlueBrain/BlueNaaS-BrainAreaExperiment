@@ -204,6 +204,7 @@ export default {
 
     fetchAnalysis() {
       // start fetching analysis
+      this.$store.commit('setAnalysisListIsLoading', true);
       const fetchFn = listJobsHelper.fetchAnalysisInfo;
       let chunkAnalysisRequester = null;
       const callbackFn = (analysisAndStatusObj) => {
@@ -216,19 +217,13 @@ export default {
           'analysisStatus',
           analysisAndStatusObj.newAnalysisStatus,
         );
-        // if job is running poll the status
-        listJobsHelper.startReloadJob(
-          analysisAndStatusObj.simulationWithFiles,
-          getComputerProjectCombo(),
-          analysisAndStatusObj.analysisInfo,
-        );
       };
 
       chunkAnalysisRequester = new ChunkRequester(fetchFn, callbackFn);
       chunkAnalysisRequester.addJobs(this.viewList);
       chunkAnalysisRequester.setOnFinishFn(() => {
         this.$store.dispatch('hideLoader');
-        this.$store.commit('setListIsLoading', false);
+        this.$store.commit('setAnalysisListIsLoading', false);
       });
     },
 

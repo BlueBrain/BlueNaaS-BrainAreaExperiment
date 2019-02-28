@@ -298,6 +298,7 @@ async function generateUnicoreConfig(configParams) {
   }
 
   function getMemory() {
+    if (configParams.runtime < 300) return null; // assumption is for test job submission
     const { memory } = simulationConfig[store.state.currentComputer];
     return memory ? `${memory}M` : null;
   }
@@ -417,7 +418,6 @@ function importPersonalSimulation(title, simFolderPath) {
     .replace('SIMFOLDERPATH', simFolderPath);
   const config = {
     computerSelected: store.state.currentComputer,
-    nodes: 1,
     runtime: 100,
     executable,
     title,

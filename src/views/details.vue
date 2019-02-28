@@ -141,7 +141,7 @@ export default {
       simulationDetails: {},
       downloadedFiles: {},
       vizRunning: false,
-      computerProjectCombo: getComputerProjectCombo(),
+      computerProjectCombo: null,
     };
   },
   computed: {
@@ -157,6 +157,7 @@ export default {
     if (this.computerParam) {
       eventBus.$emit('changeComputer', this.computerParam);
     }
+    this.computerProjectCombo = getComputerProjectCombo();
     this.getJobById(this.jobId);
   },
   methods: {
@@ -231,6 +232,8 @@ export default {
 
     async getJobById(jobId) {
       // search for the details by id
+      if (this.computerProjectCombo !== getComputerProjectCombo()) return;
+
       this.job = await unicore.getJobById(jobId);
       if (!this.job) {
         this.$Message.error('Error loading simulation details');

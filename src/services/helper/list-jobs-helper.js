@@ -95,15 +95,15 @@ async function startReloadJob(simulationJob, prevComputerProjectCombo, analysisI
 }
 
 function classifyJob(jobExpandedInfo) {
-  const getSimCorrectStatus = (simulation) => {
+  function getSimCorrectStatus(simulation) {
     if (
       !simulationProducedResults(simulation)
       && simulation.status === jobStatus.successful
     ) { // do not produce any output file - simulation failed
       return jobStatus.failed;
     }
-    return jobStatus.status;
-  };
+    return simulation.status;
+  }
 
   const updatedSimulation = jobExpandedInfo;
   if (!Object.keys(updatedSimulation).length) return updatedSimulation;

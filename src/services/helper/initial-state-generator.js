@@ -3,18 +3,13 @@ import simConfig from '@/config/simulation-config';
 import circuitConfig from '@/config/circuit-config';
 import '@/services/helper/computer-group-helper';
 
-function getCircuitToUse() {
-  const match = window.location.href.match(/circuits\/([a-z1]*)/);
-  if (!match) {
-    console.error('Specify /circuits in url');
-    return null;
-  }
-  const [, circuit] = match;
-  return circuit;
-}
+// define circuit based on URL
+const match = window.location.href.match(/circuits\/(\w*)/);
+if (!match) console.error('Specify /circuits in url');
+const circuitToUse = match ? match[1] : null;
 
 function getCurrentCircuitConfig() {
-  return circuitConfig[getCircuitToUse()];
+  return circuitConfig[circuitToUse];
 }
 
 function getDefaultDuration() {
@@ -35,7 +30,7 @@ function getComputersAvailableForCircuit() {
 }
 
 export default {
-  getCircuitToUse,
+  circuitToUse,
   getDefaultDuration,
   getDefaultForwardSkip,
   getComputersAvailableForCircuit,

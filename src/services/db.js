@@ -6,6 +6,10 @@ import { urlToComputerAndId } from '@/services/unicore';
 import { jobStatus } from '@/common/job-status';
 import store from '@/services/store';
 
+function getSavedSimConfigName() {
+  return `simConfig-${store.state.currentCircuit}`;
+}
+
 (function cleanStorage() {
   const savedVersion = localStorage.getItem('appVersion');
   if (savedVersion && savedVersion !== packageJson.version) {
@@ -51,18 +55,18 @@ function getJobByUrl(url) {
 
 async function saveSimConfiguration(bc, unicore) {
   try {
-    await localforage.setItem('simConfig', { bc, unicore });
+    await localforage.setItem(getSavedSimConfigName(), { bc, unicore });
   } catch (err) {
     console.error('saving configuration', err);
   }
 }
 
 async function retrievePreviousConfig() {
-  return await localforage.getItem('simConfig') || {};
+  return await localforage.getItem(getSavedSimConfigName()) || {};
 }
 
 function cleanPreviousConfig() {
-  return localforage.removeItem('simConfig');
+  return localforage.removeItem(getSavedSimConfigName());
 }
 
 function getAllJobsSortedList() {

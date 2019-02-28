@@ -11,7 +11,7 @@ const store = new Vuex.Store({
     title: 'Run Simulation',
     currentComputer: null,
     simulationPopulation: null,
-    currentCircuit: initialStateGenerator.getCircuitToUse(),
+    currentCircuit: initialStateGenerator.circuitToUse,
     currentCircuitConfig: initialStateGenerator.getCurrentCircuitConfig(),
     simulationDuration: initialStateGenerator.getDefaultDuration(),
     simulationForwardSkip: initialStateGenerator.getDefaultForwardSkip(),

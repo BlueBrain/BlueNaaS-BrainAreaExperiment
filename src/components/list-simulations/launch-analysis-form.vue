@@ -97,6 +97,9 @@
 
 <script>
 import analysisConfig from '@/config/analysis-config';
+import { getFiles } from '@/services/unicore';
+import get from 'lodash/get';
+import intersection from 'lodash/intersection';
 
 export default {
   name: 'AnalysisForm',
@@ -108,6 +111,7 @@ export default {
       title: '',
       analysisToRun: analysisConfig.analysisAvailable,
       checkedAnalysis: [],
+      targetsFromBlueConfig: [],
       reportForAnalysis: null,
       numberOfCells: 5,
       target: null,
@@ -162,18 +166,6 @@ export default {
     };
   },
   computed: {
-    targetsFromBlueConfig() {
-      const targetsNames = [];
-      this.reports.forEach((reportName) => {
-        const matched = reportName.match('(.*)_report');
-        if (matched && matched.length > 1) {
-          const target = matched[1];
-          targetsNames.push(target);
-        }
-      });
-      [this.target] = targetsNames;
-      return targetsNames;
-    },
     reports() {
       if (!this.jobSelectedForAnalysis) return [];
       const filteredNames = [];
@@ -207,6 +199,10 @@ export default {
     reports(newVal) {
       [this.reportForAnalysis] = newVal;
     },
+    jobSelectedForAnalysis(jobForAnalyze) {
+      if (!jobForAnalyze) return;
+      this.setTargetsFromBlueConfig(jobForAnalyze);
+    },
   },
   methods: {
     async editItem() {
@@ -218,6 +214,44 @@ export default {
     targetChanged(newTarget) {
       // TODO: is there any way you want to analyze another slice?
       this.target = newTarget;
+    },
+    async setTargetsFromBlueConfig(job) {
+      const findTargetsInBC = (BCStr) => {
+        const regex = /Target (.+)/gm;
+        const targets = [];
+        let m = regex.exec(BCStr);
+        while (m !== null) {
+          // This is necessary to avoid infinite loops with zero-width matches
+          if (m.index === regex.lastIndex) regex.lastIndex += 1;
+          targets.push(get(m, '[1]', '').trim());
+          m = regex.exec(BCStr);
+        }
+        return targets;
+      };
+
+      const getBlueConfigStr = async () => {
+        const workingDirectory = get(job, '_links.workingDirectory.href');
+        const blueConfigBlob = await getFiles(`${workingDirectory}/files/BlueConfig`);
+        const blueConfigStr = await new Response(blueConfigBlob).text();
+        return blueConfigStr;
+      };
+
+      const getTargetsByFileName = () => {
+        const targetsNames = [];
+        this.reports.forEach((reportName) => {
+          const matched = reportName.match('(.*)_report');
+          if (matched && matched.length > 1) targetsNames.push(get(matched, '[1]'));
+        });
+        [this.target] = targetsNames;
+        return targetsNames;
+      };
+
+      let targets = getTargetsByFileName();
+      if (!targets.length) {
+        const blueConfigStr = await getBlueConfigStr();
+        targets = intersection(findTargetsInBC(blueConfigStr));
+      }
+      this.targetsFromBlueConfig = targets;
     },
     generateAnalysisObjectToRun() {
       return {

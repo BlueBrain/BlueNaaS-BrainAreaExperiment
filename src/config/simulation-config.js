@@ -47,6 +47,7 @@ export default {
   available: ['JURECA', 'PIZ_DAINT', 'NUVLA'],
   defaultDuration: 300,
   defaultForwardSkip: 5000,
+  importSimulationScript: 'ln -sf SIMFOLDERPATH/* .',
   stimuli: [
     'Linear',
     'RelativeLinear',

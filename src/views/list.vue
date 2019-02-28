@@ -12,6 +12,11 @@ This component will be the frame for view the simulations.
 
       <div class="grow-space"/>
 
+      <import-simulation
+        v-if="canImport"
+        class="margined-right"
+      />
+
       <i-button
         type="primary"
         icon="ios-arrow-back"
@@ -31,6 +36,7 @@ This component will be the frame for view the simulations.
 <script>
 import ListSimulations from '@/components/list-simulations/index.vue';
 import ListFilters from '@/components/list-simulations/list-filters.vue';
+import ImportSimulation from '@/components/list-simulations/import-simulation.vue';
 
 export default {
   name: 'SimulationsList',
@@ -38,12 +44,19 @@ export default {
   components: {
     ListSimulations,
     ListFilters,
+    ImportSimulation,
   },
   data() {
     return {
       statusSearch: 'ALL',
       nameFilter: '',
     };
+  },
+  computed: {
+    canImport() {
+      // import only Julich
+      return this.$store.state.currentComputer !== 'NUVLA';
+    },
   },
   created() {
     this.$store.dispatch('showLoader');
@@ -71,7 +84,7 @@ export default {
     flex-wrap: wrap;
     align-items: baseline;
   }
-  .grow-space + .reuse-simulation {
-    margin-right: 10px;
+  .grow-space + .margined-right {
+    margin-right: 5px;
   }
 </style>

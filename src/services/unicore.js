@@ -1,6 +1,7 @@
 
 import axios from 'axios';
 import find from 'lodash/find';
+import get from 'lodash/get';
 import cleanDeep from 'clean-deep';
 
 import computeProvider from '@/common/compute-provider.json';
@@ -63,6 +64,7 @@ function getInfoByUrl(transferUrl) {
 }
 
 function urlToComputerAndId(jobURL) {
+  if (!jobURL) return {};
   const result = find(getComputeProviders(), elem => jobURL.startsWith(elem.url));
 
   const m = jobURL.match(new RegExp('/rest/core/jobs/(.*)'));
@@ -98,8 +100,7 @@ async function deleteJob(url) {
     method: 'delete',
     data: JSON.stringify({}),
   });
-  const { id } = urlToComputerAndId(url);
-  await db.deleteJob(id + store.state.currentComputer + store.state.userGroup);
+  return db.deleteJob(url);
 }
 
 function uploadData(dataToUpload, uploadURL) {
@@ -114,8 +115,13 @@ function uploadData(dataToUpload, uploadURL) {
 
 async function getAllJobs(computer) {
   const unicoreURL = getComputeProviders()[computer.toUpperCase()].url;
-  const response = await axios(`${unicoreURL}/jobs`);
-  return response.data.jobs;
+  try {
+    const response = await axios(`${unicoreURL}/jobs`);
+    return response.data.jobs;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Error getting all jobs for list');
+  }
 }
 
 async function getJobProperties(jobURL, userGroup) {
@@ -123,8 +129,9 @@ async function getJobProperties(jobURL, userGroup) {
   if (!result) {
     try {
       const job = await getInfoByUrl(jobURL, userGroup);
-      db.addJob(job.data);
       result = job.data;
+      result.id = urlToComputerAndId(result._links.self.href).id;
+      db.addJob(result);
     } catch (e) {
       return null;
     }
@@ -145,16 +152,16 @@ async function populateJobsWithFiles(jobsListUrl) {
   // get the information of some jobs asociated with key + the children
 
   async function expandInfo(jobUrl) {
-    const { id } = urlToComputerAndId(jobUrl);
     const jobExapandedInfo = await getJobProperties(jobUrl);
-
-    jobExapandedInfo.id = id;
-    const url = `${jobExapandedInfo._links.workingDirectory.href}/files`;
+    if (!jobExapandedInfo) return {};
+    const workingDirectory = get(jobExapandedInfo, '_links.workingDirectory.href');
+    const url = `${workingDirectory}/files`;
 
     if (
       jobExapandedInfo.isSimulation ||
       jobExapandedInfo.isAnalysis ||
-      jobExapandedInfo.isVisualization
+      jobExapandedInfo.isVisualization ||
+      jobExapandedInfo.isOther
     ) {
       /*
        * to have this flag means we already have loaded the files and
@@ -343,7 +350,7 @@ function getJobById(jobId) {
   return getJobProperties(url);
 }
 
-async function submitJob(runConfig, inputs, startLater = false) {
+async function submitJob(runConfig, inputs = [], startLater = false) {
   // TODO: these variables are now global for unicore. use submit job scope.
   /**
     * runConfig {computer, project }
@@ -405,6 +412,21 @@ async function workingDirToMachinePath(workingDirectory) {
   }
 }
 
+function importPersonalSimulation(title, simFolderPath) {
+  const executable = simulationConfig.importSimulationScript
+    .replace('SIMFOLDERPATH', simFolderPath);
+  const config = {
+    computerSelected: store.state.currentComputer,
+    nodes: 1,
+    runtime: 100,
+    executable,
+    title,
+  };
+  const files = [{ To: 'wasImported', Data: '' }];
+  // save this file to differentiate this one with the rest of the external jobs
+  return submitJob(config, files);
+}
+
 export default {
   getAssociatedLocation,
   deleteJob,
@@ -429,4 +451,7 @@ export default {
 export {
   urlToComputerAndId,
   getComputeProviders,
+  getFiles,
+  importPersonalSimulation,
+  populateJobsWithFiles,
 };

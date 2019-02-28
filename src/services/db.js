@@ -39,8 +39,8 @@ async function addJob(jobInfo) {
     };
   }
   if (
-    jobInfo.status === jobStatus.successful ||
-    jobInfo.status === jobStatus.failed
+    jobInfo.status === jobStatus.SUCCESSFUL ||
+    jobInfo.status === jobStatus.FAILED
   ) {
     const jobToSave = createIdAndDetails(jobInfo);
     console.debug('[db] Creating new job in DB...');

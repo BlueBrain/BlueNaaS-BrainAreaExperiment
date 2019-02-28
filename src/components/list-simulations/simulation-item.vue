@@ -17,7 +17,7 @@ This will only display the item. It knows where to put all the information.
     <div class="status analysis">
       <icon
         v-if="job.analysisStatus"
-        :title="getAnalysisStatus(job.analysisStatus)"
+        :title="getAnalysisTooltip(job.analysisStatus)"
         :type="getStatusIcon(job.analysisStatus)"
         :size="iconSize"
       />
@@ -81,24 +81,19 @@ export default {
     },
     analysisCanRun() {
       // show the analysis button
-      if (
-        this.job.status === jobStatus.failed ||
-        this.job.status === jobStatus.running ||
-        this.job.status === jobStatus.queued ||
-        this.job.analysisStatus === jobStatus.block ||
-        this.job.analysisStatus === jobStatus.loading
-      ) {
-        return false;
-      }
-      return true;
+      return this.job.status !== jobStatus.FAILED &&
+        this.job.status !== jobStatus.RUNNING &&
+        this.job.status !== jobStatus.QUEUED &&
+        this.job.analysisStatus !== jobStatus.BLOCK &&
+        this.job.analysisStatus !== jobStatus.LOADING;
     },
     jobUrl() {
       return this.job._links.self.href;
     },
     allDone() {
       return (
-        this.job.status === jobStatus.successful &&
-        this.job.analysisStatus === jobStatus.successful
+        this.job.status === jobStatus.SUCCESSFUL &&
+        this.job.analysisStatus === jobStatus.SUCCESSFUL
       );
     },
     listIsLoading() {
@@ -107,14 +102,14 @@ export default {
   },
   methods: {
     getStatusString(status) {
-      if (!status || status === jobStatus.block) {
+      if (!status || status === jobStatus.BLOCK) {
         return 'Waiting for simulation ends';
       }
       return status;
     },
 
-    getAnalysisStatus(analysisStatus) {
-      if (this.job.status === jobStatus.failed) {
+    getAnalysisTooltip(analysisStatus) {
+      if (this.job.status === jobStatus.FAILED) {
         return 'Simulation failed. No analysis can be run';
       }
       if (isRunning(this.job.status)) {

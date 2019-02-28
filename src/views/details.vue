@@ -147,7 +147,7 @@ export default {
   computed: {
     simulationWasSuccessful() {
       if (!this.job.children) return false;
-      const isSuccessful = this.simulationDetails.status === jobStatus.successful;
+      const isSuccessful = this.simulationDetails.status === jobStatus.SUCCESSFUL;
       const hasResults = simulationProducedResults(this.job);
       return isSuccessful && hasResults;
     },
@@ -257,12 +257,12 @@ export default {
         setTimeout(() => { this.getJobById(jobId); }, this.$store.state.pollInterval);
       } else {
         // after the simulation is finished check if the results were correct
-        if (this.job.children || this.job.status !== jobStatus.successful) return;
+        if (this.job.children || this.job.status !== jobStatus.SUCCESSFUL) return;
         const [simulationWithFiles] = await unicore.populateJobsWithFiles([this.job._links.self.href]);
         if (!simulationProducedResults(simulationWithFiles)) {
           // do not produce any output file - simulation failed
-          simulationWithFiles.status = jobStatus.failed;
-          this.$set(this.simulationDetails, 'status', jobStatus.failed);
+          simulationWithFiles.status = jobStatus.FAILED;
+          this.$set(this.simulationDetails, 'status', jobStatus.FAILED);
         } else {
           // this wlll upload the simulationWasSuccessful and show the analysis and viz buttons
           this.$set(this.job, 'children', simulationWithFiles.children);

@@ -88,7 +88,7 @@ export default {
         outputText = 'Fetching simulation information...';
       } else if (isRunning(this.simulationDetails.status)) {
         outputText = 'Simulation not finished yet';
-      } else if (this.simulationDetails.status === jobStatus.failed) {
+      } else if (this.simulationDetails.status === jobStatus.FAILED) {
         outputText = 'Simulation failed. No analysis could be run.';
       } else if (this.analysisDetails.length === 0 && this.overallLoading) {
         outputText = 'loading';
@@ -104,7 +104,7 @@ export default {
        *  that we save in the simulation and then the analysis image
        */
       // to get analysis the simulation must be finished sucessfully
-      if (this.simulationDetails.status !== jobStatus.successful) return false;
+      if (this.simulationDetails.status !== jobStatus.SUCCESSFUL) return false;
       this.overallLoading = true;
 
       const analysisAssociatedList = await unicore.getAssociatedLocation(
@@ -162,11 +162,11 @@ export default {
 
         if (!await analysisProducedResults(analysisWithFiles)) {
           this.$Message.info(`Analysis ${childAnalysis.id} did not produce any image`);
-          this.$set(childAnalysis, 'status', jobStatus.failed);
+          this.$set(childAnalysis, 'status', jobStatus.FAILED);
           this.$set(childAnalysis, 'fetchingImages', false);
           // no need to reactivity for next one
           // childanalysis is only in the view info it is not saved on DB
-          analysisJobInfo.status = jobStatus.failed;
+          analysisJobInfo.status = jobStatus.FAILED;
           analysisJobInfo.children = analysisWithFiles.children;
           db.addJob(analysisJobInfo);
           return;

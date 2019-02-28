@@ -1,52 +1,52 @@
 const jobStatus = {
-  successful: 'SUCCESSFUL',
-  running: 'RUNNING',
-  queued: 'QUEUED',
-  failed: 'FAILED',
-  ready: 'READY',
-  block: 'BLOCK',
-  loading: 'LOADING',
-  stagingin: 'STAGINGIN',
-  stagingout: 'STAGINGOUT',
-  undefined: 'UNDEFINED',
+  SUCCESSFUL: 'SUCCESSFUL',
+  RUNNING: 'RUNNING',
+  QUEUED: 'QUEUED',
+  FAILED: 'FAILED',
+  READY: 'READY',
+  BLOCK: 'BLOCK',
+  LOADING: 'LOADING',
+  STAGINGIN: 'STAGINGIN',
+  STAGINGOUT: 'STAGINGOUT',
+  UNDEFINED: 'UNDEFINED',
+};
+
+const iconMap = {
+  [jobStatus.SUCCESSFUL]: 'md-checkmark-circle',
+  [jobStatus.FAILED]: 'ios-close-circle',
+  [jobStatus.BLOCK]: 'md-remove-circle',
+  [jobStatus.QUEUED]: 'md-clock',
+  ALL: 'md-radio-button-off',
 };
 
 function isRunning(status) {
-  return status === jobStatus.queued ||
-    status === jobStatus.running ||
-    status === jobStatus.ready ||
-    status === jobStatus.stagingin ||
-    status === jobStatus.stagingout ||
-    status === jobStatus.undefined ||
-    status === '';
+  return [
+    jobStatus.QUEUED,
+    jobStatus.RUNNING,
+    jobStatus.READY,
+    jobStatus.STAGINGIN,
+    jobStatus.STAGINGOUT,
+    jobStatus.UNDEFINED,
+    '',
+  ].includes(status);
 }
 
 function isEnded(status) {
-  return status === jobStatus.successful ||
-    status === jobStatus.failed ||
-    status === jobStatus.block;
+  return status === jobStatus.SUCCESSFUL ||
+    status === jobStatus.FAILED ||
+    status === jobStatus.BLOCK;
 }
 
 const statesFilter = [
-  'ALL', jobStatus.successful, jobStatus.failed,
-  jobStatus.queued, jobStatus.running,
+  'ALL',
+  jobStatus.SUCCESSFUL,
+  jobStatus.FAILED,
+  jobStatus.QUEUED,
+  jobStatus.RUNNING,
 ];
 
 function getStatusIcon(status) {
-  switch (status) {
-    case jobStatus.successful:
-      return 'md-checkmark-circle';
-    case jobStatus.failed:
-      return 'ios-close-circle';
-    case jobStatus.block:
-      return 'md-remove-circle';
-    case jobStatus.queued:
-      return 'md-clock';
-    case 'ALL':
-      return 'md-radio-button-off';
-    default: // if is RUNNING, READY, etc
-      return 'md-sync';
-  }
+  return iconMap[status] || 'md-sync';
 }
 
 export {

@@ -6,7 +6,7 @@
 */
 const slicesImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/images-slices-CA1';
 
-const slices = {
+const fullca1 = {
   prefix: { // setting prefix allow to know which computer can run the circuit
     JURECA: '/p/project/cpcp0/pcp0068/CircuitRelease',
     PIZ_DAINT: '/apps/hbp/ich002/home/antonel/full_ca1',
@@ -77,7 +77,7 @@ const slices = {
 
 // https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/images-slices-mooc/mosaic.png images-slices-CA1
 const moocImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/images-slices-mooc';
-const mooc = {
+const microcircuit = {
   prefix: {
     NUVLA: '/mooc',
   },
@@ -161,6 +161,6 @@ const mooc = {
 };
 
 export default {
-  slices,
-  mooc,
+  fullca1,
+  microcircuit,
 };

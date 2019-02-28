@@ -5,9 +5,9 @@
       <i-menu mode="horizontal" theme="dark" active-name="1">
         <div class="layout-nav">
           <menu-item name="1">
-            <router-link to="/" class="no-link">
+            <span @click="goHome" class="no-link">
               <h1>{{ pageTitle }}</h1>
-            </router-link>
+            </span>
           </menu-item>
         </div>
       </i-menu>
@@ -26,6 +26,16 @@ export default {
   computed: {
     pageTitle() {
       return this.$store.state.title;
+    },
+  },
+  methods: {
+    goHome() {
+      this.$router.push({
+        name: 'run',
+        params: {
+          circuitName: this.$store.state.currentCircuit,
+        },
+      });
     },
   },
 };

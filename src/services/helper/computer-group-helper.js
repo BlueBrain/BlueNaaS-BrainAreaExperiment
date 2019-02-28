@@ -9,15 +9,6 @@ function getUser(computer) {
   return axios(unicoreURL).then(r => r.data);
 }
 
-function getComputersAvailableForCurrentModel() {
-  // will filter the computers that actually can run the circuit
-  const computersCanRunCircuit = Object.keys(store.state.currentCircuitConfig.prefix);
-  const computersAllowedToRun = store.state.allComputerAvailable.filter(computer => (
-    computersCanRunCircuit.includes(computer)
-  ));
-  return computersAllowedToRun;
-}
-
 function setupFromStorage(newGroup) {
   const computerSaved = localStorage.getItem('userComputer');
   const groupSaved = newGroup || localStorage.getItem('userGroup');
@@ -101,6 +92,4 @@ eventBus.$on('changeComputer', (computer, callback) => {
   });
 });
 
-
-export { getComputersAvailableForCurrentModel };
 export default {};

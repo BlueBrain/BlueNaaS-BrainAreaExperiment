@@ -2,20 +2,6 @@
 <template>
   <div class="inline-centered">
     <tooltip
-      content="Defines the Circuit"
-    >Model:</tooltip>
-    <i-select
-      v-model="circuitToUse"
-      class="circuit-name"
-    >
-      <i-option
-        v-for="circuit in appCircuitsList"
-        :key="circuit.displayName"
-        :value="circuit.circuitRawName"
-      >{{ circuit.displayName }}</i-option>
-    </i-select>
-
-    <tooltip
       content="Subpopulation of neurons to be simulated (CircuitTarget)"
     >Population:</tooltip>
     <autocomplete-targets
@@ -34,16 +20,12 @@
       :max="50000"
       placeholder="Duration"
     />
-
   </div>
 </template>
 
 
 <script>
-import map from 'lodash/map';
-
 import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
-import circuitConfig from '@/config/circuit-config';
 import db from '@/services/db';
 import eventBus from '@/services/event-bus';
 import { mapBlueConfigTerms, unmapBlueConfigTerms } from '@/common/utils';
@@ -53,11 +35,6 @@ export default {
   name: 'sim-params',
   components: {
     AutocompleteTargets,
-  },
-  data() {
-    return {
-      circuitToUse: localStorage.getItem('circuitToUse') || this.$store.state.appCircuitToUse,
-    };
   },
   mounted() {
     this.loadPreviousConfig();
@@ -87,11 +64,6 @@ export default {
       get() { return this.$store.state.simulationPopulation; },
       set(newVal) { this.$store.commit('setSimulationPopulation', newVal); },
     },
-    appCircuitsList() {
-      return map(circuitConfig, (circuitValue, circuit) => (
-        { displayName: circuitValue.displayName, circuitRawName: circuit }
-      ));
-    },
     populationTargets() {
       return this.$store.state.populationTargets;
     },
@@ -114,15 +86,6 @@ export default {
     },
     targetChanged(newModel) {
       this.$store.commit('setSimulationPopulation', newModel);
-    },
-  },
-  watch: {
-    circuitToUse(newVal) {
-      localStorage.setItem('circuitToUse', newVal);
-      this.$store.dispatch('showLoader');
-      db.cleanPreviousConfig().then(() => {
-        window.location.reload();
-      });
     },
   },
 };

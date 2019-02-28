@@ -41,10 +41,9 @@
       :size="iconSize"
       class="icon-spaced"
     />
-    <i-select v-model="selectedComputer"
-    >
+    <i-select v-model="selectedComputer">
       <i-option
-        v-for="computer in simulationConfig.available"
+        v-for="computer in computersAvailable"
         :value="computer"
         :key="computer"
         :disabled="listIsLoading"
@@ -111,7 +110,9 @@ export default {
       },
     },
     selectedComputer: {
-      get() { return this.$store.state.currentComputer; },
+      get() {
+        return this.$store.state.currentComputer;
+      },
       set(newComputer) {
         if (this.$store.state.currentComputer === newComputer) return;
 
@@ -126,6 +127,9 @@ export default {
     },
     hasMultipleProjects() {
       return !isEqual(this.selectedGroupsAvailable, ['*']);
+    },
+    computersAvailable() {
+      return this.$store.state.computersAvailable;
     },
   },
   mounted() {

@@ -55,11 +55,11 @@ import ConnectionManipulation from '@/components/run-simulation/connection-manip
 
 import unicore, { urlToComputerAndId } from '@/services/unicore';
 import simulationConfig from '@/config/simulation-config';
-import { getComputersAvailableForCurrentModel } from '@/services/helper/computer-group-helper';
 import '@/assets/css/simulation.css';
 
 export default {
   name: 'RunSimulation',
+  props: ['circuit'],
   components: {
     ReportTimeline,
     SimulationParams,
@@ -93,7 +93,7 @@ export default {
   },
   methods: {
     viewList() {
-      const defaultComputer = getComputersAvailableForCurrentModel()[0];
+      const defaultComputer = this.$store.state.computersAvailable[0];
       const computer = this.$store.state.currentComputer || defaultComputer;
       this.$router.push({
         name: 'view',

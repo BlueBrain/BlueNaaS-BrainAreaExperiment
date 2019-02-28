@@ -14,11 +14,18 @@ const mapper = {
 };
 
 // add targets to mapper for later conversion to BlueConfig and vice-versa
-store.state.currentCircuitConfig.targets.forEach((targetObj) => {
-  mapper[targetObj.displayName] = targetObj.name;
-});
+let fullMapper = null;
+
+function fillMapper() {
+  const targetsMapper = {};
+  store.state.currentCircuitConfig.targets.forEach((targetObj) => {
+    targetsMapper[targetObj.displayName] = targetObj.name;
+  });
+  fullMapper = Object.assign({}, mapper, targetsMapper);
+}
 
 function mapBlueConfigTerms(params) {
+  if (!fullMapper) fillMapper();
   if (typeof params === 'string') {
     return mapper[params] || params;
   }
@@ -30,6 +37,7 @@ function mapBlueConfigTerms(params) {
 }
 
 function unmapBlueConfigTerms(params) {
+  if (!fullMapper) fillMapper();
   if (typeof params === 'string') {
     const keyUnMapped = findKey(mapper, partial(isEqual, params));
     return keyUnMapped || params;

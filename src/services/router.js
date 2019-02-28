@@ -11,18 +11,18 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '',
+    path: '/circuits/:circuitName',
     component: SimulationRun,
     name: 'run',
   },
   {
-    path: '/view/:computerParam/',
+    path: '/circuits/:circuitName/view/:computerParam/',
     component: List,
     name: 'view',
     props: true,
   },
   {
-    path: '/details/:computerParam/:jobId',
+    path: '/circuits/:circuitName/details/:computerParam/:jobId',
     component: Details,
     props: true,
     name: 'details',

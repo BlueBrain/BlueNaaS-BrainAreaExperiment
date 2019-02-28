@@ -2,38 +2,27 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import simConfig from '@/config/simulation-config';
-import circuitConfig from '@/config/circuit-config';
+import initialStateGenerator from '@/services/helper/initial-state-generator';
 
 Vue.use(Vuex);
-
-// Setup default params when the app starts
-// Circuit
-const circuitToUse = localStorage.getItem('circuitToUse') || 'mooc';
-localStorage.setItem('circuitToUse', circuitToUse);
-console.log('[store] Circuit to use', circuitToUse);
-
-const storedComputer = localStorage.getItem('userComputer');
-const storedGroup = localStorage.getItem('userGroup');
-console.log(`[store] LocalStored: project: ${storedGroup} - computer: ${storedComputer}`);
 
 const store = new Vuex.Store({
   state: {
     title: 'Run Simulation',
     currentComputer: null,
-    currentCircuitConfig: circuitConfig[circuitToUse],
     simulationPopulation: null,
-    simulationDuration: simConfig.defaultDuration,
-    simulationForwardSkip: simConfig.defaultForwardSkip,
-    allComputerAvailable: simConfig.available,
+    currentCircuit: initialStateGenerator.getCircuitToUse(),
+    currentCircuitConfig: initialStateGenerator.getCurrentCircuitConfig(),
+    simulationDuration: initialStateGenerator.getDefaultDuration(),
+    simulationForwardSkip: initialStateGenerator.getDefaultForwardSkip(),
+    computersAvailable: initialStateGenerator.getComputersAvailableForCircuit(),
     token: null,
     userGroup: null,
     userGroupTmp: null,
     userGroupsAvailable: [],
     listIsLoading: true,
+    analysisListIsLoading: true,
     pollInterval: 10 * 1000,
-    // circuit to use in the app (slices, microcircuit, etc) from circuit-config.js
-    appCircuitToUse: circuitToUse,
     stimulationTargets: [],
     reportTargets: [],
     populationTargets: [],
@@ -45,11 +34,9 @@ const store = new Vuex.Store({
       state.title = newTitle;
     },
     setCurrentComputer(state, newComputer) {
-      console.debug('[store] SetCurrentComputer', newComputer);
       state.currentComputer = newComputer;
     },
     setUserGroup(state, newUserProject) {
-      console.debug('[store] SetUserGroup', newUserProject);
       state.userGroup = newUserProject;
     },
     setUserGroupTmp(state, newUserProject) {
@@ -57,7 +44,6 @@ const store = new Vuex.Store({
       state.userGroupTmp = newUserProject;
     },
     setUserGroupsAvailable(state, projectsList) {
-      console.debug('[store] setUserGroupsAvailable', projectsList);
       state.userGroupsAvailable = projectsList;
     },
     setSimulationPopulation(state, newPopulation) {
@@ -86,6 +72,9 @@ const store = new Vuex.Store({
     },
     setListIsLoading(state, value) {
       state.listIsLoading = value;
+    },
+    setAnalysisListIsLoading(state, value) {
+      state.analysisListIsLoading = value;
     },
   },
   actions: {

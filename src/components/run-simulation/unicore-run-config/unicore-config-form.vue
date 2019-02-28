@@ -136,7 +136,6 @@
 import simulationConfig from '@/config/simulation-config';
 import eventBus from '@/services/event-bus';
 import isEqual from 'lodash/isEqual';
-import { getComputersAvailableForCurrentModel } from '@/services/helper/computer-group-helper';
 import db from '@/services/db';
 
 export default {
@@ -210,7 +209,7 @@ export default {
   computed: {
     computersAvailable() {
       if (!this.showModalLocal) return [];
-      return getComputersAvailableForCurrentModel();
+      return this.$store.state.computersAvailable;
     },
 
     computerSelected: {

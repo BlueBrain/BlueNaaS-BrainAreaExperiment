@@ -45,6 +45,7 @@ import analysisConfig from '@/config/analysis-config';
 import forEach from 'lodash/forEach';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
+import { urlToComputerAndId } from '@/services/unicore';
 
 export default {
   name: 'AnalysisInNotebook',
@@ -81,7 +82,8 @@ export default {
       forEach(replaceObj, (value, key) => {
         queryParams.append(key, value);
       });
-      queryParams.append('replaceText', this.simulationDetails.url);
+      const jobId = urlToComputerAndId(this.simulationDetails.url).id;
+      queryParams.append('replaceText', jobId);
 
       const url = analysisConfig.usecasesCreationForm + queryParams.toString();
       window.open(url, '_blank');

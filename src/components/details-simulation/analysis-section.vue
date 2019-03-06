@@ -133,7 +133,9 @@ export default {
     },
 
     async refreshAnalysis(childAnalysis, prevComputerProjectCombo) {
+      // cancel polling if move to another page or changed computer
       if (prevComputerProjectCombo !== getComputerProjectCombo()) return;
+
       const analysisJobInfo = await unicore.getJobProperties(childAnalysis.jobURL);
 
       this.$set(childAnalysis, 'submissionTime', analysisJobInfo.submissionTime);

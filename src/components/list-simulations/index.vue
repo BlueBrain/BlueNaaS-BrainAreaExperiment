@@ -220,11 +220,11 @@ export default {
       };
 
       chunkAnalysisRequester = new ChunkRequester(fetchFn, callbackFn);
-      chunkAnalysisRequester.addJobs(this.viewList);
       chunkAnalysisRequester.setOnFinishFn(() => {
         this.$store.dispatch('hideLoader');
         this.$store.commit('setAnalysisListIsLoading', false);
       });
+      chunkAnalysisRequester.addJobs(this.viewList);
     },
 
     async fetchJobs() {
@@ -255,7 +255,6 @@ export default {
       };
 
       chunkSimulationRequester = new ChunkRequester(fetchFn, callbackFn);
-      chunkSimulationRequester.addJobs(listToFetch);
       chunkSimulationRequester.setOnFinishFn(() => {
         this.viewList = sortBy(this.viewList, 'submissionTime').reverse();
         // save full list of all jobs sorted for compare next time
@@ -263,6 +262,7 @@ export default {
         this.$store.commit('setListIsLoading', false);
         this.fetchAnalysis();
       });
+      chunkSimulationRequester.addJobs(listToFetch);
     },
   },
   beforeDestroy() {

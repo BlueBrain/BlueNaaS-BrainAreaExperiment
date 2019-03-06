@@ -10,6 +10,10 @@ class ChunkRequester {
   }
   addJobs(jobs) {
     this.jobs.push(...jobs);
+    if (!this.jobs.length) {
+      this.onFinish();
+      return;
+    }
     for (let i = 0; i < this.parallelRequests; i += 1) {
       this.process();
     }

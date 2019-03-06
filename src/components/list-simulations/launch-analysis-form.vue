@@ -42,7 +42,7 @@
               slot="label"
               content="Define report name to analyze"
             >
-              Target:
+              Population:
             </tooltip>
             <i-select
               v-model="target"

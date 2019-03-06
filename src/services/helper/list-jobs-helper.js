@@ -153,7 +153,8 @@ function filterOnlySimulations(jobsWithFiles) {
 const saveFullJobList = (allJobWithFiles) => {
   const sortedAllJobWithFiles = sortBy(allJobWithFiles, 'submissionTime').reverse();
   const sortedJobsUrlToSave = sortedAllJobWithFiles.map(jobPopulated => get(jobPopulated, '_links.self.href'));
-  if (!sortedJobsUrlToSave.length) return;
+  if (!sortedJobsUrlToSave.length || sortedJobsUrlToSave.includes(undefined)) return;
+
   db.setAllJobsSortedList(sortedJobsUrlToSave);
 };
 

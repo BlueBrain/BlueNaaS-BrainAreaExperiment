@@ -38,18 +38,8 @@ export default {
   },
   mounted() {
     this.loadPreviousConfig();
-    eventBus.$on('createSimParamsConfig', (resolve) => {
-      const params = {
-        Run: {
-          Default: {
-            Duration: this.duration,
-            ForwardSkip: this.$store.state.simulationForwardSkip,
-            CircuitTarget: mapBlueConfigTerms(this.populationSelected),
-          },
-        },
-      };
-      resolve(params);
-    });
+    this.creationConfigHandlerBinded = this.creationConfigHandler.bind(this);
+    eventBus.$on('createSimParamsConfig', this.creationConfigHandlerBinded);
   },
   computed: {
     duration: {
@@ -69,6 +59,18 @@ export default {
     },
   },
   methods: {
+    creationConfigHandler(resolve) {
+      const params = {
+        Run: {
+          Default: {
+            Duration: this.duration,
+            ForwardSkip: this.$store.state.simulationForwardSkip,
+            CircuitTarget: mapBlueConfigTerms(this.populationSelected),
+          },
+        },
+      };
+      resolve(params);
+    },
     async loadPreviousConfig() {
       const lastConfig = await db.retrievePreviousConfig();
       const defaultSaved = get(lastConfig, 'bc.Run.Default', {});
@@ -87,6 +89,9 @@ export default {
     targetChanged(newModel) {
       this.$store.commit('setSimulationPopulation', newModel);
     },
+  },
+  beforeDestroy() {
+    eventBus.$off('createSimParamsConfig', this.creationConfigHandlerBinded);
   },
 };
 </script>

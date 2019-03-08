@@ -291,6 +291,11 @@ async function generateUnicoreConfig(configParams) {
     return environment;
   }
 
+  function getNodes() {
+    // avoid setting nodes for test job submission
+    return configParams.runtime < 300 ? null : configParams.nodes;
+  }
+
   function getNodeType() {
     // multicore or gpu node
     const { nodeType } = simulationConfig[store.state.currentComputer];
@@ -314,7 +319,7 @@ async function generateUnicoreConfig(configParams) {
     },
     haveClientStageIn: 'true',
     Resources: {
-      Nodes: configParams.nodes,
+      Nodes: getNodes(),
       Runtime: configParams.runtime,
       Queue: getPatition(),
       NodeConstraints: getNodeType(),

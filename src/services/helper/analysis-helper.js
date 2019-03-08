@@ -37,7 +37,6 @@ async function getFilesToCopy(filesURL, userGroup) {
 }
 
 async function submitAnalysis(analysisAndTransferInfo, script) {
-  // TODO add transfer option
   /*
    *   Returns one object with the information about transfer and the destination job
    *

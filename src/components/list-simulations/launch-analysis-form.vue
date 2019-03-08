@@ -213,7 +213,6 @@ export default {
       }
     },
     targetChanged(newTarget) {
-      // TODO: is there any way you want to analyze another slice?
       this.target = newTarget;
     },
     async setTargetsFromBlueConfig(job) {

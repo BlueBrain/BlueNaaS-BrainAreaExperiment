@@ -357,7 +357,6 @@ function getJobById(jobId) {
 }
 
 async function submitJob(runConfig, inputs = [], startLater = false) {
-  // TODO: these variables are now global for unicore. use submit job scope.
   /**
     * runConfig {computer, project }
     *

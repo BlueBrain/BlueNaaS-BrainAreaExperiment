@@ -132,7 +132,6 @@ export default {
     },
 
     applyFiltersToSims(simulations) {
-      // let filteredSimulations = simulations;
       const filteredSimulations = simulations
         .filter(job => (this.statusSearch !== 'ALL' ? job.status === this.statusSearch : true))
         .filter(job => (this.nameFilter ? job.name.toUpperCase().includes(this.nameFilter.toUpperCase()) : true));
@@ -249,6 +248,7 @@ export default {
         if (!simulation) return;
         this.allSimulations.push(simulation);
         const [filteredSimulation] = this.applyFiltersToSims([simulation]);
+        if (!filteredSimulation) return;
         this.viewList.push(filteredSimulation);
         // if job is running poll the status
         listJobsHelper.startReloadJob(simulation, getComputerProjectCombo());

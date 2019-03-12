@@ -8,9 +8,9 @@
       <div class="timeline-container">
         <edit-buttons
           class="edit-buttons"
-          @itemAdd="onAdd"
-          @itemDelete="onRemove"
-          @itemEdit="onUpdate"
+          @item-add="onAdd"
+          @item-delete="onRemove"
+          @item-edit="onUpdate"
         />
         <div
           id="stimulationContainer"

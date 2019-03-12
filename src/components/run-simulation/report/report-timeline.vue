@@ -1,8 +1,6 @@
 
 <template>
   <div class="report-timeline">
-
-
     <div
       class="timeline-target-container"
       :class="{'available': showTargetSelector}"

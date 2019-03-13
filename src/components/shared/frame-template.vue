@@ -28,6 +28,12 @@ export default {
       return this.$store.state.title;
     },
   },
+  mounted() {
+    this.$Message.config({
+      top: 50,
+      duration: 5,
+    });
+  },
   methods: {
     goHome() {
       this.$router.push({

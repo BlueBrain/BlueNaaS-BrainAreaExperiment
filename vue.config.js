@@ -1,6 +1,6 @@
 
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production'
-    ? '/public/dev.simulationapp/'
+    ? process.env.BASE_URL
     : '/',
 };

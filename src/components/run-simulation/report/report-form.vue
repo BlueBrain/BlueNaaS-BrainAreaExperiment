@@ -39,12 +39,9 @@
             <i-select
               v-model="reportInfo.Type"
               placeholder="Type"
+              :disabled="true"
             >
-              <i-option
-                v-for="type in filteredTypes"
-                :value="type"
-                :key="type"
-              >{{ type }}</i-option>
+              <i-option value="Soma">Soma</i-option>
             </i-select>
           </form-item>
 
@@ -152,8 +149,6 @@ export default {
   data() {
     return {
       formInvalid: false,
-      typesFull: ['Synapse', 'Soma'],
-      filteredTypes: [],
 
       ruleValidate: {
         target: [{
@@ -229,9 +224,6 @@ export default {
     reportTargets() {
       return this.$store.state.reportTargets;
     },
-  },
-  mounted() {
-    this.filteredTypes = this.typesFull;
   },
   methods: {
     onCancel() {

@@ -195,7 +195,7 @@ export default {
         Duration: parseInt(this.$store.state.simulationDuration, 10),
         Delay: 0,
         Lambda: 5,
-        Weight: 0.2,
+        Weight: 1,
         NumOfSynapses: 10,
       };
     },

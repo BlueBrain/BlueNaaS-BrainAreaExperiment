@@ -144,17 +144,13 @@ export default {
       const circuitConf = this.$store.state.currentCircuitConfig;
 
       if (!reportKeys.length || !stimulusKeys.length) {
-        alert.error('Select at least one stimulus and one report');
-        return false;
+        alert.warning('Missing stimulus or report');
       }
 
       function checkModel() {
         if (populationSelected !== circuitConf.biggestTarget) {
-          alert.warning({
-            content: `This simulation may not run.
-              Check if union between Population, Stimulation and Report is not empty`,
-            duration: 5,
-          });
+          alert.warning(`This simulation may not run.
+            Check if Population-Stimulation-Report union is not empty`);
         }
       }
 

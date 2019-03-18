@@ -264,7 +264,7 @@ export default {
     },
   },
   beforeDestroy() {
-    eventBus.$off('createStimulusConfig', this.creationConfigHandlerBinded);
+    eventBus.$off('createReportConfig', this.creationConfigHandlerBinded);
     eventBus.$off('simulationDurationChanged', this.simulationDurationChangedBinded);
   },
 };

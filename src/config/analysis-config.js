@@ -4,7 +4,7 @@ export default {
     script: [
       'OMP_NUM_THREADS=1',
       'export OMP_NUM_THREADS',
-      '/p/project/cvsk25/vsk2512/analysis/analysis_launch_0.1.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
+      '/p/project/cvsk25/vsk2512/analysis/analysis_launch_0.2.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
     ],
     executable: '/bin/bash input.sh',
   },
@@ -13,7 +13,7 @@ export default {
       '#!/bin/bash',
       'HDF5_USE_FILE_LOCKING=FALSE',
       'export HDF5_USE_FILE_LOCKING',
-      '/users/bp000037/analysis/analysis_launch.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
+      '/users/bp000037/analysis/analysis_launch_0.2.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
     ],
     executable: '/bin/bash input.sh',
   },

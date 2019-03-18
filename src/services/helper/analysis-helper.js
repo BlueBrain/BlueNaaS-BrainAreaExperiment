@@ -69,8 +69,7 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
    * Create analysis job
    * --------------------------------------------------------------------- */
   const analysisParamsConfig = {
-    list_analysis: newAnalysisAndTransferInfo.checkedAnalysis,
-    number_of_cells: newAnalysisAndTransferInfo.numberOfCells,
+    plots_config: newAnalysisAndTransferInfo.plotsConfig,
     target_analysis: newAnalysisAndTransferInfo.target,
     report_analysis: newAnalysisAndTransferInfo.reportForAnalysis,
   };

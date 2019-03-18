@@ -19,7 +19,7 @@ async function analysisProducedResults(analysisWithFiles) {
   const imagesList = analysisWithFiles.children.filter(file => file.match('.png'));
   const configFileBlob = await unicore.getFiles(`${analysisWDUrl}/files/${analysisConfig.configFileName}`);
   const configFileJson = await new Response(configFileBlob).json();
-  const analysisRequested = configFileJson.list_analysis.length;
+  const analysisRequested = Object.keys(configFileJson.plots_config).length;
   return analysisRequested === imagesList.length;
 }
 

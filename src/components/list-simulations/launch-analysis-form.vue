@@ -25,18 +25,6 @@
             />
           </form-item>
 
-          <form-item prop="typesAnalysis" label="Analysis:">
-            <checkbox-group v-model="checkedAnalysis">
-              <checkbox
-                v-for="analysis in analysisToRun"
-                :key="analysis.param"
-                :label="analysis.param"
-              >
-                <span>{{ analysis.name }}</span>
-              </checkbox>
-            </checkbox-group>
-          </form-item>
-
           <form-item prop="target">
             <tooltip
               slot="label"
@@ -67,14 +55,10 @@
             </i-select>
           </form-item>
 
-          <form-item prop="cellsNumber" label="Cells (number):">
-            <input-number
-              v-model="numberOfCells"
-              :min="1"
-              :max="200"
-              placeholder="Cells (number) to visualize"
-            />
-          </form-item>
+          <analysis-picker
+            :analysisList="analysisToRun"
+            ref="analysisPickerRef"
+          />
 
         </i-form>
       </div>
@@ -101,10 +85,14 @@ import { getFiles } from '@/services/unicore';
 import { unmapBlueConfigTerms, mapBlueConfigTerms } from '@/common/utils';
 import get from 'lodash/get';
 import intersection from 'lodash/intersection';
+import AnalysisPicker from '@/components/list-simulations/analysis-picker.vue';
 
 export default {
   name: 'AnalysisForm',
   props: ['jobSelectedForAnalysis', 'showModal', 'isRunningAnalysis'],
+  components: {
+    AnalysisPicker,
+  },
   data() {
     return {
       formInvalid: false,
@@ -260,9 +248,8 @@ export default {
         from: this.from,
         nodes: analysisConfig.nodes,
         runtime: analysisConfig.runtime,
-        numberOfCells: this.numberOfCells,
         title: this.title,
-        checkedAnalysis: this.checkedAnalysis,
+        plotsConfig: this.$refs.analysisPickerRef.generatePlotsConfig(),
         reportForAnalysis: this.reportForAnalysis,
         target: mapBlueConfigTerms(this.target),
       };

@@ -282,7 +282,7 @@ async function generateUnicoreConfig(configParams) {
     if (!configParams.imports) {
       // is a simulation
       environment.NUVLA__worker__multiplicity = configParams.nodes;
-    } else if (configParams.numberOfCells) {
+    } else if (configParams.plotsConfig) {
       // is analysis
     } else {
       // is visualization

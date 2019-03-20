@@ -17,7 +17,7 @@
           :label-width="150"
           :model="reportInfo"
         >
-          <form-item prop="target">
+          <form-item prop="Target">
             <tooltip
               slot="label"
               content="Defines the population of cells from where the data will be reported"
@@ -29,7 +29,7 @@
             />
           </form-item>
 
-          <form-item prop="type">
+          <form-item prop="Type">
             <tooltip
               slot="label"
               content="Soma (compartment) means that each compartment outputs separately
@@ -62,7 +62,7 @@
             </div>
           </div> -->
 
-          <form-item prop="startTime">
+          <form-item prop="StartTime">
             <tooltip
               slot="label"
               content="Time to start reporting"
@@ -73,7 +73,7 @@
             />
           </form-item>
 
-          <form-item prop="endTime">
+          <form-item prop="EndTime" required>
             <tooltip
               slot="label"
               content="Time to stop reporting"
@@ -84,7 +84,7 @@
             />
           </form-item>
 
-          <form-item prop="dt">
+          <form-item prop="Dt" required>
             <tooltip
               slot="label"
               content="The frequency of reporting in milliseconds(ms)"
@@ -97,7 +97,7 @@
             />
           </form-item>
 
-          <form-item prop="format">
+          <form-item prop="Format">
             <tooltip
               slot="label"
               content="Report output format"
@@ -151,61 +151,18 @@ export default {
       formInvalid: false,
 
       ruleValidate: {
-        target: [{
+        StartTime: [{
           required: true,
           validator: (rule, value, callback) => {
-            if (!this.reportInfo.Target) {
-              callback(new Error('should be defined'));
-              return;
-            }
-            callback();
-          },
-        }],
-        type: [{
-          required: true,
-          validator: (rule, value, callback) => {
-            if (!this.reportInfo.Type) {
-              callback(new Error('should be defined'));
-              return;
-            }
-            callback();
-          },
-        }],
-        startTime: [{
-          required: true,
-          validator: (rule, value, callback) => {
+            let message = '';
             if (!this.reportInfo.StartTime && this.reportInfo.StartTime !== 0) {
-              callback(new Error('should be defined'));
-              return;
+              message = 'should be defined';
             }
-            callback();
-          },
-        }],
-        endTime: [{
-          required: true,
-          validator: (rule, value, callback) => {
-            if (!this.reportInfo.EndTime) {
-              callback(new Error('should be defined'));
-              return;
+            if (this.reportInfo.StartTime > this.reportInfo.EndTime) {
+              message = 'start time after end time';
             }
-            callback();
-          },
-        }],
-        dt: [{
-          required: true,
-          validator: (rule, value, callback) => {
-            if (!this.reportInfo.Dt) {
-              callback(new Error('should be defined'));
-              return;
-            }
-            callback();
-          },
-        }],
-        format: [{
-          required: true,
-          validator: (rule, value, callback) => {
-            if (!this.reportInfo.Format) {
-              callback(new Error('should be defined'));
+            if (message) {
+              callback(new Error(message));
               return;
             }
             callback();

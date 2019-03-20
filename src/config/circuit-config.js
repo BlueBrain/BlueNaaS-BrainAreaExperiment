@@ -66,6 +66,22 @@ const fullca1 = {
   defaultPopulation: 'Slice-4',
   biggestTarget: 'Full CA1',
   displayName: 'Hippocampus Full CA1',
+  hipperpolarizingStim: {
+    Stimulus: {
+      hypamp: {
+        Mode: 'Current',
+        Pattern: 'Hyperpolarizing',
+        Delay: '0.0',
+        Duration: '3500.0',
+      },
+    },
+    StimulusInject: {
+      hypamp_mosaic: {
+        Stimulus: 'hypamp',
+        Target: 'Mosaic',
+      },
+    },
+  },
 };
 
 
@@ -155,6 +171,22 @@ const microcircuit = {
         Path: '/mooc/circuits/O1/20181114/projection',
         Source: 'proj_nrn',
         Type: 'Synaptic',
+      },
+    },
+  },
+  hipperpolarizingStim: {
+    Stimulus: {
+      hypamp: {
+        Mode: 'Current',
+        Pattern: 'Hyperpolarizing',
+        Delay: '0.0',
+        Duration: '3500.0',
+      },
+    },
+    StimulusInject: {
+      hypamp_mosaic: {
+        Stimulus: 'hypamp',
+        Target: 'Mosaic',
       },
     },
   },

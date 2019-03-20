@@ -41,6 +41,7 @@
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import forEach from 'lodash/forEach';
+import merge from 'lodash/merge';
 
 import StimulationForm from '@/components/run-simulation/stimulation/stimulation-form.vue';
 import EditButtons from '@/components/run-simulation/edit-buttons.vue';
@@ -221,7 +222,7 @@ export default {
     },
 
     createConfig() {
-      const config = {};
+      let config = {};
       config.Stimulus = {};
       config.StimulusInject = {};
       const stimulationItems = this.timeline.getVisibleItems();
@@ -248,6 +249,14 @@ export default {
           Target: target,
         };
       });
+
+      // if Noise stimulus -> Hyperpolarizing
+      const stims = Object.keys(config.Stimulus);
+      const hasNoise = !!stims.find(s => s.includes('Noise_'));
+      if (hasNoise) {
+        config = merge(this.$store.state.currentCircuitConfig.hipperpolarizingStim, config);
+      }
+
       return config;
     },
 

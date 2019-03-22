@@ -158,26 +158,11 @@ export default {
       this.showModal = value || !this.showModal;
     },
 
-    createItem(id, target, reportOn, start, end, reportInfo) {
-      return {
-        id,
-        content: `${target} (${reportOn})`,
-        start,
-        end,
-        className: reportOn,
-        reportInfo,
-      };
-    },
     createNewItem(newItem, callback) {
-      const reportObj = Object.assign({}, this.createNewReport());
       const id = simTimelineLib.getItemId(this.timeline.itemsData);
       const newObj = this.createItem(
+        this.createNewReport(),
         id,
-        reportObj.Target,
-        reportObj.ReportOn,
-        reportObj.StartTime,
-        reportObj.EndTime,
-        reportObj,
       );
 
       this.editableItem = { item: newObj, callback };
@@ -234,32 +219,34 @@ export default {
       return config;
     },
 
-    setNewItem(newItem, id = 0) {
-      return this.createItem( // id, group, content, start, end, connection
+    createItem(newItem, id = 0) {
+      return {
         id,
-        newItem.Target,
-        newItem.ReportOn,
-        newItem.StartTime,
-        newItem.EndTime,
-        newItem,
-      );
+        content: `${newItem.Target} (${newItem.ReportOn})`,
+        start: newItem.StartTime,
+        end: newItem.EndTime,
+        className: newItem.ReportOn,
+        reportInfo: newItem,
+      };
     },
 
     async loadPreviousConfig() {
       const lastConfig = await db.retrievePreviousConfig();
       if (!lastConfig || !lastConfig.bc || !lastConfig.bc.Report) {
-        return [this.setNewItem(this.createNewReport())];
+        return [this.createItem(this.createNewReport())];
       }
       const prevItems = [];
-      forEach(lastConfig.bc.Report, (report, reportFullName) => {
+      let index = 0;
+      forEach(lastConfig.bc.Report, (report) => {
         const prevReport = unmapBlueConfigTerms(report);
-        prevItems.push(this.setNewItem(prevReport, reportFullName));
+        prevItems.push(this.createItem(prevReport, index));
+        index += 1;
       });
       return prevItems;
     },
     targetSelected(target) {
-      const id = simTimelineLib.getMaxId(this.timeline.itemsData) || 1;
-      const newStim = this.setNewItem(this.createNewReport(target.displayName), id);
+      const id = simTimelineLib.getMaxId(this.timeline.itemsData) || 0;
+      const newStim = this.createItem(this.createNewReport(target.displayName), id);
       this.timeline.itemsData.add(newStim);
     },
   },

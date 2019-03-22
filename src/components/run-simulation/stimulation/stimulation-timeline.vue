@@ -161,16 +161,11 @@ export default {
     },
 
     createNewItem(newItem, callback) {
-      const stimInfo = Object.assign({}, this.createNewStimulus());
       const id = simTimelineLib.getItemId(this.timeline.itemsData);
 
       const newObj = this.createItem(
+        this.createNewStimulus(),
         id,
-        stimInfo.Target,
-        stimInfo.Pattern,
-        stimInfo.Delay,
-        stimInfo.Duration,
-        stimInfo,
       );
 
       // object to be passed to the modal to edit
@@ -178,16 +173,17 @@ export default {
       this.showModal = true;
     },
 
-    createItem(id, target, pattern, start, end, stimulusInfo) {
+    createItem(newItem, id = 0) {
       return {
         id,
-        content: `${target} (${pattern})`,
-        className: pattern,
-        start,
-        end,
-        stimulusInfo,
+        content: `${newItem.Target} (${newItem.Pattern})`,
+        className: newItem.Pattern,
+        start: newItem.Delay,
+        end: newItem.Duration,
+        stimulusInfo: newItem,
       };
     },
+
     createNewStimulus(target = null) {
       return {
         Pattern: 'Poisson',
@@ -260,34 +256,30 @@ export default {
       return config;
     },
 
-    setNewItem(newItem, id = 0) {
-      return this.createItem(
-        id,
-        newItem.Target,
-        newItem.Pattern,
-        newItem.Delay,
-        newItem.Duration,
-        newItem,
-      );
-    },
-
     async loadPreviousConfig() {
       const lastConfig = await db.retrievePreviousConfig();
       if (!lastConfig || !lastConfig.bc || !lastConfig.bc.StimulusInject) {
-        return [this.setNewItem(this.createNewStimulus())];
+        return [this.createItem(this.createNewStimulus())];
       }
+
+      // hide hyperpolirizing in case exists
+      if (lastConfig.bc.StimulusInject.hypamp_mosaic) { delete lastConfig.bc.StimulusInject.hypamp_mosaic; }
+      if (lastConfig.bc.Stimulus.hypamp) { delete lastConfig.bc.Stimulus.hypamp; }
+
       const prevItems = [];
-      forEach(lastConfig.bc.StimulusInject, (stimulusInjectObj, stimulusInjectKey) => {
+      let index = 0;
+      forEach(lastConfig.bc.StimulusInject, (stimulusInjectObj) => {
         const stimulusInfo = lastConfig.bc.Stimulus[stimulusInjectObj.Stimulus];
         const target = { Target: stimulusInjectObj.Target };
         const prevStimulus = unmapBlueConfigTerms(Object.assign({}, target, stimulusInfo));
-        prevItems.push(this.setNewItem(prevStimulus, stimulusInjectKey));
+        prevItems.push(this.createItem(prevStimulus, index));
+        index += 1;
       });
       return prevItems;
     },
     targetSelected(target) {
-      const id = simTimelineLib.getMaxId(this.timeline.itemsData) || 1;
-      const newStim = this.setNewItem(this.createNewStimulus(target.displayName), id);
+      const id = simTimelineLib.getMaxId(this.timeline.itemsData) || 0;
+      const newStim = this.createItem(this.createNewStimulus(target.displayName), id);
       this.timeline.itemsData.add(newStim);
     },
   },

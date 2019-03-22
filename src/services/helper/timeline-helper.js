@@ -127,6 +127,7 @@ function showTooltip(event, output, tooltipElem) {
 
 function getMaxId(dataSet) {
   const ids = flatMap(dataSet._data, item => item.id);
+  if (!ids.length) return 0;
   const maxId = Math.max(...ids);
   return maxId + 1;
 }

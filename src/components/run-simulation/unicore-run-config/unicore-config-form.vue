@@ -73,7 +73,7 @@
       <form-item prop="runtime">
         <tooltip
           slot="label"
-          content="Time until the job is killed"
+          content="Time (seconds) to allocate"
         >RunTime</tooltip>
         <input-number
           :disabled="runtimeIsHidden"

@@ -164,7 +164,6 @@ export default {
         this.createNewReport(),
         id,
       );
-
       this.editableItem = { item: newObj, callback };
       this.showModal = true;
     },

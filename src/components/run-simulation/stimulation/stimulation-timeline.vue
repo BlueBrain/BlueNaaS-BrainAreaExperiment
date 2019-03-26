@@ -162,12 +162,10 @@ export default {
 
     createNewItem(newItem, callback) {
       const id = simTimelineLib.getItemId(this.timeline.itemsData);
-
       const newObj = this.createItem(
         this.createNewStimulus(),
         id,
       );
-
       // object to be passed to the modal to edit
       this.editableItem = { item: newObj, callback };
       this.showModal = true;

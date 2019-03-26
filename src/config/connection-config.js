@@ -25,7 +25,7 @@ function getDefaultConnections() {
     name: 'AMPA_NMDA',
     source: 'Excitatory',
     destination: store.state.currentCircuitConfig.biggestTarget,
-    synapseConfigure: '%s.e = 0 %s.NMDA_ratio = 1.22 %s.tau_r_NMDA = 3.9 %s.tau_d_NMDA = 35.6 %s.mg = 1.0',
+    synapseConfigure: '%s.mg = 1.0 %s.NMDA_ratio = 1.22 tau_r_NMDA_ProbAMPANMDA_EMS = 3.9 tau_d_NMDA_ProbAMPANMDA_EMS = 35.6',
     weight: 0,
     spontMinis: 0,
     delay: 0,
@@ -42,11 +42,14 @@ function getDefaultConnections() {
   }];
 }
 
-const synapseAttributes = [
-  'tau_r_AMPA', 'tau_d_AMPA', 'tau_r_NMDA', 'tau_d_NMDA', 'Use', 'Dep', 'Fac', 'e',
-  'mg', 'mggate', 'gmax', 'u0', 'NMDA_ratio', 'synapseID', 'verboseLevel', 'tau_r_GABAA',
-  'tau_d_GABAA', 'tau_r_GABAB', 'tau_d_GABAB', 'e_GABAA', 'e_GABAB', 'GABAB_ratio',
-];
+const synapseAttributes = {
+  scoped: [
+    'tau_d_AMPA', 'Use', 'Dep', 'Fac', 'mg', 'mggate', 'gmax', 'u0', 'NMDA_ratio',
+    'synapseID', 'verboseLevel', 'tau_r_GABAA', 'tau_d_GABAA',
+    'tau_r_GABAB', 'tau_d_GABAB', 'e_GABAA', 'e_GABAB', 'GABAB_ratio',
+  ],
+  global: ['tau_r_NMDA_ProbAMPANMDA_EMS', 'tau_d_NMDA_ProbAMPANMDA_EMS', 'e'],
+};
 
 export default {
   getDefaultConnections,

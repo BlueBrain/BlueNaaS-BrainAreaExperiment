@@ -39,23 +39,30 @@
           class="spaced-row"
         >
           <i-col span="10">
-            <i-select
-              v-model="synapseFragment.attr"
-            >
-              <i-option
-                v-for="synapseName in synapseAttributes"
-                :value="synapseName"
-                :key="synapseName"
-              >
-                {{ synapseName }}
-              </i-option>
+            <i-select v-model="synapseFragment.attr">
+              <option-group label="Scoped">
+                  <i-option
+                    v-for="item in synapseAttributes.scoped"
+                    :value="item"
+                    :key="item"
+                  >{{ item }}</i-option>
+              </option-group>
+              <option-group label="Globals">
+                  <i-option
+                    v-for="item in synapseAttributes.global"
+                    :value="item"
+                    :key="item"
+                  >{{ item }}</i-option>
+              </option-group>
             </i-select>
           </i-col>
+
           <i-col span="10">
             <input-number
               v-model="synapseFragment.value"
             />
           </i-col>
+
           <i-col span="3">
             <i-button
               type="primary"

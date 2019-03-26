@@ -17,6 +17,7 @@ const hippoFullCa1 = {
     CircuitPath: '<%= prefix %>/r2017.06b/',
     nrnPath: '<%= prefix %>/r2017.06b/S2F/',
     TargetFile: '<%= prefix %>/r2017.06b/user.target',
+    CellLibraryFile: 'circuit.mvd3',
     CurrentDir: '.',
     OutputRoot: '.',
   },

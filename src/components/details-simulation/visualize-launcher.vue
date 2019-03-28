@@ -58,7 +58,8 @@ export default {
         duration: 5,
       });
       this.vizRunning = true;
-      submitVisualization(this.simulationDetails);
+      submitVisualization(this.simulationDetails)
+        .catch(error => this.$Message.error(error.message));
     },
     openVisualization() {
       window.open(`http://${this.ip}/?host=${this.ip}:8200`, '_blank');

@@ -126,15 +126,16 @@ async function getAllJobs(computer) {
 
 async function getJobProperties(jobURL, userGroup) {
   let result = await db.getJobByUrl(jobURL);
+  let jobInfo = null;
   if (!result) {
     try {
-      const job = await getInfoByUrl(jobURL, userGroup);
-      result = job.data;
-      result.id = urlToComputerAndId(result._links.self.href).id;
-      db.addJob(result);
+      jobInfo = await getInfoByUrl(jobURL, userGroup);
     } catch (e) {
       return null;
     }
+    result = jobInfo.data;
+    result.id = urlToComputerAndId(result._links.self.href).id;
+    db.addJob(result);
   }
   return result;
 }

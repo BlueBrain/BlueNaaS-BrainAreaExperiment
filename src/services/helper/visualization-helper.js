@@ -8,9 +8,11 @@ import eventBus from '@/services/event-bus';
 // TODO: merge with analaysis_helper getFilesToCopy
 async function getFilesToCopy(filesURL) {
   const files = await unicore.getFilesList(filesURL);
+  if (!files) return null;
   const avoidFilesList = visualizationConfig.filesToAvoidCopy;
 
   const allowed = [];
+
   files.children.forEach((file) => {
     // remove the '/'
     const fileName = file.substr(1);
@@ -39,6 +41,7 @@ async function submitVisualization(simulationDetails) {
   const vizConfig = visualizationConfig[store.state.currentComputer];
 
   const files = await getFilesToCopy(`${simulationDetails.workingDirectory}/files`);
+  if (!files) throw new Error('Error getting files for visualization');
 
   const computerUrl = unicore.getComputeProviders()[store.state.currentComputer].url;
   const originalSM = computerUrl.replace('rest/core', 'services/StorageManagement?res=');

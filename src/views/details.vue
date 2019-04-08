@@ -257,7 +257,11 @@ export default {
         setTimeout(() => { this.getJobById(jobId); }, this.$store.state.pollInterval);
       } else {
         // after the simulation is finished check if the results were correct
-        if (this.job.children || this.job.status !== jobStatus.SUCCESSFUL) return;
+        if (this.job.children || this.job.status !== jobStatus.SUCCESSFUL) {
+          // pass children so if it has reports show the viz button
+          this.simulationDetails.children = this.job.children;
+          return;
+        }
         const [simulationWithFiles] = await unicore.populateJobsWithFiles([this.job._links.self.href]);
         if (!simulationProducedResults(simulationWithFiles)) {
           // do not produce any output file - simulation failed

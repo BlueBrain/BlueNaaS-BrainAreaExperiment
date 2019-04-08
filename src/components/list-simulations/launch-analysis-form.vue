@@ -36,16 +36,20 @@
               v-model="target"
             >
               <i-option
-                v-for="targetElem in targetsFromBlueConfig"
+                v-for="targetElem in targets"
                 :key="targetElem"
                 :value="targetElem"
               >{{ targetElem }}</i-option>
             </i-select>
           </form-item>
 
-          <form-item prop="report" label="Report">
+          <form-item
+            prop="report"
+            label="Report"
+          >
            <i-select
               v-model="reportForAnalysis"
+              :disabled="!reports.length"
             >
               <i-option
                 v-for="report in reports"
@@ -57,6 +61,7 @@
 
           <analysis-picker
             :analysisList="analysisToRun"
+            :hasReport="!!reports.length"
             ref="analysisPickerRef"
           />
 
@@ -70,8 +75,8 @@
 
         <i-button
           type="primary"
-          :disabled="isRunningAnalysis"
-          :loading="isRunningAnalysis"
+          :disabled="processing"
+          :loading="processing"
           @click="editItem"
         >Run Analysis</i-button>
       </div>
@@ -96,11 +101,10 @@ export default {
   data() {
     return {
       formInvalid: false,
-      from: {},
       title: '',
       analysisToRun: analysisConfig.analysisAvailable,
       checkedAnalysis: [],
-      targetsFromBlueConfig: [],
+      targets: [],
       reportForAnalysis: null,
       numberOfCells: 5,
       target: null,
@@ -110,40 +114,6 @@ export default {
           required: true,
           validator: (rule, value, callback) => {
             if (!this.target) {
-              callback(new Error('should be defined'));
-              return;
-            }
-            callback();
-          },
-        }],
-        typesAnalysis: [{
-          required: true,
-          validator: (rule, value, callback) => {
-            if (this.checkedAnalysis.length === 0) {
-              callback(new Error('select at least one analysis'));
-              return;
-            }
-            if (!this.analysisSelectedCorrectly) {
-              callback(new Error('report should be defined'));
-              return;
-            }
-            callback();
-          },
-        }],
-        cellsNumber: [{
-          required: true,
-          validator: (rule, value, callback) => {
-            if (!this.numberOfCells) {
-              callback(new Error('should be defined'));
-              return;
-            }
-            callback();
-          },
-        }],
-        report: [{
-          required: true,
-          validator: (rule, value, callback) => {
-            if (!this.reportForAnalysis) {
               callback(new Error('should be defined'));
               return;
             }
@@ -166,19 +136,8 @@ export default {
       });
       return filteredNames;
     },
-    analysisSelectedCorrectly() {
-      // check if based on the analaysis selected a report was selected too
-      let analysisCheckCorrect = true;
-      this.checkedAnalysis.forEach((analysisSelected) => {
-        const matched = analysisConfig.analysisAvailable.find(analysis => (
-          analysis.param === analysisSelected
-        ));
-
-        if (matched.report_select && !this.reportForAnalysis) {
-          analysisCheckCorrect = false;
-        }
-      });
-      return analysisCheckCorrect;
+    processing() {
+      return this.isRunningAnalysis || !this.target;
     },
   },
   watch: {
@@ -190,7 +149,7 @@ export default {
     },
     jobSelectedForAnalysis(jobForAnalyze) {
       if (!jobForAnalyze) return;
-      this.setTargetsFromBlueConfig(jobForAnalyze);
+      this.setTargets(jobForAnalyze);
     },
   },
   methods: {
@@ -203,8 +162,8 @@ export default {
     targetChanged(newTarget) {
       this.target = newTarget;
     },
-    async setTargetsFromBlueConfig(job) {
-      const findTargetsInBC = (BCStr) => {
+    async setTargets(job) {
+      function findTargetsInBC(BCStr) {
         const regex = /Target (.+)/gm;
         const targets = [];
         let m = regex.exec(BCStr);
@@ -215,16 +174,16 @@ export default {
           m = regex.exec(BCStr);
         }
         return targets;
-      };
+      }
 
-      const getBlueConfigStr = async () => {
+      async function getBlueConfigStr() {
         const workingDirectory = get(job, '_links.workingDirectory.href');
         const blueConfigBlob = await getFiles(`${workingDirectory}/files/BlueConfig`);
         const blueConfigStr = await new Response(blueConfigBlob).text();
         return blueConfigStr;
-      };
+      }
 
-      const getTargetsByFileName = () => {
+      function getTargetsByFileName() {
         const targetsNames = [];
         this.reports.forEach((reportName) => {
           const matched = reportName.match('(.*)_report');
@@ -232,20 +191,20 @@ export default {
         });
         [this.target] = targetsNames;
         return targetsNames;
-      };
+      }
 
-      let targets = getTargetsByFileName();
+      let targets = getTargetsByFileName.bind(this)();
       if (!targets.length) {
         const blueConfigStr = await getBlueConfigStr();
         targets = intersection(findTargetsInBC(blueConfigStr));
       }
-      this.targetsFromBlueConfig = unmapBlueConfigTerms(targets);
-      [this.target] = this.targetsFromBlueConfig;
+      this.$set(this, 'targets', unmapBlueConfigTerms(targets));
+      this.$set(this, 'target', this.targets[0]);
     },
     generateAnalysisObjectToRun() {
       return {
         computerSelected: this.$store.state.currentComputer,
-        from: this.from,
+        from: {},
         nodes: analysisConfig.nodes,
         runtime: analysisConfig.runtime,
         title: this.title,

@@ -2,7 +2,7 @@
 <template>
   <div
     class="visualize-launcher in-corner"
-    v-if="computerHasVisualization"
+    v-if="computerHasVisualization && hasReports"
   >
     <i-button
       v-if="!vizIsReady"
@@ -49,6 +49,9 @@ export default {
   computed: {
     computerHasVisualization() {
       return !!visualizationConfig[this.$store.state.currentComputer];
+    },
+    hasReports() {
+      return this.simulationDetails.children.some(file => file.match('.bbp'));
     },
   },
   methods: {

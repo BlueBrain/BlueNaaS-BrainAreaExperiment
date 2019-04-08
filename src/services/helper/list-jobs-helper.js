@@ -25,8 +25,7 @@ async function analysisProducedResults(analysisWithFiles) {
 
 function simulationProducedResults(simulationWithFiles) {
   const simulationFiles = simulationWithFiles.children;
-  const hasReport = simulationFiles.some(file => file.match('.bbp'));
-  return simulationFiles.includes('/out.dat') && hasReport;
+  return simulationFiles.includes('/out.dat');
 }
 
 async function getUrlList() {

@@ -6,6 +6,7 @@
     <div
       v-for="analysis in analysisList"
       :key="analysis.param"
+      v-if="!skipAnalysis(analysis.param)"
       class="centered"
     >
       {{ analysis.name }}
@@ -38,7 +39,7 @@ import forEach from 'lodash/forEach';
 
 export default {
   name: 'analysis-picker',
-  props: ['analysisList'],
+  props: ['analysisList', 'hasReport'],
   data() {
     return {
       selections: {},
@@ -59,6 +60,9 @@ export default {
   methods: {
     getMaxBoundry(analysisName) {
       return this.isVoltagePlot(analysisName) ? 20 : 800;
+    },
+    skipAnalysis(analysisName) {
+      return this.isVoltagePlot(analysisName) && !this.hasReport;
     },
     isVoltagePlot(analysisName) {
       return analysisName === 'voltage_collage';

@@ -51,6 +51,7 @@ export default {
       return !!visualizationConfig[this.$store.state.currentComputer];
     },
     hasReports() {
+      if (!this.simulationDetails || !this.simulationDetails.children) return false;
       return this.simulationDetails.children.some(file => file.match('.bbp'));
     },
   },

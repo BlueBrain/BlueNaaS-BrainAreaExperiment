@@ -2,7 +2,7 @@
 <template>
   <div
     class="visualize-launcher in-corner"
-    v-if="computerHasVisualization && hasReports"
+    v-if="computerHasVisualization && hasReports && hasCollab"
   >
     <i-button
       v-if="!vizIsReady"
@@ -55,6 +55,9 @@ export default {
     hasReports() {
       if (!this.simulationDetails || !this.simulationDetails.children) return false;
       return this.simulationDetails.children.some(file => file.match('.bbp'));
+    },
+    hasCollab() {
+      return !!this.$store.state.collabIdForViz;
     },
   },
   methods: {

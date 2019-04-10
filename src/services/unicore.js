@@ -260,7 +260,7 @@ async function generateUnicoreConfig(configParams) {
     *   configParams { runtime, title, nodes, computerSelected, projectSelected }
     */
 
-  function getPatition() {
+  function getPartition() {
     function filterPartition(partitionsMap, userGroup) {
       const partitions = Object.keys(partitionsMap);
       const selectedProject = partitions.find(partition => userGroup.includes(partition));
@@ -288,6 +288,7 @@ async function generateUnicoreConfig(configParams) {
     } else {
       // is visualization
       environment.NUVLA__compute__collab_oidc = store.state.token;
+      environment.NUVLA__compute__collab_id = store.state.collabIdForViz;
     }
     return environment;
   }
@@ -322,7 +323,7 @@ async function generateUnicoreConfig(configParams) {
     Resources: {
       Nodes: getNodes(),
       Runtime: configParams.runtime,
-      Queue: getPatition(),
+      Queue: getPartition(),
       NodeConstraints: getNodeType(),
       Memory: getMemory(),
     },

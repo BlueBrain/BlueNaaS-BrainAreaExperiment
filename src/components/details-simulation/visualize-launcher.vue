@@ -27,6 +27,7 @@
 import { submitVisualization } from '@/services/helper/visualization-helper';
 import visualizationConfig from '@/config/visualization-config';
 import eventBus from '@/services/event-bus';
+import db from '@/services/db';
 
 export default {
   name: 'VisualizeLauncher',
@@ -45,6 +46,7 @@ export default {
       this.ip = ip;
       this.$Message.info({ content: `Visualization running on ${ip}` });
     });
+    this.loadPreviousConfig();
   },
   computed: {
     computerHasVisualization() {
@@ -57,16 +59,21 @@ export default {
   },
   methods: {
     createVisualizationVM() {
-      this.$Message.loading({
-        content: 'Visualization is starting. This could take up to 10 minutes ...',
-        duration: 5,
-      });
+      if (!this.$store.state.collabIdForViz) {
+        this.$Message.error('No Collab in query parameters. Initiate this app from BSP Collab.');
+        return;
+      }
+      this.$Message.loading('Visualization is starting. This could take up to 10 minutes ...');
       this.vizRunning = true;
       submitVisualization(this.simulationDetails)
         .catch(error => this.$Message.error(error.message));
     },
     openVisualization() {
       window.open(`http://${this.ip}/?host=${this.ip}:8200`, '_blank');
+    },
+    async loadPreviousConfig() {
+      const collabId = await db.getCollabIdForViz();
+      this.$store.commit('setCollabIdForViz', collabId);
     },
   },
 };

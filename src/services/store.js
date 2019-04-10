@@ -27,6 +27,7 @@ const store = new Vuex.Store({
     reportTargets: [],
     populationTargets: [],
     connectionTargets: [],
+    collabIdForViz: null,
   },
   mutations: {
     /* eslint-disable no-param-reassign */
@@ -75,6 +76,9 @@ const store = new Vuex.Store({
     },
     setAnalysisListIsLoading(state, value) {
       state.analysisListIsLoading = value;
+    },
+    setCollabIdForViz(state, collabId) {
+      state.collabIdForViz = collabId;
     },
   },
   actions: {

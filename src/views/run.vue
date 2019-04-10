@@ -55,6 +55,7 @@ import ConnectionManipulation from '@/components/run-simulation/connection-manip
 
 import unicore, { urlToComputerAndId } from '@/services/unicore';
 import simulationConfig from '@/config/simulation-config';
+import db from '@/services/db';
 import '@/assets/css/simulation.css';
 
 export default {
@@ -90,6 +91,8 @@ export default {
 
     const connectionManipulationTargets = allTargets;
     this.$store.commit('setConnectionTargets', connectionManipulationTargets);
+
+    db.saveCollabIdForViz(this.$route.query.collab);
   },
   methods: {
     viewList() {

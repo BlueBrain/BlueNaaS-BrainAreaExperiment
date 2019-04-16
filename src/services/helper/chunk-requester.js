@@ -8,6 +8,7 @@ class ChunkRequester {
     this.fetchFn = fetchFn;
     this.onFinish = () => {};
   }
+
   addJobs(jobs) {
     this.jobs.push(...jobs);
     if (!this.jobs.length) {
@@ -18,12 +19,15 @@ class ChunkRequester {
       this.process();
     }
   }
+
   cancelFetching() {
     this.jobs = [];
   }
+
   setOnFinishFn(func) {
     this.onFinish = func;
   }
+
   process() {
     if (this.freeReqWorkers === this.parallelRequests && !this.jobs.length) {
       this.onFinish();

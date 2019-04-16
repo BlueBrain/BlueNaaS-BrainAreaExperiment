@@ -97,7 +97,7 @@ export default {
       );
     },
     listIsLoading() {
-      return this.$store.state.analysisListIsLoading;
+      return this.$store.state.list.analysisAreLoading;
     },
   },
   methods: {

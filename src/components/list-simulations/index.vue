@@ -88,11 +88,11 @@ export default {
   },
   computed: {
     listIsLoading() {
-      return this.$store.state.listIsLoading;
+      return this.$store.state.list.isLoading;
     },
     emptyList() {
       const isEmpty = (this.$store.state.currentComputer === this.$route.params.computerParam)
-        && !this.$store.state.listIsLoading && !this.viewList.length;
+        && !this.$store.state.list.isLoading && !this.viewList.length;
       return isEmpty;
     },
   },

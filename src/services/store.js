@@ -1,6 +1,7 @@
 
 import Vue from 'vue';
 import Vuex from 'vuex';
+import listModule from '@/services/store-list-module';
 
 import initialStateGenerator from '@/services/helper/initial-state-generator';
 
@@ -20,14 +21,15 @@ const store = new Vuex.Store({
     userGroup: null,
     userGroupTmp: null,
     userGroupsAvailable: [],
-    listIsLoading: true,
-    analysisListIsLoading: true,
     pollInterval: 10 * 1000,
     stimulationTargets: [],
     reportTargets: [],
     populationTargets: [],
     connectionTargets: [],
     collabIdForViz: null,
+  },
+  modules: {
+    list: listModule,
   },
   mutations: {
     /* eslint-disable no-param-reassign */
@@ -70,12 +72,6 @@ const store = new Vuex.Store({
     },
     setToken(state, newToken) {
       state.token = newToken;
-    },
-    setListIsLoading(state, value) {
-      state.listIsLoading = value;
-    },
-    setAnalysisListIsLoading(state, value) {
-      state.analysisListIsLoading = value;
     },
     setCollabIdForViz(state, collabId) {
       state.collabIdForViz = collabId;

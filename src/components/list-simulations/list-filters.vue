@@ -97,7 +97,7 @@ export default {
       return this.$store.state.userGroupsAvailable;
     },
     listIsLoading() {
-      return this.$store.state.listIsLoading;
+      return this.$store.state.list.isLoading;
     },
     selectedGroup: {
       get() {

@@ -19,6 +19,7 @@ export default {
   },
   NUVLA: {
     dynamicAnalysis: true,
+    bulkAnalysis: true,
     executable: 'epfl-mooc/analysis/launch_analysis',
   },
   filesToAvoidCopy: [
@@ -47,5 +48,6 @@ export default {
   nodes: 1,
   runtime: 500,
   externalDynamicAnalysisConfig: 'https://raw.githubusercontent.com/BlueBrain/MOOC-hippocampus-network-simulation-2019/master/analysis_config.json',
+  externalBulkAnalysisConfig: 'https://raw.githubusercontent.com/BlueBrain/MOOC-hippocampus-network-simulation-2019/bulk-analysis/bulk_analysis_config.json',
   usecasesCreationForm: 'https://bbp.epfl.ch/public/dev.usecases-wizard/index.html#/entitydashboard?',
 };

@@ -17,6 +17,10 @@ This component will be the frame for view the simulations.
         class="margined-right"
       />
 
+      <bulk-edit
+        class="margined-right"
+      />
+
       <i-button
         type="primary"
         icon="ios-arrow-back"
@@ -37,6 +41,7 @@ This component will be the frame for view the simulations.
 import ListSimulations from '@/components/list-simulations/index.vue';
 import ListFilters from '@/components/list-simulations/list-filters.vue';
 import ImportSimulation from '@/components/list-simulations/import-simulation.vue';
+import BulkEdit from '@/components/list-simulations/bulk-edit.vue';
 
 export default {
   name: 'SimulationsList',
@@ -45,6 +50,7 @@ export default {
     ListSimulations,
     ListFilters,
     ImportSimulation,
+    BulkEdit,
   },
   data() {
     return {

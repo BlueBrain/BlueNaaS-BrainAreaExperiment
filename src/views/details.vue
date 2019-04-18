@@ -29,7 +29,8 @@ This will display the details of a certain simulation and the analysis.
 
     <analysis-in-notebook
       v-if="simulationWasSuccessful"
-      :simulation-details="simulationDetails"
+      :replace-text="simulationId"
+      :config-url="analysisNotebookConfig"
     />
 
     <div class="detail-content" :class="{'full-disable': !simulationDetails.id}">
@@ -116,10 +117,11 @@ import CollapseTitle from '@/components/shared/collapse-title.vue';
 import ItemSummary from '@/components/details-simulation/item-summary.vue';
 import AnalysisSection from '@/components/details-simulation/analysis-section.vue';
 import DisplayOrDownload from '@/components/shared/display-or-download.vue';
-import AnalysisInNotebook from '@/components/details-simulation/analysis-in-notebook.vue';
+import AnalysisInNotebook from '@/components/shared/analysis-in-notebook.vue';
 import VisualizeLauncher from '@/components/details-simulation/visualize-launcher.vue';
 import eventBus from '@/services/event-bus';
 import db from '@/services/db';
+import analysisConfig from '@/config/analysis-config';
 import { getComputerProjectCombo } from '@/common/utils';
 import { isRunning, jobStatus } from '@/common/job-status';
 import { simulationProducedResults } from '@/services/helper/list-jobs-helper';
@@ -133,6 +135,7 @@ export default {
     AnalysisSection,
     AnalysisInNotebook,
     VisualizeLauncher,
+    analysisConfig,
   },
   props: ['jobId', 'computerParam'],
   data() {
@@ -150,6 +153,13 @@ export default {
       const isSuccessful = this.simulationDetails.status === jobStatus.SUCCESSFUL;
       const hasResults = simulationProducedResults(this.job);
       return isSuccessful && hasResults;
+    },
+    simulationId() {
+      return this.simulationDetails.id ||
+        unicore.urlToComputerAndId(this.simulationDetails.url).id;
+    },
+    analysisNotebookConfig() {
+      return analysisConfig.externalDynamicAnalysisConfig;
     },
   },
   mounted() {

@@ -8,9 +8,10 @@
       type="primary"
       icon="md-flask"
       @click="showModal = true"
+      :disabled="disabled"
     >Analyze in Notebook</i-button>
 
-    <Modal
+    <modal
       v-model="showModal"
       title="Choose Analysis Notebook"
       width="250"
@@ -35,7 +36,7 @@
           @click="prepareAnalysis"
         >Continue</i-button>
       </div>
-    </Modal>
+    </modal>
   </div>
 </template>
 
@@ -45,11 +46,11 @@ import analysisConfig from '@/config/analysis-config';
 import forEach from 'lodash/forEach';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
-import { urlToComputerAndId } from '@/services/unicore';
+
 
 export default {
   name: 'AnalysisInNotebook',
-  props: ['simulationDetails'],
+  props: ['replaceText', 'disabled', 'configUrl'],
   data() {
     return {
       showModal: false,
@@ -59,12 +60,16 @@ export default {
     };
   },
   created() {
-    fetch(analysisConfig.externalDynamicAnalysisConfig)
+    fetch(this.configUrl)
       .then(result => result.json())
       .then((config) => {
         if (!config) return;
         this.analysisList = config;
         this.configReady = true;
+      })
+      .catch((error) => {
+        console.error(error);
+        this.$Message.error('Error fetching analysis in notebook config');
       });
   },
   computed: {
@@ -82,8 +87,8 @@ export default {
       forEach(replaceObj, (value, key) => {
         queryParams.append(key, value);
       });
-      const jobId = urlToComputerAndId(this.simulationDetails.url).id;
-      queryParams.append('replaceText', jobId);
+
+      queryParams.append('replaceText', this.replaceText);
 
       const url = analysisConfig.usecasesCreationForm + queryParams.toString();
       window.open(url, '_blank');

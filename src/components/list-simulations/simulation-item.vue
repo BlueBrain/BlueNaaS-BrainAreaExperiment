@@ -4,6 +4,17 @@ This will only display the item. It knows where to put all the information.
 -->
 <template>
   <div class="simulation-item" :class="{ 'all-done': allDone }">
+
+    <div
+      class="bulk-section"
+      v-if="bulkEditActivated"
+    >
+      <checkbox
+        v-if="simulationSuccessful"
+        @on-change="bulkSelectionChanged"
+      />
+    </div>
+
     <div class="name">{{ job.name }}</div>
 
     <div class="status simulation">
@@ -99,6 +110,12 @@ export default {
     listIsLoading() {
       return this.$store.state.list.analysisAreLoading;
     },
+    bulkEditActivated() {
+      return this.$store.state.list.bulkEditActivated;
+    },
+    simulationSuccessful() {
+      return this.job.status === jobStatus.SUCCESSFUL;
+    },
   },
   methods: {
     getStatusString(status) {
@@ -117,6 +134,13 @@ export default {
       }
       return analysisStatus;
     },
+    bulkSelectionChanged(willAnalyse) {
+      if (willAnalyse) {
+        this.$store.commit('addSimulationToBulkAnalyse', this.job.id);
+      } else {
+        this.$store.commit('removeSimulationToBulkAnalyse', this.job.id);
+      }
+    },
   },
 };
 </script>
@@ -130,6 +154,15 @@ export default {
     &.all-done {
       background-color: #19b76708;
     }
+
+    .bulk-section {
+      width: 10px;
+      margin: 0 4px;
+      &+ .name {
+        width: 34%;
+      }
+    }
+
     div {
       text-align: center;
 

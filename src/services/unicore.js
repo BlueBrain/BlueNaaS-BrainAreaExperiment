@@ -9,21 +9,30 @@ import store from '@/services/store';
 import db from '@/services/db';
 import simulationConfig from '@/config/simulation-config';
 
-function init() {
-  axios.defaults.headers.common.Accept = 'application/json';
-  axios.defaults.headers.common['Content-Type'] = 'application/json';
-  axios.defaults.headers.post['Content-Type'] = 'application/json';
-  axios.defaults.headers.put['Content-Type'] = 'application/octet-stream';
+const axiosInstance = axios.create({
+  headers: {
+    'X-Custom-Header': 'foobar',
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+    post: {
+      'Content-Type': 'application/json',
+    },
+    put: {
+      'Content-Type': 'application/octet-stream',
+    },
+  },
+});
 
-  axios.interceptors.request.use((config) => {
+function init() {
+  axiosInstance.interceptors.request.use((config) => {
     // Do something before request is sent
     const newConfig = config;
 
     if (store.state.userGroupTmp) {
       // used for temporal calls (when work with multiple user accounts in the same operation)
-      newConfig.headers.common['X-UNICORE-User-Preferences'] = `group:${store.state.userGroupTmp}`;
+      newConfig.headers['X-UNICORE-User-Preferences'] = `group:${store.state.userGroupTmp}`;
     } else if (store.state.userGroup && store.state.userGroup !== '*') {
-      newConfig.headers.common['X-UNICORE-User-Preferences'] = `group:${store.state.userGroup}`;
+      newConfig.headers['X-UNICORE-User-Preferences'] = `group:${store.state.userGroup}`;
     }
 
     // Download a file
@@ -33,18 +42,23 @@ function init() {
       !newConfig.url.endsWith('/files/') &&
       !newConfig.url.endsWith('uspace')
     ) {
-      newConfig.headers.common.Accept = 'application/octet-stream';
+      newConfig.headers.Accept = 'application/octet-stream';
     }
 
     // avoid sending param when ask for the user projects
     if (newConfig.url.endsWith('/rest/core')) {
-      delete newConfig.headers.common['X-UNICORE-User-Preferences'];
+      delete newConfig.headers['X-UNICORE-User-Preferences'];
     }
 
     return newConfig;
   }, error => error);
 }
+
 init();
+
+function setAxiosToken(token) {
+  axiosInstance.defaults.headers.Authorization = `Bearer ${token}`;
+}
 
 function getComputeProviders() {
   return computeProvider;
@@ -52,7 +66,7 @@ function getComputeProviders() {
 
 function actionJob(actionURL) {
   // initiate some actions like start, restart, abort
-  return axios({
+  return axiosInstance({
     url: actionURL,
     method: 'post',
     data: JSON.stringify({}),
@@ -60,7 +74,7 @@ function actionJob(actionURL) {
 }
 
 function getInfoByUrl(transferUrl) {
-  return axios(transferUrl);
+  return axiosInstance(transferUrl);
 }
 
 function urlToComputerAndId(jobURL) {
@@ -87,7 +101,7 @@ function getProjectSelectedByLog(log) {
 }
 
 function createJob(url, jobDefinition) {
-  return axios({
+  return axiosInstance({
     url: `${url}/jobs`,
     method: 'post',
     data: JSON.stringify(jobDefinition),
@@ -95,7 +109,7 @@ function createJob(url, jobDefinition) {
 }
 
 async function deleteJob(url) {
-  await axios({
+  await axiosInstance({
     url,
     method: 'delete',
     data: JSON.stringify({}),
@@ -106,7 +120,7 @@ async function deleteJob(url) {
 function uploadData(dataToUpload, uploadURL) {
   const data = dataToUpload.Data;
   const target = dataToUpload.To;
-  return axios({
+  return axiosInstance({
     url: `${uploadURL}/${target}`,
     method: 'put',
     data,
@@ -116,7 +130,7 @@ function uploadData(dataToUpload, uploadURL) {
 async function getAllJobs(computer) {
   const unicoreURL = getComputeProviders()[computer.toUpperCase()].url;
   try {
-    const response = await axios(`${unicoreURL}/jobs`);
+    const response = await axiosInstance(`${unicoreURL}/jobs`);
     return response.data.jobs;
   } catch (error) {
     console.error(error);
@@ -185,7 +199,7 @@ async function populateJobsWithFiles(jobsListUrl) {
 }
 
 function getFiles(jobURL) {
-  return axios({
+  return axiosInstance({
     url: jobURL,
     method: 'get',
     responseType: 'blob',
@@ -334,7 +348,7 @@ async function generateUnicoreConfig(configParams) {
 
 async function getImage(imageURL) {
   try {
-    const response = await axios({
+    const response = await axiosInstance({
       url: imageURL,
       method: 'get',
       responseType: 'blob',
@@ -412,7 +426,7 @@ async function submitJob(runConfig, inputs = [], startLater = false) {
 
 async function workingDirToMachinePath(workingDirectory) {
   try {
-    const response = await axios(workingDirectory);
+    const response = await axiosInstance(workingDirectory);
     return response.data.mountPoint;
   } catch (e) {
     return Promise.reject(new Error('no mount point'));
@@ -460,4 +474,6 @@ export {
   getFiles,
   importPersonalSimulation,
   populateJobsWithFiles,
+  axiosInstance,
+  setAxiosToken,
 };

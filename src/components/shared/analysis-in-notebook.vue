@@ -43,6 +43,7 @@
 
 <script>
 import analysisConfig from '@/config/analysis-config';
+import axios from 'axios';
 import forEach from 'lodash/forEach';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
@@ -60,11 +61,10 @@ export default {
     };
   },
   created() {
-    fetch(this.configUrl)
-      .then(result => result.json())
+    axios(this.configUrl)
       .then((config) => {
         if (!config) return;
-        this.analysisList = config;
+        this.analysisList = config.data;
         this.configReady = true;
       })
       .catch((error) => {

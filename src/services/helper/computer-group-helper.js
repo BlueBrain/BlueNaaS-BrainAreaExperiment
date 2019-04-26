@@ -1,12 +1,11 @@
 
 import store from '@/services/store';
-import axios from 'axios';
-import { getComputeProviders } from '@/services/unicore';
+import { getComputeProviders, axiosInstance } from '@/services/unicore';
 import eventBus from '@/services/event-bus';
 
 function getUser(computer) {
   const unicoreURL = getComputeProviders()[computer.toUpperCase()].url;
-  return axios(unicoreURL).then(r => r.data);
+  return axiosInstance(unicoreURL).then(r => r.data);
 }
 
 function setupFromStorage(newGroup) {

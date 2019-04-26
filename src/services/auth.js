@@ -1,6 +1,6 @@
 
 import { JSO } from 'jso';
-import axios from 'axios';
+import { setAxiosToken } from '@/services/unicore';
 
 import store from '@/services/store';
 import config from '@/config';
@@ -32,7 +32,7 @@ function init() {
   const authorization = client.getToken();
   authorization.then((session) => {
     store.commit('setToken', session.access_token);
-    axios.defaults.headers.common.Authorization = `Bearer ${session.access_token}`;
+    setAxiosToken(session.access_token);
   });
 
   return authorization;

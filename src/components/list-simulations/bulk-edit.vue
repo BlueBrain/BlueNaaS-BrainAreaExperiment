@@ -58,11 +58,9 @@ export default {
       return this.$store.state.list.bulkEditActivated;
     },
     listOfSimulationsToAnalyse() {
-      /* this will return an array in string in format [\"123\", \"456\"] to be passed
-      as query param to usecases-wizard and be replaced in notebook placeholder */
-      const unescaped = JSON.stringify(this.$store.state.list.simulationsToBulkAnalyse);
-      const escaped = unescaped.replace(/"/g, '\\"');
-      return escaped;
+      /* this will return an array in string format to be passed as query
+      param to usecases-wizard and be replaced in notebook placeholder */
+      return JSON.stringify(this.$store.state.list.simulationsToBulkAnalyse);
     },
     hasSelected() {
       return this.$store.state.list.simulationsToBulkAnalyse.length;

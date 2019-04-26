@@ -88,7 +88,7 @@ export default {
         queryParams.append(key, value);
       });
 
-      queryParams.append('replaceText', this.replaceText);
+      queryParams.append('replaceText', encodeURIComponent(this.replaceText));
 
       const url = analysisConfig.usecasesCreationForm + queryParams.toString();
       window.open(url, '_blank');

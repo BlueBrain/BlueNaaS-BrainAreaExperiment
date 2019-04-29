@@ -78,10 +78,17 @@ function getComputerProjectCombo() {
   return store.state.currentComputer + store.state.userGroup + window.location.href;
 }
 
+function getDate3YearFromNow() {
+  const futureDate = new Date();
+  futureDate.setFullYear(futureDate.getFullYear() + 3);
+  return futureDate;
+}
+
 export {
   convertToBCFormat,
   openContent,
   mapBlueConfigTerms,
   unmapBlueConfigTerms,
   getComputerProjectCombo,
+  getDate3YearFromNow,
 };

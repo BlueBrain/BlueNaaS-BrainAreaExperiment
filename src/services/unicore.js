@@ -8,6 +8,7 @@ import computeProvider from '@/common/compute-provider.json';
 import store from '@/services/store';
 import db from '@/services/db';
 import simulationConfig from '@/config/simulation-config';
+import { getDate3YearFromNow } from '@/common/utils';
 
 const axiosInstance = axios.create({
   headers: {
@@ -372,6 +373,21 @@ function getJobById(jobId) {
   return getJobProperties(url);
 }
 
+function updateDeletionDate(jobURL) {
+  const futureDate = getDate3YearFromNow();
+  // converting from "2019-04-29T14:22:28.320Z" to "2019-04-29 14:22"
+  const terminationTime = futureDate.toISOString()
+    .replace('T', ' ')
+    .replace(/:[0-9][0-9]\..+/, '');
+
+  return axiosInstance({
+    url: jobURL,
+    method: 'put',
+    data: { terminationTime },
+  })
+    .catch((e) => { throw new Error(`update termination date ${e}`); });
+}
+
 async function submitJob(runConfig, inputs = [], startLater = false) {
   /**
     * runConfig {computer, project }
@@ -388,6 +404,7 @@ async function submitJob(runConfig, inputs = [], startLater = false) {
     const job = await createJob(unicoreURL, launchParams);
 
     const jobURL = job.headers.location;
+    await updateDeletionDate(jobURL);
     const jobProperties = await getJobProperties(jobURL);
     /* eslint-disable no-underscore-dangle */
     const workingDirectory = jobProperties._links.workingDirectory.href;

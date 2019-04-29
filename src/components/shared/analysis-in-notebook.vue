@@ -33,6 +33,7 @@
         <i-button
           type="primary"
           :loading="!configReady"
+          :disabled="!analysisSelected"
           @click="prepareAnalysis"
         >Continue</i-button>
       </div>

@@ -177,7 +177,7 @@ export default {
       return {
         StartTime: 0,
         EndTime: parseInt(this.$store.state.simulationDuration, 10),
-        ReportOn: 'voltage',
+        ReportOn: 'Voltage',
         Unit: 'mV',
         Target: target || this.$store.state.simulationPopulation,
         Type: 'Soma',
@@ -202,6 +202,10 @@ export default {
       }
     },
 
+    getReportUnit(reportMapped) {
+      return reportMapped.ReportOn.includes('v') ? 'mV' : 'mM';
+    },
+
     createConfig() {
       const config = {};
       config.Report = {};
@@ -214,6 +218,7 @@ export default {
           'report',
           index,
         );
+        reportMapped.Unit = this.getReportUnit(reportMapped);
         config.Report[repName] = reportMapped;
       });
       return config;

@@ -8,9 +8,10 @@ import isEqual from 'lodash/isEqual';
 import store from '@/services/store';
 
 const mapper = {
-  voltage: 'v',
+  Voltage: 'v',
   Soma: 'compartment',
   Poisson: 'NPoisson',
+  'Calcium Concentration': 'cai',
 };
 
 // add targets to mapper for later conversion to BlueConfig and vice-versa

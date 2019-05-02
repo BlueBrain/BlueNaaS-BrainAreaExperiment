@@ -41,7 +41,7 @@ export default {
   analysisAvailable: [
     { param: 'firing_rate_histogram', name: 'Peristimulus Time Histogram' },
     { param: 'raster', name: 'Spike Raster Plot' },
-    { param: 'voltage_collage', name: 'Voltage Trace Plot', report_select: true },
+    { param: 'voltage_collage', name: 'Trace Plot of Report', report_select: true },
   ],
   configFileName: 'analysis_config.json',
   analysisConnectionFileName: 'analysis_path.json',

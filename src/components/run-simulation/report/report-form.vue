@@ -45,14 +45,20 @@
             </i-select>
           </form-item>
 
+          <form-item prop="ReportOn">
+            <tooltip
+              slot="label"
+              content="The NEURON variable to access"
+            >ReportOn</tooltip>
+            <i-select
+              v-model="reportInfo.ReportOn"
+            >
+              <i-option value="Voltage">Voltage</i-option>
+              <i-option value="Calcium Concentration">Calcium Concentration</i-option>
+            </i-select>
+          </form-item>
+
           <!-- <div class="form-group">
-            <label class="control-label" title="The NEURON variable to access.">ReportOn</label>
-            <div class="controls">
-                <input v-model="reportInfo.ReportOn" type="text"
-                id="ReportOn" placeholder="ReportOn" required class="form-control" disabled>
-            </div>
-          </div>
-          <div class="form-group">
             <label class="control-label" title="The unit of the NEURON variable.">Unit</label>
             <div class="controls">
               <select v-model="reportInfo.Unit" type="text"

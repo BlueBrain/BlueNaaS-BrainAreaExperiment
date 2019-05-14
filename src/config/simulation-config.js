@@ -50,7 +50,6 @@ export default {
   importSimulationScript: 'ln -sf SIMFOLDERPATH/* .',
   stimuli: [
     { name: 'Linear', params: ['AmpStart', 'AmpEnd'] },
-    { name: 'Pulse', params: ['Width', 'Frequency', 'Offset'] },
     { name: 'NPoisson', params: ['Lambda', 'Weight', 'NumOfSynapses'] },
     { name: 'Noise', params: ['MeanPercent', 'Variance'] },
   ],

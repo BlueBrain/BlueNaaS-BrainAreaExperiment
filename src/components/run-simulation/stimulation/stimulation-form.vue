@@ -151,55 +151,6 @@
           </form-item>
 
           <form-item
-            v-if="showStimulusParam('Width')"
-            prop="Width"
-            required
-          >
-            <tooltip
-              slot="label"
-              content="Duration in milliseconds (ms) of a single pulse"
-            >Width</tooltip>
-            <input-number
-              v-model="localStimInfo.Width"
-              :min="0"
-              placeholder="5"
-              :step="1"
-            />
-          </form-item>
-
-          <form-item
-            v-if="showStimulusParam('Frequency')"
-            prop="Frequency"
-            required
-          >
-            <tooltip
-              slot="label"
-              content="Frequency of pulse trains"
-            >Frequency</tooltip>
-            <input-number
-              v-model="localStimInfo.Frequency"
-              :min="0"
-              placeholder="80"
-            />
-          </form-item>
-
-          <form-item
-            v-if="showStimulusParam('Offset')"
-            prop="Offset"
-            required
-          >
-            <tooltip
-              slot="label"
-              content="A std dev value each cell will apply to the Delay in order to add variation to the stimulation."
-            >Offset</tooltip>
-            <input-number
-              v-model="localStimInfo.Offset"
-              :min="0"
-              placeholder="0"
-            />
-          </form-item>
-
-          <form-item
             v-if="showStimulusParam('MeanPercent')"
             prop="MeanPercent"
             required

@@ -55,6 +55,7 @@ import ConnectionManipulation from '@/components/run-simulation/connection-manip
 
 import unicore, { urlToComputerAndId } from '@/services/unicore';
 import simulationConfig from '@/config/simulation-config';
+import { jobTags } from '@/common/job-status';
 import db from '@/services/db';
 import '@/assets/css/simulation.css';
 
@@ -117,6 +118,10 @@ export default {
       }
       newRunConfig.executable = currentSimConfig.executable;
       newRunConfig.environment = currentSimConfig.environment;
+
+      const newTags = newRunConfig.tags || [];
+      newTags.push(jobTags.SIMULATION);
+      newRunConfig.tags = newTags;
 
       let submittedJob;
       try {

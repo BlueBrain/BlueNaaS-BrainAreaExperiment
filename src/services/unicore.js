@@ -291,6 +291,10 @@ async function generateUnicoreConfig(configParams) {
     return configParams.executable || '/bin/bash input.sh';
   }
 
+  function getJobTags() {
+    return configParams.tags || null;
+  }
+
   function getEnvironment() {
     const environment = {};
     if (configParams.computerSelected !== 'NUVLA') return environment;
@@ -310,7 +314,7 @@ async function generateUnicoreConfig(configParams) {
 
   function getNodes() {
     // avoid setting nodes for test job submission
-    return configParams.runtime < 300 ? null : configParams.nodes;
+    return configParams.runtime < 200 ? null : configParams.nodes;
   }
 
   function getNodeType() {
@@ -342,6 +346,7 @@ async function generateUnicoreConfig(configParams) {
       NodeConstraints: getNodeType(),
       Memory: getMemory(),
     },
+    Tags: getJobTags(),
     Imports: configParams.imports,
   });
   return jobSpec;

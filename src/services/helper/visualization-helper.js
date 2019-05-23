@@ -4,6 +4,7 @@ import visualizationConfig from '@/config/visualization-config';
 import store from '@/services/store';
 import collabHelper from '@/services/helper/collab-helper';
 import eventBus from '@/services/event-bus';
+import { jobTags } from '@/common/job-status';
 
 // TODO: merge with analaysis_helper getFilesToCopy
 async function getFilesToCopy(filesURL) {
@@ -55,6 +56,10 @@ async function submitVisualization(simulationDetails) {
   vizConfig.computerSelected = vizConfig.to;
   vizConfig.projectSelected = store.state.userGroup;
   vizConfig.title = `${visualizationConfig.jobNamePrefix} ${simulationDetails.name}`;
+
+  const newTags = vizConfig.tags || [];
+  newTags.push(jobTags.VISUALIZATION);
+  vizConfig.tags = newTags;
 
   await unicore.submitJob(vizConfig, []);
   pollingVizIp();

@@ -11,6 +11,13 @@ const jobStatus = {
   UNDEFINED: 'UNDEFINED',
 };
 
+const jobTags = {
+  ANALYSIS: 'analysis',
+  SIMULATION: 'simulation',
+  VISUALIZATION: 'visualization',
+  LFP_SIMULATION: 'lfp_simulation',
+};
+
 const iconMap = {
   [jobStatus.SUCCESSFUL]: 'md-checkmark-circle',
   [jobStatus.FAILED]: 'ios-close-circle',
@@ -55,4 +62,5 @@ export {
   isEnded,
   jobStatus,
   statesFilter,
+  jobTags,
 };

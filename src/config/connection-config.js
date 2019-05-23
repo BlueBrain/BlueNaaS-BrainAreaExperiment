@@ -39,7 +39,6 @@ function getDefaultConnections() {
     weight: 0,
     spontMinis: 0,
     delay: 0,
-    // # no GABA_B (so far)
   }];
 }
 

@@ -12,12 +12,13 @@ const fullca1 = {
     PIZ_DAINT: '/apps/hbp/ich002/home/antonel/full_ca1',
   },
   paths: {
-    MorphologyPath: '/r2017.06b/MorphologyRelease/',
-    METypePath: '/r2017.06b/ccells/',
-    CircuitPath: '/r2017.06b/',
-    CurrentDir: '/r2017.06b/',
-    nrnPath: '/r2017.06b/S2F/',
-    TargetFile: '/r2017.06b/user.target',
+    MorphologyPath: '<%= prefix %>/r2017.06b/MorphologyRelease/',
+    METypePath: '<%= prefix %>/r2017.06b/ccells/',
+    CircuitPath: '<%= prefix %>/r2017.06b/',
+    nrnPath: '<%= prefix %>/r2017.06b/S2F/',
+    TargetFile: '<%= prefix %>/r2017.06b/user.target',
+    CurrentDir: '.',
+    OutputRoot: '.',
   },
   targets: [
     { name: 'slice-6', displayName: 'Slice-6', src: `${slicesImgBase}/slice-6.png` },
@@ -87,35 +88,35 @@ const fullca1 = {
 
 /*
 |--------------------------------------------------------------------------
-| MOOC Microcircuit
+| O1 Microcircuit
 |--------------------------------------------------------------------------
 */
 
-// https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/images-slices-mooc/mosaic.png images-slices-CA1
-const moocImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/images-slices-mooc';
+const microcircuitImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/images-slices-mooc';
 const microcircuit = {
   prefix: {
-    NUVLA: '/mooc',
+    JURECA: '/p/project/cvsk25/vsk2512/O1',
+    PIZ_DAINT: '/apps/hbp/ich002/home/antonel/O1',
   },
   paths: {
-    MorphologyPath: '/entities/morphologies/20180417/',
-    METypePath: '/entities/emodels/20180504b/hoc/',
-    MEComboInfoFile: '/entities/emodels/20180504b/mecombo_emodel.tsv',
-    CircuitPath: '/circuits/O1/20181114/',
-    nrnPath: '/circuits/O1/20181114/connectome/functional/',
-    TargetFile: '/circuits/O1/20181114/user.target',
+    MorphologyPath: '<%= prefix %>/entities/morphologies/20180417/',
+    METypePath: '<%= prefix %>/entities/emodels/20180504b/hoc/',
+    MEComboInfoFile: '<%= prefix %>/entities/emodels/20180504b/mecombo_emodel.tsv',
+    CircuitPath: '<%= prefix %>/circuits/O1/20181114/',
+    nrnPath: '<%= prefix %>/circuits/O1/20181114/connectome/functional/',
+    TargetFile: '<%= prefix %>/circuits/O1/20181114/user.target',
     CellLibraryFile: 'circuit.mvd3',
-    CurrentDir: '/io',
-    OutputRoot: '/io',
+    CurrentDir: '.',
+    OutputRoot: '.',
   },
   targets: [
-    { name: 'Random1PercFull', displayName: 'Random 1% full circuit', src: `${moocImgBase}/1p.png` },
-    { name: 'Random5PercFull', displayName: 'Random 5% full circuit', src: `${moocImgBase}/5p.png` },
-    { name: 'Random10PercFull', displayName: 'Random 10% full circuit', src: `${moocImgBase}/10p.png` },
-    { name: 'Random500Central', displayName: 'Random 500 central column', src: `${moocImgBase}/500.png` },
-    { name: 'Random1KCentral', displayName: 'Random 1K central column', src: `${moocImgBase}/1K.png` },
-    { name: 'mc2_Column', displayName: 'Central Column', src: `${moocImgBase}/central_column.png` },
-    { name: 'Mosaic', displayName: 'Full Circuit', src: `${moocImgBase}/full_circuit.png` },
+    { name: 'Random1PercFull', displayName: 'Random 1% full circuit', src: `${microcircuitImgBase}/1p.png` },
+    { name: 'Random5PercFull', displayName: 'Random 5% full circuit', src: `${microcircuitImgBase}/5p.png` },
+    { name: 'Random10PercFull', displayName: 'Random 10% full circuit', src: `${microcircuitImgBase}/10p.png` },
+    { name: 'Random500Central', displayName: 'Random 500 central column', src: `${microcircuitImgBase}/500.png` },
+    { name: 'Random1KCentral', displayName: 'Random 1K central column', src: `${microcircuitImgBase}/1K.png` },
+    { name: 'mc2_Column', displayName: 'Central Column', src: `${microcircuitImgBase}/central_column.png` },
+    { name: 'Mosaic', displayName: 'Full Circuit', src: `${microcircuitImgBase}/full_circuit.png` },
     { name: 'All', displayName: 'All' },
     { name: 'Excitatory', displayName: 'Excitatory' },
     { name: 'Inhibitory', displayName: 'Inhibitory' },
@@ -159,16 +160,18 @@ const microcircuit = {
     { name: 'slice450', displayName: 'slice450' },
     { name: 'slice325', displayName: 'slice325' },
     { name: 'slice315', displayName: 'slice315' },
+    { name: 'AllCompartments', displayName: 'AllCompartments' },
   ],
-  reportsTargetFilter: '(Random.{1,2}Perc|mc2_Column|Mosaic)',
+  reportsTargetFilter: '(Random.{1,2}Perc|mc2_Column|Mosaic|AllCompartments)',
   stimulationTargetFilter: '(Central|mc2_Column|Mosaic)',
+  checksForLFP: ['AllCompartments', 'Summation'],
   biggestTarget: 'Full Circuit',
   defaultPopulation: 'Central Column',
   displayName: 'Hippocampus CA1 microcircuit',
   extraParamsInBC: {
     Projection: {
       SC: {
-        Path: '/mooc/circuits/O1/20181114/projection',
+        Path: '<%= prefix %>/circuits/O1/20181114/projection',
         Source: 'proj_nrn',
         Type: 'Synaptic',
       },
@@ -192,7 +195,28 @@ const microcircuit = {
   },
 };
 
+
+/*
+|--------------------------------------------------------------------------
+| MOOC Microcircuit
+|--------------------------------------------------------------------------
+*/
+
+const newPaths = Object.assign({}, { ...microcircuit.paths }, { CurrentDir: '/io', OutputRoot: '/io' });
+const moocmicrocircuit = Object.assign(
+  {},
+  { ...microcircuit },
+  {
+    prefix: {
+      NUVLA: '/mooc',
+    },
+    paths: newPaths,
+    reportsTargetFilter: '(Random.{1,2}Perc|mc2_Column|Mosaic)',
+  },
+);
+
 export default {
   fullca1,
+  moocmicrocircuit,
   microcircuit,
 };

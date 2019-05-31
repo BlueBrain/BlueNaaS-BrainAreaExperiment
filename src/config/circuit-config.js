@@ -6,7 +6,7 @@
 */
 const slicesImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/images-slices-CA1';
 
-const fullca1 = {
+const hippoFullCa1 = {
   prefix: { // setting prefix allow to know which computer can run the circuit
     JURECA: '/p/project/cpcp0/pcp0068/CircuitRelease',
     PIZ_DAINT: '/apps/hbp/ich002/home/antonel/full_ca1',
@@ -93,7 +93,7 @@ const fullca1 = {
 */
 
 const microcircuitImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/images-slices-mooc';
-const microcircuit = {
+const hippoMicrocircuit = {
   prefix: {
     JURECA: '/p/project/cvsk25/vsk2512/O1',
     PIZ_DAINT: '/apps/hbp/ich002/home/antonel/O1',
@@ -202,21 +202,26 @@ const microcircuit = {
 |--------------------------------------------------------------------------
 */
 
-const newPaths = Object.assign({}, { ...microcircuit.paths }, { CurrentDir: '/io', OutputRoot: '/io' });
-const moocmicrocircuit = Object.assign(
+const newPaths = Object.assign({}, { ...hippoMicrocircuit.paths }, { CurrentDir: '/io', OutputRoot: '/io' });
+const moocHippoMicrocircuit = Object.assign(
   {},
-  { ...microcircuit },
+  { ...hippoMicrocircuit },
   {
     prefix: {
       NUVLA: '/mooc',
+      PIZ_DAINT: '/',
     },
     paths: newPaths,
     reportsTargetFilter: '(Random.{1,2}Perc|mc2_Column|Mosaic)',
   },
 );
 
+const mapCircuitNameWithUrl = {
+  hippo_microcircuit: hippoMicrocircuit,
+  mooc_hippo_microcircuit: moocHippoMicrocircuit,
+  hippo_full_ca1: hippoFullCa1,
+};
+
 export default {
-  fullca1,
-  moocmicrocircuit,
-  microcircuit,
+  mapCircuitNameWithUrl,
 };

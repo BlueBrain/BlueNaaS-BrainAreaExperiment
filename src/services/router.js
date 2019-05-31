@@ -5,6 +5,7 @@ import VueRouter from 'vue-router';
 import SimulationRun from '@/views/run.vue';
 import Details from '@/views/details.vue';
 import List from '@/views/list.vue';
+import CircuitIndex from '@/views/circuits-index.vue';
 
 Vue.use(VueRouter);
 
@@ -25,6 +26,10 @@ const routes = [
     component: Details,
     props: true,
     name: 'details',
+  },
+  {
+    path: '/',
+    component: CircuitIndex,
   },
 ];
 

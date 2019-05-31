@@ -7,12 +7,14 @@ import initialStateGenerator from '@/services/helper/initial-state-generator';
 
 Vue.use(Vuex);
 
+initialStateGenerator.setupInitialStates();
+
 const store = new Vuex.Store({
   state: {
     title: 'Run Simulation',
     currentComputer: null,
     simulationPopulation: null,
-    currentCircuit: initialStateGenerator.circuitToUse,
+    currentCircuit: initialStateGenerator.getCircuitToUse(),
     currentCircuitConfig: initialStateGenerator.getCurrentCircuitConfig(),
     simulationDuration: initialStateGenerator.getDefaultDuration(),
     simulationForwardSkip: initialStateGenerator.getDefaultForwardSkip(),
@@ -41,10 +43,6 @@ const store = new Vuex.Store({
     },
     setUserGroup(state, newUserProject) {
       state.userGroup = newUserProject;
-    },
-    setUserGroupTmp(state, newUserProject) {
-      console.warn('[store] SetUserGroupTmp', newUserProject);
-      state.userGroupTmp = newUserProject;
     },
     setUserGroupsAvailable(state, projectsList) {
       state.userGroupsAvailable = projectsList;

@@ -1,15 +1,17 @@
 
 import simConfig from '@/config/simulation-config';
-import circuitConfig from '@/config/circuit-config';
+import circuits from '@/config/circuit-config';
 import '@/services/helper/computer-group-helper';
 
-// define circuit based on URL
-const match = window.location.href.match(/circuits\/(\w*)/);
-if (!match) console.error('Specify /circuits in url');
-const circuitToUse = match ? match[1] : null;
+let circuitToUse;
+
+function getCircuitToUse() {
+  return circuitToUse;
+}
 
 function getCurrentCircuitConfig() {
-  return circuitConfig[circuitToUse];
+  const config = circuits.mapCircuitNameWithUrl[getCircuitToUse()];
+  return config;
 }
 
 function getDefaultDuration() {
@@ -29,10 +31,19 @@ function getComputersAvailableForCircuit() {
   return computersAllowedToRun;
 }
 
+function setupInitialStates() {
+  // define circuit based on URL
+  const match = window.location.href.match(/circuits\/([\w\\-]*)/);
+  if (!match) console.error('Specify /circuits in url');
+  circuitToUse = match ? match[1] : 'hippo_microcircuit';
+}
+
 export default {
   circuitToUse,
   getDefaultDuration,
   getDefaultForwardSkip,
   getComputersAvailableForCircuit,
   getCurrentCircuitConfig,
+  setupInitialStates,
+  getCircuitToUse,
 };

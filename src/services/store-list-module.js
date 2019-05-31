@@ -5,6 +5,7 @@ export default {
     analysisAreLoading: true,
     bulkEditActivated: false,
     simulationsToBulkAnalyse: [],
+    httpReqSource: null,
   },
   mutations: {
     /* eslint-disable no-param-reassign */
@@ -26,5 +27,16 @@ export default {
     cleanSimulationToBulkAnalyse(state) {
       state.simulationsToBulkAnalyse = [];
     },
+    setupHttpReqSource(state, httpReqSource) {
+      console.debug('- Setup cancel source');
+      state.httpReqSource = httpReqSource;
+    },
+    cancelLoadingList(state) {
+      if (!state.httpReqSource) return;
+      console.debug('- - KILL REQUESTS. Removing cancel source from store');
+      state.httpReqSource.cancel('Stop from the user');
+      state.httpReqSource = null;
+    },
   },
+
 };

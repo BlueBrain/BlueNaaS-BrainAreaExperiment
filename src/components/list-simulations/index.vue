@@ -62,8 +62,6 @@ import analysisHelper from '@/services/helper/analysis-helper';
 import listJobsHelper from '@/services/helper/list-jobs-helper';
 import eventBus from '@/services/event-bus';
 import DeleteConfirmationModal from '@/components/shared/delete-confirmation-modal.vue';
-import ChunkRequester from '@/services/helper/chunk-requester';
-import { getComputerProjectCombo } from '@/common/utils';
 import sortBy from 'lodash/sortBy';
 import remove from 'lodash/remove';
 
@@ -201,68 +199,33 @@ export default {
       this.showDetails(this.jobSelectedForAnalysis);
     },
 
-    fetchAnalysis() {
-      // start fetching analysis
-      this.$store.commit('setAnalysisListIsLoading', true);
-      const fetchFn = listJobsHelper.fetchAnalysisInfo;
-      let chunkAnalysisRequester = null;
-      const callbackFn = (analysisAndStatusObj) => {
-        if (this.originalCombo !== getComputerProjectCombo()) {
-          chunkAnalysisRequester.cancelFetching();
-          return;
-        }
-        this.$set(
-          analysisAndStatusObj.simulationWithFiles,
-          'analysisStatus',
-          analysisAndStatusObj.newAnalysisStatus,
-        );
-      };
-
-      chunkAnalysisRequester = new ChunkRequester(fetchFn, callbackFn);
-      chunkAnalysisRequester.setOnFinishFn(() => {
-        this.$store.dispatch('hideLoader');
-        this.$store.commit('setAnalysisListIsLoading', false);
-      });
-      chunkAnalysisRequester.addJobs(this.viewList);
-    },
-
     async fetchJobs() {
-      // to avoid saving jobs in the wrong computer
+      this.$store.dispatch('showLoader');
       this.$store.commit('setListIsLoading', true);
 
-      // this will be used to check if the computer or page changed
-      this.originalCombo = getComputerProjectCombo();
+      // save information for cancel request if computer is changed
+      const httpReqSource = unicore.getHttpReqSource();
+      this.$store.commit('setupHttpReqSource', httpReqSource);
 
-      const listToFetch = await listJobsHelper.getUrlList();
-      const allJobWithFiles = [];
-
-      const fetchFn = unicore.populateJobsWithFiles;
-      let chunkSimulationRequester = null;
-      const callbackFn = (jobWithFiles) => {
-        if (this.originalCombo !== getComputerProjectCombo()) {
-          chunkSimulationRequester.cancelFetching();
-          return;
+      const callbackEachSim = (simInfo) => {
+        console.log('CB each sim');
+        const [filteredSimulation] = this.applyFiltersToSims([simInfo]);
+        if (filteredSimulation) {
+          this.viewList.push(filteredSimulation);
         }
-        allJobWithFiles.push(jobWithFiles);
-        const [simulation] = listJobsHelper.filterOnlySimulations([jobWithFiles]);
-        if (!simulation) return;
-        this.allSimulations.push(simulation);
-        const [filteredSimulation] = this.applyFiltersToSims([simulation]);
-        if (!filteredSimulation) return;
-        this.viewList.push(filteredSimulation);
-        // if job is running poll the status
-        listJobsHelper.startReloadJob(simulation, getComputerProjectCombo());
       };
+      await listJobsHelper.getSimulationsWithFiles(callbackEachSim);
+      console.debug('Simulations loaded');
 
-      chunkSimulationRequester = new ChunkRequester(fetchFn, callbackFn);
-      chunkSimulationRequester.setOnFinishFn(() => {
-        this.viewList = sortBy(this.viewList, 'submissionTime').reverse();
-        // save full list of all jobs sorted for compare next time
-        listJobsHelper.saveFullJobList(allJobWithFiles);
-        this.$store.commit('setListIsLoading', false);
-        this.fetchAnalysis();
-      });
-      chunkSimulationRequester.addJobs(listToFetch);
+      this.viewList = sortBy(this.viewList, 'submissionTime').reverse();
+
+      this.$store.commit('setListIsLoading', false);
+      this.$store.dispatch('hideLoader');
+
+      this.$store.commit('setAnalysisListIsLoading', true);
+      await listJobsHelper.fetchAnalysisInfo(this.viewList);
+      console.debug('Analysis loaded');
+      this.$store.commit('setAnalysisListIsLoading', false);
     },
   },
   beforeDestroy() {

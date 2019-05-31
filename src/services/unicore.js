@@ -52,6 +52,13 @@ function init() {
       delete newConfig.headers['X-UNICORE-User-Preferences'];
     }
 
+    if (newConfig.method === 'get') {
+      if (store.state.list.httpReqSource) {
+        const cancelToken = store.state.list.httpReqSource.token;
+        newConfig.cancelToken = cancelToken;
+      }
+    }
+
     return newConfig;
   }, error => error);
 }
@@ -474,6 +481,12 @@ function importPersonalSimulation(title, simFolderPath) {
   return submitJob(config, files);
 }
 
+function getHttpReqSource() {
+  const { CancelToken } = axios;
+  const httpReqSource = CancelToken.source();
+  return httpReqSource;
+}
+
 export default {
   getAssociatedLocation,
   deleteJob,
@@ -493,6 +506,7 @@ export default {
   getInfoByUrl,
   workingDirToMachinePath,
   getAllJobs,
+  getHttpReqSource,
 };
 
 export {

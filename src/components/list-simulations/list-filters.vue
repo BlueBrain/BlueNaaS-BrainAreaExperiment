@@ -147,6 +147,7 @@ export default {
       });
     },
     startLoadingList() {
+      this.$store.commit('cancelLoadingList');
       this.$store.commit('setListIsLoading', true);
       this.$store.dispatch('showLoader');
     },

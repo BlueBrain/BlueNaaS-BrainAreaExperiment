@@ -2,7 +2,7 @@
 import unicore from '@/services/unicore';
 import analysisConfig from '@/config/analysis-config';
 import store from '@/services/store';
-import { jobTags } from '@/common/job-status';
+import { addTag, jobTags } from '@/common/job-status';
 
 
 async function generateUpdatedAssociatedFile(simulationWorkDirectory, analysisObject, userGroup) {
@@ -66,9 +66,7 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
   }));
   newAnalysisAndTransferInfo.imports = imports;
 
-  const newTags = newAnalysisAndTransferInfo.tags || [];
-  newTags.push(jobTags.ANALYSIS);
-  newAnalysisAndTransferInfo.tags = newTags;
+  addTag(newAnalysisAndTransferInfo, jobTags.ANALYSIS);
 
   /* ---------------------------------------------------------------------
    * Create analysis job

@@ -16,6 +16,8 @@ const jobTags = {
   SIMULATION: 'simulation',
   VISUALIZATION: 'visualization',
   LFP_SIMULATION: 'lfp_simulation',
+  SIMULATION_IMPORTED: 'simulation_imported',
+  OTHER: 'other',
 };
 
 const iconMap = {
@@ -56,6 +58,14 @@ function getStatusIcon(status) {
   return iconMap[status] || 'md-sync';
 }
 
+function addTag(obj, tag) {
+  const newTags = obj.tags || [];
+  if (newTags.includes(tag)) return;
+  newTags.push(tag);
+  /* eslint-disable no-param-reassign */
+  obj.tags = newTags;
+}
+
 export {
   getStatusIcon,
   isRunning,
@@ -63,4 +73,5 @@ export {
   jobStatus,
   statesFilter,
   jobTags,
+  addTag,
 };

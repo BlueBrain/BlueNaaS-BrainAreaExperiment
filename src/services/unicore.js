@@ -9,6 +9,7 @@ import store from '@/services/store';
 import db from '@/services/db';
 import simulationConfig from '@/config/simulation-config';
 import { getDate3YearFromNow } from '@/common/utils';
+import { jobTags, addTag } from '@/common/job-status';
 
 const axiosInstance = axios.create({
   headers: {
@@ -465,7 +466,11 @@ function importPersonalSimulation(title, simFolderPath) {
     title,
   };
   const files = [{ To: 'wasImported', Data: '' }];
-  // save this file to differentiate this one with the rest of the external jobs
+
+  addTag(config, jobTags.SIMULATION);
+  addTag(config, store.state.currentCircuit);
+  addTag(config, jobTags.SIMULATION_IMPORTED);
+
   return submitJob(config, files);
 }
 

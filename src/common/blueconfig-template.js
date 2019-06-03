@@ -5,6 +5,7 @@ import template from 'lodash/template';
 import store from '@/services/store';
 
 function replacePlaceholders(obj, replaceText) {
+  if (!obj) return null;
   const str = JSON.stringify(obj);
   const templateFn = template(str);
   const replacedStr = templateFn({ prefix: replaceText });

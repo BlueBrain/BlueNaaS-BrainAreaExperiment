@@ -75,7 +75,7 @@ function openContent(content) {
   x.document.close();
 }
 
-function getComputerProjectCombo() {
+function getComputerUrlCombo() {
   return store.state.currentComputer + store.state.userGroup + window.location.href;
 }
 
@@ -85,11 +85,17 @@ function getDate3YearFromNow() {
   return futureDate;
 }
 
+function getComputerProjectCircuitCombo(prefix) {
+  const comboStr = `${store.state.currentComputer}_${store.state.userGroup}_${store.state.currentCircuit}`;
+  return prefix ? `${prefix}_${comboStr}` : comboStr;
+}
+
 export {
   convertToBCFormat,
   openContent,
   mapBlueConfigTerms,
   unmapBlueConfigTerms,
-  getComputerProjectCombo,
+  getComputerUrlCombo,
+  getComputerProjectCircuitCombo,
   getDate3YearFromNow,
 };

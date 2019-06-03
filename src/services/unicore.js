@@ -13,7 +13,6 @@ import { jobTags, addTag } from '@/common/job-status';
 
 const axiosInstance = axios.create({
   headers: {
-    'X-Custom-Header': 'foobar',
     Accept: 'application/json',
     'Content-Type': 'application/json',
     post: {
@@ -83,7 +82,7 @@ function actionJob(actionURL) {
 }
 
 function getInfoByUrl(transferUrl) {
-  return axiosInstance(transferUrl);
+  return axiosInstance.get(transferUrl);
 }
 
 function urlToComputerAndId(jobURL) {
@@ -138,21 +137,39 @@ function uploadData(dataToUpload, uploadURL) {
 
 async function getAllJobs(computer) {
   const unicoreURL = getComputeProviders()[computer.toUpperCase()].url;
+  let response;
   try {
-    const response = await axiosInstance(`${unicoreURL}/jobs`);
-    return response.data.jobs;
+    response = await axiosInstance(`${unicoreURL}/jobs`);
   } catch (error) {
-    console.error(error);
-    throw new Error('Error getting all jobs for list');
+    if (error.message !== 'Stop from the user') {
+      throw new Error('Error getting all jobs for list');
+    }
   }
+  return response.data.jobs;
 }
 
-async function getJobProperties(jobURL, userGroup) {
+async function getSimUrls(computer, circuit) {
+  const unicoreURL = get(getComputeProviders(), `[${computer.toUpperCase()}].url`);
+  // get sims only for this specific circuit
+  const queryStr = `tags=${jobTags.SIMULATION},${circuit}`;
+  let response;
+  try {
+    // retrieve the simulations with tags
+    response = await axiosInstance(`${unicoreURL}/jobs?${queryStr}`);
+  } catch (error) {
+    if (error.message !== 'Stop from the user') {
+      throw new Error('Error getting all jobs for list');
+    }
+  }
+  return get(response, 'data.jobs', []);
+}
+
+async function getJobProperties(jobURL) {
   let result = await db.getJobByUrl(jobURL);
   let jobInfo = null;
   if (!result) {
     try {
-      jobInfo = await getInfoByUrl(jobURL, userGroup);
+      jobInfo = await getInfoByUrl(jobURL);
     } catch (e) {
       return null;
     }
@@ -166,51 +183,45 @@ async function getJobProperties(jobURL, userGroup) {
 async function getFilesList(jobURL) {
   try {
     const response = await getInfoByUrl(jobURL);
-    return response.data;
+    return get(response, 'data.children', []);
   } catch (e) {
-    return {};
+    return [];
   }
 }
 
-async function populateJobsWithFiles(jobsListUrl) {
-  // get the information of some jobs asociated with key + the children
+async function getAndSetChildren(jobInfo, force = false) {
+  // if already have info in localstorage do not fetch it
+  if (!force && jobInfo.children && jobInfo.children.length) return;
 
+  const workingDirectory = get(jobInfo, '_links.workingDirectory.href');
+  const url = `${workingDirectory}/files`;
+
+  const fileList = await getFilesList(url);
+
+  if (fileList) {
+    /* eslint-disable no-param-reassign */
+    jobInfo.children = fileList;
+  }
+}
+
+async function populateJobsUrlWithFiles(jobsListUrl) {
+  // get the information of some jobs asociated with key + the children
   async function expandInfo(jobUrl) {
     const jobExapandedInfo = await getJobProperties(jobUrl);
     if (!jobExapandedInfo) return {};
-    const workingDirectory = get(jobExapandedInfo, '_links.workingDirectory.href');
-    const url = `${workingDirectory}/files`;
 
-    if (
-      jobExapandedInfo.isSimulation ||
-      jobExapandedInfo.isAnalysis ||
-      jobExapandedInfo.isVisualization ||
-      jobExapandedInfo.isOther
-    ) {
-      /*
-       * to have this flag means we already have loaded the files and
-       * apply the filters to know that is a simulation (from filterOnlySimulations function)
-       */
-      return jobExapandedInfo;
-    }
-    const fileList = await getFilesList(url);
-
-    if (fileList) {
-      jobExapandedInfo.children = fileList.children || [];
-    }
-
+    // to have this flag means we already have loaded / classify the job with files
+    if (jobExapandedInfo.children) return jobExapandedInfo;
+    await getAndSetChildren(jobExapandedInfo);
     return jobExapandedInfo;
   }
-
   const promesesList = jobsListUrl.map(expandInfo);
   const expandedJob = await Promise.all(promesesList);
   return expandedJob;
 }
 
 function getFiles(jobURL) {
-  return axiosInstance({
-    url: jobURL,
-    method: 'get',
+  return axiosInstance.get(jobURL, {
     responseType: 'blob',
   })
     .then(r => (r.data))
@@ -472,13 +483,12 @@ function importPersonalSimulation(title, simFolderPath) {
     executable,
     title,
   };
-  const files = [{ To: 'wasImported', Data: '' }];
 
   addTag(config, jobTags.SIMULATION);
   addTag(config, store.state.currentCircuit);
   addTag(config, jobTags.SIMULATION_IMPORTED);
 
-  return submitJob(config, files);
+  return submitJob(config);
 }
 
 function getHttpReqSource() {
@@ -495,7 +505,7 @@ export default {
   submitJob,
   actionJob,
   getComputeProviders,
-  populateJobsWithFiles,
+  populateJobsUrlWithFiles,
   getJobById,
   getJobProperties,
   getFiles,
@@ -507,6 +517,8 @@ export default {
   workingDirToMachinePath,
   getAllJobs,
   getHttpReqSource,
+  getSimUrls,
+  getAndSetChildren,
 };
 
 export {
@@ -514,7 +526,7 @@ export {
   getComputeProviders,
   getFiles,
   importPersonalSimulation,
-  populateJobsWithFiles,
+  populateJobsUrlWithFiles,
   axiosInstance,
   setAxiosToken,
 };

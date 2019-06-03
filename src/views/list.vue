@@ -65,7 +65,6 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('showLoader');
     this.$store.commit('setAppTitle', 'List of Simulations');
   },
   methods: {

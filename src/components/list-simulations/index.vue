@@ -208,7 +208,6 @@ export default {
       this.$store.commit('setupHttpReqSource', httpReqSource);
 
       const callbackEachSim = (simInfo) => {
-        console.log('CB each sim');
         const [filteredSimulation] = this.applyFiltersToSims([simInfo]);
         if (filteredSimulation) {
           this.viewList.push(filteredSimulation);
@@ -223,7 +222,10 @@ export default {
       this.$store.dispatch('hideLoader');
 
       this.$store.commit('setAnalysisListIsLoading', true);
-      await listJobsHelper.fetchAnalysisInfo(this.viewList);
+      const callbackEachAnalysis = (sim, newAnalysisStatus) => {
+        this.$set(sim, 'analysisStatus', newAnalysisStatus);
+      };
+      await listJobsHelper.fetchAnalysisInfo(this.viewList, callbackEachAnalysis);
       console.debug('Analysis loaded');
       this.$store.commit('setAnalysisListIsLoading', false);
     },

@@ -2,10 +2,11 @@
 import unicore from '@/services/unicore';
 import Vue from 'vue';
 import analysisConfig from '@/config/analysis-config';
-import { jobStatus, isRunning } from '@/common/job-status';
-import { getComputerProjectCombo } from '@/common/utils';
+import {
+  jobStatus, isRunning, jobTags,
+} from '@/common/job-status';
+import { getComputerUrlCombo } from '@/common/utils';
 import db from '@/services/db';
-import visualizationConfig from '@/config/visualization-config';
 import store from '@/services/store';
 import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
@@ -28,8 +29,8 @@ function simulationProducedResults(simulationWithFiles) {
   return simulationFiles.includes('/out.dat');
 }
 
-async function getUrlList() {
-  const networkJobUrls = await unicore.getAllJobs(store.state.currentComputer);
+async function getSimulationUrlList() {
+  const networkJobUrls = await unicore.getSimUrls(store.state.currentComputer, store.state.currentCircuit);
 
   // compare saved list and sorted list
   const savedJobUrls = await db.getAllJobsSortedList() || [];
@@ -60,11 +61,9 @@ function setJobStatus(simulationJob, isAnalysis, status) {
   }
 }
 
-async function startReloadJob(simulationJob, prevComputerProjectCombo, analysisInfo) {
+async function startReloadJob(simulationJob, paramCombo, analysisInfo) {
   /* fetch job information and if it's running use polling until it ends */
   // when move to other page, cancel the refresh
-  if (prevComputerProjectCombo !== getComputerProjectCombo()) return;
-
   const jobToUpdate = analysisInfo || simulationJob;
   const jobUrl = get(jobToUpdate, '_links.self.href');
   const updateJobInfo = await unicore.getJobProperties(jobUrl);
@@ -78,19 +77,31 @@ async function startReloadJob(simulationJob, prevComputerProjectCombo, analysisI
 
   if (isRunning(updateJobInfo.status)) {
     setTimeout(() => {
-      startReloadJob(simulationJob, prevComputerProjectCombo, analysisInfo);
+      if (paramCombo !== getComputerUrlCombo()) {
+        // a way to stop polling when change computer
+        return;
+      }
+      startReloadJob(simulationJob, paramCombo, analysisInfo);
     }, store.state.pollInterval);
   } else if (updateJobInfo.status === jobStatus.SUCCESSFUL) {
     // after the simulation or analysis is finished check if the results were correct
-    const [updatedJobWithFiles] = await unicore.populateJobsWithFiles([jobUrl]);
+    const [updatedJobWithFiles] = await unicore.populateJobsUrlWithFiles([jobUrl]);
     const jobProducedResults = analysisInfo
       ? await analysisProducedResults(updatedJobWithFiles)
       : simulationProducedResults(updatedJobWithFiles);
 
     newStatus = jobProducedResults ? jobStatus.SUCCESSFUL : jobStatus.FAILED;
+    updatedJobWithFiles.status = newStatus;
     db.addJob(updatedJobWithFiles);
   }
   setJobStatus(simulationJob, !!analysisInfo, newStatus);
+}
+
+function saveFullJobList(jobsWithFiles) {
+  const sortedAllJobWithFiles = sortBy(jobsWithFiles, 'submissionTime').reverse();
+  const sortedJobsUrlToSave = sortedAllJobWithFiles.map(jobPopulated => get(jobPopulated, '_links.self.href'));
+  if (!sortedJobsUrlToSave.length || sortedJobsUrlToSave.includes(undefined)) return;
+  db.setAllJobsSortedList(sortedJobsUrlToSave);
 }
 
 function classifyJob(jobExpandedInfo) {
@@ -105,60 +116,47 @@ function classifyJob(jobExpandedInfo) {
   }
 
   const updatedSimulation = jobExpandedInfo;
-  if (!Object.keys(updatedSimulation).length) return updatedSimulation;
-  if (updatedSimulation.children.includes(`/${analysisConfig.configFileName}`)) {
-    // it is an analysis that should be removed
-    updatedSimulation.isAnalysis = true;
-  } else if (updatedSimulation.name.startsWith(visualizationConfig.jobNamePrefix)) {
-    updatedSimulation.isVisualization = true;
-  } else if (updatedSimulation.children.includes('/BlueConfig')) {
-    updatedSimulation.isSimulation = true;
-    updatedSimulation.status = getSimCorrectStatus(updatedSimulation);
-  } else if (updatedSimulation.children.includes('/wasImported')) {
-    updatedSimulation.isSimulation = true;
-    updatedSimulation.status = getSimCorrectStatus(updatedSimulation);
-    if (!isRunning(updatedSimulation.status)) updatedSimulation.status = jobStatus.FAILED;
-  } else {
-    // is another type of job run outside sim launcher ui. Not showing it.
-    updatedSimulation.isOther = true;
-  }
+  updatedSimulation.status = getSimCorrectStatus(updatedSimulation);
+
+  if (
+    updatedSimulation.tags.includes(jobTags.SIMULATION_IMPORTED)
+    && !isRunning(updatedSimulation.status)
+  ) { updatedSimulation.status = jobStatus.FAILED; }
+
+  console.debug(`Classifying ${updatedSimulation.id} [${updatedSimulation.status}]`);
   db.addJob(updatedSimulation);
-  console.debug(`Classifing ${updatedSimulation.id} [${!!updatedSimulation.isSimulation}]`);
   return updatedSimulation;
 }
 
-function filterOnlySimulations(jobsWithFiles) {
-  // return job information and a list of files as children []
-  const displayEverything = localStorage.getItem('displayAll') === 'true';
-  // 'hack' in case you want to see all the jobs not only simulation from one computer
-  if (displayEverything) { console.warn('Using displayAll flag'); }
-  const simulations = jobsWithFiles.filter((jobExpandedInfo) => {
-    if (displayEverything) return true;
-    if (jobExpandedInfo.isSimulation) return true;
-    // when add a new condition remember to add also into populateJobsWithFiles
-    if (
-      jobExpandedInfo.isAnalysis
-      || jobExpandedInfo.isVisualization
-      || jobExpandedInfo.isOther
-    ) return false;
-
-    const updatedSimulation = classifyJob(jobExpandedInfo);
-    const { isSimulation } = updatedSimulation;
-    return isSimulation;
+async function getSimulationsWithFiles(cbEach) {
+  const simulations = [];
+  const allJobs = [];
+  const jobsList = await getSimulationUrlList();
+  const promiseArray = jobsList.map(async (jobUrl) => {
+    const jobInfo = await unicore.getJobProperties(jobUrl);
+    // if has children it was already classified and saved in localStorage
+    if (!jobInfo.children || !jobInfo.children.length) {
+      await unicore.getAndSetChildren(jobInfo);
+      classifyJob(jobInfo);
+    }
+    // TODO: this is a workaround until the queryparam fetch jobs with AND
+    allJobs.push(jobInfo);
+    if (!jobInfo.tags.includes(store.state.currentCircuit)) return false;
+    simulations.push(jobInfo);
+    // if job is running poll the status
+    if (isRunning(jobInfo.status)) { startReloadJob(jobInfo, getComputerUrlCombo()); }
+    if (cbEach) { cbEach(jobInfo); }
+    return true;
   });
+
+  await Promise.all(promiseArray);
+  // save full list of all jobs sorted for compare next time
+  saveFullJobList(allJobs);
   return simulations;
 }
 
-const saveFullJobList = (allJobWithFiles) => {
-  const sortedAllJobWithFiles = sortBy(allJobWithFiles, 'submissionTime').reverse();
-  const sortedJobsUrlToSave = sortedAllJobWithFiles.map(jobPopulated => get(jobPopulated, '_links.self.href'));
-  if (!sortedJobsUrlToSave.length || sortedJobsUrlToSave.includes(undefined)) return;
-
-  db.setAllJobsSortedList(sortedJobsUrlToSave);
-};
-
-const fetchAnalysisInfo = async (simulationListWithFiles) => {
-  const getAnalysisAndStatus = async (simulationWithFiles) => {
+async function fetchAnalysisInfo(simulationListWithFiles, cbEach) {
+  async function getAnalysisAndStatus(simulationWithFiles) {
     let newAnalysisStatus = jobStatus.BLOCK;
     let analysisInfo = null;
     if (simulationWithFiles.status === jobStatus.SUCCESSFUL) {
@@ -174,32 +172,37 @@ const fetchAnalysisInfo = async (simulationListWithFiles) => {
       analysisInfo = last(analysisArray);
       if (analysisArray.length) {
         // fetch and fill data. If is running will poll data
-        startReloadJob(simulationWithFiles, getComputerProjectCombo(), analysisInfo);
+        startReloadJob(simulationWithFiles, getComputerUrlCombo(), analysisInfo);
         newAnalysisStatus = jobStatus.LOADING;
       } else {
         newAnalysisStatus = null;
       }
     }
-    return {
+
+    if (cbEach) cbEach(simulationWithFiles, newAnalysisStatus);
+
+    const resultObj = {
       simulationWithFiles,
       newAnalysisStatus,
       analysisInfo,
     };
-  };
+
+    return resultObj;
+  }
 
   const analysisAndStatusInfoProm = simulationListWithFiles.map(getAnalysisAndStatus);
   const analysisAndStatusInfo = await Promise.all(analysisAndStatusInfoProm);
   return analysisAndStatusInfo;
-};
+}
 
 export default {
   saveFullJobList,
   fetchAnalysisInfo,
-  filterOnlySimulations,
   simulationProducedResults,
   analysisProducedResults,
   startReloadJob,
-  getUrlList,
+  getSimulationUrlList,
+  getSimulationsWithFiles,
 };
 
 export {

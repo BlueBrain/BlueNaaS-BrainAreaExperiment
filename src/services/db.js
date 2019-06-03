@@ -4,6 +4,7 @@ import localforage from 'localforage';
 import packageJson from '@/../package.json';
 import { urlToComputerAndId } from '@/services/unicore';
 import { jobStatus } from '@/common/job-status';
+import { getComputerProjectCircuitCombo } from '@/common/utils';
 import store from '@/services/store';
 
 function getSavedSimConfigName() {
@@ -31,26 +32,28 @@ function getJob(combinedId) {
 async function addJob(jobInfo) {
   function createIdAndDetails(job) {
     const id = job.id || urlToComputerAndId(job._links.self.href).id;
-    const computer = job.computer || urlToComputerAndId(job._links.self.href).computer;
-    const uniqueId = id + computer + store.state.userGroup;
+    const prefix = id;
+    const uniqueId = getComputerProjectCircuitCombo(prefix);
     return {
       id: uniqueId,
       details: job,
     };
   }
+
   if (
-    jobInfo.status === jobStatus.SUCCESSFUL ||
-    jobInfo.status === jobStatus.FAILED
-  ) {
-    const jobToSave = createIdAndDetails(jobInfo);
-    console.debug('[db] Creating new job in DB...');
-    await localforage.setItem(jobToSave.id, jobToSave.details);
-  }
+    jobInfo.status !== jobStatus.SUCCESSFUL &&
+    jobInfo.status !== jobStatus.FAILED
+  ) { return; }
+
+  const jobToSave = createIdAndDetails(jobInfo);
+  console.debug('[db] Creating new job in DB...');
+  await localforage.setItem(jobToSave.id, jobToSave.details);
 }
 
 function getJobByUrl(url) {
-  const info = urlToComputerAndId(url);
-  return getJob(info.id + info.computer + store.state.userGroup);
+  const { id } = urlToComputerAndId(url);
+  const prefix = id;
+  return getJob(getComputerProjectCircuitCombo(prefix));
 }
 
 async function saveSimConfiguration(bc, unicore) {
@@ -70,16 +73,20 @@ function cleanPreviousConfig() {
 }
 
 function getAllJobsSortedList() {
-  return localforage.getItem(`allJobsSorted${store.state.currentComputer}`);
+  const prefix = 'allJobsSorted';
+  return localforage.getItem(getComputerProjectCircuitCombo(prefix));
 }
 
 function setAllJobsSortedList(jobUrlList) {
-  return localforage.setItem(`allJobsSorted${store.state.currentComputer}`, jobUrlList);
+  const prefix = 'allJobsSorted';
+  return localforage.setItem(getComputerProjectCircuitCombo(prefix), jobUrlList);
 }
 
 function deleteJob(url) {
   const { id } = urlToComputerAndId(url);
-  const combinedId = id + store.state.currentComputer + store.state.userGroup;
+  const prefix = id;
+
+  const combinedId = getComputerProjectCircuitCombo(prefix);
   getAllJobsSortedList().then((savedList) => {
     savedList.splice(savedList.findIndex(savedUrl => savedUrl === url), 1);
     setAllJobsSortedList(savedList);

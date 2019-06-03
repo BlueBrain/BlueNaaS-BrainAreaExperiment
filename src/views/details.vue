@@ -122,7 +122,7 @@ import VisualizeLauncher from '@/components/details-simulation/visualize-launche
 import eventBus from '@/services/event-bus';
 import db from '@/services/db';
 import analysisConfig from '@/config/analysis-config';
-import { getComputerProjectCombo } from '@/common/utils';
+import { getComputerUrlCombo } from '@/common/utils';
 import { isRunning, jobStatus } from '@/common/job-status';
 import { simulationProducedResults } from '@/services/helper/list-jobs-helper';
 
@@ -167,7 +167,7 @@ export default {
     if (this.computerParam) {
       eventBus.$emit('changeComputer', this.computerParam);
     }
-    this.computerProjectCombo = getComputerProjectCombo();
+    this.computerProjectCombo = getComputerUrlCombo();
     this.getJobById(this.jobId);
   },
   methods: {
@@ -242,7 +242,7 @@ export default {
 
     async getJobById(jobId) {
       // search for the details by id
-      if (this.computerProjectCombo !== getComputerProjectCombo()) return;
+      if (this.computerProjectCombo !== getComputerUrlCombo()) return;
 
       this.job = await unicore.getJobById(jobId);
       if (!this.job) {
@@ -272,7 +272,7 @@ export default {
           this.simulationDetails.children = this.job.children;
           return;
         }
-        const [simulationWithFiles] = await unicore.populateJobsWithFiles([this.job._links.self.href]);
+        const [simulationWithFiles] = await unicore.populateJobsUrlWithFiles([this.job._links.self.href]);
         if (!simulationProducedResults(simulationWithFiles)) {
           // do not produce any output file - simulation failed
           simulationWithFiles.status = jobStatus.FAILED;

@@ -9,12 +9,12 @@ import { jobTags, addTag } from '@/common/job-status';
 // TODO: merge with analaysis_helper getFilesToCopy
 async function getFilesToCopy(filesURL) {
   const files = await unicore.getFilesList(filesURL);
-  if (!files) return null;
+  if (!files.length) return null;
   const avoidFilesList = visualizationConfig.filesToAvoidCopy;
 
   const allowed = [];
 
-  files.children.forEach((file) => {
+  files.forEach((file) => {
     // remove the '/'
     const fileName = file.substr(1);
     // allowed if was not found

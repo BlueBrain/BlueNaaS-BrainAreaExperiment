@@ -27,7 +27,7 @@ async function getFilesToCopy(filesURL, userGroup) {
   const avoidFilesList = analysisConfig.filesToAvoidCopy;
 
   const allowed = [];
-  files.children.forEach((file) => {
+  files.forEach((file) => {
     // remove the '/'
     const fileName = file.substr(1);
     // allowed if was not found

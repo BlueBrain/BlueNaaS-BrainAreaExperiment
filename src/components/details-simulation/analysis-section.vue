@@ -59,7 +59,7 @@ import ItemSummary from '@/components/details-simulation/item-summary.vue';
 import AnalysisItem from '@/components/details-simulation/analysis-item.vue';
 import analysisConfig from '@/config/analysis-config';
 import { isRunning, jobStatus } from '@/common/job-status';
-import { getComputerProjectCombo } from '@/common/utils';
+import { getComputerUrlCombo } from '@/common/utils';
 import db from '@/services/db';
 import DeleteConfirmationModal from '@/components/shared/delete-confirmation-modal.vue';
 import unicore from '@/services/unicore';
@@ -125,7 +125,7 @@ export default {
         childAnalysis.workingDirectory = analysis._links.workingDirectory.href;
         childAnalysis.id = childAnalysis.jobURL.split('/').pop();
         childAnalysis.type = 'Analysis';
-        this.refreshAnalysis(childAnalysis, getComputerProjectCombo());
+        this.refreshAnalysis(childAnalysis, getComputerUrlCombo());
         this.analysisDetails.push(childAnalysis);
       });
       this.overallLoading = false;
@@ -134,7 +134,7 @@ export default {
 
     async refreshAnalysis(childAnalysis, prevComputerProjectCombo) {
       // cancel polling if move to another page or changed computer
-      if (prevComputerProjectCombo !== getComputerProjectCombo()) return;
+      if (prevComputerProjectCombo !== getComputerUrlCombo()) return;
 
       const analysisJobInfo = await unicore.getJobProperties(childAnalysis.jobURL);
 
@@ -156,7 +156,7 @@ export default {
         // check if after finishing produce any plot. if not means an error occurred
         let analysisWithFiles = null;
         try {
-          [analysisWithFiles] = await unicore.populateJobsWithFiles([childAnalysis.jobURL]);
+          [analysisWithFiles] = await unicore.populateJobsUrlWithFiles([childAnalysis.jobURL]);
         } catch (error) {
           this.$Message.error('Error fetching analysis information', error.message);
           throw error;

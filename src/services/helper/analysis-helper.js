@@ -75,6 +75,8 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
     plots_config: newAnalysisAndTransferInfo.plotsConfig,
     target_analysis: newAnalysisAndTransferInfo.target,
     report_analysis: newAnalysisAndTransferInfo.reportForAnalysis,
+    lfp_plots_config: newAnalysisAndTransferInfo.lfpPlotsConfig,
+    lfp_target: newAnalysisAndTransferInfo.lfpTarget,
   };
   const inputs = [
     { To: analysisConfig.configFileName, Data: analysisParamsConfig },

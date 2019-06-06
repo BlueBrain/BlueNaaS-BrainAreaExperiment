@@ -15,7 +15,7 @@
           name="reportForm"
           label-position="right"
           :label-width="150"
-          :model="reportInfo"
+          :model="localReportInfo"
         >
           <form-item prop="Target">
             <tooltip
@@ -23,7 +23,7 @@
               content="Defines the population of cells from where the data will be reported"
             >Population</tooltip>
             <autocomplete-targets
-              :target-selected="reportInfo.Target"
+              :target-selected="localReportInfo.Target"
               :itemsAvailable="reportTargets"
               @target-changed="targetChanged"
             />
@@ -37,11 +37,11 @@
               separate entry in the report"
             >Type</tooltip>
             <i-select
-              v-model="reportInfo.Type"
+              v-model="localReportInfo.Type"
               placeholder="Type"
-              :disabled="true"
             >
               <i-option value="Soma">Soma</i-option>
+              <i-option value="Summation">Summation</i-option>
             </i-select>
           </form-item>
 
@@ -51,22 +51,16 @@
               content="The NEURON variable to access"
             >ReportOn</tooltip>
             <i-select
-              v-model="reportInfo.ReportOn"
+              v-model="localReportInfo.ReportOn"
+              @on-change="reportOnChanged"
             >
-              <i-option value="Voltage">Voltage</i-option>
-              <i-option value="Calcium Concentration">Calcium Concentration</i-option>
+              <i-option
+                v-for="(name, value) in reportOptions"
+                :key="value"
+                :value="name"
+              >{{ name }}</i-option>
             </i-select>
           </form-item>
-
-          <!-- <div class="form-group">
-            <label class="control-label" title="The unit of the NEURON variable.">Unit</label>
-            <div class="controls">
-              <select v-model="reportInfo.Unit" type="text"
-              id="Unit" placeholder="Unit" required class="form-control">
-                <option>mV</option>
-              </select>
-            </div>
-          </div> -->
 
           <form-item prop="StartTime">
             <tooltip
@@ -74,7 +68,7 @@
               content="Time to start reporting"
             >StartTime(ms)</tooltip>
             <input-number
-              v-model="reportInfo.StartTime"
+              v-model="localReportInfo.StartTime"
               placeholder="Start Time"
             />
           </form-item>
@@ -85,7 +79,7 @@
               content="Time to stop reporting"
             >EndTime(ms)</tooltip>
             <input-number
-              v-model="reportInfo.EndTime"
+              v-model="localReportInfo.EndTime"
               placeholder="End Time"
             />
           </form-item>
@@ -96,7 +90,7 @@
               content="The frequency of reporting in milliseconds(ms)"
             >Dt(ms)</tooltip>
             <input-number
-              v-model="reportInfo.Dt"
+              v-model="localReportInfo.Dt"
               :step="0.01"
               :min="0.01"
               placeholder="Dt"
@@ -109,7 +103,7 @@
               content="Report output format"
             >Format</tooltip>
             <i-select
-              v-model="reportInfo.Format"
+              v-model="localReportInfo.Format"
               placeholder="Output Format"
             >
               <i-option value="ASCII">ASCII</i-option>
@@ -118,7 +112,7 @@
             </i-select>
           </form-item>
 
-          <!-- <div class="form-group" v-if="reportInfo.Type == 'Summation'">
+          <!-- <div class="form-group" v-if="localReportInfo.Type == 'Summation'">
             <label class="control-label" title="Handling of density values">Scaling</label>
             <div class="controls">
               <select class="form-control" v-model="report.Scaling"
@@ -145,6 +139,7 @@
 
 <script>
 import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
+import simulationConfig from '@/config/simulation-config';
 
 export default {
   name: 'ReportForm',
@@ -155,16 +150,17 @@ export default {
   data() {
     return {
       formInvalid: false,
+      localReportInfo: Object.assign({}, this.reportInfo),
 
       ruleValidate: {
         StartTime: [{
           required: true,
           validator: (rule, value, callback) => {
             let message = '';
-            if (!this.reportInfo.StartTime && this.reportInfo.StartTime !== 0) {
+            if (!this.localReportInfo.StartTime && this.localReportInfo.StartTime !== 0) {
               message = 'should be defined';
             }
-            if (this.reportInfo.StartTime > this.reportInfo.EndTime) {
+            if (this.localReportInfo.StartTime > this.localReportInfo.EndTime) {
               message = 'start time after end time';
             }
             if (message) {
@@ -182,10 +178,17 @@ export default {
     showModal(newVal) {
       this.formInvalid = newVal;
     },
+    reportInfo(newInfo) {
+      if (!newInfo) return;
+      this.localReportInfo = Object.assign({}, newInfo);
+    },
   },
   computed: {
     reportTargets() {
       return this.$store.state.reportTargets;
+    },
+    reportOptions() {
+      return simulationConfig.reportOn;
     },
   },
   methods: {
@@ -194,16 +197,22 @@ export default {
     },
     async editItem() {
       const isValid = await this.$refs.formValidate.validate();
-      if (isValid) {
-        this.$emit('item-edited', this.reportInfo);
-        this.formInvalid = false;
-      }
+      if (!isValid) return;
+
+      this.$emit('item-edited', this.localReportInfo);
+      this.formInvalid = false;
     },
 
     targetChanged(newTarget) {
-      if (this.reportInfo.Target !== newTarget) {
-        this.reportInfo.Target = newTarget;
-      }
+      if (this.localReportInfo.Target === newTarget) return;
+      this.$set(this.localReportInfo, 'Target', newTarget);
+    },
+    reportOnChanged(newReportOn) {
+      if (newReportOn !== this.reportOptions.lfp) return;
+      // if report on lfp change other params to run simulation full lfp compatible
+      this.$set(this.localReportInfo, 'Type', 'Summation');
+      const lfpTarget = this.reportTargets.find(t => t.lfp);
+      this.$set(this.localReportInfo, 'Target', lfpTarget.displayName);
     },
   },
 };

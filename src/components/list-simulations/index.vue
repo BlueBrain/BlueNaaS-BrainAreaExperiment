@@ -178,6 +178,8 @@ export default {
     },
 
     async analysisConfigReady(analysisParamsEdited) {
+      if (!analysisParamsEdited) return;
+
       this.isRunningAnalysis = true;
 
       const newAnalysisParamsEdited = analysisParamsEdited;
@@ -214,6 +216,7 @@ export default {
         }
       };
       await listJobsHelper.getSimulationsWithFiles(callbackEachSim);
+
       console.debug('Simulations loaded');
 
       this.viewList = sortBy(this.viewList, 'submissionTime').reverse();

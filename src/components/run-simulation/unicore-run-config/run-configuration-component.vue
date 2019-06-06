@@ -50,6 +50,8 @@ import { createBCTemplate } from '@/common/blueconfig-template';
 import UnicoreConfigForm from '@/components/run-simulation/unicore-run-config/unicore-config-form.vue';
 import db from '@/services/db';
 import { convertToBCFormat, openContent, mapBlueConfigTerms } from '@/common/utils';
+import { jobTags, addTag } from '@/common/job-status';
+import simulationConfig from '@/config/simulation-config';
 
 
 export default {
@@ -120,6 +122,19 @@ export default {
       openContent(finalBlueConfig);
     },
 
+    setIfSimulationIsLFP(blueConfigStr, unicoreConfig) {
+      const lfpCheckAttributes = simulationConfig.checksForLFP;
+      if (!lfpCheckAttributes) return;
+
+      const hasRequirements = lfpCheckAttributes.every(attr => (
+        blueConfigStr.includes(attr)
+      ));
+      if (!hasRequirements) return;
+      addTag(unicoreConfig, jobTags.SIMULATION);
+      addTag(unicoreConfig, jobTags.LFP_SIMULATION);
+      addTag(unicoreConfig, this.$store.state.currentCircuit);
+    },
+
     async runSimulation(unicoreConfig) {
       const blueConfigStr = await this.generateFinalBlueConfigJSON();
       this.blueConfig = JSON.parse(blueConfigStr);
@@ -127,6 +142,8 @@ export default {
       db.saveSimConfiguration(this.blueConfig, unicoreConfig);
       // we have already checked the simulation consistancy
       this.isLaunchingSim = true;
+
+      this.setIfSimulationIsLFP(blueConfigStr, unicoreConfig);
 
       const finalBlueConfig = convertToBCFormat(blueConfigStr);
       this.$emit('launch-sim', finalBlueConfig, unicoreConfig, () => {

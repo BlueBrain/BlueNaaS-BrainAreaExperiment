@@ -281,12 +281,12 @@ export default {
     async editItem() {
       this.localStimInfo.Pattern = this.localPattern;
       const isValid = await this.$refs.formValidate.validate();
-      if (isValid) {
-        const valuesToKeep = ['Delay', 'Duration', 'Mode', 'Pattern', 'Target', ...this.paramsToShow];
-        const prunedStimulusInfo = pick(this.localStimInfo, valuesToKeep);
-        this.$emit('item-edited', prunedStimulusInfo);
-        this.formInvalid = false;
-      }
+      if (!isValid) return;
+
+      const valuesToKeep = ['Delay', 'Duration', 'Mode', 'Pattern', 'Target', ...this.paramsToShow];
+      const prunedStimulusInfo = pick(this.localStimInfo, valuesToKeep);
+      this.$emit('item-edited', prunedStimulusInfo);
+      this.formInvalid = false;
     },
     targetChanged(newTarget) {
       if (this.localStimInfo.Target !== newTarget) {

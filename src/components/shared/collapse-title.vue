@@ -57,6 +57,11 @@ export default {
       this.$emit(this.toggleCollapse ? 'collapsed' : 'expanded');
     },
   },
+  watch: {
+    collapsed() {
+      this.toggle();
+    },
+  },
 };
 </script>
 

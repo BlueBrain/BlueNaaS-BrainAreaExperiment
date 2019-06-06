@@ -3,13 +3,13 @@
   <div>
     <divider>Choose Plot(s)</divider>
 
-    <div
+    <form-item
       v-for="analysis in analysisList"
       :key="analysis.param"
       v-if="!skipAnalysis(analysis.param)"
       class="centered"
+      :label="analysis.name"
     >
-      {{ analysis.name }}
       <div>
         <radio-group
           v-model="selections[analysis.param]"
@@ -29,7 +29,8 @@
           class="small-width"
         />
       </div>
-    </div>
+    </form-item>
+
   </div>
 </template>
 
@@ -77,6 +78,7 @@ export default {
         }
         plotConfig[key] = value;
       });
+      if (!Object.keys(plotConfig).length) return false;
       return plotConfig;
     },
     showCellsInput(analysisName) {

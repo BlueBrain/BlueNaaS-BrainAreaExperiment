@@ -2,7 +2,7 @@
 <template>
   <div class="analysis-section">
     <collapse-title
-      :collapsed="false"
+      :collapsed="sectionCollapsed"
       title="Analysis"
       @expanded="getAnalysisInfo"
     >
@@ -78,6 +78,7 @@ export default {
     return {
       analysisDetails: [],
       overallLoading: false,
+      sectionCollapsed: true,
       isRunningFn: isRunning,
     };
   },
@@ -97,6 +98,12 @@ export default {
       }
       return outputText;
     },
+  },
+  mounted() {
+    // open after some seconds to avoid overload
+    setTimeout(() => {
+      this.sectionCollapsed = false;
+    }, 2000);
   },
   methods: {
     async getAnalysisInfo() {
@@ -162,30 +169,23 @@ export default {
           throw error;
         }
 
+        analysisJobInfo.children = analysisWithFiles.children || [];
+        db.addJob(analysisJobInfo);
+
         if (!await analysisProducedResults(analysisWithFiles)) {
-          this.$Message.info(`Analysis ${childAnalysis.id} did not produce any image`);
+          this.$Message.info(`Analysis ${childAnalysis.id}, requested images and output mismatch`);
           this.$set(childAnalysis, 'status', jobStatus.FAILED);
           this.$set(childAnalysis, 'fetchingImages', false);
           // no need to reactivity for next one
           // childanalysis is only in the view info it is not saved on DB
           analysisJobInfo.status = jobStatus.FAILED;
-          analysisJobInfo.children = analysisWithFiles.children;
           db.addJob(analysisJobInfo);
           return;
         }
       }
-      this.$set(childAnalysis, 'status', analysisJobInfo.status);
-      analysisConfig.plots.forEach((plot) => {
-        this.getAnalysisImage(childAnalysis.workingDirectory, plot, childAnalysis);
-      });
-    },
 
-    async getAnalysisImage(analysisURL, plotName, childAnalysis) {
-      const plot = await unicore.getImage(`${analysisURL}/files/${plotName}.png`);
-      if (plot) {
-        this.$set(childAnalysis, plotName, plot);
-      }
-      this.$set(childAnalysis, 'fetchingImages', false);
+      this.$set(childAnalysis, 'status', analysisJobInfo.status);
+      this.$set(childAnalysis, 'children', analysisJobInfo.children);
     },
 
     async getAnalysisLog(childAnalysis) {

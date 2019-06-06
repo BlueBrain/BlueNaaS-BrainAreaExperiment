@@ -3,16 +3,15 @@
   <div class="analysis">
     <div class="all-plots-container">
       <div
-        v-for="plot in analysisConfig.plots"
+        v-for="plot in plotNames"
         :key="plot"
       >
         <div
           v-if="itemDetails[plot]"
           class="plot-container"
         >
-          <span class="plot-label">{{ fullName(plot) }}</span>
           <a
-            :download="plot +'.png'"
+            :download="plot"
             :href="itemDetails[plot]"
           >
             <img
@@ -45,10 +44,11 @@
 
 
 <script>
-import find from 'lodash/find';
+import isEqual from 'lodash/isEqual';
 
 import collapseTitle from '@/components/shared/collapse-title.vue';
 import analysisConfig from '@/config/analysis-config';
+import unicore from '@/services/unicore';
 
 export default {
   name: 'Analysis',
@@ -59,16 +59,41 @@ export default {
   data() {
     return {
       analysisConfig,
+      plotNames: [],
     };
   },
-  methods: {
-    fullName(plotShortName) {
-      const plotInfo = find(this.analysisConfig.analysisAvailable, elem => elem.param === plotShortName);
-      if (!plotInfo) return '';
-      return plotInfo.name;
+  computed: {
+    analysisFiles() {
+      if (!this.itemDetails.children || !this.itemDetails.children.length) return [];
+      return this.itemDetails.children;
     },
+  },
+  watch: {
+    analysisFiles(files) {
+      if (!files || !files.length) return;
+      const plotNames = files.filter(f => f.endsWith('.png')).map(p => p.replace('/', ''));
+
+      const nonLfpPlots = plotNames.filter(p => !p.startsWith('lfp')).sort();
+      const lfpPlots = plotNames.filter(p => p.startsWith('lfp')).sort();
+      const completeSortedPlots = nonLfpPlots.concat(lfpPlots);
+
+      if (isEqual(completeSortedPlots, this.plotNames)) return;
+      completeSortedPlots.forEach((plot) => {
+        this.getAnalysisImage(this.itemDetails.workingDirectory, plot, this.itemDetails);
+      });
+      this.plotNames = completeSortedPlots;
+    },
+  },
+  methods: {
     analysisLogRequest() {
       this.$emit('analysis-log-request', this.itemDetails);
+    },
+    async getAnalysisImage(analysisURL, plotName, childAnalysis) {
+      const plot = await unicore.getImage(`${analysisURL}/files/${plotName}`);
+      if (plot) {
+        this.$set(childAnalysis, plotName, plot);
+        this.$set(childAnalysis, 'fetchingImages', false);
+      }
     },
   },
 };
@@ -86,15 +111,12 @@ export default {
   .all-plots-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
   }
   .plot-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-  .plot-label {
-    font-size: 24px;
-    margin: 5px 0;
+    width: 380px;
+    margin: 15px;
   }
 </style>

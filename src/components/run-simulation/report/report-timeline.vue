@@ -203,7 +203,18 @@ export default {
     },
 
     getReportUnit(reportMapped) {
-      return reportMapped.ReportOn.includes('v') ? 'mV' : 'mM';
+      let unit = '';
+      switch (reportMapped.ReportOn) {
+        case 'cai':
+          unit = 'mM';
+          break;
+        case 'i_membrane IClamp':
+          unit = 'nA';
+          break;
+        default:
+          unit = 'mV';
+      }
+      return unit;
     },
 
     createConfig() {

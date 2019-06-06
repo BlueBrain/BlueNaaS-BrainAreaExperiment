@@ -53,4 +53,10 @@ export default {
     { name: 'NPoisson', params: ['Lambda', 'Weight', 'NumOfSynapses'] },
     { name: 'Noise', params: ['MeanPercent', 'Variance'] },
   ],
+  reportOn: {
+    voltage: 'Voltage',
+    calcium: 'Calcium Concentration',
+    lfp: 'Total Current for LFP',
+  },
+  checksForLFP: ['AllCompartments', 'Summation'],
 };

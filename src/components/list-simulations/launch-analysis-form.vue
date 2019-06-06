@@ -3,69 +3,104 @@
   <div>
     <modal
       width="350"
-      v-model="formInvalid"
+      v-model="showModalLocal"
       @on-cancel="$emit('changeModalVisibility')"
+      :mask-closable="false"
       class="report-form"
     >
       <h3 slot="header">Launch Analysis</h3>
-      <div>
-        <i-form
-          ref="formValidate"
-          :rules="ruleValidate"
-          name="reportForm"
-          label-position="right"
-          :label-width="150"
-          :model="{}"
-        >
-          <form-item prop="title" label="Title:">
-            <i-input
-              required
-              v-model="title"
-              placeholder="Title of the analysis"
-            />
-          </form-item>
 
-          <form-item prop="target">
-            <tooltip
-              slot="label"
-              content="Define report name to analyze"
-            >
-              Population:
-            </tooltip>
-            <i-select
-              v-model="target"
-            >
-              <i-option
-                v-for="targetElem in targets"
-                :key="targetElem"
-                :value="targetElem"
-              >{{ targetElem }}</i-option>
-            </i-select>
-          </form-item>
-
-          <form-item
-            prop="report"
-            label="Report"
+      <div v-if="showModalLocal">
+        <div>
+          <i-form
+            ref="formValidate"
+            name="reportForm"
+            label-position="right"
+            :label-width="150"
+            :model="{}"
           >
-           <i-select
-              v-model="reportForAnalysis"
-              :disabled="!reports.length"
+            <form-item prop="title" label="Title:">
+              <i-input
+                required
+                v-model="title"
+                placeholder="Title of the analysis"
+              />
+            </form-item>
+
+            <form-item
+              prop="report"
+              label="Report"
             >
-              <i-option
-                v-for="report in reports"
-                :key="report"
-                :value="report"
-              >{{ report }}</i-option>
-            </i-select>
-          </form-item>
+             <i-select
+                v-model="reportForAnalysis"
+                :disabled="!reports.length"
+              >
+                <i-option
+                  v-for="report in reports"
+                  :key="report"
+                  :value="report"
+                >{{ report }}</i-option>
+              </i-select>
+            </form-item>
 
-          <analysis-picker
-            :analysisList="analysisToRun"
-            :hasReport="!!reports.length"
-            ref="analysisPickerRef"
-          />
+            <tabs>
+              <tab-pane label="Raster/Traces">
+                <form-item prop="target">
+                  <tooltip
+                    slot="label"
+                    content="Define report name to analyze"
+                  >
+                    Population:
+                  </tooltip>
+                  <i-select
+                    v-model="target"
+                  >
+                    <i-option
+                      v-for="targetElem in targets"
+                      :key="targetElem"
+                      :value="targetElem"
+                    >{{ targetElem }}</i-option>
+                  </i-select>
+                </form-item>
 
-        </i-form>
+                <analysis-picker
+                  :analysisList="analysisToRun"
+                  :hasReport="!!reports.length"
+                  ref="analysisPickerRef"
+                />
+              </tab-pane>
+
+              <tab-pane label="LFP" :disabled="!isLFP">
+                <form-item prop="lfpTarget">
+                  <tooltip
+                    slot="label"
+                    content="Define report name to analyze"
+                  >
+                    Population:
+                  </tooltip>
+                  <i-select
+                    v-model="lfpTarget"
+                  >
+                    <i-option
+                      v-for="targetElem in lfpTargets"
+                      :key="targetElem"
+                      :value="targetElem"
+                    >{{ targetElem }}</i-option>
+                  </i-select>
+                </form-item>
+
+                <lfp-analysis-picker
+                  :analysisList="analysisToRun"
+                  :hasReport="!!reports.length"
+                  ref="lfpAnalysisPickerRef"
+                />
+
+              </tab-pane>
+            </tabs>
+
+          </i-form>
+        </div>
+
       </div>
 
       <div slot="footer">
@@ -91,16 +126,19 @@ import { unmapBlueConfigTerms, mapBlueConfigTerms } from '@/common/utils';
 import get from 'lodash/get';
 import intersection from 'lodash/intersection';
 import AnalysisPicker from '@/components/list-simulations/analysis-picker.vue';
+import LfpAnalysisPicker from '@/components/list-simulations/lfp-analysis-picker.vue';
+import { jobTags } from '@/common/job-status';
 
 export default {
   name: 'AnalysisForm',
   props: ['jobSelectedForAnalysis', 'showModal', 'isRunningAnalysis'],
   components: {
     AnalysisPicker,
+    LfpAnalysisPicker,
   },
   data() {
     return {
-      formInvalid: false,
+      showModalLocal: false,
       title: '',
       analysisToRun: analysisConfig.analysisAvailable,
       checkedAnalysis: [],
@@ -108,20 +146,8 @@ export default {
       reportForAnalysis: null,
       numberOfCells: 5,
       target: null,
-
-      ruleValidate: {
-        target: [{
-          required: true,
-          validator: (rule, value, callback) => {
-            if (!this.target) {
-              callback(new Error('should be defined'));
-              return;
-            }
-            callback();
-          },
-        }],
-      },
-
+      lfpTarget: null,
+      lfpTargets: [],
     };
   },
   computed: {
@@ -139,10 +165,14 @@ export default {
     processing() {
       return this.isRunningAnalysis || !this.target;
     },
+    isLFP() {
+      return this.jobSelectedForAnalysis.tags.includes(jobTags.LFP_SIMULATION);
+    },
   },
   watch: {
     showModal(newVal) {
-      this.formInvalid = newVal;
+      this.showModalLocal = newVal;
+      if (newVal) this.setupLfpTargets();
     },
     reports(newVal) {
       [this.reportForAnalysis] = newVal;
@@ -154,13 +184,17 @@ export default {
   },
   methods: {
     async editItem() {
-      const isValid = await this.$refs.formValidate.validate();
-      if (isValid) {
-        this.$emit('analysis-config-ready', this.generateAnalysisObjectToRun());
-      }
+      this.$emit('analysis-config-ready', this.generateAnalysisObjectToRun());
     },
     targetChanged(newTarget) {
       this.target = newTarget;
+    },
+    setupLfpTargets() {
+      // set targets for LFP
+      const reportRegExp = new RegExp(this.$store.state.currentCircuitConfig.reportsTargetFilter);
+      const allTargets = this.$store.state.currentCircuitConfig.targets;
+      const filteredTargetsForReport = allTargets.filter(target => reportRegExp.test(target.name));
+      this.$set(this, 'lfpTargets', filteredTargetsForReport.map(t => t.displayName));
     },
     async setTargets(job) {
       function findTargetsInBC(BCStr) {
@@ -202,15 +236,37 @@ export default {
       this.$set(this, 'target', this.targets[0]);
     },
     generateAnalysisObjectToRun() {
+      const analysisObj = this.$refs.analysisPickerRef.generatePlotsConfig();
+      if (analysisObj && !this.target) {
+        this.$Message.error('Please select Population to analyze');
+        return false;
+      }
+
+      let lfpAnalysisObj = null;
+      if (this.isLFP) {
+        lfpAnalysisObj = this.$refs.lfpAnalysisPickerRef.generatePlotsConfig();
+        if (lfpAnalysisObj && !this.lfpTarget) {
+          this.$Message.error('Please select LFP Population');
+          return false;
+        }
+      }
+
+      if (!analysisObj && !lfpAnalysisObj) {
+        this.$Message.warning('Please complete the form');
+        return false;
+      }
+
       return {
         computerSelected: this.$store.state.currentComputer,
         from: {},
         nodes: analysisConfig.nodes,
         runtime: analysisConfig.runtime,
         title: this.title,
-        plotsConfig: this.$refs.analysisPickerRef.generatePlotsConfig(),
+        plotsConfig: analysisObj,
+        lfpPlotsConfig: lfpAnalysisObj,
         reportForAnalysis: this.reportForAnalysis,
         target: mapBlueConfigTerms(this.target),
+        lfpTarget: mapBlueConfigTerms(this.lfpTarget),
       };
     },
   },

@@ -17,11 +17,12 @@ import last from 'lodash/last';
 
 async function analysisProducedResults(analysisWithFiles) {
   const analysisWDUrl = get(analysisWithFiles, '_links.workingDirectory.href');
-  const imagesList = analysisWithFiles.children.filter(file => file.match('.png'));
+  const imagesList = analysisWithFiles.children.filter(file => file.endsWith('.png'));
   const configFileBlob = await unicore.getFiles(`${analysisWDUrl}/files/${analysisConfig.configFileName}`);
   const configFileJson = await new Response(configFileBlob).json();
-  const analysisRequested = Object.keys(configFileJson.plots_config).length;
-  return analysisRequested === imagesList.length;
+  let imgReqCount = Object.keys(configFileJson.plots_config).length;
+  imgReqCount += get(configFileJson, 'lfp_plots_config.points.length', 0);
+  return imgReqCount === imagesList.length;
 }
 
 function simulationProducedResults(simulationWithFiles) {

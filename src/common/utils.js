@@ -12,6 +12,7 @@ const mapper = {
   Soma: 'compartment',
   Poisson: 'NPoisson',
   'Calcium Concentration': 'cai',
+  'Total Current for LFP': 'i_membrane IClamp',
 };
 
 // add targets to mapper for later conversion to BlueConfig and vice-versa
@@ -90,6 +91,23 @@ function getComputerProjectCircuitCombo(prefix) {
   return prefix ? `${prefix}_${comboStr}` : comboStr;
 }
 
+function pointIsValid(point) {
+  const regex = /^-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+-]?\d+)?$/g;
+  const sp = point.split(',');
+  let isValid = false;
+
+  if (!sp) return isValid;
+
+  const numbList = sp.map(e => e.trim());
+  if (numbList.length !== 3) return isValid;
+
+  isValid = numbList.every((numb) => {
+    const match = numb.match(regex);
+    return match ? !!match.length : false;
+  });
+  return isValid;
+}
+
 export {
   convertToBCFormat,
   openContent,
@@ -98,4 +116,5 @@ export {
   getComputerUrlCombo,
   getComputerProjectCircuitCombo,
   getDate3YearFromNow,
+  pointIsValid,
 };

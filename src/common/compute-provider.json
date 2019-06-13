@@ -63,5 +63,10 @@
     "name": "PIZ_DAINT",
     "id": "PIZ_DAINT",
     "url": "https://brissago.cscs.ch:8080/DAINT-CSCS/rest/core"
+  },
+  "BB5": {
+    "name": "BlueBrain 5",
+    "id": "BB5",
+    "url": "https://bbpunicore.epfl.ch:8080/BB5-CSCS/rest/core"
   }
 }

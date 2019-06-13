@@ -144,7 +144,6 @@ const hippoMicrocircuit = {
     { name: 'SLM', displayName: 'SLM' },
     { name: 'mc0_Column', displayName: 'mc0_Column' },
     { name: 'SO', displayName: 'SO' },
-    { name: 'mc2_Column', displayName: 'mc2_Column' },
     { name: 'mc6_Column', displayName: 'mc6_Column' },
     { name: 'mc1_Column', displayName: 'mc1_Column' },
     { name: 'mc3_Column', displayName: 'mc3_Column' },
@@ -215,10 +214,21 @@ const moocHippoMicrocircuit = Object.assign(
   },
 );
 
+const bbpHippoMicrocircuit = Object.assign(
+  {},
+  { ...hippoMicrocircuit },
+  {
+    prefix: {
+      BB5: '/gpfs/bbp.cscs.ch/home/antonel/20181114/putting_circuit_together',
+    },
+  },
+);
+
 const mapCircuitNameWithUrl = {
   hippo_microcircuit: hippoMicrocircuit,
   mooc_hippo_microcircuit: moocHippoMicrocircuit,
   hippo_full_ca1: hippoFullCa1,
+  bbp_hippo_microcircuit: bbpHippoMicrocircuit,
 };
 
 export default {

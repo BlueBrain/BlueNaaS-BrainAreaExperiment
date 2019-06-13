@@ -17,6 +17,15 @@ export default {
     ],
     executable: '/bin/bash input.sh',
   },
+  BB5: {
+    script: [
+      '#!/bin/bash',
+      'HDF5_USE_FILE_LOCKING=FALSE',
+      'export HDF5_USE_FILE_LOCKING',
+      '/users/bp000037/analysis/analysis_launch_0.4.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
+    ],
+    executable: '/bin/bash input.sh',
+  },
   NUVLA: {
     dynamicAnalysis: true,
     bulkAnalysis: true,

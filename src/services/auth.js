@@ -3,17 +3,26 @@ import { JSO } from 'jso';
 import { setAxiosToken } from '@/services/unicore';
 
 import store from '@/services/store';
-import config from '@/config';
+import { configHBP, configBBP } from '@/config';
 
-const client = new JSO({
-  client_id: config.auth.clientId,
-  redirect_uri: `${window.location.href}/`,
-  authorization: config.auth.authUrl,
-  response_type: 'id_token token',
-  request: config.auth.request,
-});
+let client = null;
+if (store.state.currentCircuit) {
+  const isBBP = store.state.currentCircuit.includes('bbp_');
+  const actualAuthProvider = isBBP ? configBBP : configHBP;
+
+  client = new JSO({
+    client_id: actualAuthProvider.auth.clientId,
+    redirect_uri: `${window.location.href}/`,
+    authorization: actualAuthProvider.auth.authUrl,
+    response_type: 'id_token token',
+    request: actualAuthProvider.auth.request,
+  });
+}
 
 function init() {
+  const isIndex = window.location.hash === '#/';
+  if (!client && isIndex) { return Promise.resolve(); }
+
   client.callback();
 
   /*

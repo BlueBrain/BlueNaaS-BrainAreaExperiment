@@ -8,7 +8,7 @@ const slicesImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher
 
 const hippoFullCa1 = {
   prefix: { // setting prefix allow to know which computer can run the circuit
-    JURECA: '/p/project/cpcp0/pcp0068/CircuitRelease',
+    JURECA: '/p/project/cvsk25/vsk2512/CA1',
     PIZ_DAINT: '/apps/hbp/ich002/home/antonel/full_ca1',
   },
   paths: {
@@ -208,7 +208,6 @@ const moocHippoMicrocircuit = Object.assign(
   {
     prefix: {
       NUVLA: '/mooc',
-      PIZ_DAINT: '/',
     },
     paths: newPaths,
     reportsTargetFilter: '(Random.{1,2}Perc|mc2_Column|Mosaic)',

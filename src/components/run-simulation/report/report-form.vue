@@ -112,17 +112,6 @@
             </i-select>
           </form-item>
 
-          <!-- <div class="form-group" v-if="localReportInfo.Type == 'Summation'">
-            <label class="control-label" title="Handling of density values">Scaling</label>
-            <div class="controls">
-              <select class="form-control" v-model="report.Scaling"
-              type="text" id="Format" placeholder="Format" required>
-                <option>Area</option>
-                <option>None</option>
-              </select>
-            </div>
-          </div> -->
-
         </i-form>
       </div>
       <div slot="footer">
@@ -188,7 +177,16 @@ export default {
       return this.$store.state.reportTargets;
     },
     reportOptions() {
+      if (!this.allowRunLfp) {
+        const newReportOptions = Object.assign({}, simulationConfig.reportOn);
+        delete newReportOptions.lfp;
+        return newReportOptions;
+      }
       return simulationConfig.reportOn;
+    },
+    allowRunLfp() {
+      if (!this.reportTargets || !this.reportTargets.length) return false;
+      return !!this.reportTargets.find(t => t.lfp);
     },
   },
   methods: {
@@ -210,6 +208,7 @@ export default {
     reportOnChanged(newReportOn) {
       if (newReportOn !== this.reportOptions.lfp) return;
       // if report on lfp change other params to run simulation full lfp compatible
+      this.$Message.warning('Simulation for LFP is an expensive operation');
       this.$set(this.localReportInfo, 'Type', 'Summation');
       const lfpTarget = this.reportTargets.find(t => t.lfp);
       this.$set(this.localReportInfo, 'Target', lfpTarget.displayName);

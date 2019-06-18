@@ -5,6 +5,7 @@
     width="350"
     class="computer-config-form"
     @on-cancel="$emit('closeModal')"
+    :mask-closable="false"
   >
     <h3 slot="header">Edit Parameters</h3>
     <i-form
@@ -42,17 +43,33 @@
         </i-select>
       </form-item>
 
-      <form-item prop="project">
+      <form-item prop="group">
         <tooltip
           slot="label"
-          content="Name of the project to run jobs"
-        >Project</tooltip>
+          content="Name of the group to run jobs"
+        >Unicore Group</tooltip>
         <i-select
           v-model="groupSelected"
           :disabled="disableGroupSelector"
         >
           <i-option
-            v-for="project in groupsAvailable"
+            v-for="group in groupsAvailable"
+            :key="group"
+            :value="group"
+          >{{ group }}</i-option>
+        </i-select>
+      </form-item>
+
+      <form-item prop="account" v-if="!accountIsHidden">
+        <tooltip
+          slot="label"
+          content="Name of the account to run jobs"
+        >Account</tooltip>
+        <i-select
+          v-model="runParameters.accountSelected"
+        >
+          <i-option
+            v-for="project in projectsAvailable"
             :key="project"
             :value="project"
           >{{ project }}</i-option>
@@ -123,7 +140,7 @@
         <i-button
           type="success"
           size="default"
-          :loading="isLaunchingSim || !projectsFetched"
+          :loading="isLoading"
           @click="checkForm"
         >Run Simulation</i-button>
       </div>
@@ -134,6 +151,7 @@
 
 <script>
 import simulationConfig from '@/config/simulation-config';
+import auth from '@/services/auth';
 import eventBus from '@/services/event-bus';
 import isEqual from 'lodash/isEqual';
 import db from '@/services/db';
@@ -149,9 +167,12 @@ export default {
         nodes: null,
         runtime: null,
         cpus: null,
+        accountSelected: null,
       },
-      projectsFetched: false,
 
+      accountIsHidden: true,
+      projectsFetched: false,
+      projectsAvailable: [],
       previousConfig: null,
 
       ruleValidate: {
@@ -188,6 +209,16 @@ export default {
             }
             if (this.runParameters.runtime < 1) {
               callback(new Error('should be > 1'));
+              return;
+            }
+            callback();
+          },
+        }],
+        account: [{
+          required: true,
+          validator: (rule, value, callback) => {
+            if (!this.runParameters.accountSelected) {
+              callback(new Error('should be defined'));
               return;
             }
             callback();
@@ -244,6 +275,12 @@ export default {
     runtimeIsHidden() {
       return this.$store.state.currentComputer === 'NUVLA';
     },
+
+    isLoading() {
+      return this.isLaunchingSim ||
+        !this.projectsFetched ||
+        (!this.accountIsHidden && !this.projectsAvailable.length);
+    },
   },
   methods: {
     async checkForm() {
@@ -256,9 +293,8 @@ export default {
       }
     },
 
-    loadDefaultValues() {
-      const computer = this.$store.state.currentComputer || this.computersAvailable[0];
-      const defaultValues = simulationConfig[computer];
+    loadDefaultValues(defaultComputer) {
+      const defaultValues = simulationConfig[defaultComputer];
       this.runParameters.runtime = defaultValues.runtime;
       this.runParameters.nodes = defaultValues.nodes;
       this.runParameters.cpus = defaultValues.cpus;
@@ -271,16 +307,23 @@ export default {
         !lastConfig.unicore ||
         !lastConfig.unicore.runtime ||
         !lastConfig.unicore.nodes ||
-        !lastConfig.unicore.title ||
         !lastConfig.unicore.computerSelected
       ) {
-        this.loadDefaultValues();
+        const defaultComputer = this.$store.state.currentComputer || this.computersAvailable[0];
+        this.loadDefaultValues(defaultComputer);
+        this.loadAccount(defaultComputer);
         return null;
       }
       this.runParameters.runtime = lastConfig.unicore.runtime;
       this.runParameters.nodes = lastConfig.unicore.nodes;
       this.runParameters.title = lastConfig.unicore.title;
       this.runParameters.cpus = simulationConfig[lastConfig.unicore.computerSelected].cpus;
+
+      this.loadAccount(lastConfig.unicore.computerSelected);
+      if (!this.accountIsHidden && lastConfig.unicore.accountSelected) {
+        this.runParameters.accountSelected = lastConfig.unicore.accountSelected;
+      }
+
       return lastConfig.unicore.computerSelected;
     },
 
@@ -290,6 +333,20 @@ export default {
       eventBus.$emit('changeComputer', computerToFetch, () => {
         this.projectsFetched = true;
         if (callback) callback();
+      });
+    },
+
+    loadAccount(computer) {
+      const isHidden = computer !== 'BB5';
+      if (!isHidden) { this.getUserProjects(); }
+      this.accountIsHidden = isHidden;
+    },
+
+    getUserProjects() {
+      auth.getUserProjects().then((projects) => {
+        this.projectsAvailable = projects;
+      }).catch((e) => {
+        this.$Message.error('Error fetching user groups', e);
       });
     },
   },

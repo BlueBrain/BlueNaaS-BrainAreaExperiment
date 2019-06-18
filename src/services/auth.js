@@ -1,14 +1,16 @@
 
 import { JSO } from 'jso';
-import { setAxiosToken } from '@/services/unicore';
+import { setAxiosToken, axiosInstance } from '@/services/unicore';
+
 
 import store from '@/services/store';
 import { configHBP, configBBP } from '@/config';
 
 let client = null;
+let actualAuthProvider = null;
 if (store.state.currentCircuit) {
   const isBBP = store.state.currentCircuit.includes('bbp_');
-  const actualAuthProvider = isBBP ? configBBP : configHBP;
+  actualAuthProvider = isBBP ? configBBP : configHBP;
 
   client = new JSO({
     client_id: actualAuthProvider.auth.clientId,
@@ -47,6 +49,29 @@ function init() {
   return authorization;
 }
 
+async function getUserInfo() {
+  const info = await axiosInstance.get(actualAuthProvider.userEndpoint);
+  if (!info) return null;
+  return info.data;
+}
+
+async function getUserProjects() {
+  const userInfo = await getUserInfo();
+  const projectPrefix = '/bbp-dev-proj';
+  const regexp = `${projectPrefix}(\\d{2})`;
+
+  const projects = userInfo.groups
+    .filter(g => g.startsWith(projectPrefix))
+    .map((groupString) => {
+      const match = groupString.match(regexp);
+      if (!match || !match.length) return false;
+      return `proj${match[1]}`;
+    })
+    .filter(group => group);
+  return projects;
+}
+
 export default {
   init,
+  getUserProjects,
 };

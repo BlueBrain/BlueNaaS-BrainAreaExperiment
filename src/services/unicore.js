@@ -333,6 +333,7 @@ async function generateUnicoreConfig(configParams) {
 
   function getNodes() {
     // avoid setting nodes for test job submission
+    if (configParams.nodes === 0) return null;
     return configParams.runtime < 200 ? null : configParams.nodes;
   }
 
@@ -348,6 +349,14 @@ async function generateUnicoreConfig(configParams) {
     return memory ? `${memory}M` : null;
   }
 
+  function getProject() {
+    return simulationConfig[configParams.computerSelected].project || null;
+  }
+
+  function getCpusPerNode() {
+    return simulationConfig[configParams.computerSelected].cpus || null;
+  }
+
   // generate and remove the nulls
   const jobSpec = cleanDeep({
     Name: configParams.title || 'unnamed job',
@@ -360,10 +369,12 @@ async function generateUnicoreConfig(configParams) {
     haveClientStageIn: 'true',
     Resources: {
       Nodes: getNodes(),
+      CPUsPerNode: getCpusPerNode(),
       Runtime: configParams.runtime,
-      Queue: getPartition(),
       NodeConstraints: getNodeType(),
       Memory: getMemory(),
+      Queue: getPartition(),
+      Project: getProject(),
     },
     Tags: getJobTags(),
     Imports: configParams.imports,

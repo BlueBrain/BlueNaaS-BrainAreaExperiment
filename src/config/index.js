@@ -12,6 +12,7 @@ const configBBP = {
     authUrl: 'https://bbpteam.epfl.ch/auth/realms/BBP/protocol/openid-connect/auth',
     request: { nonce: null },
   },
+  userEndpoint: 'https://bbpteam.epfl.ch/auth/realms/BBP/protocol/openid-connect/userinfo',
 };
 
 export {

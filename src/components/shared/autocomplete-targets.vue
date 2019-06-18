@@ -23,16 +23,12 @@
 <script>
 export default {
   props: ['targetSelected', 'itemsAvailable'],
-  data() {
-    return {
-      populationSelected: this.targetSelected || null,
-    };
-  },
   methods: {
     matched(search = '', targetValue = '') {
       return targetValue.toLowerCase().indexOf(search.toLowerCase()) >= 0;
     },
     itemSelected(selection) {
+      if (!selection) return;
       this.$emit('target-changed', selection);
     },
     getTargetImage(targetObj) {
@@ -46,11 +42,9 @@ export default {
       }
       return this.$store.state.currentCircuitConfig.targets;
     },
-  },
-  watch: {
-    targetSelected(newTarget) {
-      this.populationSelected = newTarget;
-      this.itemSelected(this.populationSelected);
+    populationSelected: {
+      get() { return this.targetSelected || null; },
+      set(newPopulation) { this.itemSelected(newPopulation); },
     },
   },
 };

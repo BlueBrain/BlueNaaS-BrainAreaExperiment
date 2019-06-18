@@ -6,7 +6,7 @@
 */
 const slicesImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/images-slices-CA1';
 
-const hippoFullCa1 = {
+const hippoHbpFullCa1 = {
   prefix: { // setting prefix allow to know which computer can run the circuit
     JURECA: '/p/project/cvsk25/vsk2512/CA1',
     PIZ_DAINT: '/apps/hbp/ich002/home/antonel/full_ca1',
@@ -94,7 +94,7 @@ const hippoFullCa1 = {
 */
 
 const microcircuitImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/images-slices-mooc';
-const hippoMicrocircuit = {
+const hippoHbpMicrocircuit = {
   prefix: {
     JURECA: '/p/project/cvsk25/vsk2512/O1',
     PIZ_DAINT: '/apps/hbp/ich002/home/antonel/O1',
@@ -201,10 +201,10 @@ const hippoMicrocircuit = {
 |--------------------------------------------------------------------------
 */
 
-const newPaths = Object.assign({}, { ...hippoMicrocircuit.paths }, { CurrentDir: '/io', OutputRoot: '/io' });
-const moocHippoMicrocircuit = Object.assign(
+const newPaths = Object.assign({}, { ...hippoHbpMicrocircuit.paths }, { CurrentDir: '/io', OutputRoot: '/io' });
+const hippoMoocMicrocircuit = Object.assign(
   {},
-  { ...hippoMicrocircuit },
+  { ...hippoHbpMicrocircuit },
   {
     prefix: {
       NUVLA: '/mooc',
@@ -214,9 +214,9 @@ const moocHippoMicrocircuit = Object.assign(
   },
 );
 
-const bbpHippoMicrocircuit = Object.assign(
+const hippoBbpMicrocircuit = Object.assign(
   {},
-  { ...hippoMicrocircuit },
+  { ...hippoHbpMicrocircuit },
   {
     prefix: {
       BB5: '/gpfs/bbp.cscs.ch/home/antonel/20181114/putting_circuit_together',
@@ -225,10 +225,10 @@ const bbpHippoMicrocircuit = Object.assign(
 );
 
 const mapCircuitNameWithUrl = {
-  hippo_microcircuit: hippoMicrocircuit,
-  mooc_hippo_microcircuit: moocHippoMicrocircuit,
-  hippo_full_ca1: hippoFullCa1,
-  bbp_hippo_microcircuit: bbpHippoMicrocircuit,
+  hippo_hbp_microcircuit: hippoHbpMicrocircuit,
+  hippo_mooc_microcircuit: hippoMoocMicrocircuit,
+  hippo_hbp_full_ca1: hippoHbpFullCa1,
+  hippo_bbp_microcircuit: hippoBbpMicrocircuit,
 };
 
 export default {

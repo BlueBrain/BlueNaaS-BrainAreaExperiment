@@ -1,6 +1,8 @@
 
+import constants from '@/common/constants';
+
 export default {
-  JURECA: {
+  [constants.computers.JURECA]: {
     script: [
       'OMP_NUM_THREADS=1',
       'export OMP_NUM_THREADS',
@@ -8,7 +10,7 @@ export default {
     ],
     executable: '/bin/bash input.sh',
   },
-  PIZ_DAINT: {
+  [constants.computers.PIZ_DAINT]: {
     script: [
       '#!/bin/bash',
       'HDF5_USE_FILE_LOCKING=FALSE',
@@ -17,7 +19,7 @@ export default {
     ],
     executable: '/bin/bash input.sh',
   },
-  BB5: {
+  [constants.computers.BB5]: {
     script: [
       '#!/bin/bash',
       'HDF5_USE_FILE_LOCKING=FALSE',
@@ -26,7 +28,7 @@ export default {
     ],
     executable: '/bin/bash input.sh',
   },
-  NUVLA: {
+  [constants.computers.NUVLA]: {
     dynamicAnalysis: true,
     bulkAnalysis: true,
     executable: 'epfl-mooc/analysis/launch_analysis',

@@ -155,6 +155,7 @@ import auth from '@/services/auth';
 import eventBus from '@/services/event-bus';
 import isEqual from 'lodash/isEqual';
 import db from '@/services/db';
+import constants from '@/common/constants';
 
 export default {
   name: 'UnicoreConfigForm',
@@ -273,7 +274,7 @@ export default {
     },
 
     runtimeIsHidden() {
-      return this.$store.state.currentComputer === 'NUVLA';
+      return this.$store.state.currentComputer === constants.computers.NUVLA;
     },
 
     isLoading() {
@@ -337,7 +338,7 @@ export default {
     },
 
     loadAccount(computer) {
-      const isHidden = computer !== 'BB5';
+      const isHidden = computer !== constants.computers.BB5;
       if (!isHidden) { this.getUserProjects(); }
       this.accountIsHidden = isHidden;
     },

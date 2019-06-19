@@ -1,6 +1,8 @@
 
+import constants from '@/common/constants';
+
 const config = {
-  NUVLA: {
+  [constants.computers.NUVLA]: {
     to: 'NUVLA',
     needsTransfer: true,
     executable: 'brayns/BraynsUI',

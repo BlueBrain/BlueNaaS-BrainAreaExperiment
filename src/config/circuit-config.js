@@ -1,6 +1,5 @@
 
 import constants from '@/common/constants';
-
 /*
 |--------------------------------------------------------------------------
 | Hippocampus Full CA1

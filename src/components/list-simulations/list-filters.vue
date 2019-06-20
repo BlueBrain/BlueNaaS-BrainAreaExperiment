@@ -73,7 +73,6 @@
 
 <script>
 import { statesFilter, getStatusIcon } from '@/common/job-status';
-import simulationConfig from '@/config/simulation-config';
 import eventBus from '@/services/event-bus';
 import isEqual from 'lodash/isEqual';
 
@@ -86,7 +85,6 @@ export default {
       iconSize: 18,
       statesFilter,
       getStatusIcon,
-      simulationConfig,
     };
   },
   computed: {

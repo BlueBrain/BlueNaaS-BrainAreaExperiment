@@ -128,7 +128,6 @@
 
 <script>
 import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
-import simulationConfig from '@/config/simulation-config';
 
 export default {
   name: 'ReportForm',
@@ -178,11 +177,11 @@ export default {
     },
     reportOptions() {
       if (!this.allowRunLfp) {
-        const newReportOptions = Object.assign({}, simulationConfig.reportOn);
+        const newReportOptions = Object.assign({}, this.$store.state.currentSimulationConfig.reportOn);
         delete newReportOptions.lfp;
         return newReportOptions;
       }
-      return simulationConfig.reportOn;
+      return this.$store.state.currentSimulationConfig.reportOn;
     },
     allowRunLfp() {
       if (!this.reportTargets || !this.reportTargets.length) return false;

@@ -273,6 +273,7 @@ export default {
         prevItems.push(this.createItem(prevStimulus, index));
         index += 1;
       });
+
       return prevItems;
     },
     targetSelected(target) {

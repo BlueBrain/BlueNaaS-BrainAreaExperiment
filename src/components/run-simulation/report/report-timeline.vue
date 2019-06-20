@@ -257,6 +257,7 @@ export default {
         prevItems.push(this.createItem(prevReport, index));
         index += 1;
       });
+
       return prevItems;
     },
     targetSelected(target) {

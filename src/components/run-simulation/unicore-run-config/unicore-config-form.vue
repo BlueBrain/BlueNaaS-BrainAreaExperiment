@@ -150,7 +150,6 @@
 
 
 <script>
-import simulationConfig from '@/config/simulation-config';
 import auth from '@/services/auth';
 import eventBus from '@/services/event-bus';
 import isEqual from 'lodash/isEqual';
@@ -294,11 +293,12 @@ export default {
       }
     },
 
-    loadDefaultValues(defaultComputer) {
-      const defaultValues = simulationConfig[defaultComputer];
-      this.runParameters.runtime = defaultValues.runtime;
-      this.runParameters.nodes = defaultValues.nodes;
-      this.runParameters.cpus = defaultValues.cpus;
+    loadDefaultValues() {
+      const simConfig = this.$store.state.currentSimulationConfig;
+      const defaultParams = simConfig[this.$store.state.currentComputer];
+      this.runParameters.runtime = defaultParams.runtime;
+      this.runParameters.nodes = defaultParams.nodes;
+      this.runParameters.cpus = defaultParams.cpus;
     },
 
     async loadPreviousConfig() {
@@ -318,7 +318,8 @@ export default {
       this.runParameters.runtime = lastConfig.unicore.runtime;
       this.runParameters.nodes = lastConfig.unicore.nodes;
       this.runParameters.title = lastConfig.unicore.title;
-      this.runParameters.cpus = simulationConfig[lastConfig.unicore.computerSelected].cpus;
+      const simConfig = this.$store.state.currentSimulationConfig;
+      this.runParameters.cpus = simConfig[this.$store.state.currentComputer].cpus;
 
       this.loadAccount(lastConfig.unicore.computerSelected);
       if (!this.accountIsHidden && lastConfig.unicore.accountSelected) {

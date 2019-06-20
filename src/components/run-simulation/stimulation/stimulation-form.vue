@@ -197,7 +197,6 @@
 
 <script>
 import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
-import simulationConfig from '@/config/simulation-config';
 import { unmapBlueConfigTerms, mapBlueConfigTerms } from '@/common/utils';
 import pick from 'lodash/pick';
 
@@ -263,14 +262,16 @@ export default {
       return this.$store.state.stimulationTargets;
     },
     stimuliAvailable() {
-      return simulationConfig.stimuli.map(stimulus => unmapBlueConfigTerms(stimulus.name));
+      const simConfig = this.$store.state.currentSimulationConfig;
+      return simConfig.stimuli.map(stimulus => unmapBlueConfigTerms(stimulus.name));
     },
     hasStimulusInfo() {
       return !!Object.keys(this.localStimInfo).length;
     },
     paramsToShow() {
       const patternName = mapBlueConfigTerms(this.localPattern);
-      const stimulus = simulationConfig.stimuli.find(s => s.name === patternName);
+      const simConfig = this.$store.state.currentSimulationConfig;
+      const stimulus = simConfig.stimuli.find(s => s.name === patternName);
       return stimulus ? stimulus.params : [];
     },
   },

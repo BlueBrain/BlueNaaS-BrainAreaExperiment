@@ -51,7 +51,6 @@ import UnicoreConfigForm from '@/components/run-simulation/unicore-run-config/un
 import db from '@/services/db';
 import { convertToBCFormat, openContent, mapBlueConfigTerms } from '@/common/utils';
 import { jobTags, addTag } from '@/common/job-status';
-import simulationConfig from '@/config/simulation-config';
 
 
 export default {
@@ -123,7 +122,7 @@ export default {
     },
 
     setIfSimulationIsLFP(blueConfigStr, unicoreConfig) {
-      const lfpCheckAttributes = simulationConfig.checksForLFP;
+      const lfpCheckAttributes = this.$store.state.currentSimulationConfig.checksForLFP;
       if (!lfpCheckAttributes) return;
 
       const hasRequirements = lfpCheckAttributes.every(attr => (

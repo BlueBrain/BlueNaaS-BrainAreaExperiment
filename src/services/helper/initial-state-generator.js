@@ -17,15 +17,15 @@ function getCurrentCircuitConfig() {
 }
 
 function getDefaultDuration() {
-  return simulationCurrentConfig.defaultDuration || null;
+  return simulationCurrentConfig.defaultDuration;
 }
 
 function getDefaultForwardSkip() {
-  return simulationCurrentConfig.defaultForwardSkip || null;
+  return simulationCurrentConfig.defaultForwardSkip;
 }
 
 function getCurrentSimulationConfig() {
-  return simulationCurrentConfig || {};
+  return simulationCurrentConfig;
 }
 
 function getComputersAvailableForCircuit() {
@@ -33,7 +33,7 @@ function getComputersAvailableForCircuit() {
   const computerForCircuit = getCurrentCircuitConfig().prefix;
   if (!computerForCircuit) return [];
   const computersCanRunCircuit = Object.keys(computerForCircuit);
-  const allComutersAvailable = Object.keys(pickBy(simConfig, computer => computer.cpus));
+  const allComutersAvailable = Object.keys(pickBy(simulationCurrentConfig, computer => computer.cpus));
   const computersAllowedToRun = allComutersAvailable.filter(computer => (
     computersCanRunCircuit.includes(computer)
   ));
@@ -49,7 +49,10 @@ function setupInitialStates() {
   const match = window.location.href.match(/circuits\/([\w\\-]*)/);
   if (!match) console.error('Specify /circuits in url');
   circuitToUse = match ? match[1] : null;
+
+  simulationCurrentConfig = getCurrentSimConfig();
 }
+
 
 export default {
   circuitToUse,

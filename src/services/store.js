@@ -19,6 +19,7 @@ const store = new Vuex.Store({
     simulationDuration: initialStateGenerator.getDefaultDuration(),
     simulationForwardSkip: initialStateGenerator.getDefaultForwardSkip(),
     computersAvailable: initialStateGenerator.getComputersAvailableForCircuit(),
+    currentSimulationConfig: initialStateGenerator.getCurrentSimulationConfig(),
     token: null,
     userGroup: null,
     userGroupTmp: null,
@@ -74,6 +75,9 @@ const store = new Vuex.Store({
     setCollabIdForViz(state, collabId) {
       state.collabIdForViz = collabId;
     },
+    setCurrentSimulationConfig(state, config) {
+      state.currentSimulationConfig = config;
+    },
   },
   actions: {
     showLoader() {
@@ -85,6 +89,10 @@ const store = new Vuex.Store({
       const squareLoading = document.getElementById('loading-component');
       if (!squareLoading) return;
       squareLoading.style.display = 'none';
+    },
+    setupCurrentSimulationConfig(ctx) {
+      const simConf = initialStateGenerator.getCurrentSimConfig();
+      ctx.commit('setCurrentSimulationConfig', simConf);
     },
   },
 });

@@ -54,7 +54,6 @@ import RunConfigurationComponent from '@/components/run-simulation/unicore-run-c
 import ConnectionManipulation from '@/components/run-simulation/connection-manipulation/connection-list.vue';
 
 import unicore, { urlToComputerAndId } from '@/services/unicore';
-import simulationConfig from '@/config/simulation-config';
 import { jobTags, addTag } from '@/common/job-status';
 import db from '@/services/db';
 import '@/assets/css/simulation.css';
@@ -85,9 +84,8 @@ export default {
     const filteredTargetsForReport = allTargets.filter(target => reportRegExp.test(target.name));
     this.$store.commit('setReportTargets', filteredTargetsForReport);
 
-    // set the population to be loaded in the simulation (circuitTarget in BlueConfig)
-    const population = this.$store.state.currentCircuitConfig.defaultPopulation;
-    this.$store.commit('setSimulationPopulation', population);
+    // current population and computer will be set in sim-params due it needs to check the saved config
+
     this.$store.commit('setPopulationTargets', filteredTargetsForStimulation);
 
     const connectionManipulationTargets = allTargets;
@@ -108,16 +106,16 @@ export default {
     },
     async launchSim(blueConfigStr, runConfig, hideModalFn) {
       const newRunConfig = runConfig;
-      const currentSimConfig = simulationConfig[this.$store.state.currentComputer];
+      const simResources = this.$store.state.currentSimulationConfig[this.$store.state.currentComputer];
 
       const files = [{ To: 'BlueConfig', Data: blueConfigStr }];
-      let { script } = currentSimConfig;
+      let { script } = simResources;
       if (script) {
         script = script.join('\n');
         files.push({ To: 'input.sh', Data: script });
       }
-      newRunConfig.executable = currentSimConfig.executable;
-      newRunConfig.environment = currentSimConfig.environment;
+      newRunConfig.executable = simResources.executable;
+      newRunConfig.environment = simResources.environment;
 
       addTag(newRunConfig, jobTags.SIMULATION);
       // add from which circuit this simulation was launched

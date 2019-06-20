@@ -86,6 +86,7 @@ eventBus.$on('changeUserGroup', (group, callback) => {
 
 eventBus.$on('changeComputer', (computer, callback) => {
   store.commit('setCurrentComputer', computer);
+  store.dispatch('setupCurrentSimulationConfig');
   setupUserProjects().then(() => {
     if (callback) callback();
   });

@@ -172,14 +172,15 @@ export default {
   watch: {
     showModal(newVal) {
       this.showModalLocal = newVal;
-      if (newVal) this.setupLfpTargets();
+      if (newVal) {
+        this.target = null;
+        this.lfpTarget = null;
+        this.setupLfpTargets();
+        this.setTargets(this.jobSelectedForAnalysis);
+      }
     },
     reports(newVal) {
       [this.reportForAnalysis] = newVal;
-    },
-    jobSelectedForAnalysis(jobForAnalyze) {
-      if (!jobForAnalyze) return;
-      this.setTargets(jobForAnalyze);
     },
   },
   methods: {
@@ -197,17 +198,22 @@ export default {
       this.$set(this, 'lfpTargets', filteredTargetsForReport.map(t => t.displayName));
     },
     async setTargets(job) {
-      function findTargetsInBC(BCStr) {
-        const regex = /Target (.+)/gm;
-        const targets = [];
-        let m = regex.exec(BCStr);
+      function findAnalysisTargetsInBC(bcStr) {
+        const regexp = /Report (.+)_report/gm;
+        const matches = [];
+        let m = regexp.exec(bcStr);
         while (m !== null) {
           // This is necessary to avoid infinite loops with zero-width matches
-          if (m.index === regex.lastIndex) regex.lastIndex += 1;
-          targets.push(get(m, '[1]', '').trim());
-          m = regex.exec(BCStr);
+          if (m.index === regexp.lastIndex) regexp.lastIndex += 1;
+          matches.push(get(m, '[1]', '').trim());
+          m = regexp.exec(bcStr);
         }
-        return targets;
+        return matches;
+      }
+      function findLfpAnalysisTargetsInBC(bcStr) {
+        const regexp = /CircuitTarget (.+)/;
+        const circuitTargetMatched = bcStr.match(regexp);
+        return get(circuitTargetMatched, '[1]', '').trim();
       }
 
       async function getBlueConfigStr() {
@@ -217,23 +223,21 @@ export default {
         return blueConfigStr;
       }
 
-      function getTargetsByFileName() {
-        const targetsNames = [];
-        this.reports.forEach((reportName) => {
-          const matched = reportName.match('(.*)_report');
-          if (matched && matched.length > 1) targetsNames.push(get(matched, '[1]'));
-        });
-        [this.target] = targetsNames;
-        return targetsNames;
-      }
-
-      let targets = getTargetsByFileName.bind(this)();
-      if (!targets.length) {
-        const blueConfigStr = await getBlueConfigStr();
-        targets = intersection(findTargetsInBC(blueConfigStr));
-      }
-      this.$set(this, 'targets', unmapBlueConfigTerms(targets));
+      // setup targets for default analysis
+      const blueConfigStr = await getBlueConfigStr();
+      const defaultAnalysisTargets = intersection(findAnalysisTargetsInBC(blueConfigStr));
+      this.$set(this, 'targets', unmapBlueConfigTerms(defaultAnalysisTargets));
       this.$set(this, 'target', this.targets[0]);
+
+      // setup targets for lfp
+      const lfpAnalysisTarget = findLfpAnalysisTargetsInBC(blueConfigStr);
+      if (lfpAnalysisTarget === this.$store.state.currentCircuitConfig.biggestTarget) {
+        // show the full list of targets
+        this.$set(this, 'lfpTargets', unmapBlueConfigTerms(this.$store.state.currentCircuitConfig.targets));
+      } else {
+        this.$set(this, 'lfpTargets', [unmapBlueConfigTerms(lfpAnalysisTarget)]);
+      }
+      this.$set(this, 'lfpTarget', this.lfpTargets[0]);
     },
     generateAnalysisObjectToRun() {
       const analysisObj = this.$refs.analysisPickerRef.generatePlotsConfig();

@@ -22,9 +22,12 @@ export default {
   [constants.computers.BB5]: {
     script: [
       '#!/bin/bash',
+      '. /etc/profile',
       'HDF5_USE_FILE_LOCKING=FALSE',
       'export HDF5_USE_FILE_LOCKING',
-      '/users/bp000037/analysis/analysis_launch_0.4.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
+      'module load nix/viz/emsim/latest',
+      'module load nix/nse/bluepy-py3/0.13.4',
+      'python /gpfs/bbp.cscs.ch/home/antonel/scripts_unicore/analysis_launch_0.5.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
     ],
     executable: '/bin/bash input.sh',
   },

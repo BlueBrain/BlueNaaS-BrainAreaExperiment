@@ -56,7 +56,7 @@ export default {
         'module load nix/nse/bluepy-py3/0.13.4',
         'module load neurodamus-hippocampus/0.2/python3',
         'export FULL_CPU_PER_NODE=36',
-        'python /gpfs/bbp.cscs.ch/home/antonel/20181114/simulation_launch_python3.py -vv --blueconfig BlueConfig',
+        'python /gpfs/bbp.cscs.ch/home/antonel/scripts_unicore/simulation_launch_python3.py -vv --blueconfig BlueConfig',
       ],
       runtime: 3600,
       nodes: 1,

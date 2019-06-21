@@ -98,7 +98,6 @@ export default {
   props: ['analysisList', 'hasReport'],
   data() {
     return {
-      pointsFile: null,
       pointsCollection: [],
       lfpAnalysisChosen: [],
       startTime: 0,
@@ -111,28 +110,43 @@ export default {
       return point.split(',').map(e => e.trim()).join(',');
     },
     generatePlotsConfig() {
-      if (!this.lfpAnalysisChosen.length) return false;
-      // check all the points are correct
+      const isOkObj = {
+        configOk: false,
+        errorMessage: null,
+        hasLFPAnalysis: false, // if no points nor analysis were selected do not run LFP analysis
+      };
+
+      if (!this.lfpAnalysisChosen.length && !this.pointsCollection.length) {
+        isOkObj.hasLFPAnalysis = false;
+        return isOkObj;
+      }
+      isOkObj.hasLFPAnalysis = true;
+      if (!this.lfpAnalysisChosen.length) {
+        isOkObj.errorMessage = 'None LFP analysis was selected';
+        return isOkObj;
+      }
       if (!this.pointsCollection.length) {
-        this.$Message.error('No points were selected');
-        return false;
+        isOkObj.errorMessage = 'None LFP point was defined';
+        return isOkObj;
       }
       const pointsAreCorrect = this.pointsCollection.every(pointObj => pointObj.isValid);
       if (!pointsAreCorrect) {
-        this.$Message.error('One or more points are not correct');
-        return false;
+        isOkObj.errorMessage = 'One or more points are not correct';
+        return isOkObj;
       }
-
       if (this.startTime >= this.endTime) {
-        this.$Message.error('Start time should be smaller than end time');
-        return false;
+        isOkObj.errorMessage = 'Start time should be smaller than end time';
+        return isOkObj;
       }
+      isOkObj.configOk = true;
+      isOkObj.errorMessage = null;
 
       return {
         plots: this.lfpAnalysisChosen,
         points: this.pointsCollection.map(pointObj => this.sanitizePoint(pointObj.value)),
         start_time: this.startTime,
         end_time: this.endTime,
+        ...isOkObj,
       };
     },
     fileUploaded(file) {

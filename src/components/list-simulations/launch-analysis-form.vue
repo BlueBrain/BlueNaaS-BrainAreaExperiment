@@ -245,14 +245,18 @@ export default {
       let lfpAnalysisObj = null;
       if (this.isLFP) {
         lfpAnalysisObj = this.$refs.lfpAnalysisPickerRef.generatePlotsConfig();
-        if (lfpAnalysisObj && !this.lfpTarget) {
+        if (lfpAnalysisObj.hasLFPAnalysis && !this.lfpTarget) {
           this.$Message.error('Please select LFP Population');
+          return false;
+        }
+        if (lfpAnalysisObj.hasLFPAnalysis && !lfpAnalysisObj.configOk) {
+          this.$Message.error(lfpAnalysisObj.errorMessage);
           return false;
         }
       }
 
-      if (!analysisObj && !lfpAnalysisObj) {
-        this.$Message.warning('Please complete the form');
+      if (!analysisObj && !lfpAnalysisObj.hasLFPAnalysis) {
+        this.$Message.warning('Please select at least one analysis to run');
         return false;
       }
 

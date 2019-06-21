@@ -16,6 +16,7 @@ const jobTags = {
   SIMULATION: 'simulation',
   VISUALIZATION: 'visualization',
   LFP_SIMULATION: 'lfp_simulation',
+  LFP_ANALYSIS: 'lfp_analysis',
   SIMULATION_IMPORTED: 'simulation_imported',
   OTHER: 'other',
 };

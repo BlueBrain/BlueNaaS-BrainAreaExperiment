@@ -171,7 +171,7 @@ export default {
       },
 
       accountIsHidden: true,
-      projectsFetched: false,
+      groupsFetched: false,
       projectsAvailable: [],
       previousConfig: null,
 
@@ -231,9 +231,7 @@ export default {
     showModal(newVal) {
       this.showModalLocal = newVal;
       if (newVal) {
-        this.loadPreviousConfig().then((selectedComputer) => {
-          this.refreshProjects(selectedComputer);
-        });
+        this.loadPreviousConfig();
       }
     },
   },
@@ -249,7 +247,7 @@ export default {
       },
       set(newComputer) {
         if (!newComputer || newComputer === this.$store.state.currentComputer) return;
-        this.refreshProjects(newComputer, this.loadDefaultValues);
+        this.refreshUnicoreProjects(newComputer, this.loadDefaultValues);
       },
     },
 
@@ -278,7 +276,7 @@ export default {
 
     isLoading() {
       return this.isLaunchingSim ||
-        !this.projectsFetched ||
+        !this.groupsFetched ||
         (!this.accountIsHidden && !this.projectsAvailable.length);
     },
   },
@@ -302,38 +300,46 @@ export default {
     },
 
     async loadPreviousConfig() {
-      const lastConfig = await db.retrievePreviousConfig();
+      const prevConfig = await db.retrievePreviousConfig();
       if (
-        !lastConfig ||
-        !lastConfig.unicore ||
-        !lastConfig.unicore.runtime ||
-        !lastConfig.unicore.nodes ||
-        !lastConfig.unicore.computerSelected
+        !prevConfig ||
+        !prevConfig.unicore ||
+        !prevConfig.unicore.runtime ||
+        !prevConfig.unicore.nodes ||
+        !prevConfig.unicore.computerSelected
       ) {
         const defaultComputer = this.$store.state.currentComputer || this.computersAvailable[0];
-        this.loadDefaultValues(defaultComputer);
+        this.loadDefaultValues();
         this.loadAccount(defaultComputer);
+        this.refreshUnicoreProjects(defaultComputer);
+
         return null;
       }
-      this.runParameters.runtime = lastConfig.unicore.runtime;
-      this.runParameters.nodes = lastConfig.unicore.nodes;
-      this.runParameters.title = lastConfig.unicore.title;
+      this.runParameters.runtime = prevConfig.unicore.runtime;
+      this.runParameters.nodes = prevConfig.unicore.nodes;
+      this.runParameters.title = prevConfig.unicore.title;
       const simConfig = this.$store.state.currentSimulationConfig;
       this.runParameters.cpus = simConfig[this.$store.state.currentComputer].cpus;
 
-      this.loadAccount(lastConfig.unicore.computerSelected);
-      if (!this.accountIsHidden && lastConfig.unicore.accountSelected) {
-        this.runParameters.accountSelected = lastConfig.unicore.accountSelected;
+      this.loadAccount(prevConfig.unicore.computerSelected);
+      this.refreshUnicoreProjects(prevConfig.unicore.computerSelected);
+
+      if (!this.accountIsHidden && prevConfig.unicore.accountSelected) {
+        this.runParameters.accountSelected = prevConfig.unicore.accountSelected;
       }
 
-      return lastConfig.unicore.computerSelected;
+      return prevConfig.unicore.computerSelected;
     },
 
-    refreshProjects(computer, callback) {
-      this.projectsFetched = false;
+    refreshUnicoreProjects(computer, callback) {
+      this.groupsFetched = false;
       const computerToFetch = computer || this.computersAvailable[0];
+      if (computer === this.$store.state.currentComputer && this.groupsAvailable.length) {
+        this.groupsFetched = true;
+        return;
+      }
       eventBus.$emit('changeComputer', computerToFetch, () => {
-        this.projectsFetched = true;
+        this.groupsFetched = true;
         if (callback) callback();
       });
     },

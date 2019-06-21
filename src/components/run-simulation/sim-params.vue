@@ -72,19 +72,23 @@ export default {
       resolve(params);
     },
     async loadPreviousConfig() {
-      const lastConfig = await db.retrievePreviousConfig();
-      const defaultSaved = get(lastConfig, 'bc.Run.Default', {});
-      if (
-        !defaultSaved.ForwardSkip || !defaultSaved.Duration || !defaultSaved.CircuitTarget
-      ) {
-        this.duration = this.$store.state.simulationDuration;
-        this.forwardSkip = this.$store.state.simulationForwardSkip;
-        this.populationSelected = this.$store.state.simulationPopulation;
-      } else {
-        this.duration = lastConfig.bc.Run.Default.Duration;
-        this.forwardSkip = lastConfig.bc.Run.Default.ForwardSkip;
-        this.populationSelected = unmapBlueConfigTerms(lastConfig.bc.Run.Default.CircuitTarget);
-      }
+      const prevConfig = await db.retrievePreviousConfig();
+
+      const runDefaultSaved = get(prevConfig, 'bc.Run.Default', {});
+      const hasSavedParams = Boolean(runDefaultSaved.ForwardSkip &&
+        runDefaultSaved.Duration &&
+        runDefaultSaved.CircuitTarget);
+
+      this.duration = hasSavedParams ? runDefaultSaved.Duration : this.$store.state.simulationDuration;
+      this.forwardSkip = hasSavedParams ? runDefaultSaved.ForwardSkip : this.$store.state.simulationForwardSkip;
+      this.populationSelected = hasSavedParams ?
+        unmapBlueConfigTerms(runDefaultSaved.CircuitTarget) :
+        this.$store.state.currentCircuitConfig.defaultPopulation;
+
+      // setup default computer
+      const unicoreSavedParams = get(prevConfig, 'unicore.computerSelected', null);
+      const computerToUse = unicoreSavedParams || this.$store.state.computersAvailable[0];
+      eventBus.$emit('changeComputer', computerToUse);
     },
     targetChanged(newModel) {
       this.$store.commit('setSimulationPopulation', newModel);

@@ -1,8 +1,9 @@
 
 import store from '@/services/store';
+import constants from '@/common/constants';
 
-function getDefaultConnections() {
-  return [{
+const hippocampusConnections = [
+  {
     id: 1,
     name: 'All-All',
     source: store.state.currentCircuitConfig.biggestTarget,
@@ -39,7 +40,17 @@ function getDefaultConnections() {
     weight: 0,
     spontMinis: 0,
     delay: 0,
-  }];
+  },
+];
+
+
+const connections = {
+  [constants.areas.HIPPOCAMPUS]: hippocampusConnections,
+  [constants.areas.SSCX]: hippocampusConnections,
+};
+
+function getDefaultConnections() {
+  return connections[store.state.currentCircuitConfig.simConfigToUse];
 }
 
 const synapseAttributes = {

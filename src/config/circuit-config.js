@@ -227,11 +227,44 @@ const hippoBbpMicrocircuit = Object.assign(
   },
 );
 
+/*
+|--------------------------------------------------------------------------
+| O1 SSCx
+|--------------------------------------------------------------------------
+*/
+
+const sscxBbpMicrocircuit = {
+  prefix: {
+    [constants.computers.BB5]: '',
+  },
+  paths: {
+    MorphologyPath: '<%= prefix %>/gpfs/bbp.cscs.ch/project/proj1/morphologies',
+    METypePath: '<%= prefix %>/gpfs/bbp.cscs.ch/project/proj1/ccells',
+    CircuitPath: '<%= prefix %>/gpfs/bbp.cscs.ch/project/proj1/circuits/SomatosensoryCxS1-v4.lowerCellDensity.r151/O1_2/merged_circuit',
+    nrnPath: '<%= prefix %>/gpfs/bbp.cscs.ch/project/proj1/circuits/SomatosensoryCxS1-v4.lowerCellDensity.r151/O1_2/merged_circuit/ncsFunctionalAllRecipePathways',
+    TargetFile: '<%= prefix %>/gpfs/bbp.cscs.ch/project/proj1/simulations/2014.08.21/SomatosensoryCxS1-v4.SynUpdate.r151/Silberberg/k_ca_scan/K3p5/Ca1p2/user.target',
+    CellLibraryFile: 'circuit.mvd3',
+    NumSynapseFiles: 8192,
+    CurrentDir: '.',
+    OutputRoot: '.',
+  },
+  targets: [
+    { name: 'mc2_Column', displayName: 'Central Column' },
+  ],
+  reportsTargetFilter: '(Random.{1,2}Perc|mc2_Column|Mosaic|AllCompartments)',
+  stimulationTargetFilter: '(Central|mc2_Column|Mosaic)',
+  biggestTarget: 'Full Circuit',
+  defaultPopulation: 'Central Column',
+  displayName: 'SomatosensoryCortex microcircuit',
+  simConfigToUse: constants.areas.SSCX,
+};
+
 const mapCircuitNameWithUrl = {
   hippo_hbp_microcircuit: hippoHbpMicrocircuit,
   hippo_mooc_microcircuit: hippoMoocMicrocircuit,
   hippo_hbp_full_ca1: hippoHbpFullCa1,
   hippo_bbp_microcircuit: hippoBbpMicrocircuit,
+  sscx_bbp_microcircuit: sscxBbpMicrocircuit,
 };
 
 export default {

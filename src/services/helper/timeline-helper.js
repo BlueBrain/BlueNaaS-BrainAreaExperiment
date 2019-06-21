@@ -1,11 +1,11 @@
 
-/* global vis */
+/* global timeline */
 import noop from 'lodash/noop';
 import flatMap from 'lodash/flatMap';
 
 import store from '@/services/store';
 
-const { Timeline, DataSet } = vis;
+const { Timeline, DataSet } = timeline;
 
 function joinName(target, type, newId) {
   const temp = [];

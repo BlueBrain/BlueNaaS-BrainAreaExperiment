@@ -64,8 +64,8 @@
                 </form-item>
 
                 <analysis-picker
-                  :analysisList="analysisToRun"
-                  :hasReport="!!reports.length"
+                  :analysis-list="analysisToRun"
+                  :has-report="!!reports.length"
                   ref="analysisPickerRef"
                 />
               </tab-pane>
@@ -90,8 +90,9 @@
                 </form-item>
 
                 <lfp-analysis-picker
-                  :analysisList="analysisToRun"
-                  :hasReport="!!reports.length"
+                  :analysis-list="analysisToRun"
+                  :has-report="!!reports.length"
+                  :sim-duration="simDuration"
                   ref="lfpAnalysisPickerRef"
                 />
 
@@ -148,6 +149,7 @@ export default {
       target: null,
       lfpTarget: null,
       lfpTargets: [],
+      simDuration: 100, // default
     };
   },
   computed: {
@@ -173,10 +175,10 @@ export default {
     showModal(newVal) {
       this.showModalLocal = newVal;
       if (newVal) {
+        // reset params
         this.target = null;
         this.lfpTarget = null;
-        this.setupLfpTargets();
-        this.setTargets(this.jobSelectedForAnalysis);
+        this.parseBlueConfig(this.jobSelectedForAnalysis);
       }
     },
     reports(newVal) {
@@ -190,14 +192,7 @@ export default {
     targetChanged(newTarget) {
       this.target = newTarget;
     },
-    setupLfpTargets() {
-      // set targets for LFP
-      const reportRegExp = new RegExp(this.$store.state.currentCircuitConfig.reportsTargetFilter);
-      const allTargets = this.$store.state.currentCircuitConfig.targets;
-      const filteredTargetsForReport = allTargets.filter(target => reportRegExp.test(target.name));
-      this.$set(this, 'lfpTargets', filteredTargetsForReport.map(t => t.displayName));
-    },
-    async setTargets(job) {
+    async parseBlueConfig(job) {
       function findAnalysisTargetsInBC(bcStr) {
         const regexp = /Report (.+)_report/gm;
         const matches = [];
@@ -210,6 +205,14 @@ export default {
         }
         return matches;
       }
+
+      function findDurationInBC(bcStr) {
+        const regexp = /Duration (.+)/;
+        const simulationDurationMatched = bcStr.match(regexp);
+        const durationStr = get(simulationDurationMatched, '[1]', 100).trim();
+        return Number(durationStr);
+      }
+
       function findLfpAnalysisTargetsInBC(bcStr) {
         const regexp = /CircuitTarget (.+)/;
         const circuitTargetMatched = bcStr.match(regexp);
@@ -238,6 +241,10 @@ export default {
         this.$set(this, 'lfpTargets', [unmapBlueConfigTerms(lfpAnalysisTarget)]);
       }
       this.$set(this, 'lfpTarget', this.lfpTargets[0]);
+
+      // setup default times for LFP
+      const simulationDuratation = findDurationInBC(blueConfigStr);
+      this.$set(this, 'simDuration', simulationDuratation);
     },
     generateAnalysisObjectToRun() {
       const analysisObj = this.$refs.analysisPickerRef.generatePlotsConfig();

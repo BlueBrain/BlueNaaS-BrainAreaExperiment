@@ -95,7 +95,7 @@ const maxUploadFileSize = 400;
 
 export default {
   name: 'lfp-analysis-picker',
-  props: ['analysisList', 'hasReport'],
+  props: ['analysisList', 'hasReport', 'simDuration'],
   data() {
     return {
       pointsCollection: [],
@@ -104,7 +104,11 @@ export default {
       endTime: 1,
     };
   },
-  created() {},
+  watch: {
+    simDuration(newDuration) {
+      this.endTime = newDuration;
+    },
+  },
   methods: {
     sanitizePoint(point) {
       return point.split(',').map(e => e.trim()).join(',');

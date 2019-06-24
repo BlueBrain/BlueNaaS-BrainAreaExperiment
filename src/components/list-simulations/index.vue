@@ -210,6 +210,7 @@ export default {
       this.$store.commit('setupHttpReqSource', httpReqSource);
 
       const callbackEachSim = (simInfo) => {
+        this.allSimulations.push(simInfo);
         const [filteredSimulation] = this.applyFiltersToSims([simInfo]);
         if (filteredSimulation) {
           this.viewList.push(filteredSimulation);

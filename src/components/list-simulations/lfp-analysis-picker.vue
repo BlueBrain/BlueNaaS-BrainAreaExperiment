@@ -173,7 +173,7 @@ export default {
     addNewPoint(pointStr) {
       const newPoint = {
         index: uuidGen(),
-        value: pointStr || '1, 1, 1',
+        value: pointStr || '360.0, 330.0, 630.0',
         isValid: true,
       };
       if (pointStr) {

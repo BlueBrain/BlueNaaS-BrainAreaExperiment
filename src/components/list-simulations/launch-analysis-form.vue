@@ -229,22 +229,25 @@ export default {
       // setup targets for default analysis
       const blueConfigStr = await getBlueConfigStr();
       const defaultAnalysisTargets = intersection(findAnalysisTargetsInBC(blueConfigStr));
-      this.$set(this, 'targets', unmapBlueConfigTerms(defaultAnalysisTargets));
-      this.$set(this, 'target', this.targets[0]);
+      this.targets = unmapBlueConfigTerms(defaultAnalysisTargets);
+      [this.target] = this.targets;
 
       // setup targets for lfp
-      const lfpAnalysisTarget = findLfpAnalysisTargetsInBC(blueConfigStr);
+      const lfpAnalysisTarget = unmapBlueConfigTerms(findLfpAnalysisTargetsInBC(blueConfigStr));
+
       if (lfpAnalysisTarget === this.$store.state.currentCircuitConfig.biggestTarget) {
         // show the full list of targets
-        this.$set(this, 'lfpTargets', unmapBlueConfigTerms(this.$store.state.currentCircuitConfig.targets));
+        const targetDisplayNames = this.$store.state.currentCircuitConfig.targets.map(t => t.displayName);
+        this.lfpTargets = targetDisplayNames;
+        this.lfpTarget = this.$store.state.currentCircuitConfig.biggestTarget;
       } else {
-        this.$set(this, 'lfpTargets', [unmapBlueConfigTerms(lfpAnalysisTarget)]);
+        this.lfpTargets = [unmapBlueConfigTerms(lfpAnalysisTarget)];
+        [this.lfpTarget] = this.lfpTargets;
       }
-      this.$set(this, 'lfpTarget', this.lfpTargets[0]);
 
       // setup default times for LFP
       const simulationDuratation = findDurationInBC(blueConfigStr);
-      this.$set(this, 'simDuration', simulationDuratation);
+      this.simDuration = simulationDuratation;
     },
     generateAnalysisObjectToRun() {
       const analysisObj = this.$refs.analysisPickerRef.generatePlotsConfig();

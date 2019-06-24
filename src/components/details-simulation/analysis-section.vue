@@ -183,6 +183,9 @@ export default {
           return;
         }
       }
+      if (analysisJobInfo.status === jobStatus.FAILED) {
+        this.$set(childAnalysis, 'fetchingImages', false);
+      }
 
       this.$set(childAnalysis, 'status', analysisJobInfo.status);
       this.$set(childAnalysis, 'children', analysisJobInfo.children);

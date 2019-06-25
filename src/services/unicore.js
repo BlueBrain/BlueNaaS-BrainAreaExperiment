@@ -312,10 +312,10 @@ async function generateUnicoreConfig(configParams) {
     const environment = {};
     if (configParams.computerSelected !== constants.computers.NUVLA) return environment;
 
-    if (!configParams.imports) {
+    if (configParams.tags.includes(jobTags.SIMULATION)) {
       // is a simulation
       environment.NUVLA__worker__multiplicity = configParams.nodes;
-    } else if (configParams.plotsConfig) {
+    } else if (configParams.tags.includes(jobTags.ANALYSIS)) {
       // is analysis
     } else {
       // is visualization

@@ -26,7 +26,7 @@ export default {
     };
   },
   created() {
-    const circuits = Object.keys(circuitConfig.mapCircuitNameWithUrl);
+    const circuits = Object.keys(circuitConfig.mapCircuitNameWithUrl).sort();
     this.$store.dispatch('hideLoader');
     this.circuits = circuits.map(circuit => ({
       name: upperCase(circuit),

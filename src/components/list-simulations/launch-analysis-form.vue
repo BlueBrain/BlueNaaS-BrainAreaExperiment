@@ -149,7 +149,7 @@ export default {
       target: null,
       lfpTarget: null,
       lfpTargets: [],
-      simDuration: 100, // default
+      simDuration: null,
     };
   },
   computed: {
@@ -178,6 +178,7 @@ export default {
         // reset params
         this.target = null;
         this.lfpTarget = null;
+        this.simDuration = null;
         this.parseBlueConfig(this.jobSelectedForAnalysis);
       }
     },

@@ -352,7 +352,7 @@ export default {
 
     getUserProjects() {
       auth.getUserProjects().then((projects) => {
-        this.projectsAvailable = projects;
+        this.projectsAvailable = projects.sort();
       }).catch((e) => {
         this.$Message.error('Error fetching user groups', e);
       });

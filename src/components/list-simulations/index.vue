@@ -64,6 +64,7 @@ import eventBus from '@/services/event-bus';
 import DeleteConfirmationModal from '@/components/shared/delete-confirmation-modal.vue';
 import sortBy from 'lodash/sortBy';
 import remove from 'lodash/remove';
+import get from 'lodash/get';
 
 export default {
   name: 'ListSimulations',
@@ -177,6 +178,13 @@ export default {
       // after the form will return to analysisConfigReady
     },
 
+    getAccountFromLog(jobDetails) {
+      const simulationLog = get(jobDetails, 'log[6]', '');
+      const matchedProj = get(simulationLog.match(/Project=(.*?),/), '[1]', null);
+      if (!matchedProj || matchedProj === 'NONE') return null;
+      return matchedProj;
+    },
+
     async analysisConfigReady(analysisParamsEdited) {
       if (!analysisParamsEdited) return;
 
@@ -184,6 +192,7 @@ export default {
 
       const newAnalysisParamsEdited = analysisParamsEdited;
       newAnalysisParamsEdited.from.workingDirectory = this.jobSelectedForAnalysis._links.workingDirectory.href;
+      newAnalysisParamsEdited.accountSelected = this.getAccountFromLog(this.jobSelectedForAnalysis);
 
       const config = analysisConfig[this.$store.state.currentComputer];
       if (!config || (!config.script && !config.executable)) {

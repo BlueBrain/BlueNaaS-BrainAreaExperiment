@@ -8,11 +8,11 @@
       </checkbox-group>
     </form-item>
 
-    <form-item label="Start Time:">
+    <form-item label="Start Time (ms):">
       <input-number v-model="startTime" :min="0"/>
     </form-item>
 
-    <form-item label="End Time:">
+    <form-item label="End Time (ms):">
       <input-number v-model="endTime" :min="1"/>
     </form-item>
 

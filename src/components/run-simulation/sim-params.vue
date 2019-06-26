@@ -12,7 +12,7 @@
 
     <tooltip
       content="Time length of stimulus duration, given in milliseconds(ms)"
-    >Duration(ms):</tooltip>
+    >Duration (ms):</tooltip>
     <input-number
       v-model="duration"
       :min="1"

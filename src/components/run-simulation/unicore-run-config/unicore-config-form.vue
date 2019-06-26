@@ -91,7 +91,7 @@
         <tooltip
           slot="label"
           content="Time (seconds) to allocate"
-        >RunTime</tooltip>
+        >RunTime (sec)</tooltip>
         <input-number
           :disabled="runtimeIsHidden"
           v-model="runParameters.runtime"

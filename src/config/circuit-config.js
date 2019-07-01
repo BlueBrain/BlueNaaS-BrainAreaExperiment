@@ -199,6 +199,7 @@ const hippoHbpMicrocircuit = {
     OutputRoot: '.',
   },
   targets: [
+    { name: '5Cells', displayName: '5Cells' },
     { name: 'Random1PercFull', displayName: 'Random 1% full circuit', src: `${microcircuitImgBase}/1p.png` },
     { name: 'Random5PercFull', displayName: 'Random 5% full circuit', src: `${microcircuitImgBase}/5p.png` },
     { name: 'Random10PercFull', displayName: 'Random 10% full circuit', src: `${microcircuitImgBase}/10p.png` },
@@ -250,8 +251,6 @@ const hippoHbpMicrocircuit = {
     { name: 'slice315', displayName: 'slice315' },
     { name: 'AllCompartments', displayName: 'AllCompartments', lfp: true },
   ],
-  reportsTargetFilter: '(Random.{1,2}Perc|mc2_Column|Mosaic|AllCompartments)',
-  stimulationTargetFilter: '(Central|mc2_Column|Mosaic)',
   biggestTarget: 'Full Circuit',
   defaultPopulation: 'Central Column',
   displayName: 'Hippocampus CA1 microcircuit',
@@ -299,7 +298,6 @@ const hippoMoocMicrocircuit = Object.assign(
       [constants.computers.NUVLA]: '/mooc',
     },
     paths: newPaths,
-    reportsTargetFilter: '(Random.{1,2}Perc|mc2_Column|Mosaic)',
   },
 );
 

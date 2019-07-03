@@ -111,6 +111,7 @@ export default {
   .all-plots-container {
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-around;
   }
   .plot-container {
     display: flex;

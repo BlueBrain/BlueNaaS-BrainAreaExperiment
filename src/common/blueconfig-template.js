@@ -13,9 +13,9 @@ function replacePlaceholders(obj, replaceText) {
 }
 
 function createBCTemplate() {
-  const circuitPaths = store.state.currentCircuitConfig.paths;
+  const circuitRunSection = store.state.currentCircuitConfig.paths;
   const circuitPathsPrefixes = store.state.currentCircuitConfig.prefix[store.state.currentComputer];
-  const fullPathAttributes = replacePlaceholders(circuitPaths, circuitPathsPrefixes);
+  const fullPathAttributes = replacePlaceholders(circuitRunSection, circuitPathsPrefixes);
   const extraParams = replacePlaceholders(store.state.currentCircuitConfig.extraParamsInBC, circuitPathsPrefixes);
   const bcTemplate = cleanDeep({
     Stimulus: {},
@@ -27,7 +27,7 @@ function createBCTemplate() {
         Dt: '0.025',
         Duration: store.state.simulationDuration,
         ForwardSkip: store.state.simulationForwardSkip,
-        NumSynapseFiles: '2048',
+        NumSynapseFiles: circuitRunSection.NumSynapseFiles || '2048',
         BaseSeed: '10',
       },
     },

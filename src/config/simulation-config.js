@@ -31,6 +31,7 @@ export default {
   PIZ_DAINT: {
     script: [
       '#!/bin/bash -l',
+      '. /etc/profile',
       'module swap PrgEnv-cray PrgEnv-intel',
       'export MODULEPATH=/apps/hbp/ich002/hbp-spack-deployments/softwares/05-06-2019/install/modules/tcl/cray-cnl6-haswell:$MODULEPATH',
       'module load neurodamus-hippocampus/0.2 cray-python/2.7.15.1',

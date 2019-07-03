@@ -42,7 +42,7 @@
     display: flex;
 }
 .timeline-target-container.available .timeline-container {
-    flex-grow: 1;
+    width: 83%;
 }
 .timeline-target-container.available .target-selection-container .list-item {
     white-space: nowrap;

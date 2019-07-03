@@ -7,7 +7,7 @@ import cleanDeep from 'clean-deep';
 import computeProvider from '@/common/compute-provider.json';
 import store from '@/services/store';
 import db from '@/services/db';
-import simulationConfig from '@/config/simulation-config';
+import constants from '@/common/constants';
 import { getDate3YearFromNow } from '@/common/utils';
 import { jobTags, addTag } from '@/common/job-status';
 
@@ -294,6 +294,8 @@ async function generateUnicoreConfig(configParams) {
     *   configParams { runtime, title, nodes, computerSelected, projectSelected }
     */
 
+  const simStaticParams = store.state.currentSimulationConfig[store.state.currentComputer];
+
   function getPartition() {
     function filterPartition(partitionsMap, userGroup) {
       const partitions = Object.keys(partitionsMap);
@@ -301,22 +303,14 @@ async function generateUnicoreConfig(configParams) {
       const selectedPartition = partitionsMap[selectedProject];
       return selectedPartition;
     }
-    const partitionsMap = simulationConfig[configParams.computerSelected].partitions;
+    const partitionsMap = simStaticParams.partitions;
     if (!partitionsMap) return null;
     return filterPartition(partitionsMap, store.state.userGroup);
   }
 
-  function getExecutable() {
-    return configParams.executable || '/bin/bash input.sh';
-  }
-
-  function getJobTags() {
-    return configParams.tags || null;
-  }
-
   function getEnvironment() {
     const environment = {};
-    if (configParams.computerSelected !== 'NUVLA') return environment;
+    if (configParams.computerSelected !== constants.computers.NUVLA) return environment;
 
     if (!configParams.imports) {
       // is a simulation
@@ -337,30 +331,16 @@ async function generateUnicoreConfig(configParams) {
     return configParams.runtime < 200 ? null : configParams.nodes;
   }
 
-  function getNodeType() {
-    // multicore or gpu node
-    const { nodeType } = simulationConfig[store.state.currentComputer];
-    return nodeType;
-  }
-
   function getMemory() {
     if (configParams.runtime < 300) return null; // assumption is for test job submission
-    const { memory } = simulationConfig[store.state.currentComputer];
+    const { memory } = simStaticParams;
     return memory ? `${memory}M` : null;
   }
 
-  function getProject() {
-    return simulationConfig[configParams.computerSelected].project || null;
-  }
-
-  function getCpusPerNode() {
-    return simulationConfig[configParams.computerSelected].cpus || null;
-  }
-
-  // generate and remove the nulls
-  const jobSpec = cleanDeep({
+  // generate jobSpecs and remove the nulls
+  return cleanDeep({
     Name: configParams.title || 'unnamed job',
-    Executable: getExecutable(),
+    Executable: configParams.executable || '/bin/bash input.sh',
     Environment: getEnvironment(),
     Arguments: [],
     Parameters: {
@@ -369,17 +349,16 @@ async function generateUnicoreConfig(configParams) {
     haveClientStageIn: 'true',
     Resources: {
       Nodes: getNodes(),
-      CPUsPerNode: getCpusPerNode(),
+      CPUsPerNode: simStaticParams.cpus,
       Runtime: configParams.runtime,
-      NodeConstraints: getNodeType(),
+      NodeConstraints: simStaticParams.nodeType,
       Memory: getMemory(),
       Queue: getPartition(),
-      Project: getProject(),
+      Project: simStaticParams.project,
     },
-    Tags: getJobTags(),
+    Tags: configParams.tags,
     Imports: configParams.imports,
   });
-  return jobSpec;
 }
 
 async function getImage(imageURL) {
@@ -486,7 +465,7 @@ async function workingDirToMachinePath(workingDirectory) {
 }
 
 function importPersonalSimulation(title, simFolderPath) {
-  const executable = simulationConfig.importSimulationScript
+  const executable = store.state.currentSimulationConfig.importSimulationScript
     .replace('SIMFOLDERPATH', simFolderPath);
   const config = {
     computerSelected: store.state.currentComputer,

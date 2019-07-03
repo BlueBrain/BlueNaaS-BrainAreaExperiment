@@ -5,6 +5,7 @@ import circuits from '@/config/circuit-config';
 import '@/services/helper/computer-group-helper';
 
 let circuitToUse;
+let simulationCurrentConfig;
 
 function getCircuitToUse() {
   return circuitToUse;
@@ -58,4 +59,7 @@ export default {
   getCurrentCircuitConfig,
   setupInitialStates,
   getCircuitToUse,
+  getCurrentSimulationConfig,
+  getCurrentSimConfig,
+
 };

@@ -42,6 +42,7 @@ import ListSimulations from '@/components/list-simulations/index.vue';
 import ListFilters from '@/components/list-simulations/list-filters.vue';
 import ImportSimulation from '@/components/list-simulations/import-simulation.vue';
 import BulkEdit from '@/components/list-simulations/bulk-edit.vue';
+import constants from '@/common/constants';
 
 export default {
   name: 'SimulationsList',
@@ -61,7 +62,7 @@ export default {
   computed: {
     canImport() {
       // import only Julich
-      return this.$store.state.currentComputer !== 'NUVLA';
+      return this.$store.state.currentComputer !== constants.computers.NUVLA;
     },
   },
   created() {

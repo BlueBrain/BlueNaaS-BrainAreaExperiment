@@ -355,6 +355,7 @@ async function generateUnicoreConfig(configParams) {
       Memory: getMemory(),
       Queue: getPartition(),
       Project: configParams.accountSelected || null,
+      CPUs: getNodes() * simStaticParams.cpus,
     },
     Tags: configParams.tags,
     Imports: configParams.imports,

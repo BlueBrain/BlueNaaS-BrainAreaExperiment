@@ -16,11 +16,15 @@ function getCurrentCircuitConfig() {
 }
 
 function getDefaultDuration() {
-  return simConfig.defaultDuration;
+  return simulationCurrentConfig.defaultDuration || null;
 }
 
 function getDefaultForwardSkip() {
-  return simConfig.defaultForwardSkip;
+  return simulationCurrentConfig.defaultForwardSkip || null;
+}
+
+function getCurrentSimulationConfig() {
+  return simulationCurrentConfig || {};
 }
 
 function getComputersAvailableForCircuit() {
@@ -33,6 +37,10 @@ function getComputersAvailableForCircuit() {
     computersCanRunCircuit.includes(computer)
   ));
   return computersAllowedToRun;
+}
+
+function getCurrentSimConfig() {
+  return simConfig[getCurrentCircuitConfig().simConfigToUse] || {};
 }
 
 function setupInitialStates() {

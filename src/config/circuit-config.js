@@ -1,15 +1,17 @@
 
+import constants from '@/common/constants';
+
 /*
 |--------------------------------------------------------------------------
-| Slices Full CA1
+| Hippocampus Full CA1
 |--------------------------------------------------------------------------
 */
 const slicesImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/images-slices-CA1';
 
 const hippoHbpFullCa1 = {
   prefix: { // setting prefix allow to know which computer can run the circuit
-    JURECA: '/p/project/cvsk25/vsk2512/CA1',
-    PIZ_DAINT: '/apps/hbp/ich002/home/antonel/full_ca1',
+    [constants.computers.JURECA]: '/p/project/cvsk25/vsk2512/CA1',
+    [constants.computers.PIZ_DAINT]: '/apps/hbp/ich002/home/antonel/full_ca1',
   },
   paths: {
     MorphologyPath: '<%= prefix %>/r2017.06b/MorphologyRelease/',
@@ -68,6 +70,7 @@ const hippoHbpFullCa1 = {
   defaultPopulation: 'Slice-4',
   biggestTarget: 'Full CA1',
   displayName: 'Hippocampus Full CA1',
+  simConfigToUse: constants.areas.HIPPOCAMPUS,
   hipperpolarizingStim: {
     Stimulus: {
       hypamp: {
@@ -89,15 +92,15 @@ const hippoHbpFullCa1 = {
 
 /*
 |--------------------------------------------------------------------------
-| O1 Microcircuit
+| O1 Hippocampus Microcircuit
 |--------------------------------------------------------------------------
 */
 
 const microcircuitImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/images-slices-mooc';
 const hippoHbpMicrocircuit = {
   prefix: {
-    JURECA: '/p/project/cvsk25/vsk2512/O1',
-    PIZ_DAINT: '/apps/hbp/ich002/home/antonel/O1',
+    [constants.computers.JURECA]: '/p/project/cvsk25/vsk2512/O1',
+    [constants.computers.PIZ_DAINT]: '/apps/hbp/ich002/home/antonel/O1',
   },
   paths: {
     MorphologyPath: '<%= prefix %>/entities/morphologies/20180417/',
@@ -167,6 +170,7 @@ const hippoHbpMicrocircuit = {
   biggestTarget: 'Full Circuit',
   defaultPopulation: 'Central Column',
   displayName: 'Hippocampus CA1 microcircuit',
+  simConfigToUse: constants.areas.HIPPOCAMPUS,
   extraParamsInBC: {
     Projection: {
       SC: {
@@ -197,7 +201,7 @@ const hippoHbpMicrocircuit = {
 
 /*
 |--------------------------------------------------------------------------
-| MOOC Microcircuit
+| MOOC Hippocampus Microcircuit
 |--------------------------------------------------------------------------
 */
 
@@ -207,7 +211,7 @@ const hippoMoocMicrocircuit = Object.assign(
   { ...hippoHbpMicrocircuit },
   {
     prefix: {
-      NUVLA: '/mooc',
+      [constants.computers.NUVLA]: '/mooc',
     },
     paths: newPaths,
     reportsTargetFilter: '(Random.{1,2}Perc|mc2_Column|Mosaic)',
@@ -219,7 +223,7 @@ const hippoBbpMicrocircuit = Object.assign(
   { ...hippoHbpMicrocircuit },
   {
     prefix: {
-      BB5: '/gpfs/bbp.cscs.ch/home/antonel/20181114/putting_circuit_together',
+      [constants.computers.BB5]: '/gpfs/bbp.cscs.ch/home/antonel/20181114/putting_circuit_together',
     },
   },
 );

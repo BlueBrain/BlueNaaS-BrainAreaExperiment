@@ -20,6 +20,7 @@ export default {
       '/apps/hbp/ich002/home/antonel/analysis_launch_0.8.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
     ],
     executable: '/bin/bash input.sh',
+    dynamicAnalysisConfig: 'https://raw.githubusercontent.com/antonelepfl/simulation-launcher-notebooks/analysis-notebooks/analysis_config.json',
   },
   [constants.computers.BB5]: {
     script: [
@@ -35,8 +36,8 @@ export default {
     executable: '/bin/bash input.sh',
   },
   [constants.computers.NUVLA]: {
-    dynamicAnalysis: true,
-    bulkAnalysis: true,
+    dynamicAnalysisConfig: 'https://raw.githubusercontent.com/BlueBrain/MOOC-hippocampus-network-simulation-2019/master/analysis_config.json',
+    bulkAnalysisConfig: 'https://raw.githubusercontent.com/BlueBrain/MOOC-hippocampus-network-simulation-2019/bulk-analysis/bulk_analysis_config.json',
     executable: 'epfl-mooc/analysis/launch_analysis',
   },
   filesToAvoidCopy: [
@@ -64,7 +65,5 @@ export default {
   analysisConnectionFileName: 'analysis_path.json',
   nodes: 2,
   runtime: 1800,
-  externalDynamicAnalysisConfig: 'https://raw.githubusercontent.com/BlueBrain/MOOC-hippocampus-network-simulation-2019/master/analysis_config.json',
-  externalBulkAnalysisConfig: 'https://raw.githubusercontent.com/BlueBrain/MOOC-hippocampus-network-simulation-2019/bulk-analysis/bulk_analysis_config.json',
-  usecasesCreationForm: 'https://bbp.epfl.ch/public/dev.usecases-wizard/index.html#/entitydashboard?',
+  usecasesCreationForm: 'https://bbp.epfl.ch/public/usecases-wizard/index.html#/entitydashboard?',
 };

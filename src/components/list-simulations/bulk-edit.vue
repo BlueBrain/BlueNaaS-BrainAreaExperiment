@@ -3,7 +3,7 @@
   <div>
     <dropdown
       trigger="click"
-      v-if="computerAllowBulkAnalysis"
+      v-if="bulkNotebooksConfig"
     >
       <i-button>
         Bulk Edit
@@ -66,11 +66,8 @@ export default {
       return this.$store.state.list.simulationsToBulkAnalyse.length;
     },
     bulkNotebooksConfig() {
-      return analysisConfig.externalBulkAnalysisConfig;
-    },
-    computerAllowBulkAnalysis() {
       if (!this.$store.state.currentComputer) return false;
-      return analysisConfig[this.$store.state.currentComputer].bulkAnalysis;
+      return analysisConfig[this.$store.state.currentComputer].bulkAnalysisConfig;
     },
   },
   methods: {

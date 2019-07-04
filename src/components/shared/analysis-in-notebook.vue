@@ -76,7 +76,7 @@ export default {
   computed: {
     canAnalyse() {
       if (!this.$store.state.currentComputer) return false;
-      return get(analysisConfig, `${this.$store.state.currentComputer}.dynamicAnalysis`);
+      return get(analysisConfig, `${this.$store.state.currentComputer}.dynamicAnalysisConfig`);
     },
   },
   methods: {

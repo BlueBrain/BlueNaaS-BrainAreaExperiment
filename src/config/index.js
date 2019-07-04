@@ -8,7 +8,7 @@ const configHBP = {
 
 const configBBP = {
   auth: {
-    clientId: 'mooc-voucher-management',
+    clientId: 'sim-launcher-ui-unicore',
     authUrl: 'https://bbpteam.epfl.ch/auth/realms/BBP/protocol/openid-connect/auth',
     request: { nonce: null },
   },

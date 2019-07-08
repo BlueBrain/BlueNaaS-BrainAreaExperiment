@@ -11,10 +11,25 @@
       :value="target.displayName"
       :label="target.displayName"
     >
-      <div class="target-img-container">
+      <Poptip
+        v-if="target.src"
+        trigger="hover"
+        title="Population Preview"
+        :transfer="true"
+        placement="right-start"
+        @on-popper-show="showImg(target.displayName)"
+      >
         <span>{{ target.displayName }}</span>
-        <img :src="getTargetImage(target)">
-      </div>
+        <div slot="content">
+          <img
+            v-if="visibleImageTarget === target.displayName"
+            :src="target.src"
+          >
+        </div>
+      </Poptip>
+
+      <span v-else>{{ target.displayName }}</span>
+
     </i-option>
   </i-select>
 </template>
@@ -23,6 +38,11 @@
 <script>
 export default {
   props: ['targetSelected', 'itemsAvailable'],
+  data() {
+    return {
+      visibleImageTarget: '',
+    };
+  },
   methods: {
     matched(search = '', targetValue = '') {
       return targetValue.toLowerCase().indexOf(search.toLowerCase()) >= 0;
@@ -31,8 +51,8 @@ export default {
       if (!selection) return;
       this.$emit('target-changed', selection);
     },
-    getTargetImage(targetObj) {
-      return targetObj.src;
+    showImg(targetName) {
+      this.visibleImageTarget = targetName;
     },
   },
   computed: {
@@ -49,15 +69,3 @@ export default {
   },
 };
 </script>
-
-
-<style scoped lang="scss">
-  .target-img-container {
-    display: inline-flex;
-    align-items: center;
-    flex-direction: row;
-    img {
-      max-width: 50px;
-    }
-  }
-</style>

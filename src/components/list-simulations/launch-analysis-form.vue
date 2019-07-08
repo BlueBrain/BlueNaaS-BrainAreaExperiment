@@ -257,7 +257,7 @@ export default {
         return false;
       }
 
-      let lfpAnalysisObj = null;
+      let lfpAnalysisObj = {};
       if (this.isLFP) {
         lfpAnalysisObj = this.$refs.lfpAnalysisPickerRef.generatePlotsConfig();
         if (lfpAnalysisObj.hasLFPAnalysis && !this.lfpTarget) {

@@ -455,6 +455,7 @@ const sscxBbpMicrocircuit = {
     { name: 'Layer6Excitatory', displayName: 'Layer6Excitatory' },
     { name: 'dNAC_dSTUT', displayName: 'dNAC_dSTUT' },
     { name: 'Inhibitory_no_dNAC_dSTUT', displayName: 'Inhibitory_no_dNAC_dSTUT' },
+    { name: 'AllCompartments', displayName: 'AllCompartments', lfp: true },
   ],
   biggestTarget: 'Full Circuit',
   defaultPopulation: 'Mosaic',

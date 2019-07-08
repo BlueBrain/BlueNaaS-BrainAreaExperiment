@@ -63,7 +63,7 @@ export default {
   ],
   configFileName: 'analysis_config.json',
   analysisConnectionFileName: 'analysis_path.json',
-  nodes: 2,
+  nodes: 1,
   runtime: 1800,
   usecasesCreationForm: 'https://bbp.epfl.ch/public/usecases-wizard/index.html#/entitydashboard?',
 };

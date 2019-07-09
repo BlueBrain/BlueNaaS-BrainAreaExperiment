@@ -1,3 +1,4 @@
+
 <template>
   <div class="target-selection-container">
     <!-- <div class="title">Add targets using slices of the Hippocampus</div> -->
@@ -10,7 +11,7 @@
           v-for="(item, index) in imagePoll"
           :key="index"
           class="list-item"
-          @mouseover="hoverSelector(item)"
+          @mouseenter="hoverSelector(item)"
           @click="targetSelected(item)"
         >
           <span>{{ item['displayName'] }}</span>
@@ -21,13 +22,18 @@
   </div>
 </template>
 
+
 <script>
+import isEqual from 'lodash/isEqual';
+import axios from 'axios';
+
 export default {
   name: 'TargetSelection',
   props: ['itemsAvailable'],
   data() {
     return {
-      selectedSlice: '',
+      selectedSliceObj: {},
+      cachedImgs: {},
     };
   },
   computed: {
@@ -49,21 +55,32 @@ export default {
     }
   },
   methods: {
-    hoverSelector(el) {
-      this.loadImage(el);
+    hoverSelector(targetObj) {
+      if (isEqual(targetObj, this.selectedSliceObj)) return;
+      this.loadImage(targetObj);
     },
-    loadImage(element) {
-      let newElem = element;
-      if (!newElem) {
-        newElem = this.firstImgElement;
-      }
+    async loadImage(targetObj) {
+      const newElem = targetObj || this.firstImgElement;
       const image = this.$el.querySelector('#currentSliceImg');
       image.classList.add('blur');
-      image.src = newElem.src;
-      this.selectedSlice = newElem;
-      image.onload = () => {
+      this.selectedSliceObj = newElem;
+
+      let imgBlob = null;
+      if (this.cachedImgs[newElem.displayName]) {
+        imgBlob = this.cachedImgs[newElem.displayName];
+      } else {
+        const response = await axios({ url: newElem.src, responseType: 'blob' });
+        imgBlob = response.data;
+        this.cachedImgs[newElem.displayName] = imgBlob;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        image.src = reader.result;
         image.classList.remove('blur');
       };
+      reader.onerror = () => { this.$Message.error('Error loading target image'); };
+      reader.readAsDataURL(imgBlob);
     },
     getNext(element) {
       const indexFound = this.imagePoll.findIndex(pollElements => (
@@ -76,11 +93,13 @@ export default {
       return this.firstImgElement;
     },
     targetSelected() {
-      this.$emit('target-selected', this.selectedSlice);
+      this.$emit('target-selected', this.selectedSliceObj);
     },
   },
 };
 </script>
+
+
 <style scoped>
     .title {
         font-size: 10px;

@@ -1,5 +1,7 @@
 
 import constants from '@/common/constants';
+
+const { computers } = constants;
 /*
 |--------------------------------------------------------------------------
 | Hippocampus Full CA1
@@ -10,8 +12,8 @@ const slicesImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher
 
 const hippoHbpFullCa1 = {
   prefix: { // setting prefix allow to know which computer can run the circuit
-    [constants.computers.JURECA]: '/p/home/jusers/antonel1/jureca/vsk2512/CA1/20181114',
-    [constants.computers.PIZ_DAINT]: '/apps/hbp/ich002/home/antonel/full_ca1/CA1',
+    [computers.JURECA]: '/p/home/jusers/antonel1/jureca/vsk2512/CA1/20181114',
+    [computers.PIZ_DAINT]: '/apps/hbp/ich002/home/antonel/full_ca1/CA1',
   },
   paths: {
     MorphologyPath: '<%= prefix %>/entities/morphologies/20180417/',
@@ -170,7 +172,7 @@ const hippoBbpFullCa1 = Object.assign(
   { ...hippoHbpFullCa1 },
   {
     prefix: {
-      [constants.computers.BB5]: '/gpfs/bbp.cscs.ch/project/proj42/home/antonel/CA1',
+      [computers.BB5]: '/gpfs/bbp.cscs.ch/project/proj42/home/antonel/CA1',
     },
   },
 );
@@ -184,8 +186,8 @@ const hippoBbpFullCa1 = Object.assign(
 const microcircuitImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/images-slices-mooc';
 const hippoHbpMicrocircuit = {
   prefix: {
-    [constants.computers.JURECA]: '/p/project/cvsk25/vsk2512/O1',
-    [constants.computers.PIZ_DAINT]: '/apps/hbp/ich002/home/antonel/O1',
+    [computers.JURECA]: '/p/project/cvsk25/vsk2512/O1',
+    [computers.PIZ_DAINT]: '/apps/hbp/ich002/home/antonel/O1',
   },
   paths: {
     MorphologyPath: '<%= prefix %>/entities/morphologies/20180417/',
@@ -295,7 +297,7 @@ const hippoMoocMicrocircuit = Object.assign(
   { ...hippoHbpMicrocircuit },
   {
     prefix: {
-      [constants.computers.NUVLA]: '/mooc',
+      [computers.NUVLA]: '/mooc',
     },
     paths: newPaths,
   },
@@ -306,7 +308,7 @@ const hippoBbpMicrocircuit = Object.assign(
   { ...hippoHbpMicrocircuit },
   {
     prefix: {
-      [constants.computers.BB5]: '/gpfs/bbp.cscs.ch/home/antonel/20181114/putting_circuit_together',
+      [computers.BB5]: '/gpfs/bbp.cscs.ch/home/antonel/20181114/putting_circuit_together',
     },
   },
 );
@@ -319,7 +321,7 @@ const hippoBbpMicrocircuit = Object.assign(
 
 const sscxBbpMicrocircuit = {
   prefix: {
-    [constants.computers.BB5]: '',
+    [computers.BB5]: '',
   },
   paths: {
     MorphologyPath: '<%= prefix %>/gpfs/bbp.cscs.ch/project/proj59/entities/morphologies/2017.10.31',

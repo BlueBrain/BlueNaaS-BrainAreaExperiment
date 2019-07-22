@@ -1,8 +1,10 @@
 
 import constants from '@/common/constants';
 
+const { computers } = constants;
+
 export default {
-  [constants.computers.JURECA]: {
+  [computers.JURECA]: {
     script: [
       'OMP_NUM_THREADS=1',
       'export OMP_NUM_THREADS',
@@ -11,7 +13,7 @@ export default {
     ],
     executable: '/bin/bash input.sh',
   },
-  [constants.computers.PIZ_DAINT]: {
+  [computers.PIZ_DAINT]: {
     script: [
       '#!/bin/bash',
       'HDF5_USE_FILE_LOCKING=FALSE',
@@ -22,7 +24,7 @@ export default {
     executable: '/bin/bash input.sh',
     dynamicAnalysisConfig: 'https://raw.githubusercontent.com/antonelepfl/simulation-launcher-notebooks/analysis-notebooks/analysis_config.json',
   },
-  [constants.computers.BB5]: {
+  [computers.BB5]: {
     script: [
       '#!/bin/bash',
       '. /etc/profile',
@@ -35,7 +37,7 @@ export default {
     ],
     executable: '/bin/bash input.sh',
   },
-  [constants.computers.NUVLA]: {
+  [computers.NUVLA]: {
     dynamicAnalysisConfig: 'https://raw.githubusercontent.com/BlueBrain/MOOC-hippocampus-network-simulation-2019/master/analysis_config.json',
     bulkAnalysisConfig: 'https://raw.githubusercontent.com/BlueBrain/MOOC-hippocampus-network-simulation-2019/bulk-analysis/bulk_analysis_config.json',
     executable: 'epfl-mooc/analysis/launch_analysis',

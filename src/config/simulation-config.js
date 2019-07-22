@@ -1,9 +1,11 @@
 
 import constants from '@/common/constants';
 
+const { computers, areas } = constants;
+
 export default {
-  [constants.areas.HIPPOCAMPUS]: {
-    [constants.computers.JURECA]: {
+  [areas.HIPPOCAMPUS]: {
+    [computers.JURECA]: {
       script: [
         '#!/bin/sh',
         'module --force purge all',
@@ -23,14 +25,14 @@ export default {
       partitions: { vsk25: 'booster' },
       executable: '/bin/bash input.sh',
     },
-    [constants.computers.NUVLA]: {
+    [computers.NUVLA]: {
       runtime: 10800,
       nodes: 3,
       cpus: 8,
       executable: 'epfl-mooc/simulation/launch_simulation_parallel',
       environment: { NUVLA__worker__multiplicity: 4 },
     },
-    [constants.computers.PIZ_DAINT]: {
+    [computers.PIZ_DAINT]: {
       script: [
         '#!/bin/bash -l',
         '. /etc/profile',
@@ -46,7 +48,7 @@ export default {
       nodeType: 'mc',
       memory: 64000,
     },
-    [constants.computers.BB5]: {
+    [computers.BB5]: {
       script: [
         '#!/bin/bash -l',
         '. /etc/profile',
@@ -78,8 +80,8 @@ export default {
     },
     checksForLFP: ['AllCompartments', 'Summation'],
   },
-  [constants.areas.SSCX]: {
-    [constants.computers.BB5]: {
+  [areas.SSCX]: {
+    [computers.BB5]: {
       script: [
         '#!/bin/bash -l',
         '. /etc/profile',

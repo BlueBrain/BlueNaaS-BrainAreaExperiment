@@ -57,6 +57,7 @@ import unicore, { urlToComputerAndId } from '@/services/unicore';
 import { jobTags, addTag } from '@/common/job-status';
 import db from '@/services/db';
 import '@/assets/css/simulation.css';
+import 'timeline-plus/dist/timeline.min.css';
 
 export default {
   name: 'RunSimulation',

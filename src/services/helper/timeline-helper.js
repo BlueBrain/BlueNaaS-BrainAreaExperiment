@@ -1,11 +1,9 @@
 
-/* global timeline */
 import noop from 'lodash/noop';
 import flatMap from 'lodash/flatMap';
-
+import { Timeline, DataSet } from 'timeline-plus';
 import store from '@/services/store';
 
-const { Timeline, DataSet } = timeline;
 
 function joinName(target, type, newId) {
   const temp = [];

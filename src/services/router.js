@@ -2,34 +2,29 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 
-import SimulationRun from '@/views/run.vue';
-import Details from '@/views/details.vue';
-import List from '@/views/list.vue';
-import CircuitIndex from '@/views/circuits-index.vue';
-
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: '/circuits/:circuitName',
-    component: SimulationRun,
+    component: () => import(/* webpackChunkName: "run" */ '@/views/run.vue'),
     name: 'run',
   },
   {
     path: '/circuits/:circuitName/view/:computerParam/',
-    component: List,
+    component: () => import(/* webpackChunkName: "list" */ '@/views/list.vue'),
     name: 'view',
     props: true,
   },
   {
     path: '/circuits/:circuitName/details/:computerParam/:jobId',
-    component: Details,
+    component: () => import(/* webpackChunkName: "details" */ '@/views/details.vue'),
     props: true,
     name: 'details',
   },
   {
     path: '/',
-    component: CircuitIndex,
+    component: () => import(/* webpackChunkName: "circuits-index" */ '@/views/circuits-index.vue'),
   },
 ];
 

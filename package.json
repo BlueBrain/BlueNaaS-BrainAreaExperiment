@@ -1,7 +1,7 @@
 {
   "name": "sim-launcher-gui",
   "description": "Configure and launch simulations in HPC using Uncore API",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
@@ -20,7 +20,7 @@
     "localforage": "^1.7.3",
     "lodash": "^4.17.11",
     "pouchdb-browser": "^7.0.0",
-    "timeline-plus": "^2.3.7",
+    "timeline-plus": "^2.4.0",
     "uuid": "^3.3.2",
     "vis": "^4.21.0",
     "vue": "^2.6.10",

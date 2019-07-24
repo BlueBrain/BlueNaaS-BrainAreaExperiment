@@ -122,13 +122,14 @@
 
 <script>
 import analysisConfig from '@/config/analysis-config';
-import { getFiles } from '@/services/unicore';
 import { unmapBlueConfigTerms, mapBlueConfigTerms } from '@/common/utils';
-import get from 'lodash/get';
 import intersection from 'lodash/intersection';
 import AnalysisPicker from '@/components/list-simulations/analysis-picker.vue';
 import LfpAnalysisPicker from '@/components/list-simulations/lfp-analysis-picker.vue';
 import { jobTags } from '@/common/job-status';
+import {
+  findAnalysisTargets, findDuration, findLfpAnalysisTargets, getBlueConfigStr,
+} from '@/services/helper/blueconfig-helper';
 
 export default {
   name: 'AnalysisForm',
@@ -194,47 +195,14 @@ export default {
       this.target = newTarget;
     },
     async parseBlueConfig(job) {
-      function findAnalysisTargetsInBC(bcStr) {
-        const regexp = /Report (.+)_report/gm;
-        const matches = [];
-        let m = regexp.exec(bcStr);
-        while (m !== null) {
-          // This is necessary to avoid infinite loops with zero-width matches
-          if (m.index === regexp.lastIndex) regexp.lastIndex += 1;
-          matches.push(get(m, '[1]', '').trim());
-          m = regexp.exec(bcStr);
-        }
-        return matches;
-      }
-
-      function findDurationInBC(bcStr) {
-        const regexp = /Duration (.+)/;
-        const simulationDurationMatched = bcStr.match(regexp);
-        const durationStr = get(simulationDurationMatched, '[1]', 100).trim();
-        return Number(durationStr);
-      }
-
-      function findLfpAnalysisTargetsInBC(bcStr) {
-        const regexp = /CircuitTarget (.+)/;
-        const circuitTargetMatched = bcStr.match(regexp);
-        return get(circuitTargetMatched, '[1]', '').trim();
-      }
-
-      async function getBlueConfigStr() {
-        const workingDirectory = get(job, '_links.workingDirectory.href');
-        const blueConfigBlob = await getFiles(`${workingDirectory}/files/BlueConfig`);
-        const blueConfigStr = await new Response(blueConfigBlob).text();
-        return blueConfigStr;
-      }
-
       // setup targets for default analysis
-      const blueConfigStr = await getBlueConfigStr();
-      const defaultAnalysisTargets = intersection(findAnalysisTargetsInBC(blueConfigStr));
+      const blueConfigStr = await getBlueConfigStr(job);
+      const defaultAnalysisTargets = intersection(findAnalysisTargets(blueConfigStr));
       this.targets = unmapBlueConfigTerms(defaultAnalysisTargets);
       [this.target] = this.targets;
 
       // setup targets for lfp
-      const lfpAnalysisTarget = unmapBlueConfigTerms(findLfpAnalysisTargetsInBC(blueConfigStr));
+      const lfpAnalysisTarget = unmapBlueConfigTerms(findLfpAnalysisTargets(blueConfigStr));
 
       if (lfpAnalysisTarget === this.$store.state.currentCircuitConfig.biggestTarget) {
         // show the full list of targets
@@ -247,7 +215,7 @@ export default {
       }
 
       // setup default times for LFP
-      const simulationDuratation = findDurationInBC(blueConfigStr);
+      const simulationDuratation = findDuration(blueConfigStr);
       this.simDuration = simulationDuratation;
     },
     generateAnalysisObjectToRun() {

@@ -24,7 +24,7 @@ const routes = [
   },
   {
     path: '/',
-    component: () => import(/* webpackChunkName: "circuits-index" */ '@/views/circuits-index.vue'),
+    component: () => import(/* webpackChunkName: "circuitsindex" */ '@/views/circuits-index.vue'),
   },
 ];
 

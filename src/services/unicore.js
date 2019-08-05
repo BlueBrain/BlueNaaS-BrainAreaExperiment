@@ -332,7 +332,7 @@ async function generateUnicoreConfig(configParams) {
   }
 
   function getMemory() {
-    if (configParams.runtime < 300) return null; // assumption is for test job submission
+    if (configParams.runtime < 200) return null; // assumption is for test job submission
     const { memory } = simStaticParams;
     return memory ? `${memory}M` : null;
   }

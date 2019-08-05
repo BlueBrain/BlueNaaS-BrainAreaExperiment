@@ -62,6 +62,7 @@ export default {
     };
   },
   created() {
+    if (!this.canAnalyse) return;
     axios(this.configUrl)
       .then((config) => {
         if (!config) return;

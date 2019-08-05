@@ -83,6 +83,7 @@
         >Nodes</tooltip>
         <input-number
           v-model="runParameters.nodes"
+          :min="1"
           placeholder="Node to allocate"
         />
       </form-item>
@@ -95,6 +96,7 @@
         <input-number
           :disabled="runtimeIsHidden"
           v-model="runParameters.runtime"
+          :min="1"
           placeholder="(optional)"
         />
       </form-item>
@@ -105,6 +107,7 @@
           content="Number of CPUs per node"
         >CPUs Per Node</tooltip>
         <i-input
+          :disabled="true"
           v-model="runParameters.cpus"
           readonly
         />
@@ -116,6 +119,7 @@
           content="Total number of processors"
         >Total Processors</tooltip>
         <i-input
+          :disabled="true"
           :value="runParameters.nodes * runParameters.cpus"
           readonly
         />

@@ -465,12 +465,14 @@ async function workingDirToMachinePath(workingDirectory) {
   }
 }
 
-function importPersonalSimulation(title, simFolderPath) {
+function importPersonalSimulation(title, simFolderPath, account = null) {
   const executable = store.state.currentSimulationConfig.importSimulationScript
     .replace('SIMFOLDERPATH', simFolderPath);
   const config = {
     computerSelected: store.state.currentComputer,
-    runtime: 100,
+    runtime: 500,
+    nodes: 1,
+    accountSelected: account,
     executable,
     title,
   };

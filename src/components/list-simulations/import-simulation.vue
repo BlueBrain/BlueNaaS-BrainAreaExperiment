@@ -25,14 +25,14 @@
           <form-item label="Title:" prop="title">
             <i-input
               v-model="formModel.title"
-              placeholder="Title of the simulation"
+              placeholder="Imported Simulation"
             />
           </form-item>
 
-          <form-item label="Full Path:" prop="simPath">
+          <form-item label="Full Path to the simulation directory:" prop="simPath">
             <i-input
               v-model="formModel.simPath"
-              placeholder="Full path to the simulation directory"
+              placeholder="Full path"
             />
           </form-item>
 
@@ -57,6 +57,8 @@
 
 <script>
 import { urlToComputerAndId, importPersonalSimulation } from '@/services/unicore';
+import auth from '@/services/auth';
+import constants from '@/common/constants';
 
 export default {
   name: 'ImportSimulation',
@@ -72,11 +74,13 @@ export default {
         simPath: [{ required: true, validator: this.validatePath, trigger: 'blur' }],
       },
       isLoading: false,
+      userProject: null, // so far only for BB5
     };
   },
   methods: {
     showModal() {
       this.showImportModal = true;
+      this.getUserProjects();
     },
     cleanUpStrings() {
       this.formModel.title = this.formModel.title.trim();
@@ -93,7 +97,11 @@ export default {
       const isValid = await this.$refs.formValidate.validate();
       if (!isValid) return;
       this.isLoading = true;
-      const jobDetails = await importPersonalSimulation(this.formModel.title, this.formModel.simPath);
+      const jobDetails = await importPersonalSimulation(
+        this.formModel.title,
+        this.formModel.simPath,
+        this.userProject,
+      );
       const { id } = urlToComputerAndId(jobDetails._links.self.href);
       this.isLoading = false;
       this.$router.push({
@@ -102,6 +110,14 @@ export default {
           jobId: id,
           computerParam: this.$store.state.currentComputer,
         },
+      });
+    },
+    getUserProjects() {
+      if (this.$store.state.currentComputer !== constants.computers.BB5) return;
+      auth.getUserProjects().then((projects) => {
+        [this.userProject] = projects;
+      }).catch((e) => {
+        this.$Message.error('Error fetching user projects', e);
       });
     },
   },

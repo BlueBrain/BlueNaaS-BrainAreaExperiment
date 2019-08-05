@@ -56,6 +56,7 @@ import ConnectionManipulation from '@/components/run-simulation/connection-manip
 import unicore, { urlToComputerAndId } from '@/services/unicore';
 import { jobTags, addTag } from '@/common/job-status';
 import db from '@/services/db';
+import sortBy from 'lodash/sortBy';
 import '@/assets/css/simulation.css';
 import 'timeline-plus/dist/timeline.min.css';
 
@@ -78,19 +79,19 @@ export default {
     // set the targets for stimulations
     const stimulationRegExp = new RegExp(this.$store.state.currentCircuitConfig.stimulationTargetFilter);
     const filteredTargetsForStimulation = allTargets.filter(target => stimulationRegExp.test(target.name));
-    this.$store.commit('setStimulationTargets', filteredTargetsForStimulation);
+    this.$store.commit('setStimulationTargets', sortBy(filteredTargetsForStimulation, 'displayName'));
 
     // set targets for reports
     const reportRegExp = new RegExp(this.$store.state.currentCircuitConfig.reportsTargetFilter);
     const filteredTargetsForReport = allTargets.filter(target => reportRegExp.test(target.name));
-    this.$store.commit('setReportTargets', filteredTargetsForReport);
+    this.$store.commit('setReportTargets', sortBy(filteredTargetsForReport, 'displayName'));
 
     // current population and computer will be set in sim-params due it needs to check the saved config
 
-    this.$store.commit('setPopulationTargets', filteredTargetsForStimulation);
+    this.$store.commit('setPopulationTargets', sortBy(filteredTargetsForStimulation, 'displayName'));
 
     const connectionManipulationTargets = allTargets;
-    this.$store.commit('setConnectionTargets', connectionManipulationTargets);
+    this.$store.commit('setConnectionTargets', sortBy(connectionManipulationTargets, 'displayName'));
 
     db.saveCollabIdForViz(this.$route.query.collab);
   },

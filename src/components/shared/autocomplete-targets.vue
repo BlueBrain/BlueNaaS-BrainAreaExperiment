@@ -4,6 +4,7 @@
     v-model="populationSelected"
     filterable
     @on-change="itemSelected"
+    class="custom-autocomplete-targets"
   >
     <i-option
       v-for="target in targets"
@@ -69,3 +70,13 @@ export default {
   },
 };
 </script>
+
+
+<style>
+  .custom-autocomplete-targets .ivu-poptip {
+    display: block;
+  }
+  .custom-autocomplete-targets .ivu-poptip-rel {
+    display: block;
+  }
+</style>

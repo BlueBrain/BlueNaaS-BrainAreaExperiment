@@ -337,6 +337,7 @@ async function generateUnicoreConfig(configParams) {
     return memory ? `${memory}M` : null;
   }
 
+  const nodes = getNodes();
   // generate jobSpecs and remove the nulls
   return cleanDeep({
     Name: configParams.title || 'unnamed job',
@@ -348,14 +349,14 @@ async function generateUnicoreConfig(configParams) {
     },
     haveClientStageIn: 'true',
     Resources: {
-      Nodes: getNodes(),
+      Nodes: nodes,
       CPUsPerNode: simStaticParams.cpus,
       Runtime: configParams.runtime,
       NodeConstraints: simStaticParams.nodeType,
       Memory: getMemory(),
       Queue: getPartition(),
       Project: configParams.accountSelected || null,
-      CPUs: getNodes() * simStaticParams.cpus,
+      CPUs: nodes ? nodes * simStaticParams.cpus : null,
     },
     Tags: configParams.tags,
     Imports: configParams.imports,
@@ -467,7 +468,7 @@ async function workingDirToMachinePath(workingDirectory) {
 
 function importPersonalSimulation(title, simFolderPath, account = null) {
   const executable = store.state.currentSimulationConfig.importSimulationScript
-    .replace('SIMFOLDERPATH', simFolderPath);
+    .replace(/SIMFOLDERPATH/g, simFolderPath);
   const config = {
     computerSelected: store.state.currentComputer,
     runtime: 500,

@@ -3,7 +3,7 @@ import unicore from '@/services/unicore';
 import Vue from 'vue';
 import analysisConfig from '@/config/analysis-config';
 import {
-  jobStatus, isRunning, jobTags,
+  jobStatus, isRunning,
 } from '@/common/job-status';
 import { getComputerUrlCombo } from '@/common/utils';
 import db from '@/services/db';
@@ -118,11 +118,6 @@ function classifyJob(jobExpandedInfo) {
 
   const updatedSimulation = jobExpandedInfo;
   updatedSimulation.status = getSimCorrectStatus(updatedSimulation);
-
-  if (
-    updatedSimulation.tags.includes(jobTags.SIMULATION_IMPORTED)
-    && !isRunning(updatedSimulation.status)
-  ) { updatedSimulation.status = jobStatus.FAILED; }
 
   console.debug(`Classifying ${updatedSimulation.id} [${updatedSimulation.status}]`);
   db.addJob(updatedSimulation);

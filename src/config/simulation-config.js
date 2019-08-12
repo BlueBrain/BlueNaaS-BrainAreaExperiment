@@ -68,7 +68,7 @@ export default {
     },
     defaultDuration: 300,
     defaultForwardSkip: 5000,
-    importSimulationScript: 'ln -sf SIMFOLDERPATH/* .',
+    importSimulationScript: 'ln -sf SIMFOLDERPATH/* . && rm ./BlueConfig && cp SIMFOLDERPATH/BlueConfig .',
     stimuli: [
       { name: 'Linear', params: ['AmpStart', 'AmpEnd'] },
       { name: 'NPoisson', params: ['Lambda', 'Weight', 'NumOfSynapses'] },

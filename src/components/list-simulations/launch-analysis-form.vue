@@ -215,8 +215,8 @@ export default {
       }
 
       // setup default times for LFP
-      const simulationDuratation = findDuration(blueConfigStr);
-      this.simDuration = simulationDuratation;
+      const simulationDuration = findDuration(blueConfigStr);
+      this.simDuration = simulationDuration;
     },
     generateAnalysisObjectToRun() {
       const analysisObj = this.$refs.analysisPickerRef.generatePlotsConfig();

@@ -104,7 +104,7 @@ export default {
       set(newGroup) {
         if (!newGroup) return;
         this.startLoadingList();
-        eventBus.$emit('changeUserGroup', newGroup, () => eventBus.$emit('reloadJobsList'));
+        eventBus.$emit('change-user-group', newGroup, () => eventBus.$emit('reload-jobs-list'));
       },
     },
     selectedComputer: {
@@ -115,11 +115,11 @@ export default {
         if (this.$store.state.currentComputer === newComputer) return;
 
         this.startLoadingList();
-        eventBus.$emit('changeComputer', newComputer, () => {
+        eventBus.$emit('change-computer', newComputer, () => {
           this.$router.replace({
             name: 'view',
             params: { computerParam: newComputer },
-          }, () => eventBus.$emit('reloadJobsList'));
+          }, () => eventBus.$emit('reload-jobs-list'));
         });
       },
     },
@@ -131,7 +131,7 @@ export default {
     },
   },
   mounted() {
-    eventBus.$emit('setupFromStorage');
+    eventBus.$emit('setup-from-storage');
   },
   methods: {
     resetFilter() {
@@ -141,7 +141,7 @@ export default {
     applyFilters() {
       this.$emit('update-filters', this.nameFilter, this.statusFilter);
       this.$nextTick(() => {
-        eventBus.$emit('applyFilters');
+        eventBus.$emit('apply-filters');
       });
     },
     startLoadingList() {

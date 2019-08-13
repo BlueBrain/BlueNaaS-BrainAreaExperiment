@@ -73,18 +73,18 @@ async function setupUserProjects(newGroup) {
   return store.state.userGroup;
 }
 
-eventBus.$on('setupFromStorage', () => {
+eventBus.$on('setup-from-storage', () => {
   setupFromStorage();
 });
 
-eventBus.$on('changeUserGroup', (group, callback) => {
+eventBus.$on('change-user-group', (group, callback) => {
   if (store.state.userGroup === group) return;
   setupUserProjects(group).then(() => {
     if (callback) callback();
   });
 });
 
-eventBus.$on('changeComputer', (computer, callback) => {
+eventBus.$on('change-computer', (computer, callback) => {
   store.commit('setCurrentComputer', computer);
   store.dispatch('setupCurrentSimulationConfig');
   setupUserProjects().then(() => {

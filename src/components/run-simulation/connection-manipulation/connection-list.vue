@@ -158,7 +158,7 @@ export default {
   created() {
     this.connectionsArray = getDefaultConnections();
     this.creationConfigHandlerBinded = this.creationConfigHandler.bind(this);
-    eventBus.$on('create-connection-config', this.creationConfigHandlerBinded);
+    eventBus.$on('createConnectionConfig', this.creationConfigHandlerBinded);
   },
   methods: {
     updateValue(connection, subitem, newValue) {
@@ -210,7 +210,7 @@ export default {
     },
   },
   beforeDestroy() {
-    eventBus.$off('create-connection-config', this.creationConfigHandlerBinded);
+    eventBus.$off('createConnectionConfig', this.creationConfigHandlerBinded);
   },
 };
 </script>

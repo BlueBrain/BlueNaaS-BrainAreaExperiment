@@ -101,8 +101,8 @@ export default {
     // before running the simulation create BlueConfig
     this.creationConfigHandlerBinded = this.creationConfigHandler.bind(this);
     this.simulationDurationChangedBinded = this.simulationDurationChanged.bind(this);
-    eventBus.$on('create-stimulus-config', this.creationConfigHandlerBinded);
-    eventBus.$on('simulation-duration-changed', this.simulationDurationChangedBinded);
+    eventBus.$on('createStimulusConfig', this.creationConfigHandlerBinded);
+    eventBus.$on('simulationDurationChanged', this.simulationDurationChangedBinded);
   },
   methods: {
     onAdd(item, callback) {
@@ -283,8 +283,8 @@ export default {
     },
   },
   beforeDestroy() {
-    eventBus.$off('create-stimulus-config', this.creationConfigHandlerBinded);
-    eventBus.$off('simulation-duration-changed', this.simulationDurationChangedBinded);
+    eventBus.$off('createStimulusConfig', this.creationConfigHandlerBinded);
+    eventBus.$off('simulationDurationChanged', this.simulationDurationChangedBinded);
   },
 };
 </script>

@@ -24,9 +24,9 @@ This component manage each job (delete, start, create, etc).
         v-for="job in viewList"
         :key="job.id"
         :job="job"
-        @delete-job="deleteJob"
-        @show-details="showDetails(job)"
-        @run-analysis="runAnalysis(job)"
+        @deleteJob="deleteJob"
+        @showDetails="showDetails(job)"
+        @runAnalysis="runAnalysis(job)"
       />
 
       <div
@@ -42,7 +42,7 @@ This component manage each job (delete, start, create, etc).
       :show-modal="showAnalysisForm"
       :job-selected-for-analysis="jobSelectedForAnalysis"
       :is-running-analysis="isRunningAnalysis"
-      @change-modal-visibility="toggleModal"
+      @changeModalVisibility="toggleModal"
       @analysis-config-ready="analysisConfigReady"
     />
 
@@ -96,21 +96,21 @@ export default {
     },
   },
   mounted() {
-    eventBus.$on('reload-jobs-list', this.reloadJobsListBinded);
+    eventBus.$on('reloadJobsList', this.reloadJobsListBinded);
 
-    eventBus.$on('apply-filters', () => {
+    eventBus.$on('applyFilters', () => {
       const filtered = this.applyFiltersToSims(this.allSimulations);
       this.viewList = sortBy(filtered, 'submissionTime').reverse();
     });
 
     if (this.$route.params.computerParam) {
       eventBus.$emit(
-        'change-computer',
+        'changeComputer',
         this.$route.params.computerParam,
-        () => eventBus.$emit('reload-jobs-list'),
+        () => eventBus.$emit('reloadJobsList'),
       );
     } else {
-      eventBus.$emit('reload-jobs-list');
+      eventBus.$emit('reloadJobsList');
     }
   },
   methods: {

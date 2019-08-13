@@ -40,7 +40,7 @@ export default {
     };
   },
   created() {
-    eventBus.$on('viz-ready', (ip) => {
+    eventBus.$on('vizReady', (ip) => {
       this.vizRunning = false;
       this.vizIsReady = true;
       this.ip = ip;

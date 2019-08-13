@@ -4,7 +4,7 @@
     <modal
       width="350"
       v-model="showModalLocal"
-      @on-cancel="$emit('change-modal-visibility')"
+      @on-cancel="$emit('changeModalVisibility')"
       :mask-closable="false"
       class="report-form"
     >
@@ -106,7 +106,7 @@
 
       <div slot="footer">
         <i-button
-          @click="$emit('change-modal-visibility')"
+          @click="$emit('changeModalVisibility')"
         >Cancel</i-button>
 
         <i-button

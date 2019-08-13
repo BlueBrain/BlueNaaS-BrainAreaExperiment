@@ -165,7 +165,7 @@ export default {
   mounted() {
     this.$store.commit('setAppTitle', 'Simulation Details');
     if (this.computerParam) {
-      eventBus.$emit('change-computer', this.computerParam);
+      eventBus.$emit('changeComputer', this.computerParam);
     }
     this.computerProjectCombo = getComputerUrlCombo();
     this.getJobById(this.jobId);

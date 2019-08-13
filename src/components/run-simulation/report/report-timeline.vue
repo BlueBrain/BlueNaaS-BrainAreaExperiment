@@ -99,8 +99,8 @@ export default {
     // before running the simulation create BlueConfig
     this.creationConfigHandlerBinded = this.creationConfigHandler.bind(this);
     this.simulationDurationChangedBinded = this.simulationDurationChanged.bind(this);
-    eventBus.$on('createReportConfig', this.creationConfigHandlerBinded);
-    eventBus.$on('simulationDurationChanged', this.simulationDurationChangedBinded);
+    eventBus.$on('create-report-config', this.creationConfigHandlerBinded);
+    eventBus.$on('simulation-duration-changed', this.simulationDurationChangedBinded);
   },
   methods: {
     onAdd(item, callback) {
@@ -267,8 +267,8 @@ export default {
     },
   },
   beforeDestroy() {
-    eventBus.$off('createReportConfig', this.creationConfigHandlerBinded);
-    eventBus.$off('simulationDurationChanged', this.simulationDurationChangedBinded);
+    eventBus.$off('create-report-config', this.creationConfigHandlerBinded);
+    eventBus.$off('simulation-duration-changed', this.simulationDurationChangedBinded);
   },
 };
 </script>

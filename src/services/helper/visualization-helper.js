@@ -30,7 +30,7 @@ async function pollingVizIp() {
 
   try {
     const ip = await collabHelper.getIpByName(store.state.collabIdForViz, `${lastCharactersToken}.txt`);
-    eventBus.$emit('vizReady', ip);
+    eventBus.$emit('viz-ready', ip);
   } catch (e) {
     console.debug('VM IP not found. Retrying...');
     setTimeout(() => pollingVizIp(), store.state.pollInterval);

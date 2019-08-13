@@ -48,7 +48,7 @@ This will only display the item. It knows where to put all the information.
       <i-button
         type="primary"
         icon="ios-search"
-        @click="$emit('showDetails', jobUrl)"
+        @click="$emit('show-details', jobUrl)"
         ghost
       >View</i-button>
 
@@ -56,7 +56,7 @@ This will only display the item. It knows where to put all the information.
         :disabled="!analysisCanRun"
         type="success"
         icon="md-play"
-        @click="$emit('runAnalysis', jobUrl)"
+        @click="$emit('run-analysis', jobUrl)"
         ghost
       >Analyze</i-button>
 
@@ -64,7 +64,7 @@ This will only display the item. It knows where to put all the information.
         type="error"
         class="delete"
         icon="md-trash"
-        @click="$emit('deleteJob', jobUrl)"
+        @click="$emit('delete-job', jobUrl)"
         ghost
       >Delete</i-button>
     </div>

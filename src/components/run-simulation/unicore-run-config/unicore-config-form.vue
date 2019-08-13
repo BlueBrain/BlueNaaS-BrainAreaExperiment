@@ -4,7 +4,7 @@
     v-model="showModalLocal"
     width="350"
     class="computer-config-form"
-    @on-cancel="$emit('closeModal')"
+    @on-cancel="$emit('close-modal')"
     :mask-closable="false"
   >
     <h3 slot="header">Edit Parameters</h3>
@@ -129,7 +129,7 @@
         <i-button
           shape="circle"
           size="default"
-          @click="$emit('previewBlueConfig')"
+          @click="$emit('preview-blueconfig')"
         >Preview BlueConfig</i-button>
       </form-item>
 
@@ -138,7 +138,7 @@
       <div class="flex">
         <i-button
           size="default"
-          @click="$emit('closeModal')"
+          @click="$emit('close-modal')"
         >Cancel</i-button>
 
         <i-button
@@ -261,7 +261,7 @@ export default {
       },
       set(newGroup) {
         if (!newGroup || newGroup === this.$store.state.userGroup) return;
-        eventBus.$emit('changeUserGroup', newGroup);
+        eventBus.$emit('change-user-group', newGroup);
       },
     },
 
@@ -342,7 +342,7 @@ export default {
         this.groupsFetched = true;
         return;
       }
-      eventBus.$emit('changeComputer', computerToFetch, () => {
+      eventBus.$emit('change-computer', computerToFetch, () => {
         this.groupsFetched = true;
         if (callback) callback();
       });

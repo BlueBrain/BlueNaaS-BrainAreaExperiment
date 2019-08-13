@@ -32,8 +32,9 @@
     <unicore-config-form
       :show-modal="showComputerParamsModal"
       :is-launching-sim="isLaunchingSim"
-      @previewBlueConfig="previewBlueConfig"
+      @preview-blueconfig="previewBlueConfig"
       @closeModal="showComputerParamsModal = false"
+      @close-modal="showComputerParamsModal = false"
       @run-simulation="runSimulation"
     />
     <!-- END template for configuration -->
@@ -91,16 +92,16 @@ export default {
       /* it will send an action to each section to generate it's own config
         and when it received all of them it will merge it into BlueConfig (NO PATH) */
       const generateStimuli = new Promise((resolve) => {
-        eventBus.$emit('createStimulusConfig', resolve);
+        eventBus.$emit('create-stimulus-config', resolve);
       });
       const generateReport = new Promise((resolve) => {
-        eventBus.$emit('createReportConfig', resolve);
+        eventBus.$emit('create-report-config', resolve);
       });
       const generateConnections = new Promise((resolve) => {
-        eventBus.$emit('createConnectionConfig', resolve);
+        eventBus.$emit('create-connection-config', resolve);
       });
       const generateSimParams = new Promise((resolve) => {
-        eventBus.$emit('createSimParamsConfig', resolve);
+        eventBus.$emit('create-sim-params-config', resolve);
       });
       const [stimulationBC, reportBC, connectionsBC, simParamsBC] = await Promise.all([
         generateStimuli, generateReport, generateConnections, generateSimParams,

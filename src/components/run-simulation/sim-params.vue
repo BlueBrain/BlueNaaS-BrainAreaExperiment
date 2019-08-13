@@ -39,7 +39,7 @@ export default {
   mounted() {
     this.loadPreviousConfig();
     this.creationConfigHandlerBinded = this.creationConfigHandler.bind(this);
-    eventBus.$on('createSimParamsConfig', this.creationConfigHandlerBinded);
+    eventBus.$on('create-sim-params-config', this.creationConfigHandlerBinded);
   },
   computed: {
     duration: {
@@ -47,7 +47,7 @@ export default {
       set(newVal) {
         if (!newVal || newVal < 1) return;
         this.$store.commit('setSimulationDuration', newVal);
-        eventBus.$emit('simulationDurationChanged', newVal);
+        eventBus.$emit('simulation-duration-changed', newVal);
       },
     },
     populationSelected: {
@@ -88,14 +88,14 @@ export default {
       // setup default computer
       const unicoreSavedParams = get(prevConfig, 'unicore.computerSelected', null);
       const computerToUse = unicoreSavedParams || this.$store.state.computersAvailable[0];
-      eventBus.$emit('changeComputer', computerToUse);
+      eventBus.$emit('change-computer', computerToUse);
     },
     targetChanged(newModel) {
       this.$store.commit('setSimulationPopulation', newModel);
     },
   },
   beforeDestroy() {
-    eventBus.$off('createSimParamsConfig', this.creationConfigHandlerBinded);
+    eventBus.$off('create-sim-params-config', this.creationConfigHandlerBinded);
   },
 };
 </script>

@@ -28,6 +28,7 @@ function createBCTemplate() {
         Duration: store.state.simulationDuration,
         ForwardSkip: store.state.simulationForwardSkip,
         NumSynapseFiles: circuitRunSection.NumSynapseFiles || '2048',
+        FlushBufferScalar: Math.round(store.state.simulationDuration / 25),
         BaseSeed: '10',
       },
     },

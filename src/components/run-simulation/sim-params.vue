@@ -1,6 +1,6 @@
 
 <template>
-  <div class="inline-centered">
+  <div class="sim-params inline-centered">
     <tooltip
       content="Subpopulation of neurons to be simulated (CircuitTarget)"
     >Population:</tooltip>
@@ -101,23 +101,16 @@ export default {
 </script>
 
 
-<style scoped lang="scss">
-  .inline-centered {
+<style lang="scss">
+  .sim-params.inline-centered {
     display: inline-flex;
     align-items: center;
     flex-wrap: wrap;
     .ivu-tooltip {
-      margin-right: 5px;
-    }
-    .ivu-select,
-    .ivu-input-number {
-      margin-right: 5px;
+      margin: 0px 5px;
     }
     .ivu-select {
       width: 120px;
-    }
-    .circuit-name {
-      width: 220px;
     }
   }
 </style>

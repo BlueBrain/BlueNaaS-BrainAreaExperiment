@@ -4,19 +4,20 @@
   <div class="flex">
     <i-input
       class="raw-synapse-connection"
-      :disabled="true"
       :value="predefinedSynapses"
-    />
+      readonly
+    >
+      <i-button slot="append"
+        type="primary"
+        @click="isConfiguring = true"
+      >Configure</i-button>
+    </i-input>
 
-    <i-button
-      type="primary"
-      @click="isConfiguring = true"
-    >Configure</i-button>
 
-    <Modal v-model="isConfiguring" width="300">
+    <modal v-model="isConfiguring" width="300">
       <h3 slot="header">Synapse Configurator</h3>
 
-      <Row
+      <row
         type="flex"
         justify="space-between"
       >
@@ -29,10 +30,10 @@
             @click="addNewSynapseAttribute()"
           />
         </i-col>
-      </Row>
+      </row>
 
       <transition-group name="list">
-        <Row
+        <row
           v-for="(synapseFragment, index) in synapseConfigList"
           :key="synapseFragment.uuid"
           type="flex" justify="space-between"
@@ -71,7 +72,7 @@
               @click="removeSynapseAttr(index)"
             />
           </i-col>
-        </Row>
+        </row>
       </transition-group>
 
       <div slot="footer">
@@ -80,7 +81,7 @@
           @click="processSynapse"
         >Save</i-button>
       </div>
-    </Modal>
+    </modal>
 
   </div>
 </template>

@@ -140,12 +140,7 @@ This component allows to create or modify the connections in the circuit for the
           @target-changed="updateConnectionTarget"
         />
 
-        <div slot="footer">
-          <i-button
-            type="primary"
-            @click="updateConnectionTarget"
-          >Save</i-button>
-        </div>
+        <div slot="footer"/>
       </modal>
     </div>
 

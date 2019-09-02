@@ -110,7 +110,7 @@ export default {
       margin: 0px 5px;
     }
     .ivu-select {
-      width: 120px;
+      width: 140px;
     }
   }
 </style>

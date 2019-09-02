@@ -84,7 +84,9 @@ export default {
         padding: 7px 16px;
       }
     }
-
+    .ivu-select-dropdown {
+      max-width: 120px;
+    }
   }
   .poptip-preview-container {
     transition: opacity 0.4s linear;
@@ -96,7 +98,7 @@ export default {
     z-index: -1;
     border-radius: 6px;
     box-shadow: 0 1px 6px rgba(0,0,0,.2);
-    margin-left: 10px;
+    margin-left: 5px;
     display: inline;
 
     &.showing {

@@ -1,8 +1,8 @@
 
 <template>
-  <Modal v-model="showModal" width="360">
+  <modal v-model="showModal" width="360">
     <p slot="header" class="text-header text-centered">
-      <Icon type="ios-information-circle"></Icon>
+      <icon type="ios-information-circle"></icon>
       <span>Delete confirmation</span>
     </p>
     <div class="text-centered">
@@ -10,15 +10,15 @@
       <p>Will you delete it?</p>
     </div>
     <div slot="footer">
-      <Button
+      <i-button
         type="error"
         size="large"
         long
         :loading="isLoading"
         @click="del"
-      >Delete</Button>
+      >Delete</i-button>
     </div>
-  </Modal>
+  </modal>
 </template>
 
 

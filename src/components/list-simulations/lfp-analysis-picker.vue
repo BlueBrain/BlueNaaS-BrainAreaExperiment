@@ -18,7 +18,7 @@
 
     <divider>Specify Point(s)</divider>
     <div class="centered">
-      <Row
+      <row
         type="flex"
         justify="space-between"
       >
@@ -31,11 +31,11 @@
             @click="addNewPoint()"
           />
         </i-col>
-      </Row>
+      </row>
 
       <div class="scollable-points">
         <transition-group name="list">
-          <Row
+          <row
             v-for="(pointObj, index) in pointsCollection"
             :key="pointObj.index"
             type="flex"
@@ -65,7 +65,7 @@
                 @click="removePoint(index)"
               />
             </i-col>
-          </Row>
+          </row>
         </transition-group>
       </div>
 

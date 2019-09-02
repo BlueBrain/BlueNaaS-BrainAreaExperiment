@@ -20,13 +20,6 @@
       </div>
 
     </div>
-    <i-button
-      icon="md-play"
-      type="success"
-      size="default"
-      @click="configureSimulation"
-      class="baseline-align"
-    >Continue</i-button>
 
     <!-- template for configuration -->
     <unicore-config-form
@@ -38,6 +31,13 @@
       @run-simulation="runSimulation"
     />
     <!-- END template for configuration -->
+    <i-button
+      icon="md-play"
+      type="success"
+      size="default"
+      @click="configureSimulation"
+      class="baseline-align"
+    >Continue</i-button>
   </div>
 </template>
 

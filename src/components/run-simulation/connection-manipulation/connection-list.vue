@@ -21,7 +21,7 @@ This component allows to create or modify the connections in the circuit for the
       :class="{ 'table-collapsed': tableCollapsed }"
     >
       <!-- Header for connection manipulation -->
-      <Row type="flex" class="connection-table-header" justify="space-between">
+      <row type="flex" class="connection-table-header" justify="space-between">
         <i-col span="4">
           <tooltip content="This target defines presynaptic cells">
             <h3>Source</h3>
@@ -59,24 +59,34 @@ This component allows to create or modify the connections in the circuit for the
             @click="addNewConnection()"
           />
         </i-col>
-      </Row>
+      </row>
+
       <!-- Connection manipulation -->
       <transition-group name="list">
         <div v-for="(connection, index) in connectionsArray" :key="connection.id">
-          <Row type="flex" justify="space-between" class="connection-table-content">
+          <row type="flex" justify="space-between" class="connection-table-content">
             <i-col span="4">
-              <autocomplete-targets
-                :target-selected="connection.source"
-                :itemsAvailable="targets"
-                @target-changed="updateValue(connection, 'source', ...arguments)"
-              />
+              <i-input
+                :value="connection.source"
+                readonly
+              >
+                <i-button slot="append"
+                  type="primary"
+                  @click="editConnectionTarget(connection, 'source')"
+                >Change</i-button>
+              </i-input>
+
             </i-col>
             <i-col span="4">
-              <autocomplete-targets
-                :target-selected="connection.destination"
-                :itemsAvailable="targets"
-                @target-changed="updateValue(connection, 'destination', ...arguments)"
-              />
+              <i-input
+                :value="connection.destination"
+                readonly
+              >
+                <i-button slot="append"
+                  type="primary"
+                  @click="editConnectionTarget(connection, 'destination')"
+                >Change</i-button>
+              </i-input>
             </i-col>
             <i-col span="2">
               <input-number
@@ -117,9 +127,26 @@ This component allows to create or modify the connections in the circuit for the
                 @click="removeConnection(index)"
               />
             </i-col>
-          </Row>
+          </row>
         </div>
       </transition-group>
+
+      <modal v-model="changeTargetModal.showModal" width="300">
+        <h3 slot="header">Target Configurator</h3>
+
+        <autocomplete-targets
+          :target-selected="changeTargetModal.currentTarget"
+          :itemsAvailable="targets"
+          @target-changed="updateConnectionTarget"
+        />
+
+        <div slot="footer">
+          <i-button
+            type="primary"
+            @click="updateConnectionTarget"
+          >Save</i-button>
+        </div>
+      </modal>
     </div>
 
   </div>
@@ -145,6 +172,12 @@ export default {
     return {
       connectionsArray: {},
       tableCollapsed: true,
+      changeTargetModal: {
+        currentTarget: null,
+        currentConnectionObj: null,
+        currentConnectionAttribute: null,
+        showModal: false,
+      },
     };
   },
   computed: {
@@ -161,9 +194,6 @@ export default {
     eventBus.$on('create-connection-config', this.creationConfigHandlerBinded);
   },
   methods: {
-    updateValue(connection, subitem, newValue) {
-      this.$set(connection, subitem, newValue);
-    },
     addNewConnection() {
       this.connectionsArray.push({
         id: uuidGen(),
@@ -207,6 +237,21 @@ export default {
     },
     toggleTable() {
       this.tableCollapsed = !this.tableCollapsed;
+    },
+    editConnectionTarget(connectionObj, connectionAttribute) {
+      this.$set(this.changeTargetModal, 'currentTarget', connectionObj[connectionAttribute]);
+      this.$set(this.changeTargetModal, 'currentConnectionObj', connectionObj);
+      this.$set(this.changeTargetModal, 'currentConnectionAttribute', connectionAttribute);
+      this.$set(this.changeTargetModal, 'showModal', true);
+    },
+    updateConnectionTarget(newTarget) {
+      this.$set(
+        this.changeTargetModal.currentConnectionObj,
+        this.changeTargetModal.currentConnectionAttribute,
+        newTarget,
+      );
+      this.$set(this.changeTargetModal, 'showModal', false);
+      this.$set(this.changeTargetModal, 'currentTarget', '');
     },
   },
   beforeDestroy() {

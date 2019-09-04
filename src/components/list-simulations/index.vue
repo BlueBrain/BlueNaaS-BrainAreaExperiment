@@ -28,14 +28,12 @@ This component manage each job (delete, start, create, etc).
         @show-details="showDetails(job)"
         @run-analysis="runAnalysis(job)"
       />
-
-      <div
-        v-if="emptyList"
-        :key="emptyList"
-        class="really-centered colored-red"
-      >List of jobs is empty</div>
-
     </transition-group>
+
+    <div
+      v-if="!viewList.length && !listIsLoading"
+      class="really-centered colored-red"
+    >List of jobs is empty</div>
 
     <!-- template for configuration -->
     <launch-analysis-form
@@ -88,11 +86,6 @@ export default {
   computed: {
     listIsLoading() {
       return this.$store.state.list.isLoading;
-    },
-    emptyList() {
-      const isEmpty = (this.$store.state.currentComputer === this.$route.params.computerParam)
-        && !this.$store.state.list.isLoading && !this.viewList.length;
-      return isEmpty;
     },
   },
   mounted() {
@@ -244,7 +237,7 @@ export default {
     },
   },
   beforeDestroy() {
-    eventBus.$off('reloadJobsList', this.reloadJobsListBinded);
+    eventBus.$off('reload-jobs-list', this.reloadJobsListBinded);
   },
 };
 </script>

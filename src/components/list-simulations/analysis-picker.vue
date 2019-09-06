@@ -4,30 +4,32 @@
     <divider>Choose Plot(s)</divider>
 
     <form-item
-      v-for="analysis in analysisList"
-      :key="analysis.param"
-      v-if="!skipAnalysis(analysis.param)"
+      v-for="(analysisObj, analysisRawName) in analysisConfigObj"
+      :key="analysisRawName"
+      v-if="!skipAnalysis(analysisRawName)"
       class="centered"
-      :label="analysis.name"
+      :label="analysisObj.name"
     >
       <div>
         <radio-group
-          v-model="selections[analysis.param]"
+          v-model="analysisObj.mode"
           type="button"
           size="small"
         >
           <radio :label="modes.NO"/>
-          <radio :label="modes.ALL" :disabled="isVoltagePlot(analysis.param)"/>
+          <radio :label="modes.ALL" :disabled="isVoltagePlot(analysisRawName)"/>
           <radio :label="modes.CELLS"/>
         </radio-group>
+
         <input-number
-          v-if="showCellsInput(analysis.param)"
-          v-model="cellsCount[analysis.param]"
-          size="small"
+          v-if="analysisObj.mode === modes.CELLS"
+          v-model="analysisObj.cells"
           :min="1"
-          :max="getMaxBoundry(analysis.param)"
+          :max="getMaxBoundry(analysisRawName)"
+          size="small"
           class="small-width"
         />
+
       </div>
     </form-item>
 
@@ -38,25 +40,30 @@
 <script>
 import forEach from 'lodash/forEach';
 
+const modes = {
+  NO: 'NO',
+  ALL: 'ALL',
+  CELLS: 'CELLS',
+};
+const defaultMode = modes.NO;
+const defaultCellsNumber = 5;
+const analysisConfigObjReduceFn = ((endObj, analysisObj) => ({
+  ...endObj,
+  [analysisObj.realName]: {
+    mode: defaultMode,
+    cells: defaultCellsNumber,
+    name: analysisObj.displayName,
+  },
+}));
+
 export default {
   name: 'analysis-picker',
   props: ['analysisList', 'hasReport'],
   data() {
     return {
-      selections: {},
-      cellsCount: {},
-      modes: {
-        NO: 'NO',
-        ALL: 'ALL',
-        CELLS: 'cells',
-      },
+      analysisConfigObj: this.analysisList.reduce(analysisConfigObjReduceFn, {}),
+      modes,
     };
-  },
-  created() {
-    // set default values no analysis
-    this.analysisList.forEach((analysis) => {
-      this.$set(this.selections, analysis.param, this.modes.NO);
-    });
   },
   methods: {
     getMaxBoundry(analysisName) {
@@ -70,23 +77,16 @@ export default {
     },
     generatePlotsConfig() {
       const plotConfig = {};
-      forEach(this.selections, (value, key) => {
-        if (value === this.modes.NO) return;
-        if (value === this.modes.CELLS) {
-          plotConfig[key] = this.cellsCount[key] || 1;
+      forEach(this.analysisConfigObj, (analysisValue, analysisKey) => {
+        if (analysisValue.mode === this.modes.NO) return;
+        if (analysisValue.mode === this.modes.CELLS) {
+          plotConfig[analysisKey] = analysisValue.cells || 1;
           return;
         }
-        plotConfig[key] = value;
+        plotConfig[analysisKey] = analysisValue.mode;
       });
       if (!Object.keys(plotConfig).length) return false;
       return plotConfig;
-    },
-    showCellsInput(analysisName) {
-      if (this.selections[analysisName] === this.modes.CELLS) {
-        this.$set(this.cellsCount, analysisName, 5);
-        return true;
-      }
-      return false;
     },
   },
 };

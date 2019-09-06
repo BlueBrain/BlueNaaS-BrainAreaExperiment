@@ -243,11 +243,14 @@ export default {
         return false;
       }
 
+      const defaultRunTime = analysisConfig.runtime;
+      const analysisRunTime = lfpAnalysisObj.hasLFPAnalysis ? defaultRunTime * 2 : defaultRunTime;
+
       return {
         computerSelected: this.$store.state.currentComputer,
         from: {},
         nodes: analysisConfig.nodes,
-        runtime: analysisConfig.runtime,
+        runtime: analysisRunTime,
         title: this.title,
         plotsConfig: analysisObj,
         lfpPlotsConfig: lfpAnalysisObj,

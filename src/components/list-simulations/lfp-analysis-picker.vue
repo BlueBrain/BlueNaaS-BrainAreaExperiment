@@ -95,7 +95,7 @@ const maxUploadFileSize = 400;
 
 export default {
   name: 'lfp-analysis-picker',
-  props: ['analysisList', 'hasReport', 'simDuration'],
+  props: ['simDuration'],
   data() {
     return {
       pointsCollection: [],

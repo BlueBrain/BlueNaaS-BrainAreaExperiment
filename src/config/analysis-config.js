@@ -59,13 +59,13 @@ export default {
   ],
   plots: ['firing_rate_histogram', 'raster', 'voltage_collage'],
   analysisAvailable: [
-    { param: 'firing_rate_histogram', name: 'Peristimulus Time Histogram' },
-    { param: 'raster', name: 'Spike Raster Plot' },
-    { param: 'voltage_collage', name: 'Trace Plot of Report', report_select: true },
+    { realName: 'firing_rate_histogram', displayName: 'Peristimulus Time Histogram' },
+    { realName: 'raster', displayName: 'Spike Raster Plot' },
+    { realName: 'voltage_collage', displayName: 'Trace Plot of Report', report_select: true },
   ],
   configFileName: 'analysis_config.json',
   analysisConnectionFileName: 'analysis_path.json',
-  nodes: 1,
+  nodes: 4,
   runtime: 1800,
   usecasesCreationForm: 'https://bbp.epfl.ch/public/usecases-wizard/index.html#/entitydashboard?',
 };

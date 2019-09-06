@@ -72,9 +72,9 @@
 
 
 <script>
+import isEqual from 'lodash/isEqual';
 import { statesFilter, getStatusIcon } from '@/common/job-status';
 import eventBus from '@/services/event-bus';
-import isEqual from 'lodash/isEqual';
 
 export default {
   name: 'ListFilters',

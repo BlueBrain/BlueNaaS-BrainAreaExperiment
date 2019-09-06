@@ -196,9 +196,9 @@
 
 
 <script>
+import pick from 'lodash/pick';
 import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
 import { unmapBlueConfigTerms, mapBlueConfigTerms } from '@/common/utils';
-import pick from 'lodash/pick';
 
 export default {
   name: 'StimulationForm',

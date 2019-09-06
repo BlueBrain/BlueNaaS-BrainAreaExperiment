@@ -149,13 +149,13 @@ This component allows to create or modify the connections in the circuit for the
 
 
 <script>
+import cleanDeep from 'clean-deep';
+import uuidGen from 'uuid';
 import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
 import SynapseConfigurator from '@/components/run-simulation/connection-manipulation/synapse-configurator.vue';
 import { getDefaultConnections } from '@/services/helper/connection-helper';
 import { mapBlueConfigTerms } from '@/common/utils';
 import eventBus from '@/services/event-bus';
-import cleanDeep from 'clean-deep';
-import uuidGen from 'uuid';
 
 export default {
   name: 'ConnectionManipulation',

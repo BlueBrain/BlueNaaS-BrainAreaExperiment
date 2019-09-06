@@ -1,6 +1,6 @@
 
-import simConfig from '@/config/simulation-config';
 import pickBy from 'lodash/pickBy';
+import simConfig from '@/config/simulation-config';
 import circuits from '@/config/circuit-config';
 import '@/services/helper/computer-group-helper';
 

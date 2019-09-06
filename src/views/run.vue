@@ -47,6 +47,7 @@
 
 
 <script>
+import sortBy from 'lodash/sortBy';
 import SimulationParams from '@/components/run-simulation/sim-params.vue';
 import StimulationTimeline from '@/components/run-simulation/stimulation/stimulation-timeline.vue';
 import ReportTimeline from '@/components/run-simulation/report/report-timeline.vue';
@@ -56,7 +57,6 @@ import ConnectionManipulation from '@/components/run-simulation/connection-manip
 import unicore, { urlToComputerAndId } from '@/services/unicore';
 import { jobTags, addTag } from '@/common/job-status';
 import db from '@/services/db';
-import sortBy from 'lodash/sortBy';
 import '@/assets/css/simulation.css';
 import 'timeline-plus/dist/timeline.min.css';
 

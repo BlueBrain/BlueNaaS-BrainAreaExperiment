@@ -1,6 +1,11 @@
 
-import unicore from '@/services/unicore';
 import Vue from 'vue';
+import sortBy from 'lodash/sortBy';
+import isEqual from 'lodash/isEqual';
+import get from 'lodash/get';
+import difference from 'lodash/difference';
+import last from 'lodash/last';
+import unicore from '@/services/unicore';
 import analysisConfig from '@/config/analysis-config';
 import {
   jobStatus, isRunning,
@@ -8,11 +13,6 @@ import {
 import { getComputerUrlCombo } from '@/common/utils';
 import db from '@/services/db';
 import store from '@/services/store';
-import sortBy from 'lodash/sortBy';
-import isEqual from 'lodash/isEqual';
-import get from 'lodash/get';
-import difference from 'lodash/difference';
-import last from 'lodash/last';
 
 
 async function analysisProducedResults(analysisWithFiles) {

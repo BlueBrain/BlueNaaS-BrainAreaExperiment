@@ -88,9 +88,9 @@
 
 
 <script>
+import uuidGen from 'uuid';
 import { synapseAttributes } from '@/config/connection-config';
 import { synapseStringToArray, synapseArrayToString } from '@/services/helper/connection-helper';
-import uuidGen from 'uuid';
 
 export default {
   name: 'SynapseConfigurator',

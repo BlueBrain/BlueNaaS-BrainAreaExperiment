@@ -51,8 +51,11 @@ This component manage each job (delete, start, create, etc).
 
 
 <script>
-import SimulationItem from '@/components/list-simulations/simulation-item.vue';
 import InfiniteLoading from 'vue-infinite-loading';
+import sortBy from 'lodash/sortBy';
+import remove from 'lodash/remove';
+import get from 'lodash/get';
+import SimulationItem from '@/components/list-simulations/simulation-item.vue';
 import unicore from '@/services/unicore';
 import analysisConfig from '@/config/analysis-config';
 import LaunchAnalysisForm from '@/components/list-simulations/launch-analysis-form.vue';
@@ -60,9 +63,6 @@ import analysisHelper from '@/services/helper/analysis-helper';
 import listJobsHelper from '@/services/helper/list-jobs-helper';
 import eventBus from '@/services/event-bus';
 import DeleteConfirmationModal from '@/components/shared/delete-confirmation-modal.vue';
-import sortBy from 'lodash/sortBy';
-import remove from 'lodash/remove';
-import get from 'lodash/get';
 
 export default {
   name: 'ListSimulations',

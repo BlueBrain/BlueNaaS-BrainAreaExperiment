@@ -25,11 +25,11 @@
 
 
 <script>
+import get from 'lodash/get';
 import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
 import db from '@/services/db';
 import eventBus from '@/services/event-bus';
 import { mapBlueConfigTerms, unmapBlueConfigTerms } from '@/common/utils';
-import get from 'lodash/get';
 
 export default {
   name: 'sim-params',

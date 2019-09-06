@@ -15,8 +15,8 @@
 
 
 <script>
-import circuitConfig from '@/config/circuit-config';
 import upperCase from 'lodash/upperCase';
+import circuitConfig from '@/config/circuit-config';
 
 export default {
   name: 'CircuitIndex',

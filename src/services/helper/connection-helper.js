@@ -1,6 +1,6 @@
 
-import connectionsConfig from '@/config/connection-config';
 import uuidGen from 'uuid';
+import connectionsConfig from '@/config/connection-config';
 
 const { getDefaultConnections } = connectionsConfig;
 

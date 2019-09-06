@@ -43,11 +43,11 @@
 
 
 <script>
-import analysisConfig from '@/config/analysis-config';
 import axios from 'axios';
 import forEach from 'lodash/forEach';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
+import analysisConfig from '@/config/analysis-config';
 
 
 export default {

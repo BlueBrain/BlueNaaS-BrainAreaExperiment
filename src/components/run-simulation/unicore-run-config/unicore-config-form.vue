@@ -154,9 +154,9 @@
 
 
 <script>
+import isEqual from 'lodash/isEqual';
 import auth from '@/services/auth';
 import eventBus from '@/services/event-bus';
-import isEqual from 'lodash/isEqual';
 import db from '@/services/db';
 import constants from '@/common/constants';
 

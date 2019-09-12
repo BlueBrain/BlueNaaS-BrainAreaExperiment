@@ -24,6 +24,7 @@ const hippoHbpFullCa1 = {
     BioName: '<%= prefix %>/circuits/CA1/20181114/bioname',
     TargetFile: '<%= prefix %>/circuits/CA1/20181114/user.target',
     CellLibraryFile: 'circuit.mvd3',
+    NumSynapseFiles: '2048',
     CurrentDir: '.',
     OutputRoot: '.',
   },
@@ -156,7 +157,7 @@ const hippoHbpFullCa1 = {
         Mode: 'Current',
         Pattern: 'Hyperpolarizing',
         Delay: '0.0',
-        Duration: '3500.0',
+        Duration: '20000',
       },
     },
     StimulusInject: {
@@ -199,6 +200,7 @@ const hippoHbpMicrocircuit = {
     nrnPath: '<%= prefix %>/circuits/O1/20181114/connectome/functional/',
     TargetFile: '<%= prefix %>/circuits/O1/20181114/user.target',
     CellLibraryFile: 'circuit.mvd3',
+    NumSynapseFiles: '2048',
     CurrentDir: '.',
     OutputRoot: '.',
   },
@@ -240,7 +242,7 @@ const hippoHbpMicrocircuit = {
     { name: 'mc6_Column', displayName: 'mc6_Column', src: `${microcircuitImgBase}/mc6_Column.png` },
     { name: 'mc1_Column', displayName: 'mc1_Column', src: `${microcircuitImgBase}/mc1_Column.png` },
     { name: 'mc3_Column', displayName: 'mc3_Column', src: `${microcircuitImgBase}/mc3_Column.png` },
-    { name: 'SC-Exc', displayName: 'Exc', src: `${microcircuitImgBase}/SC-Exc.png` },
+    { name: 'SC-Exc', displayName: 'SC_Exc', src: `${microcircuitImgBase}/SC-Exc.png` },
     { name: 'PV', displayName: 'PV', src: `${microcircuitImgBase}/PV.png` },
     { name: 'BS', displayName: 'BS', src: `${microcircuitImgBase}/BS.png` },
     { name: 'BC', displayName: 'BC', src: `${microcircuitImgBase}/BC.png` },
@@ -258,22 +260,14 @@ const hippoHbpMicrocircuit = {
   defaultPopulation: 'Central Column',
   displayName: 'Hippocampus CA1 microcircuit',
   simConfigToUse: constants.areas.HIPPOCAMPUS,
-  extraParamsInBC: {
-    Projection: {
-      SC: {
-        Path: '<%= prefix %>/circuits/O1/20181114/projection',
-        Source: 'proj_nrn',
-        Type: 'Synaptic',
-      },
-    },
-  },
+  extraParamsInBC: {},
   hipperpolarizingStim: {
     Stimulus: {
       hypamp: {
         Mode: 'Current',
         Pattern: 'Hyperpolarizing',
         Delay: '0.0',
-        Duration: '3500.0',
+        Duration: '20000',
       },
     },
     StimulusInject: {
@@ -334,6 +328,7 @@ const sscxBbpMicrocircuit = {
     TargetFile: '<%= prefix %>/gpfs/bbp.cscs.ch/home/antonel/sscx/user.target',
     CellLibraryFile: 'circuit.mvd3',
     BaseSeed: 372588,
+    NumSynapseFiles: '2048',
     CurrentDir: '.',
     OutputRoot: '.',
   },
@@ -466,40 +461,20 @@ const sscxBbpMicrocircuit = {
     },
   ],
   biggestTarget: 'Full Circuit',
-  defaultPopulation: 'Mosaic',
+  defaultPopulation: 'Central Column',
   displayName: 'SomatosensoryCortex microcircuit',
   simConfigToUse: constants.areas.SSCX,
-  extraParamsInBC: {
-    Projection: {
-      SC: {
-        Path: '<%= prefix %>/gpfs/bbp.cscs.ch/project/proj64/circuits/O1.v6a/20171212/proj_Thalamocortical_VPM/20171214-2',
-        Source: 'proj_Thalamocortical_VPM_Source',
-        // Type: 'Synaptic',
-      },
-    },
-  },
+  extraParamsInBC: {},
   hipperpolarizingStim: {
     Stimulus: {
-      ThresholdExc: {
-        Mode: 'Current',
-        Pattern: 'Noise',
-        Delay: '0.0',
-        Duration: '2500.0',
-        MeanPercent: '85.0',
-        Variance: '0.001',
-      },
       hypamp: {
         Mode: 'Current',
         Pattern: 'Hyperpolarizing',
         Delay: '0.0',
-        Duration: '3500.0',
+        Duration: '20000',
       },
     },
     StimulusInject: {
-      spikeReplayIntoUniverse: {
-        Stimulus: 'spikeReplay',
-        Target: 'Mosaic',
-      },
       hypamp_mosaic: {
         Stimulus: 'hypamp',
         Target: 'Mosaic',

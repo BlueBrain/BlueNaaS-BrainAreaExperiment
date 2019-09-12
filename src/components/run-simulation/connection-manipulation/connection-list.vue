@@ -3,7 +3,7 @@
 This component allows to create or modify the connections in the circuit for the simulation
 -->
 <template>
-  <div class="connection-manipulation">
+  <div class="manipulation-section connection-manipulation">
 
     <div class="in-corner">
       <icon
@@ -21,7 +21,7 @@ This component allows to create or modify the connections in the circuit for the
       :class="{ 'table-collapsed': tableCollapsed }"
     >
       <!-- Header for connection manipulation -->
-      <row type="flex" class="connection-table-header" justify="space-between">
+      <row type="flex" class="manipulation-table-header" justify="space-between">
         <i-col span="4">
           <tooltip content="This target defines presynaptic cells">
             <h3>Source</h3>
@@ -64,7 +64,7 @@ This component allows to create or modify the connections in the circuit for the
       <!-- Connection manipulation -->
       <transition-group name="list">
         <div v-for="(connection, index) in connectionsArray" :key="connection.id">
-          <row type="flex" justify="space-between" class="connection-table-content">
+          <row type="flex" justify="space-between" class="manipulation-table-content">
             <i-col span="4">
               <i-input
                 :value="connection.source"
@@ -131,7 +131,11 @@ This component allows to create or modify the connections in the circuit for the
         </div>
       </transition-group>
 
-      <modal v-model="changeTargetModal.showModal" width="300">
+      <modal
+        v-model="changeTargetModal.showModal"
+        width="300"
+        :mask-closable="false"
+      >
         <h3 slot="header">Target Configurator</h3>
 
         <autocomplete-targets
@@ -156,6 +160,7 @@ import SynapseConfigurator from '@/components/run-simulation/connection-manipula
 import { getDefaultConnections } from '@/services/helper/connection-helper';
 import { mapBlueConfigTerms } from '@/common/utils';
 import eventBus from '@/services/event-bus';
+import '@/assets/css/manipulations-blocks.scss';
 
 export default {
   name: 'ConnectionManipulation',
@@ -254,41 +259,3 @@ export default {
   },
 };
 </script>
-
-
-<style scoped>
-  .ivu-input-number.ivu-input-number-small {
-    width: 100%;
-  }
-  .connection-table-header,
-  .connection-table-content {
-    margin-bottom: 2px;
-  }
-  .ivu-col label.ivu-checkbox-wrapper {
-    vertical-align: sub;
-  }
-  .in-corner {
-    float: right;
-    margin-left: 5px;
-  }
-  .custom-table {
-    transition: max-height 0.3s;
-    max-height: 700px;
-  }
-  .table-collapsed {
-    max-height: 0px;
-    overflow: hidden;
-  }
-  .toggle-arrow {
-    margin-right: 10px;
-    font-size: 30px;
-  }
-  .inverted {
-    transform: rotate(180deg);
-  }
-  .error-indicator {
-    width: 20px;
-    color: #d81414;
-    font-size: 16px;
-  }
-</style>

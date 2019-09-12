@@ -27,10 +27,7 @@
               />
             </form-item>
 
-            <form-item
-              prop="report"
-              label="Report"
-            >
+            <form-item prop="report" label="Report">
              <i-select
                 v-model="reportForAnalysis"
                 :disabled="!reports.length"
@@ -52,9 +49,7 @@
                   >
                     Population:
                   </tooltip>
-                  <i-select
-                    v-model="target"
-                  >
+                  <i-select v-model="target">
                     <i-option
                       v-for="targetElem in targets"
                       :key="targetElem"
@@ -78,9 +73,7 @@
                   >
                     Population:
                   </tooltip>
-                  <i-select
-                    v-model="lfpTarget"
-                  >
+                  <i-select v-model="lfpTarget">
                     <i-option
                       v-for="targetElem in lfpTargets"
                       :key="targetElem"

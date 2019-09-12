@@ -29,6 +29,28 @@
             />
           </form-item>
 
+          <form-item prop="StartTime">
+            <tooltip
+              slot="label"
+              content="Time to start reporting"
+            >StartTime(ms)</tooltip>
+            <input-number
+              v-model="localReportInfo.StartTime"
+              placeholder="Start Time"
+            />
+          </form-item>
+
+          <form-item prop="EndTime" required>
+            <tooltip
+              slot="label"
+              content="Time to stop reporting"
+            >EndTime(ms)</tooltip>
+            <input-number
+              v-model="localReportInfo.EndTime"
+              placeholder="End Time"
+            />
+          </form-item>
+
           <form-item prop="Type">
             <tooltip
               slot="label"
@@ -60,28 +82,6 @@
                 :value="name"
               >{{ name }}</i-option>
             </i-select>
-          </form-item>
-
-          <form-item prop="StartTime">
-            <tooltip
-              slot="label"
-              content="Time to start reporting"
-            >StartTime(ms)</tooltip>
-            <input-number
-              v-model="localReportInfo.StartTime"
-              placeholder="Start Time"
-            />
-          </form-item>
-
-          <form-item prop="EndTime" required>
-            <tooltip
-              slot="label"
-              content="Time to stop reporting"
-            >EndTime(ms)</tooltip>
-            <input-number
-              v-model="localReportInfo.EndTime"
-              placeholder="End Time"
-            />
           </form-item>
 
           <form-item prop="Dt" required>

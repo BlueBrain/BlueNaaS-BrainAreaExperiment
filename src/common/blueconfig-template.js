@@ -4,7 +4,7 @@ import template from 'lodash/template';
 
 import store from '@/services/store';
 
-function replacePlaceholders(obj, replaceText) {
+function replacePrefixPlaceholders(obj, replaceText) {
   if (!obj) return null;
   const str = JSON.stringify(obj);
   const templateFn = template(str);
@@ -15,8 +15,8 @@ function replacePlaceholders(obj, replaceText) {
 function createBCTemplate() {
   const circuitRunSection = store.state.currentCircuitConfig.paths;
   const circuitPathsPrefixes = store.state.currentCircuitConfig.prefix[store.state.currentComputer];
-  const fullPathAttributes = replacePlaceholders(circuitRunSection, circuitPathsPrefixes);
-  const extraParams = replacePlaceholders(store.state.currentCircuitConfig.extraParamsInBC, circuitPathsPrefixes);
+  const fullPathAttributes = replacePrefixPlaceholders(circuitRunSection, circuitPathsPrefixes);
+  const extraParams = replacePrefixPlaceholders(store.state.currentCircuitConfig.extraParamsInBC, circuitPathsPrefixes);
   const bcTemplate = cleanDeep({
     Stimulus: {},
     Report: {},
@@ -27,7 +27,7 @@ function createBCTemplate() {
         Dt: '0.025',
         Duration: store.state.simulationDuration,
         ForwardSkip: store.state.simulationForwardSkip,
-        NumSynapseFiles: circuitRunSection.NumSynapseFiles || '2048',
+        NumSynapseFiles: circuitRunSection.NumSynapseFiles,
         FlushBufferScalar: Math.round(store.state.simulationDuration / 25),
         BaseSeed: '10',
       },
@@ -41,4 +41,7 @@ function createBCTemplate() {
 
 export default {};
 
-export { createBCTemplate };
+export {
+  createBCTemplate,
+  replacePrefixPlaceholders,
+};

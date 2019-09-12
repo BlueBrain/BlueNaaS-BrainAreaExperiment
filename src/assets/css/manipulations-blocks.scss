@@ -1,0 +1,43 @@
+
+.manipulation-section {
+
+  .ivu-input-number.ivu-input-number-small {
+    width: 100%;
+  }
+  .manipulation-table-header,
+  .manipulation-table-content {
+    margin-bottom: 2px;
+  }
+  .ivu-col label.ivu-checkbox-wrapper {
+    vertical-align: sub;
+  }
+  .in-corner {
+    float: right;
+    margin-left: 5px;
+  }
+  .custom-table {
+    transition: max-height 0.3s;
+    max-height: 700px;
+  }
+  .table-collapsed {
+    max-height: 0px;
+    overflow: hidden;
+  }
+  .toggle-arrow {
+    margin-right: 10px;
+    font-size: 30px;
+  }
+  .inverted {
+    transform: rotate(180deg);
+  }
+  .hover-colored {
+    padding-top: 3px;
+    span {
+      vertical-align: text-top;
+    }
+    &:hover {
+      background-color: #e4e5f5;
+    }
+  }
+
+}

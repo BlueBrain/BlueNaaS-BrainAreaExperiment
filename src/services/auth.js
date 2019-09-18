@@ -42,6 +42,11 @@ function init() {
 
   const authorization = client.getToken();
   authorization.then((session) => {
+    const nowTime = parseInt(Date.now().toString().substr(0, 10), 10);
+    if (session.expires < nowTime) { // makes sure to reload the token if expires
+      client.wipeTokens();
+      window.location.reload();
+    }
     store.commit('setToken', session.access_token);
     setAxiosToken(session.access_token);
   });

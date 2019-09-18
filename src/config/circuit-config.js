@@ -140,6 +140,7 @@ const hippoHbpFullCa1 = {
     { name: 'SP', displayName: 'SP', src: `${slicesImgBase}/SP.png` },
     { name: 'SO', displayName: 'SO', src: `${slicesImgBase}/SO.png` },
     { name: 'SR', displayName: 'SR', src: `${slicesImgBase}/SR.png` },
+    { name: '5Cells', displayName: '5Cells' },
     {
       name: 'AllCompartments',
       displayName: 'AllCompartments',

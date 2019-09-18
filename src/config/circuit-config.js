@@ -13,16 +13,16 @@ const slicesImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher
 const hippoHbpFullCa1 = {
   prefix: { // setting prefix allow to know which computer can run the circuit
     [computers.JURECA]: '/p/home/jusers/antonel1/jureca/vsk2512/CA1/20181114',
-    [computers.PIZ_DAINT]: '/apps/hbp/ich002/home/antonel/full_ca1/CA1',
+    [computers.PIZ_DAINT]: '/apps/hbp/ich002/home/antonel/full_ca1/CA1/20181114',
   },
   paths: {
     MorphologyPath: '<%= prefix %>/entities/morphologies/20180417/',
     METypePath: '<%= prefix %>/entities/emodels/20180504b/hoc',
-    CircuitPath: '<%= prefix %>/circuits/CA1/20181114/',
-    nrnPath: '<%= prefix %>/circuits/CA1/20181114/connectome/functional/',
+    CircuitPath: '<%= prefix %>/circuit/',
+    nrnPath: '<%= prefix %>/circuit/connectome/functional/',
     MEComboInfoFile: '<%= prefix %>/entities/emodels/20180504b/mecombo_emodel.tsv',
-    BioName: '<%= prefix %>/circuits/CA1/20181114/bioname',
-    TargetFile: '<%= prefix %>/circuits/CA1/20181114/user.target',
+    BioName: '<%= prefix %>/circuit/bioname',
+    TargetFile: '<%= prefix %>/circuit/user.target',
     CellLibraryFile: 'circuit.mvd3',
     NumSynapseFiles: '2048',
     CurrentDir: '.',
@@ -175,7 +175,7 @@ const hippoBbpFullCa1 = Object.assign(
   { ...hippoHbpFullCa1 },
   {
     prefix: {
-      [computers.BB5]: '/gpfs/bbp.cscs.ch/project/proj42/home/antonel/CA1',
+      [computers.BB5]: '/gpfs/bbp.cscs.ch/project/proj42/home/antonel/CA1/20181114',
     },
   },
 );
@@ -189,16 +189,16 @@ const hippoBbpFullCa1 = Object.assign(
 const microcircuitImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/o1-20181114';
 const hippoHbpMicrocircuit = {
   prefix: {
-    [computers.JURECA]: '/p/project/cvsk25/vsk2512/O1',
-    [computers.PIZ_DAINT]: '/apps/hbp/ich002/home/antonel/O1',
+    [computers.JURECA]: '/p/project/cvsk25/vsk2512/O1/20181114',
+    [computers.PIZ_DAINT]: '/apps/hbp/ich002/home/antonel/O1/20181114',
   },
   paths: {
     MorphologyPath: '<%= prefix %>/entities/morphologies/20180417/',
     METypePath: '<%= prefix %>/entities/emodels/20180504b/hoc/',
     MEComboInfoFile: '<%= prefix %>/entities/emodels/20180504b/mecombo_emodel.tsv',
-    CircuitPath: '<%= prefix %>/circuits/O1/20181114/',
-    nrnPath: '<%= prefix %>/circuits/O1/20181114/connectome/functional/',
-    TargetFile: '<%= prefix %>/circuits/O1/20181114/user.target',
+    CircuitPath: '<%= prefix %>/circuit/',
+    nrnPath: '<%= prefix %>/circuit/connectome/functional/',
+    TargetFile: '<%= prefix %>/circuit/user.target',
     CellLibraryFile: 'circuit.mvd3',
     NumSynapseFiles: '2048',
     CurrentDir: '.',
@@ -280,6 +280,16 @@ const hippoHbpMicrocircuit = {
 };
 
 
+const hippoBbpMicrocircuit = Object.assign(
+  {},
+  { ...hippoHbpMicrocircuit },
+  {
+    prefix: {
+      [computers.BB5]: '/gpfs/bbp.cscs.ch/project/proj42/home/antonel/O1/20181114',
+    },
+  },
+);
+
 /*
 |--------------------------------------------------------------------------
 | MOOC Hippocampus Microcircuit
@@ -295,16 +305,6 @@ const hippoMoocMicrocircuit = Object.assign(
       [computers.NUVLA]: '/mooc',
     },
     paths: newPaths,
-  },
-);
-
-const hippoBbpMicrocircuit = Object.assign(
-  {},
-  { ...hippoHbpMicrocircuit },
-  {
-    prefix: {
-      [computers.BB5]: '/gpfs/bbp.cscs.ch/home/antonel/20181114/putting_circuit_together',
-    },
   },
 );
 

@@ -103,11 +103,15 @@ export default {
       const generateSimParams = new Promise((resolve) => {
         eventBus.$emit('create-sim-params-config', resolve);
       });
-      const [stimulationBC, reportBC, connectionsBC, simParamsBC] = await Promise.all([
-        generateStimuli, generateReport, generateConnections, generateSimParams,
+      const generateProjection = new Promise((resolve) => {
+        eventBus.$emit('create-projection-config', resolve);
+      });
+
+      const [stimulationBC, reportBC, connectionsBC, simParamsBC, projectionBC] = await Promise.all([
+        generateStimuli, generateReport, generateConnections, generateSimParams, generateProjection,
       ]);
 
-      return merge({}, createBCTemplate(), stimulationBC, simParamsBC, reportBC, connectionsBC);
+      return merge({}, createBCTemplate(), stimulationBC, simParamsBC, reportBC, connectionsBC, projectionBC);
     },
 
     async generateFinalBlueConfigJSON() {
@@ -146,10 +150,17 @@ export default {
       this.setIfSimulationIsLFP(blueConfigStr, unicoreConfig);
 
       const finalBlueConfig = convertToBCFormat(blueConfigStr);
+
+      const getProjectionFilePromise = new Promise((resolve) => {
+        eventBus.$emit('create-projection-file', resolve);
+      });
+      const projectionFile = await getProjectionFilePromise;
+      const extraFiles = projectionFile ? [projectionFile] : null;
+
       this.$emit('launch-sim', finalBlueConfig, unicoreConfig, () => {
         // hideModalFn passed to Run will hide the modal when finish spinning
         this.showComputerParamsModal = false;
-      });
+      }, extraFiles);
     },
 
     checkSimulationConsistancy(blueConfig, populationSelected) {

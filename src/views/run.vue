@@ -114,7 +114,7 @@ export default {
         },
       });
     },
-    async launchSim(blueConfigStr, runConfig, hideModalFn) {
+    async launchSim(blueConfigStr, runConfig, hideModalFn, extraFiles = null) {
       const newRunConfig = runConfig;
       const simResources = this.$store.state.currentSimulationConfig[this.$store.state.currentComputer];
 
@@ -123,6 +123,12 @@ export default {
       if (script) {
         script = script.join('\n');
         files.push({ To: 'input.sh', Data: script });
+      }
+
+      if (extraFiles) {
+        extraFiles.forEach((fileObj) => {
+          files.push({ To: fileObj.name, Data: fileObj.data });
+        });
       }
       newRunConfig.executable = simResources.executable;
       newRunConfig.environment = simResources.environment;

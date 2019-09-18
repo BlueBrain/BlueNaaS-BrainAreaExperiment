@@ -86,6 +86,12 @@
         </i-col>
       </row>
 
+      <projection-configurator
+        :projection-item="projectionBeingEdited"
+        @on-ready="projectionChanged"
+        @on-close="resetEditableProjection"
+      />
+
     </div>
 
   </div>
@@ -95,12 +101,16 @@
 <script>
 
 import '@/assets/css/manipulations-blocks.scss';
+import ProjectionConfigurator from '@/components/run-simulation/projection-manipulation/configurator.vue';
 import * as projectionConfig from '@/config/projection-config';
 import { replacePrefixPlaceholders } from '@/common/blueconfig-template';
 import eventBus from '@/services/event-bus';
 
 export default {
   name: 'ProjectionManipulationList',
+  components: {
+    ProjectionConfigurator,
+  },
   data() {
     return {
       isConfiguring: false,

@@ -39,6 +39,12 @@
       </div>
       <!-- END connection manipulation -->
 
+      <!-- projection manipulation -->
+      <div class="border-container">
+        <projection-manipulation/>
+      </div>
+      <!-- END projection manipulation -->
+
       <run-configuration-component @launch-sim="launchSim"/>
 
     </div>
@@ -53,6 +59,7 @@ import StimulationTimeline from '@/components/run-simulation/stimulation/stimula
 import ReportTimeline from '@/components/run-simulation/report/report-timeline.vue';
 import RunConfigurationComponent from '@/components/run-simulation/unicore-run-config/run-configuration-component.vue';
 import ConnectionManipulation from '@/components/run-simulation/connection-manipulation/connection-list.vue';
+import ProjectionManipulation from '@/components/run-simulation/projection-manipulation/list.vue';
 
 import unicore, { urlToComputerAndId } from '@/services/unicore';
 import { jobTags, addTag } from '@/common/job-status';
@@ -69,6 +76,7 @@ export default {
     StimulationTimeline,
     RunConfigurationComponent,
     ConnectionManipulation,
+    ProjectionManipulation,
   },
   created() {
     this.$store.commit('setAppTitle', 'Run Simulation');

@@ -4,10 +4,6 @@
   .ivu-input-number.ivu-input-number-small {
     width: 100%;
   }
-  .manipulation-table-header,
-  .manipulation-table-content {
-    margin-bottom: 2px;
-  }
   .ivu-col label.ivu-checkbox-wrapper {
     vertical-align: sub;
   }
@@ -30,14 +26,18 @@
   .inverted {
     transform: rotate(180deg);
   }
-  .hover-colored {
-    padding-top: 3px;
-    span {
-      vertical-align: text-top;
+
+  .custom-manipulation-table {
+    .ivu-table {
+      background-color: transparent;
+      .ivu-table-body .ivu-table-column-center {
+        background-color: #ffffffd4;
+      }
     }
-    &:hover {
-      background-color: #e4e5f5;
+    .ivu-input-group {
+      top: 0;  /* to avoid cutting bottom of source - destination buttons */
     }
   }
+
 
 }

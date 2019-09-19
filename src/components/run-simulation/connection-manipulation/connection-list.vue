@@ -20,116 +20,85 @@ This component allows to create or modify the connections in the circuit for the
       class="custom-table"
       :class="{ 'table-collapsed': tableCollapsed }"
     >
-      <!-- Header for connection manipulation -->
-      <row type="flex" class="manipulation-table-header" justify="space-between">
-        <i-col span="4">
-          <tooltip content="This target defines presynaptic cells">
-            <h3>Source</h3>
-          </tooltip>
-        </i-col>
-        <i-col span="4">
-          <tooltip content="This target defines postsynaptic cells">
-            <h3>Destination</h3>
-          </tooltip>
-        </i-col>
-        <i-col span="2">
-          <tooltip content="A delay after which the modifications are applied">
-            <h3>Delay (ms)</h3>
-          </tooltip>
-        </i-col>
-        <i-col span="2">
-          <tooltip content="A scaling factor to adjust the synaptic strength (default = 1)">
-            <h3>Weight</h3>
-          </tooltip>
-        </i-col>
-        <i-col span="2">
-          <tooltip content="The Poisson mean rate for miniature events">
-            <h3>MinisFreq</h3>
-          </tooltip>
-        </i-col>
-        <i-col span="7">
-          <tooltip content="Snippets of hoc code to manipulate additional synaptic parameters">
-            <h3>Synapse Configuration</h3>
-          </tooltip>
-        </i-col>
-        <i-col span="1">
-          <i-button
-            type="success"
-            icon="md-add"
-            @click="addNewConnection()"
+      <i-table
+        :columns="columns"
+        :data="connectionsArray"
+        border
+        class="custom-manipulation-table"
+      >
+        <template slot-scope="{ row, index }" slot="source">
+          <i-input
+            :value="row.source"
+            readonly
+          >
+            <i-button slot="append"
+              type="primary"
+              @click="editConnectionTarget(connectionsArray[index], 'source')"
+            >Change</i-button>
+          </i-input>
+        </template>
+
+        <template slot-scope="{ row, index }" slot="destination">
+          <i-input
+            :value="row.destination"
+            readonly
+          >
+            <i-button slot="append"
+              type="primary"
+              @click="editConnectionTarget(connectionsArray[index], 'destination')"
+            >Change</i-button>
+          </i-input>
+        </template>
+
+        <template slot-scope="{ row, index }" slot="delay">
+          <input-number
+            :min="0"
+            :step="10"
+            v-model="connectionsArray[index].delay"
           />
-        </i-col>
-      </row>
+        </template>
 
-      <!-- Connection manipulation -->
-      <transition-group name="list">
-        <div v-for="(connection, index) in connectionsArray" :key="connection.id">
-          <row type="flex" justify="space-between" class="manipulation-table-content">
-            <i-col span="4">
-              <i-input
-                :value="connection.source"
-                readonly
-              >
-                <i-button slot="append"
-                  type="primary"
-                  @click="editConnectionTarget(connection, 'source')"
-                >Change</i-button>
-              </i-input>
+        <template slot-scope="{ row, index }" slot="weight">
+          <input-number
+            :min="0"
+            :max="3"
+            :step="0.01"
+            v-model="connectionsArray[index].weight"
+          />
+        </template>
 
-            </i-col>
-            <i-col span="4">
-              <i-input
-                :value="connection.destination"
-                readonly
-              >
-                <i-button slot="append"
-                  type="primary"
-                  @click="editConnectionTarget(connection, 'destination')"
-                >Change</i-button>
-              </i-input>
-            </i-col>
-            <i-col span="2">
-              <input-number
-                :min="0"
-                :step="10"
-                v-model="connection.delay"
-                :value="connection.delay"
-              />
-            </i-col>
-            <i-col span="2">
-              <input-number
-                :min="0"
-                :max="3"
-                :step="0.01"
-                v-model="connection.weight"
-                :value="connection.weight"
-              />
-            </i-col>
-            <i-col span="2">
-              <input-number
-                :min="0"
-                :step="0.01"
-                v-model="connection.spontMinis"
-                :value="connection.spontMinis"
-              />
-            </i-col>
-            <i-col span="7">
-              <synapse-configurator
-                :predefined-synapses="connection.synapseConfigure"
-                @on-ready="setNewSynapseString(connection, ...arguments)"
-              />
-            </i-col>
-            <i-col span="1">
-              <i-button
-                type="primary"
-                ghost
-                icon="md-remove"
-                @click="removeConnection(index)"
-              />
-            </i-col>
-          </row>
-        </div>
-      </transition-group>
+        <template slot-scope="{ row, index }" slot="spontMinis">
+          <input-number
+            :min="0"
+            :step="0.01"
+            v-model="connectionsArray[index].spontMinis"
+          />
+        </template>
+
+        <template slot-scope="{ row, index }" slot="synapseConfigure">
+          <synapse-configurator
+            :predefined-synapses="row.synapseConfigure"
+            @on-ready="setNewSynapseString(connectionsArray[index], ...arguments)"
+          />
+        </template>
+
+        <template slot-scope="{ row, index }" slot="remove">
+          <i-button
+            type="error"
+            ghost
+            icon="md-remove"
+            @click="removeConnection(index)"
+          />
+        </template>
+      </i-table>
+
+      <h3 class="end-line">
+        <i-button
+          type="success"
+          icon="md-add"
+          @click="addNewConnection"
+        >Add new Connection</i-button>
+      </h3>
 
       <modal
         v-model="changeTargetModal.showModal"
@@ -178,6 +147,59 @@ export default {
         currentConnectionAttribute: null,
         showModal: false,
       },
+      columns: [
+        {
+          title: 'Source',
+          slot: 'source',
+          align: 'center',
+          tooltip: 'This target defines presynaptic cells',
+
+        },
+        {
+          title: 'Destination',
+          slot: 'destination',
+          align: 'center',
+          tooltip: 'This target defines postsynaptic cells',
+
+        },
+        {
+          title: 'Delay (ms)',
+          slot: 'delay',
+          width: 150,
+          align: 'center',
+          tooltip: 'A delay after which the modifications are applied',
+
+        },
+        {
+          title: 'Weight',
+          slot: 'weight',
+          width: 150,
+          align: 'center',
+          tooltip: 'A scaling factor to adjust the synaptic strength (default = 1)',
+
+        },
+        {
+          title: 'MinisFreq',
+          slot: 'spontMinis',
+          width: 150,
+          align: 'center',
+          tooltip: 'The Poisson mean rate for miniature events',
+
+        },
+        {
+          title: 'Synapse Configuration',
+          slot: 'synapseConfigure',
+          align: 'center',
+          tooltip: 'Snippets of hoc code to manipulate additional synaptic parameters',
+
+        },
+        {
+          title: 'Remove',
+          slot: 'remove',
+          align: 'center',
+          width: 150,
+        },
+      ],
     };
   },
   computed: {
@@ -259,3 +281,11 @@ export default {
   },
 };
 </script>
+
+
+<style scoped>
+  .end-line {
+    text-align: right;
+    margin-top: 15px;
+  }
+</style>

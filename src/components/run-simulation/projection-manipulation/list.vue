@@ -17,74 +17,36 @@
       class="custom-table"
       :class="{ 'table-collapsed': tableCollapsed }"
     >
-      <!-- Header for projection manipulation -->
-      <row type="flex" class="manipulation-table-header" justify="space-between">
-        <i-col span="4">
-          <tooltip content="This target defines presynaptic cells">
-            <h3>Name</h3>
-          </tooltip>
-        </i-col>
-        <i-col span="2">
-          <tooltip content="This target defines postsynaptic cells">
-            <h3>Weight</h3>
-          </tooltip>
-        </i-col>
-        <i-col span="2">
-          <tooltip content="A delay after which the modifications are applied">
-            <h3>Minis Freq</h3>
-          </tooltip>
-        </i-col>
-        <i-col span="4">
-          <tooltip content="A scaling factor to adjust the synaptic strength (default = 1)">
-            <h3>Target</h3>
-          </tooltip>
-        </i-col>
-        <i-col span="2">
-          <tooltip content="The Poisson mean rate for miniature events">
-            <h3>Frequency</h3>
-          </tooltip>
-        </i-col>
-        <i-col span="4">
-          <tooltip content="Snippets of hoc code to manipulate additional synaptic parameters">
-            <h3>Type</h3>
-          </tooltip>
-        </i-col>
-        <i-col span="1" offset="3"/>
-      </row>
-
-      <!-- Connection manipulation -->
-      <row type="flex" justify="space-between" class="manipulation-table-content hover-colored">
-        <i-col span="4">
-          <span>{{ currentProjection.name }}</span>
-        </i-col>
-        <i-col span="2">
-          <span>{{ currentProjection.weight }}</span>
-        </i-col>
-        <i-col span="2">
-          <span v-if="currentProjection.isMinis">{{ currentProjection.minisFreq }}</span>
-          <span v-else>{{ notAvailableValue }}</span>
-        </i-col>
-        <i-col span="4">
-          <span v-if="currentProjection.isSpikeReplay">{{ currentProjection.target }}</span>
-          <span v-else>{{ notAvailableValue }}</span>
-        </i-col>
-        <i-col span="2">
-          <span v-if="currentProjection.isSpikeReplay">{{ currentProjection.freq }}</span>
-          <span v-else>{{ notAvailableValue }}</span>
-        </i-col>
-        <i-col span="4">
-          <span v-if="currentProjection.isSpikeReplay">{{ currentProjection.type }}</span>
-          <span v-else>{{ notAvailableValue }}</span>
-        </i-col>
-        <i-col span="1" offset="3">
+      <i-table
+        :columns="columns"
+        :data="[currentProjection]"
+        border
+        class="custom-manipulation-table"
+      >
+        <template slot-scope="{ row, index }" slot="edit">
           <i-button
             type="primary"
             ghost
             icon="md-create"
             @click="editProjection"
           >Edit</i-button>
-        </i-col>
-      </row>
+        </template>
+
+        <template slot-scope="{ row, index }" slot="minisFreq">
+          {{ row.isMinis ? row.minisFreq : notAvailableValue}}
+        </template>
+
+        <template slot-scope="{ row, index }" slot="target">
+          {{ row.isSpikeReplay ? row.target : notAvailableValue}}
+        </template>
+        <template slot-scope="{ row, index }" slot="freq">
+          {{ row.isSpikeReplay ? row.freq : notAvailableValue}}
+        </template>
+        <template slot-scope="{ row, index }" slot="type">
+          {{ row.isSpikeReplay ? row.type : notAvailableValue}}
+        </template>
+
+      </i-table>
 
       <projection-configurator
         :projection-item="projectionBeingEdited"
@@ -120,6 +82,56 @@ export default {
       simConfigToUse: this.$store.state.currentCircuitConfig.simConfigToUse,
       currentProjection: {},
       globalProjectionBlock: {},
+      columns: [
+        {
+          title: 'Name',
+          key: 'name',
+          align: 'center',
+        },
+        {
+          title: 'Weight',
+          key: 'weight',
+          align: 'center',
+        },
+        {
+          title: 'Minis Projection',
+          align: 'center',
+          children: [
+            {
+              title: 'Frequency (Hz)',
+              slot: 'minisFreq',
+              align: 'center',
+            },
+          ],
+        },
+        {
+          title: 'Spike Replay Projection',
+          align: 'center',
+          children: [
+            {
+              title: 'Target',
+              slot: 'target',
+              align: 'center',
+            },
+            {
+              title: 'Frequency (Hz)',
+              slot: 'freq',
+              align: 'center',
+            },
+            {
+              title: 'Type',
+              slot: 'type',
+              align: 'center',
+            },
+          ],
+        },
+        {
+          title: ' ',
+          slot: 'edit',
+          align: 'center',
+          width: 100,
+        },
+      ],
     };
   },
   created() {

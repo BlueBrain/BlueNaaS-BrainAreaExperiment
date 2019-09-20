@@ -7,7 +7,7 @@ This component manage each job (delete, start, create, etc).
   <div class="list-simulations">
 
     <div class="table-header">
-      <span class="name">Name</span>
+      <span class="name">Title</span>
       <span class="simulated status">Simulated</span>
       <span class="analyzed status">Analyzed</span>
       <span class="time">Submission Date</span>

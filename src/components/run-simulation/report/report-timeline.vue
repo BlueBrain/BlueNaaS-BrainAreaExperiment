@@ -14,7 +14,7 @@
         />
         <div
           id="reportContainer"
-          class="report-container"
+          class="report-container custom-changed-timeline"
         />
       </div>
 

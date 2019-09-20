@@ -177,8 +177,11 @@ export default {
 
       function checkModel() {
         if (populationSelected !== circuitConf.biggestTarget) {
-          alert.warning(`This simulation may not run.
-            Check if Population-Stimulation-Report union is not empty`);
+          alert.warning({
+            content: `This simulation may not run.
+            Check if Population-Stimulation-Report union is not empty`,
+            duration: 10,
+          });
         }
       }
 

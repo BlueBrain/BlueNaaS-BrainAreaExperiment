@@ -14,7 +14,7 @@
         />
         <div
           id="stimulationContainer"
-          class="stimulation-container"
+          class="stimulation-container custom-changed-timeline"
         />
       </div>
 

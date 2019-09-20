@@ -108,7 +108,7 @@
             >
               <i-option value="ASCII">ASCII</i-option>
               <i-option value="HDF5">HDF5</i-option>
-              <i-option value="Bin">Bin</i-option>
+              <i-option value="Bin">Binary</i-option>
             </i-select>
           </form-item>
 

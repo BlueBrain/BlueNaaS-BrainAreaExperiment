@@ -141,6 +141,7 @@ const hippoHbpFullCa1 = {
     { name: 'SO', displayName: 'SO', src: `${slicesImgBase}/SO.png` },
     { name: 'SR', displayName: 'SR', src: `${slicesImgBase}/SR.png` },
     { name: '5Cells', displayName: '5Cells' },
+    { name: 'SC', displayName: 'Schaffer Collateral Projection' },
     {
       name: 'AllCompartments',
       displayName: 'AllCompartments',
@@ -250,6 +251,7 @@ const hippoHbpMicrocircuit = {
     { name: 'SP_INT', displayName: 'SP_INT', src: `${microcircuitImgBase}/SP_INT.png` },
     { name: 'INT', displayName: 'INT', src: `${microcircuitImgBase}/INT.png` },
     { name: 'Minicolumn', displayName: 'Minicolumn', src: `${microcircuitImgBase}/Minicolumn.png` },
+    { name: 'SC', displayName: 'Schaffer Collateral Projection' },
     {
       name: 'AllCompartments',
       displayName: 'AllCompartments',

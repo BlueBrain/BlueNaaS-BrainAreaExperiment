@@ -6,17 +6,15 @@ const configFileName = 'projection-config.json';
 
 const hippocampusProjections = {
   defaultProjection: {
+    // a full projection has {name, weight, minisFreq, isMinis, isSpikeReplay, target, freq, type}
     name: 'Microcircuit Project',
     weight: 1,
     minisFreq: 0.01,
     isMinis: true,
     isSpikeReplay: false,
-    // target, // will be added on by the projection list component
-    freq: 0.1,
-    type: 'Poisson',
   },
   projectionBlock: {
-    projectionSrcTarget: 'SC',
+    projectionSrcTarget: 'Schaffer Collateral Projection',
     Projection: {
       SC: {
         Path: '<%= prefix %>/circuit/projection',

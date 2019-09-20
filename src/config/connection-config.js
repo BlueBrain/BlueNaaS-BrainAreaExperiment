@@ -15,7 +15,7 @@ const hippocampusConnections = [
   {
     id: 2,
     name: 'SC-All',
-    source: 'SC',
+    source: 'Schaffer Collateral Projection',
     destination: store.state.currentCircuitConfig.biggestTarget,
     weight: 1,
     spontMinis: 0.01,

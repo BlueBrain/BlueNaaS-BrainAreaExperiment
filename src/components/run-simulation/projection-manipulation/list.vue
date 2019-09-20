@@ -67,6 +67,7 @@ import ProjectionConfigurator from '@/components/run-simulation/projection-manip
 import * as projectionConfig from '@/config/projection-config';
 import { replacePrefixPlaceholders } from '@/common/blueconfig-template';
 import eventBus from '@/services/event-bus';
+import { mapBlueConfigTerms } from '@/common/utils';
 
 export default {
   name: 'ProjectionManipulationList',
@@ -200,7 +201,7 @@ export default {
         name: projectionConfig.getConfigFileName(),
         data: JSON.stringify({
           frequency: this.currentProjection.freq,
-          projectionSrcTarget: pBlocks.projectionSrcTarget,
+          projectionSrcTarget: mapBlueConfigTerms(pBlocks.projectionSrcTarget),
         }),
       });
     },

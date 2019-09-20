@@ -27,8 +27,8 @@ const hippocampusConnections = [
     source: 'Excitatory',
     destination: store.state.currentCircuitConfig.biggestTarget,
     synapseConfigure: '%s.mg = 1.0 %s.NMDA_ratio = 1.22 tau_r_NMDA_ProbAMPANMDA_EMS = 3.9 tau_d_NMDA_ProbAMPANMDA_EMS = 35.6',
-    weight: 0,
-    spontMinis: 0,
+    weight: null,
+    spontMinis: null,
     delay: 0,
   },
   {
@@ -37,8 +37,8 @@ const hippocampusConnections = [
     source: 'Inhibitory',
     destination: store.state.currentCircuitConfig.biggestTarget,
     synapseConfigure: '%s.e_GABAA = -80.0 %s.GABAB_ratio = 0',
-    weight: 0,
-    spontMinis: 0,
+    weight: null,
+    spontMinis: null,
     delay: 0,
   },
 ];

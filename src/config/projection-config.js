@@ -32,7 +32,7 @@ const hippocampusProjections = {
     },
     spikeReplay: {
       Stimulus: {
-        spikeReplay_stimulus_0: {
+        spikeReplay: {
           Mode: 'Current',
           Delay: '0',
           Duration: '10000',
@@ -41,8 +41,8 @@ const hippocampusProjections = {
         },
       },
       StimulusInject: {
-        spikeReplay_stimulusinject_0: {
-          Stimulus: 'spikeReplay_stimulus_0',
+        spikeReplayIntoAll: {
+          Stimulus: 'spikeReplay',
           Target: 'Mosaic',
         },
       },

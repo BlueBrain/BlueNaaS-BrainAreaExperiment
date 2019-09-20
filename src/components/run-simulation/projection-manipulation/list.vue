@@ -85,11 +85,6 @@ export default {
       globalProjectionBlock: {},
       columns: [
         {
-          title: 'Name',
-          key: 'name',
-          align: 'center',
-        },
-        {
           title: 'Weight',
           key: 'weight',
           align: 'center',
@@ -147,7 +142,12 @@ export default {
       this.projectionBeingEdited = Object.assign(
         {},
         this.currentProjection,
-        { target: projTarget, isConfiguring: true },
+        {
+          target: projTarget,
+          isConfiguring: true,
+          freq: 0.1,
+          type: 'Poisson',
+        },
       );
     },
     projectionChanged(newProjectionInfo) {
@@ -180,6 +180,7 @@ export default {
         };
       }
       if (this.currentProjection.isSpikeReplay) {
+        delete projConnection.SpontMinis;
         return {
           Projection,
           Connection,
@@ -187,12 +188,14 @@ export default {
           StimulusInject,
         };
       }
-      // minis projection selected
-      projConnection.SpontMinis = this.currentProjection.minisFreq;
-      return {
-        Projection,
-        Connection,
-      };
+      if (this.currentProjection.isMinis) {
+        projConnection.SpontMinis = this.currentProjection.minisFreq;
+        return {
+          Projection,
+          Connection,
+        };
+      }
+      return {};
     },
     createProjectionFile(resolve) {
       if (!this.currentProjection.isSpikeReplay) return resolve(null);

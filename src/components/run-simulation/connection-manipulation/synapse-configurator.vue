@@ -126,11 +126,8 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
 .spaced-row {
   margin-bottom: 2px;
-}
-.flex {
-  display: flex;
 }
 </style>

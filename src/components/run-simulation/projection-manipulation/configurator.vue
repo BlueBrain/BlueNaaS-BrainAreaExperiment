@@ -18,9 +18,6 @@
         :rules="ruleValidate"
         :model="localProjItem"
       >
-        <form-item prop="name" label="Name:">
-          <i-input v-model="localProjItem.name"/>
-        </form-item>
         <form-item prop="weight" label="Weight:">
           <input-number v-model="localProjItem.weight"/>
         </form-item>
@@ -31,7 +28,7 @@
         <form-item
           v-if="localProjItem.isMinis"
           prop="minisFreq"
-          label="Frequency:"
+          label="Frequency (Hz):"
         >
           <input-number
             :step="0.01"
@@ -100,7 +97,6 @@ export default {
       unmapBlueConfigTerms,
       localProjItem: {},
       ruleValidate: {
-        name: [{ required: true }],
         weight: [{ required: true }],
         minisFreq: [{
           validator: (rule, value, callback) => {
@@ -139,24 +135,14 @@ export default {
     },
   },
   methods: {
-    async checkValid() {
-      const isValidObj = { isValid: false, message: '' };
-      const proj = this.localProjItem;
-      const hasSelectedOne = proj.isMinis || proj.isSpikeReplay;
-      if (!hasSelectedOne) {
-        isValidObj.message = 'Select at least one projection type';
-        return isValidObj;
-      }
-
-      const formIsValid = await this.$refs.formValidate.validate();
-      if (!formIsValid) return isValidObj;
-      isValidObj.isValid = true;
-      return isValidObj;
-    },
     async projectionEdited() {
-      const validObj = await this.checkValid();
-      if (!validObj.isValid) {
-        this.$Message.warning(validObj.message || 'Complete the field');
+      const hasSelectedOne = this.localProjItem.isMinis || this.localProjItem.isSpikeReplay;
+      const formIsValid = await this.$refs.formValidate.validate();
+      if (!hasSelectedOne) {
+        this.$Message.warning('No Projections were selected');
+      }
+      if (!formIsValid) {
+        this.$Message.warning('Please complete the field');
       } else {
         this.$emit('on-ready', this.localProjItem);
       }

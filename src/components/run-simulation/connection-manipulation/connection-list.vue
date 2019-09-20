@@ -219,8 +219,6 @@ export default {
     addNewConnection() {
       this.connectionsArray.push({
         id: uuidGen(),
-        delay: 0,
-        spontMinis: 0,
       });
     },
     removeConnection(index) {
@@ -242,6 +240,10 @@ export default {
         conn.SynapseConfigure = connectionItem.synapseConfigure !== '' ? connectionItem.synapseConfigure : null;
         conn.Weight = connectionItem.weight;
         let name = `${conn.Source}-${conn.Destination}`;
+        if (!conn.SpontMinis && !conn.SynapseConfigure) {
+          const warning = `Connection ${conn.Source} to ${conn.Destination} missing parameters`;
+          this.$Message.warning(warning);
+        }
         if (prunedConnections[name]) { // avoid overwrite existing connection
           name = `${name}-${uuidGen()}`;
         }

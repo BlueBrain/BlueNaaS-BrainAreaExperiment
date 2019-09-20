@@ -37,7 +37,7 @@
   "contributors": [
     "NSE Team"
   ],
-  "license": "",
+  "license": "GPLv3",
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.6.0",
     "@vue/cli-plugin-eslint": "^3.6.0",

@@ -2,7 +2,9 @@
 import axios from 'axios';
 import find from 'lodash/find';
 import get from 'lodash/get';
+import map from 'lodash/map';
 import cleanDeep from 'clean-deep';
+import prettyBytes from 'pretty-bytes';
 
 import computeProvider from '@/common/compute-provider.json';
 import store from '@/services/store';
@@ -187,6 +189,34 @@ async function getFilesList(jobURL) {
   } catch (e) {
     return [];
   }
+}
+
+async function getFilesWithSizes(jobURL) {
+  let filesInfoResponse = [];
+
+  try {
+    filesInfoResponse = await getInfoByUrl(jobURL);
+  } catch (e) {
+    filesInfoResponse = [];
+  }
+
+  const files = get(filesInfoResponse, 'data.content', []);
+  const filesWithSize = map(files, (value, key) => ({
+    name: key.substr(1),
+    size: prettyBytes(value.size),
+  }));
+
+  return filesWithSize;
+}
+
+function getJobPhysicalLocation(log) {
+  let location = '(Location not available)';
+  if (!log) return location;
+  // set physical location
+  const matches = log[7].match(/TSI_USPACE_DIR (.*)/);
+  if (!matches || !matches.length > 0) return location;
+  [, location] = matches;
+  return location;
 }
 
 async function getAndSetChildren(jobInfo, force = false) {
@@ -514,6 +544,8 @@ export default {
   getHttpReqSource,
   getSimUrls,
   getAndSetChildren,
+  getFilesWithSizes,
+  getJobPhysicalLocation,
 };
 
 export {

@@ -39,7 +39,7 @@ This will display the details of a certain simulation and the analysis.
       <collapse-title
         :collapsed="true"
         title="BlueConfig"
-        @expanded="getBlueConfig()"
+        @expanded="getBlueConfig"
       >
         <div slot="element">
           <display-or-download
@@ -52,27 +52,46 @@ This will display the details of a certain simulation and the analysis.
       <collapse-title
         :collapsed="true"
         title="Unicore Logs"
+        @expanded="parseUnicoreLogs"
       >
         <div slot="element">
-          <display-or-download
-            :file-content="simulationDetails.logParsed"
-            file-name="unicore_log"
-          />
+          <div v-if="parsedFiles.unicoreLog">
+            <display-or-download
+              :file-content="parsedFiles.unicoreLog"
+              file-name="unicore_log"
+            />
+          </div>
+          <div v-else>
+            <icon type="md-sync" size="20" class="spin" />
+          </div>
         </div>
       </collapse-title>
 
       <collapse-title
         :collapsed="true"
         title="Files"
-        @expanded="getFileExpanded('wdfiles', downloadedFiles, '')"
+        @expanded="parseUnicoreFiles"
       >
         <div
           slot="element"
-          class="log-item" >
-          <display-or-download
-            :file-content="downloadedFiles.wdfiles"
-            file-name="workingDirectoryFiles"
-          />
+          class="log-item"
+        >
+          <div class="files-content">
+            <div v-if="parsedFiles.physicalLocation">
+              <strong>HPC Location: </strong><span>{{ parsedFiles.physicalLocation }}</span>
+              <div v-if="!parsedFiles.unicoreSimulationFiles.length">
+                <badge status="error"/>
+                <span>Files not available</span>
+              </div>
+              <div v-else v-for="file in parsedFiles.unicoreSimulationFiles" :key="file.name">
+                <badge status="success"/> {{ file.name }} ({{ file.size }})
+              </div>
+            </div>
+            <div v-else>
+              <icon type="md-sync" size="20" class="spin" />
+            </div>
+
+          </div>
         </div>
       </collapse-title>
 
@@ -145,6 +164,11 @@ export default {
       downloadedFiles: {},
       vizRunning: false,
       computerProjectCombo: null,
+      parsedFiles: {
+        unicoreLog: '',
+        unicoreSimulationFiles: '',
+        physicalLocation: '',
+      },
     };
   },
   computed: {
@@ -180,7 +204,6 @@ export default {
       details.workingDirectory = job._links.workingDirectory.href;
       details.submissionTime = job.submissionTime;
       details.type = 'Simulation';
-      details.logParsed = this.simulationDetails.logParsed;
 
       this.simulationDetails = details;
     },
@@ -250,15 +273,6 @@ export default {
         return;
       }
 
-      if (
-        !this.simulationDetails.logParsed ||
-        this.simulationDetails.logParsed.length < this.job.log.length
-      ) {
-        this.simulationDetails.logParsed = this.parseLog(this.job.log);
-      } else {
-        this.simulationDetails.logParsed = this.simulationDetails.logParsed;
-      }
-
       this.fillJobs(this.job);
 
       this.$store.dispatch('hideLoader');
@@ -285,9 +299,21 @@ export default {
       }
     },
 
-    parseLog(log) {
+    async parseUnicoreFiles() {
+      const url = `${this.simulationDetails.workingDirectory}/files/`;
+      const filesList = await unicore.getFilesWithSizes(url);
+      this.$set(this.parsedFiles, 'unicoreSimulationFiles', filesList);
+      const physicalLocation = unicore.getJobPhysicalLocation(this.job.log);
+      this.parsedFiles.physicalLocation = physicalLocation;
+    },
+
+    parseUnicoreLogs() {
       // transform to array to display with indentation
-      if (!log) return [];
+      const { log } = this.job;
+      if (!log) {
+        this.$set(this.parsedFiles, 'unicoreLog', 'No logs are available');
+        return;
+      }
 
       // choose the project
       const simProject = unicore.getProjectSelectedByLog(log);
@@ -295,14 +321,14 @@ export default {
         this.$store.commit('setUserProject', simProject);
       }
 
-      const clone = log.slice(0);
-      clone.forEach((elem, index) => {
+      const logList = log.slice(0);
+      logList.forEach((elem, index) => {
         if (elem.includes('\n')) {
-          clone[index] = elem.split('\n');
+          logList[index] = elem.split('\n');
         }
       });
 
-      return clone;
+      this.$set(this.parsedFiles, 'unicoreLog', logList);
     },
 
     returnList() {
@@ -334,5 +360,8 @@ export default {
   .in-corner {
     float: right;
     margin-left: 5px;
+  }
+  .files-content {
+    font-size: 16px;
   }
 </style>

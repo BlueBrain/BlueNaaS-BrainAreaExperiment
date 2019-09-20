@@ -20,6 +20,7 @@
     "localforage": "^1.7.3",
     "lodash": "^4.17.15",
     "pouchdb-browser": "^7.0.0",
+    "pretty-bytes": "^5.3.0",
     "timeline-plus": "^2.4.0",
     "uuid": "^3.3.2",
     "vis": "^4.21.0",

@@ -28,6 +28,9 @@
       <icon type="md-sync" size="20" class="spin" />
     </span>
 
+    <div v-if="isAvailable && !showText">
+      <h3>(File is too big to show in this page. Please Download it)</h3>
+    </div>
     <i-button
       v-show="isAvailable"
       type="primary" icon="md-download"
@@ -56,9 +59,6 @@ export default {
     showText() {
       // check if the file is not so big to avoid stack overflow of arrays in client
       if (this.fileContent && this.fileContent.length < 10000) {
-        // if (this.fileContent.length === 1 && this.fileContent[0] === '') {
-        //   this.fileContent = ['No file content found'];
-        // }
         return true;
       }
       return false;

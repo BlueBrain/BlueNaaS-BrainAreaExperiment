@@ -63,6 +63,7 @@ export default {
 <style scoped>
   .item-summary {
     min-height: 40px;
+    font-size: 14px;
   }
   .type {
     margin-right: 5px;

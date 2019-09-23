@@ -45,7 +45,6 @@ export default {
     };
   },
   mounted() {
-    // this.toggleCollapse = !this.collapsed ? true : this.collapsed;
     if (!this.collapsed) {
       // To avoid overload set timeout
       setTimeout(() => { this.toggle(); }, 600);
@@ -87,8 +86,8 @@ export default {
     padding-left: 24px;
   }
   .collapse-title .item.sublevel {
-    color: black;
-    font-size: 15px;
+    color: #5b6376;
+    font-size: 14px;
   }
   .collapse-title .toggle-arrow {
     transition: transform 0.3s;

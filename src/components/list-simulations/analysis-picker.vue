@@ -7,7 +7,6 @@
       v-for="(analysisObj, analysisRawName) in analysisConfigObj"
       :key="analysisRawName"
       v-if="!skipAnalysis(analysisRawName)"
-      class="centered"
       :label="analysisObj.name"
     >
       <div>
@@ -43,7 +42,7 @@ import forEach from 'lodash/forEach';
 const modes = {
   NO: 'NO',
   ALL: 'ALL',
-  CELLS: 'CELLS',
+  CELLS: 'RANDOM CELLS',
 };
 const defaultMode = modes.NO;
 const defaultCellsNumber = 5;
@@ -94,10 +93,7 @@ export default {
 
 
 <style scoped>
-  .centered {
-    text-align: center;
-  }
   .small-width.ivu-input-number.ivu-input-number-small {
-    width: 50px;
+    width: 40px;
   }
 </style>

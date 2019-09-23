@@ -2,7 +2,7 @@
 <template>
   <div>
     <modal
-      width="350"
+      width="440"
       v-model="showModalLocal"
       @on-cancel="$emit('change-modal-visibility')"
       :mask-closable="false"

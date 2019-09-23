@@ -24,7 +24,8 @@
     </div>
     <collapse-title
       :collapsed="true"
-      title="log"
+      title="Analysis Logs"
+      :sublevel="true"
       @expanded="analysisLogRequest"
     >
       <div

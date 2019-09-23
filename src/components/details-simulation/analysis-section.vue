@@ -88,7 +88,7 @@ export default {
       if (!Object.keys(this.simulationDetails).length) {
         outputText = 'Fetching simulation information...';
       } else if (isRunning(this.simulationDetails.status)) {
-        outputText = 'Simulation not finished yet';
+        outputText = 'Simulation not finished yet. Wait until it finishes to run analysis';
       } else if (this.simulationDetails.status === jobStatus.FAILED) {
         outputText = 'Simulation failed. No analysis could be run.';
       } else if (this.analysisDetails.length === 0 && this.overallLoading) {

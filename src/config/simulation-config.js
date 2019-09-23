@@ -39,6 +39,7 @@ export default {
       script: [
         '#!/bin/bash -l',
         '. /etc/profile',
+        'export HDF5_USE_FILE_LOCKING=FALSE',
         'module swap PrgEnv-cray PrgEnv-intel',
         'export MODULEPATH=/apps/hbp/ich002/hbp-spack-deployments/softwares/05-06-2019/install/modules/tcl/cray-cnl6-haswell:$MODULEPATH',
         'module load neurodamus-hippocampus cray-python/2.7.15.1',

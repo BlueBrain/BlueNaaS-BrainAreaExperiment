@@ -13,15 +13,6 @@ const hippocampusConnections = [
     delay: 0,
   },
   {
-    id: 2,
-    name: 'SC-All',
-    source: 'Schaffer Collateral Projection',
-    destination: store.state.currentCircuitConfig.biggestTarget,
-    weight: 1,
-    spontMinis: 0.01,
-    delay: 0,
-  },
-  {
     id: 3,
     name: 'AMPA_NMDA',
     source: 'Excitatory',

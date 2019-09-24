@@ -40,10 +40,6 @@
     pointer-events: none;
 }
 
-.custom-changed-timeline .timeline-time-axis .timeline-text {
-    text-align: center;
-}
-
 /* ----------- timeline + target selection ----------- */
 .timeline-target-container.available {
     display: flex;

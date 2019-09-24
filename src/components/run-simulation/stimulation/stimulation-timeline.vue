@@ -1,38 +1,47 @@
 
 <template>
-  <div class="stimulation-timeline">
-    <div
-      class="timeline-target-container"
-      :class="{'available': showTargetSelector}"
-    >
-      <div class="timeline-container">
-        <edit-buttons
-          class="edit-buttons"
-          @item-add="onAdd"
-          @item-delete="onRemove"
-          @item-edit="onUpdate"
-        />
-        <div
-          id="stimulationContainer"
-          class="stimulation-container custom-changed-timeline"
-        />
-      </div>
-
-      <target-selection
-        v-if="showTargetSelector"
-        :itemsAvailable="stimulationTargets"
-        @target-selected="targetSelected"
+  <div class="stimulation-timeline manipulation-section">
+    <div class="in-corner">
+      <icon
+        class="toggle-arrow"
+        :class="{ 'inverted': sectionCollapsed }"
+        type="ios-arrow-down"
+        @click="sectionCollapsed = !sectionCollapsed"
       />
     </div>
+    <h2>Stimulations</h2>
+    <div class="subtitle">Defines pattern of stimuli to be injected into multiple locations</div>
 
-    <stimulation-form
-      :show-modal="showModal"
-      :stimulus-info="editableStimulusInfo"
-      @item-edited="stimulusEdited"
-      @hide-modal="toggleModal"
-    />
+    <div
+      class="custom-collapsable-section"
+      :class="{ 'section-collapsed': sectionCollapsed }"
+    >
+      <div
+        class="timeline-target-container"
+      >
+        <div class="timeline-container">
+          <edit-buttons
+            class="edit-buttons"
+            @item-add="onAdd"
+            @item-delete="onRemove"
+            @item-edit="onUpdate"
+          />
+          <div
+            id="stimulationContainer"
+            class="stimulation-container custom-changed-timeline"
+          />
+        </div>
+      </div>
 
-    <span class="tooltip-span"/> <!-- tooltip hover item -->
+      <stimulation-form
+        :show-modal="showModal"
+        :stimulus-info="editableStimulusInfo"
+        @item-edited="stimulusEdited"
+        @hide-modal="toggleModal"
+      />
+
+      <span class="tooltip-span"/> <!-- tooltip hover item -->
+    </div>
   </div>
 </template>
 
@@ -45,7 +54,6 @@ import merge from 'lodash/merge';
 
 import StimulationForm from '@/components/run-simulation/stimulation/stimulation-form.vue';
 import EditButtons from '@/components/run-simulation/edit-buttons.vue';
-import TargetSelection from '@/components/shared/target-selection.vue';
 import simTimelineLib from '@/services/helper/timeline-helper';
 import eventBus from '@/services/event-bus';
 import { mapBlueConfigTerms, unmapBlueConfigTerms } from '@/common/utils';
@@ -56,7 +64,6 @@ export default {
   components: {
     StimulationForm,
     EditButtons,
-    TargetSelection,
   },
   data() {
     return {
@@ -64,6 +71,7 @@ export default {
       showModal: false,
       editableItem: {},
       tooltipElem: null,
+      sectionCollapsed: true,
     };
   },
   computed: {
@@ -71,33 +79,13 @@ export default {
       const stimulus = get(this, 'editableItem.item.stimulusInfo');
       return cloneDeep(stimulus) || {};
     },
-    showTargetSelector() {
-      return get(this, '$store.state.stimulationTargets.length');
-    },
-    stimulationTargets() {
-      return this.$store.state.stimulationTargets;
-    },
   },
-  async mounted() {
-    const savedItems = await this.loadPreviousConfig(); // if there is prev load otherwise, create
-
-    const timelineElem = this.$el.querySelector('#stimulationContainer');
-    const eventsObj = {
-      onAdd: this.onAdd,
-      onMove: this.onMove,
-      onRemove: this.onRemove,
-      onUpdate: this.onUpdate,
-    };
-    this.timeline = simTimelineLib.createTimeline(timelineElem, eventsObj);
-    this.timeline.setItems(new simTimelineLib.DataSet(savedItems));
-
-    // tooltip section
-    this.tooltipElem = this.$el.querySelector('.tooltip-span');
-    this.timeline.on('itemover', this.createTooltip);
-    this.timeline.on('itemout', () => {
-      this.tooltipElem.style.display = 'none';
+  mounted() {
+    this.$store.subscribe((mutation, state) => {
+      if (mutation.type === 'setSimulationPopulation' && state.simulationPopulation) {
+        this.createTimelineOnExpand();
+      }
     });
-
     // before running the simulation create BlueConfig
     this.creationConfigHandlerBinded = this.creationConfigHandler.bind(this);
     this.simulationDurationChangedBinded = this.simulationDurationChanged.bind(this);
@@ -105,6 +93,29 @@ export default {
     eventBus.$on('simulation-duration-changed', this.simulationDurationChangedBinded);
   },
   methods: {
+    async createTimelineOnExpand() {
+      const savedItems = await this.loadPreviousConfig(); // if there is prev load otherwise, create
+
+      const timelineElem = this.$el.querySelector('#stimulationContainer');
+      timelineElem.innerHTML = '';
+      const eventsObj = {
+        onAdd: this.onAdd,
+        onMove: this.onMove,
+        onRemove: this.onRemove,
+        onUpdate: this.onUpdate,
+      };
+      this.timeline = simTimelineLib.createTimeline(timelineElem, eventsObj);
+      this.timeline.setItems(new simTimelineLib.DataSet(savedItems));
+
+      // tooltip section
+      this.tooltipElem = this.$el.querySelector('.tooltip-span');
+      this.timeline.on('itemover', this.createTooltip);
+      this.timeline.on('itemout', () => {
+        this.tooltipElem.style.display = 'none';
+      });
+
+      this.sectionCollapsed = false;
+    },
     onAdd(item, callback) {
       const oldItem = item || null;
       this.createNewItem(oldItem, callback);

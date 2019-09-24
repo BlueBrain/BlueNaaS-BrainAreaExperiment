@@ -1,25 +1,35 @@
 
 <template>
-  <div class="sim-params inline-centered">
-    <tooltip
-      content="Subpopulation of neurons to be simulated (CircuitTarget)"
-    >Population:</tooltip>
-    <autocomplete-targets
-      :target-selected="populationSelected"
-      :itemsAvailable="populationTargets"
-      @target-changed="targetChanged"
-    />
+  <div class="sim-params">
 
-    <tooltip
-      content="Time length of stimulus duration, given in milliseconds(ms)"
-    >Duration (ms):</tooltip>
-    <input-number
-      v-model="duration"
-      :min="1"
-      :step="1"
-      :max="50000"
-      placeholder="Duration"
-    />
+    <div>
+      <div class="inline">
+        <h2 class="margined-right">Define Population to Simulate:</h2>
+        <autocomplete-targets
+          :target-selected="populationSelected"
+          :itemsAvailable="populationTargets"
+          @target-changed="targetChanged"
+        />
+      </div>
+      <div class="subtitle">Subpopulation of neurons to be simulated (CircuitTarget)"</div>
+    </div>
+
+    <div class="spaced"/>
+
+    <div>
+      <div class="inline">
+        <h2 class="margined-right">Duration:</h2>
+        <input-number
+          v-model="duration"
+          :min="1"
+          :step="1"
+          :max="50000"
+          placeholder="Duration"
+        />
+      </div>
+      <div class="subtitle">Total duration of the simulation (ms)</div>
+    </div>
+
   </div>
 </template>
 
@@ -75,15 +85,15 @@ export default {
       const prevConfig = await db.retrievePreviousConfig();
 
       const runDefaultSaved = get(prevConfig, 'bc.Run.Default', {});
-      const hasSavedParams = Boolean(runDefaultSaved.ForwardSkip &&
-        runDefaultSaved.Duration &&
-        runDefaultSaved.CircuitTarget);
+      const hasSavedParams = Boolean(runDefaultSaved.ForwardSkip
+        && runDefaultSaved.Duration
+        && runDefaultSaved.CircuitTarget);
 
       this.duration = hasSavedParams ? runDefaultSaved.Duration : this.$store.state.simulationDuration;
       this.forwardSkip = hasSavedParams ? runDefaultSaved.ForwardSkip : this.$store.state.simulationForwardSkip;
-      this.populationSelected = hasSavedParams ?
-        unmapBlueConfigTerms(runDefaultSaved.CircuitTarget) :
-        this.$store.state.currentCircuitConfig.defaultPopulation;
+      this.populationSelected = hasSavedParams
+        ? unmapBlueConfigTerms(runDefaultSaved.CircuitTarget)
+        : null;
 
       // setup default computer
       const unicoreSavedParams = get(prevConfig, 'unicore.computerSelected', null);
@@ -101,16 +111,26 @@ export default {
 </script>
 
 
-<style lang="scss">
-  .sim-params.inline-centered {
-    display: inline-flex;
-    align-items: center;
-    flex-wrap: wrap;
-    .ivu-tooltip {
-      margin: 0px 5px;
-    }
-    .ivu-select {
-      width: 140px;
+<style scoped lang="scss">
+.sim-params {
+  display: flex;
+
+  .spaced {
+    width: 250px;
+  }
+
+  .inline {
+    display: flex;
+    align-items: flex-end;
+    .margined-right {
+      margin-right: 10px;
     }
   }
+  .container-grow {
+    flex-grow: 1;
+  }
+  .custom-autocomplete-targets {
+    max-width: 400px;
+  }
+}
 </style>

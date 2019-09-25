@@ -5,15 +5,15 @@
       width="350"
       v-model="formInvalid"
       @on-cancel="onCancel"
-      class="stimulation-form"
+      class="stimulation-form larger-inputs"
     >
       <h3 slot="header">Stimulus Definition</h3>
       <div v-if="hasStimulusInfo">
         <i-form
           ref="formValidate"
-          :rules="ruleValidate"
           name="stimulationForm"
           label-position="right"
+          :rules="ruleValidate"
           :label-width="150"
           :model="localStimInfo"
         >

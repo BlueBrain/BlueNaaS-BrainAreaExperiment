@@ -5,15 +5,15 @@
       width="350"
       v-model="formInvalid"
       @on-cancel="onCancel"
-      class="report-form"
+      class="report-form larger-inputs"
     >
       <h3 slot="header">Report Definition</h3>
       <div>
         <i-form
           ref="formValidate"
-          :rules="ruleValidate"
           name="reportForm"
           label-position="right"
+          :rules="ruleValidate"
           :label-width="150"
           :model="localReportInfo"
         >

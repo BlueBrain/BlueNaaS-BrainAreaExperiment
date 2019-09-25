@@ -1,49 +1,40 @@
 
 <template>
   <div class="simulation">
-    <div class="app-content">
-      <!-- header params -->
-      <div class="duration-skip">
+    <div class="app-content simulation-run">
 
-        <simulation-params/>
-
-        <span class="grow-space"/>
+      <div class="right-align">
         <i-button
           type="primary"
           icon="ios-list"
           @click="viewList"
         >View Simulations</i-button>
       </div>
-      <!-- END header params -->
 
-      <!-- stimulation timeline -->
-      <div class="border-container">
-        <h2>Stimulations</h2>
-        <div class="subtitle">Defines pattern of stimuli to be
-        injected into multiple locations</div>
-        <stimulation-timeline/>
+      <div class="shared-flex-block">
+        <div class="params-config-container">
+          <div class="border-container">
+            <simulation-params/>
+          </div>
+
+          <div class="border-container margined-right">
+            <stimulation-timeline/>
+          </div>
+
+          <div class="border-container margined-right">
+            <report-timeline/>
+          </div>
+        </div>
+
       </div>
-      <!-- END stimulation timeline -->
 
-      <!-- report timeline -->
-      <div class="border-container">
-        <h2>Reports</h2>
-        <div class="subtitle">Controls data collection during the simulation</div>
-        <report-timeline/>
-      </div>
-      <!-- END report timeline -->
-
-      <!-- connection manipulation -->
       <div class="border-container">
         <connection-manipulation/>
       </div>
-      <!-- END connection manipulation -->
 
-      <!-- projection manipulation -->
       <div class="border-container">
         <projection-manipulation/>
       </div>
-      <!-- END projection manipulation -->
 
       <run-configuration-component @launch-sim="launchSim"/>
 
@@ -64,7 +55,7 @@ import ProjectionManipulation from '@/components/run-simulation/projection-manip
 import unicore, { urlToComputerAndId } from '@/services/unicore';
 import { jobTags, addTag } from '@/common/job-status';
 import db from '@/services/db';
-import '@/assets/css/simulation.css';
+import '@/assets/css/simulation.scss';
 import 'timeline-plus/dist/timeline.min.css';
 
 export default {
@@ -168,15 +159,30 @@ export default {
 
 
 <style scoped>
-  .duration-skip {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+  .right-align {
+    text-align: right;
+    margin-bottom: 8px;
+
   }
   .border-container {
     background-color: rgba(216, 223, 239, 0.38);
     border-radius: 5px;
-    padding: 20px 10px;
-    margin: 20px 0;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  .params-config-container {
+    flex-grow: 1;
+  }
+  .target-viewer-right-container {
+    display: flex;
+    align-self: stretch;
+    max-width: 350px;
+  }
+  .shared-flex-block {
+    display: flex;
+    align-items: flex-end;
+  }
+  .shared-flex-block .border-container.margined-right {
+    margin-right: 10px;
   }
 </style>

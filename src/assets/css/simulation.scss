@@ -1,0 +1,92 @@
+
+/* --------- Tips styles --------- */
+.run-configuration-component .tip {
+  background-color: #cef1fc;
+  border-color: #9ee3f9;
+  color: #12718f;
+  border-radius: 5px;
+  -webkit-box-shadow: 0 2px 3px rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.1);
+  box-shadow: 0 2px 3px rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.1);
+  display: block;
+  padding: 1rem;
+  font-size: 12px;
+  display: flex;
+
+  i.centered {
+    vertical-align: middle;
+    cursor: pointer;
+    margin-left: 5px;
+  }
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+/* --------- timeline ---------- */
+.vis-item.voltage:not(.vis-selected) {
+  background-color: #F6D5ED;
+  border-color: #F797E0;
+}
+.tooltip-span {
+  z-index: 2;
+  background-color: #8393b7;
+  color: white;
+  border-radius: 7px;
+  font-size: 14px;
+  padding: 8px;
+  display: none;
+  position: fixed;
+}
+.timeline-custom-time.end {
+  pointer-events: none;
+}
+
+/* ----------- timeline + target selection ----------- */
+.timeline-target-container.available {
+  display: flex;
+
+  .timeline-container {
+    width: 95%;
+  }
+
+  .target-selection-container .list-item {
+    white-space: nowrap;
+  }
+}
+@media screen and (max-width: 990px) {
+  .timeline-target-container.available .target-selection-container {
+
+    .img-container {
+      display: none;
+    }
+    .target-selection {
+      margin-left: 10%;
+    }
+  }
+}
+
+/* ----------- forms larger inputs ----------- */
+.stimulation-form.larger-inputs,
+.report-form.larger-inputs {
+  .ivu-input-number, .ivu-select {
+    width: 140px;
+  }
+  .custom-autocomplete-targets .ivu-select-dropdown {
+    overflow-x: hidden;
+  }
+}
+
+
+/* ----------- steps number ----------- */
+.border-container .circle-number {
+  font-size: 20px;
+  border-radius: 50%;
+  background-color: #a9a9a9;
+  color: #fff;
+  min-width: 27px;
+  min-height: 27px;
+  display: inline-block;
+  text-align: center;
+  margin-right: 10px;
+}

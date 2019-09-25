@@ -5,17 +5,17 @@
     <div class="in-corner">
       <icon
         class="toggle-arrow"
-        :class="{ 'inverted': tableCollapsed }"
+        :class="{ 'inverted': sectionCollapsed }"
         type="ios-arrow-down"
-        @click="tableCollapsed = !tableCollapsed"
+        @click="sectionCollapsed = !sectionCollapsed"
       />
     </div>
     <h2>Projection Manipulation (expert users only)</h2>
     <div class="subtitle">Controls the projection in the circuit</div>
 
     <div
-      class="custom-table"
-      :class="{ 'table-collapsed': tableCollapsed }"
+      class="custom-collapsable-section"
+      :class="{ 'section-collapsed': sectionCollapsed }"
     >
       <i-table
         :columns="columns"
@@ -77,7 +77,7 @@ export default {
   data() {
     return {
       isConfiguring: false,
-      tableCollapsed: true,
+      sectionCollapsed: true,
       projectionBeingEdited: {},
       notAvailableValue: '-',
       simConfigToUse: this.$store.state.currentCircuitConfig.simConfigToUse,

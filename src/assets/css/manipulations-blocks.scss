@@ -11,11 +11,11 @@
     float: right;
     margin-left: 5px;
   }
-  .custom-table {
+  .custom-collapsable-section {
     transition: max-height 0.3s;
-    max-height: 700px;
+    max-height: 1700px;
   }
-  .table-collapsed {
+  .section-collapsed {
     max-height: 0px;
     overflow: hidden;
   }
@@ -38,6 +38,5 @@
       top: 0;  /* to avoid cutting bottom of source - destination buttons */
     }
   }
-
 
 }

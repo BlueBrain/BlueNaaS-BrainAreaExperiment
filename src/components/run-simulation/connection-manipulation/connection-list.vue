@@ -8,17 +8,17 @@ This component allows to create or modify the connections in the circuit for the
     <div class="in-corner">
       <icon
         class="toggle-arrow"
-        :class="{ 'inverted': tableCollapsed }"
+        :class="{ 'inverted': sectionCollapsed }"
         type="ios-arrow-down"
-        @click="toggleTable()"
+        @click="sectionCollapsed = !sectionCollapsed"
       />
     </div>
     <h2>Connection Manipulation (expert users only)</h2>
     <div class="subtitle">Controls the connection between populations</div>
 
     <div
-      class="custom-table"
-      :class="{ 'table-collapsed': tableCollapsed }"
+      class="custom-collapsable-section"
+      :class="{ 'section-collapsed': sectionCollapsed }"
     >
       <i-table
         :columns="columns"
@@ -140,7 +140,7 @@ export default {
   data() {
     return {
       connectionsArray: {},
-      tableCollapsed: true,
+      sectionCollapsed: true,
       changeTargetModal: {
         currentTarget: null,
         currentConnectionObj: null,
@@ -258,9 +258,6 @@ export default {
     },
     setNewSynapseString(connection, synapseString) {
       this.$set(connection, 'synapseConfigure', synapseString);
-    },
-    toggleTable() {
-      this.tableCollapsed = !this.tableCollapsed;
     },
     editConnectionTarget(connectionObj, connectionAttribute) {
       this.$set(this.changeTargetModal, 'currentTarget', connectionObj[connectionAttribute]);

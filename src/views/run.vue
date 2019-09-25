@@ -26,6 +26,9 @@
           </div>
         </div>
 
+        <div class="target-viewer-right-container border-container">
+          <target-viewer :target-selected-url="targetSelectedUrl"/>
+        </div>
       </div>
 
       <div class="border-container">
@@ -51,6 +54,7 @@ import ReportTimeline from '@/components/run-simulation/report/report-timeline.v
 import RunConfigurationComponent from '@/components/run-simulation/unicore-run-config/run-configuration-component.vue';
 import ConnectionManipulation from '@/components/run-simulation/connection-manipulation/connection-list.vue';
 import ProjectionManipulation from '@/components/run-simulation/projection-manipulation/list.vue';
+import TargetViewer from '@/components/shared/target-viewer.vue';
 
 import unicore, { urlToComputerAndId } from '@/services/unicore';
 import { jobTags, addTag } from '@/common/job-status';
@@ -68,6 +72,12 @@ export default {
     RunConfigurationComponent,
     ConnectionManipulation,
     ProjectionManipulation,
+    TargetViewer,
+  },
+  data() {
+    return {
+      targetSelectedUrl: null,
+    };
   },
   created() {
     this.$store.commit('setAppTitle', 'Run Simulation');
@@ -93,6 +103,12 @@ export default {
     this.$store.commit('setConnectionTargets', sortBy(connectionManipulationTargets, 'displayName'));
 
     db.saveCollabIdForViz(this.$route.query.collab);
+
+    this.$store.subscribe((mutation, state) => {
+      if (mutation.type === 'setSimulationPopulation' && state.simulationPopulation) {
+        this.getTargetImageUrl(state.simulationPopulation);
+      }
+    });
   },
   methods: {
     viewList() {
@@ -152,6 +168,11 @@ export default {
           computerParam: computer,
         },
       });
+    },
+    getTargetImageUrl(newPopulationName) {
+      const selectedTargetObj = this.$store.state.populationTargets.find(targetObj => targetObj.displayName === newPopulationName);
+      if (!selectedTargetObj) return;
+      this.targetSelectedUrl = selectedTargetObj.src;
     },
   },
 };

@@ -193,11 +193,12 @@ export default {
   }
   .params-config-container {
     flex-grow: 1;
+    align-self: flex-start;
   }
   .target-viewer-right-container {
     display: flex;
     align-self: stretch;
-    max-width: 350px;
+    width: 20%;
   }
   .shared-flex-block {
     display: flex;

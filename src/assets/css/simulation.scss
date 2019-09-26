@@ -42,6 +42,15 @@
   pointer-events: none;
 }
 
+.timeline-target-container {
+  opacity: 1;
+  transition: opacity 1.0s;
+
+  &.loading {
+    opacity: 0;
+  }
+}
+
 /* ----------- timeline + target selection ----------- */
 .timeline-target-container.available {
   display: flex;

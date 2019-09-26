@@ -2,11 +2,11 @@
 <template>
   <div
     class="target-viewer-container"
-    :class="{'rotate': !targetSelectedUrl}"
+    :class="{ 'rotate': !localSrc, 'loading': isLoading }"
   >
     <section class="img-container">
-      <img v-if="targetSelectedUrl" :src="targetSelectedUrl">
-      <span v-else>Preview Not Available</span>
+      <span v-if="!localSrc" >Preview Not Available</span>
+      <img :src="localSrc">
     </section>
   </div>
 </template>
@@ -16,20 +16,42 @@
 export default {
   name: 'TargetViewer',
   props: ['targetSelectedUrl'],
+  data() {
+    return {
+      isLoading: true,
+      localSrc: null,
+    };
+  },
+  watch: {
+    targetSelectedUrl(newVal) {
+      this.isLoading = true;
+      setTimeout(() => {
+        this.isLoading = false;
+        this.localSrc = newVal;
+      }, 1000);
+    },
+  },
 };
 </script>
 
 
-<style scoped>
+<style scoped lang="scss">
   .img-container > img {
     max-width: 100%;
     transform: scale(1.2);
   }
   .target-viewer-container {
     align-self: center;
-  }
-  .target-viewer-container.rotate {
-    transform: rotate(45deg);
-    font-size: 20px;
+    opacity: 1;
+    transition: opacity 1.0s;
+
+    &.rotate {
+      transform: rotate(45deg);
+      font-size: 20px;
+    }
+
+    &.loading {
+      opacity: 0;
+    }
   }
 </style>

@@ -18,6 +18,7 @@
     >
       <div
         class="timeline-target-container"
+        :class="{ 'loading': isTimelineLoading }"
       >
         <div class="timeline-container">
           <edit-buttons
@@ -72,6 +73,7 @@ export default {
       editableItem: {},
       tooltipElem: null,
       sectionCollapsed: true,
+      isTimelineLoading: true,
     };
   },
   computed: {
@@ -94,6 +96,7 @@ export default {
   },
   methods: {
     async createTimelineOnExpand() {
+      this.isTimelineLoading = true;
       const savedItems = await this.loadPreviousConfig(); // if there is prev load otherwise, create
 
       const timelineElem = this.$el.querySelector('#stimulationContainer');
@@ -114,7 +117,11 @@ export default {
         this.tooltipElem.style.display = 'none';
       });
 
-      this.sectionCollapsed = false;
+      setTimeout(() => {
+        // to add transition effect
+        this.isTimelineLoading = false;
+        this.sectionCollapsed = false;
+      }, 1000);
     },
     onAdd(item, callback) {
       const oldItem = item || null;

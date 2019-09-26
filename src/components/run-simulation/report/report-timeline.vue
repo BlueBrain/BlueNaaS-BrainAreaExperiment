@@ -49,13 +49,13 @@
 <script>
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
-import forEach from 'lodash/forEach';
 
 import ReportForm from '@/components/run-simulation/report/report-form.vue';
 import EditButtons from '@/components/run-simulation/edit-buttons.vue';
 import simTimelineLib from '@/services/helper/timeline-helper';
 import eventBus from '@/services/event-bus';
-import { mapBlueConfigTerms, unmapBlueConfigTerms } from '@/common/utils';
+import { mapBlueConfigTerms } from '@/common/utils';
+import constants from '@/common/constants';
 import db from '@/services/db';
 
 export default {
@@ -135,7 +135,9 @@ export default {
       const reportBlueConfig = this.createConfig();
       resolve(reportBlueConfig);
     },
+
     simulationDurationChanged(newDuration) {
+      if (!this.timeline) return;
       this.timeline.setCustomTime(newDuration, 'end');
     },
 
@@ -229,10 +231,12 @@ export default {
 
     createConfig() {
       const config = {};
+      const configToSave = [];
       config.Report = {};
       const reportItems = this.timeline.getVisibleItems();
       reportItems.forEach((reportName, index) => {
         const reportObj = this.timeline.itemsData.get(reportName);
+        configToSave.push(reportObj);
         const reportMapped = mapBlueConfigTerms(reportObj.reportInfo);
         const repName = simTimelineLib.joinName(
           reportMapped.Target,
@@ -242,6 +246,7 @@ export default {
         reportMapped.Unit = this.getReportUnit(reportMapped);
         config.Report[repName] = reportMapped;
       });
+      db.setSavedConfig(constants.saveParamNames.REPORT, configToSave);
       return config;
     },
 
@@ -257,20 +262,14 @@ export default {
     },
 
     async loadPreviousConfig() {
-      const lastConfig = await db.retrievePreviousConfig();
-      if (!lastConfig || !lastConfig.bc || !lastConfig.bc.Report) {
+      const targetSame = await simTimelineLib.isCurrentSameAsSavedTarget();
+      const savedConfig = await db.getSavedConfig(constants.saveParamNames.REPORT);
+      if (!savedConfig || !targetSame) {
         return [this.createItem(this.createNewReport())];
       }
-      const prevItems = [];
-      let index = 0;
-      forEach(lastConfig.bc.Report, (report) => {
-        const prevReport = unmapBlueConfigTerms(report);
-        prevItems.push(this.createItem(prevReport, index));
-        index += 1;
-      });
-
-      return prevItems;
+      return savedConfig;
     },
+
     targetSelected(target) {
       const id = simTimelineLib.getMaxId(this.timeline.itemsData) || 0;
       const newStim = this.createItem(this.createNewReport(target.displayName), id);

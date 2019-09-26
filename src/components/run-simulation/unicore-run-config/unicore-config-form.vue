@@ -177,7 +177,6 @@ export default {
       accountIsHidden: true,
       groupsFetched: false,
       projectsAvailable: [],
-      previousConfig: null,
 
       ruleValidate: {
         computer: [{
@@ -290,6 +289,7 @@ export default {
       if (isValid) {
         this.runParameters.computerSelected = this.computerSelected;
         this.runParameters.groupSelected = this.groupSelected;
+        db.setSavedConfig(constants.saveParamNames.UNICORE, this.runParameters);
         // to start spinner
         this.$emit('run-simulation', this.runParameters);
       }
@@ -304,35 +304,22 @@ export default {
     },
 
     async loadPreviousConfig() {
-      const prevConfig = await db.retrievePreviousConfig();
-      if (
-        !prevConfig ||
-        !prevConfig.unicore ||
-        !prevConfig.unicore.runtime ||
-        !prevConfig.unicore.nodes ||
-        !prevConfig.unicore.computerSelected
-      ) {
+      const savedConfig = await db.getSavedConfig(constants.saveParamNames.UNICORE);
+      if (!savedConfig) {
         const defaultComputer = this.$store.state.currentComputer || this.computersAvailable[0];
         this.loadDefaultValues();
         this.loadAccount(defaultComputer);
         this.refreshUnicoreProjects(defaultComputer);
-
-        return null;
+        return;
       }
-      this.runParameters.runtime = prevConfig.unicore.runtime;
-      this.runParameters.nodes = prevConfig.unicore.nodes;
-      this.runParameters.title = prevConfig.unicore.title;
-      const simConfig = this.$store.state.currentSimulationConfig;
-      this.runParameters.cpus = simConfig[this.$store.state.currentComputer].cpus;
+      this.runParameters = savedConfig;
 
-      this.loadAccount(prevConfig.unicore.computerSelected);
-      this.refreshUnicoreProjects(prevConfig.unicore.computerSelected);
+      this.loadAccount(savedConfig.computerSelected);
+      this.refreshUnicoreProjects(savedConfig.computerSelected);
 
-      if (!this.accountIsHidden && prevConfig.unicore.accountSelected) {
-        this.runParameters.accountSelected = prevConfig.unicore.accountSelected;
+      if (!this.accountIsHidden && savedConfig.accountSelected) {
+        this.runParameters.accountSelected = savedConfig.accountSelected;
       }
-
-      return prevConfig.unicore.computerSelected;
     },
 
     refreshUnicoreProjects(computer, callback) {

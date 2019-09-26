@@ -1,25 +1,21 @@
 
 import localforage from 'localforage';
-
 import packageJson from '@/../package.json';
 import { urlToComputerAndId } from '@/services/unicore';
 import { jobStatus } from '@/common/job-status';
 import { getComputerProjectCircuitCombo } from '@/common/utils';
 import store from '@/services/store';
 
-function getSavedSimConfigName() {
-  return `simConfig-${store.state.currentCircuit}`;
-}
 
 (function cleanStorage() {
-  const savedVersion = localStorage.getItem('appVersion');
+  const savedVersion = localStorage.getItem('simUILauncherVersion');
   if (savedVersion && savedVersion !== packageJson.version) {
     console.warn('Cleaning saved data due new application was release');
     localforage.clear();
     localStorage.clear();
   } else if (!savedVersion) {
     console.debug('App version', packageJson.version);
-    localStorage.setItem('appVersion', packageJson.version);
+    localStorage.setItem('simUILauncherVersion', packageJson.version);
   }
 }());
 
@@ -56,22 +52,6 @@ function getJobByUrl(url) {
   return getJob(getComputerProjectCircuitCombo(prefix));
 }
 
-async function saveSimConfiguration(bc, unicore) {
-  try {
-    await localforage.setItem(getSavedSimConfigName(), { bc, unicore });
-  } catch (err) {
-    console.error('saving configuration', err);
-  }
-}
-
-async function retrievePreviousConfig() {
-  return await localforage.getItem(getSavedSimConfigName()) || {};
-}
-
-function cleanPreviousConfig() {
-  return localforage.removeItem(getSavedSimConfigName());
-}
-
 function getAllJobsSortedList() {
   const prefix = 'allJobsSorted';
   return localforage.getItem(getComputerProjectCircuitCombo(prefix));
@@ -102,18 +82,32 @@ function getCollabIdForViz() {
   return localforage.getItem('collabIdForViz');
 }
 
+function getConfigName(itemName) {
+  return `simConfig-${store.state.currentCircuit}-${itemName}`;
+}
+
+function getSavedConfig(itemName) {
+  const configName = getConfigName(itemName);
+  return localforage.getItem(configName);
+}
+
+function setSavedConfig(itemName, params) {
+  const configName = getConfigName(itemName);
+  return localforage.setItem(configName, params);
+}
+
+
 export default {
   addJob,
   getJob,
   getJobByUrl,
   getAllJobsSortedList,
-  saveSimConfiguration,
   setAllJobsSortedList,
-  retrievePreviousConfig,
   deleteJob,
-  cleanPreviousConfig,
   saveCollabIdForViz,
   getCollabIdForViz,
+  getSavedConfig,
+  setSavedConfig,
 };
 
 /* eslint-enable no-underscore-dangle */

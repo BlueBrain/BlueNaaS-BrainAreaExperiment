@@ -49,14 +49,14 @@
 <script>
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
-import forEach from 'lodash/forEach';
 import merge from 'lodash/merge';
 
 import StimulationForm from '@/components/run-simulation/stimulation/stimulation-form.vue';
 import EditButtons from '@/components/run-simulation/edit-buttons.vue';
 import simTimelineLib from '@/services/helper/timeline-helper';
 import eventBus from '@/services/event-bus';
-import { mapBlueConfigTerms, unmapBlueConfigTerms } from '@/common/utils';
+import { mapBlueConfigTerms } from '@/common/utils';
+import constants from '@/common/constants';
 import db from '@/services/db';
 
 export default {
@@ -147,9 +147,12 @@ export default {
       const stimulusBlueConfig = this.createConfig();
       resolve(stimulusBlueConfig);
     },
+
     simulationDurationChanged(newDuration) {
+      if (!this.timeline) return;
       this.timeline.setCustomTime(newDuration, 'end');
     },
+
     toggleModal(value) {
       this.showModal = value || !this.showModal;
     },
@@ -228,11 +231,13 @@ export default {
 
     createConfig() {
       let config = {};
+      const configToSave = [];
       config.Stimulus = {};
       config.StimulusInject = {};
       const stimulationItems = this.timeline.getVisibleItems();
       stimulationItems.forEach((stimulusName, index) => {
         const stimObj = this.timeline.itemsData.get(stimulusName);
+        configToSave.push(stimObj);
         const stimulusMapped = mapBlueConfigTerms(stimObj.stimulusInfo);
         const target = stimulusMapped.Target;
         delete stimulusMapped.Target;
@@ -254,6 +259,7 @@ export default {
           Target: target,
         };
       });
+      db.setSavedConfig(constants.saveParamNames.STIMULATION, configToSave);
 
       // if Noise stimulus -> Hyperpolarizing
       const stims = Object.keys(config.Stimulus);
@@ -266,26 +272,12 @@ export default {
     },
 
     async loadPreviousConfig() {
-      const lastConfig = await db.retrievePreviousConfig();
-      if (!lastConfig || !lastConfig.bc || !lastConfig.bc.StimulusInject) {
+      const targetSame = await simTimelineLib.isCurrentSameAsSavedTarget();
+      const savedConfig = await db.getSavedConfig(constants.saveParamNames.STIMULATION);
+      if (!savedConfig || !targetSame) {
         return [this.createItem(this.createNewStimulus())];
       }
-
-      // hide hyperpolirizing in case exists
-      if (lastConfig.bc.StimulusInject.hypamp_mosaic) { delete lastConfig.bc.StimulusInject.hypamp_mosaic; }
-      if (lastConfig.bc.Stimulus.hypamp) { delete lastConfig.bc.Stimulus.hypamp; }
-
-      const prevItems = [];
-      let index = 0;
-      forEach(lastConfig.bc.StimulusInject, (stimulusInjectObj) => {
-        const stimulusInfo = lastConfig.bc.Stimulus[stimulusInjectObj.Stimulus];
-        const target = { Target: stimulusInjectObj.Target };
-        const prevStimulus = unmapBlueConfigTerms(Object.assign({}, target, stimulusInfo));
-        prevItems.push(this.createItem(prevStimulus, index));
-        index += 1;
-      });
-
-      return prevItems;
+      return savedConfig;
     },
     targetSelected(target) {
       const id = simTimelineLib.getMaxId(this.timeline.itemsData) || 0;

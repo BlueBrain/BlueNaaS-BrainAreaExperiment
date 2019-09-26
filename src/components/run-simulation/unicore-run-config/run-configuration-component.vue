@@ -45,11 +45,9 @@
 <script>
 import union from 'lodash/union';
 import merge from 'lodash/merge';
-
 import eventBus from '@/services/event-bus';
 import { createBCTemplate } from '@/common/blueconfig-template';
 import UnicoreConfigForm from '@/components/run-simulation/unicore-run-config/unicore-config-form.vue';
-import db from '@/services/db';
 import { convertToBCFormat, openContent, mapBlueConfigTerms } from '@/common/utils';
 import { jobTags, addTag } from '@/common/job-status';
 
@@ -143,7 +141,6 @@ export default {
       const blueConfigStr = await this.generateFinalBlueConfigJSON();
       this.blueConfig = JSON.parse(blueConfigStr);
 
-      db.saveSimConfiguration(this.blueConfig, unicoreConfig);
       // we have already checked the simulation consistancy
       this.isLaunchingSim = true;
 

@@ -3,6 +3,8 @@ import noop from 'lodash/noop';
 import flatMap from 'lodash/flatMap';
 import { Timeline, DataSet } from 'timeline-plus';
 import store from '@/services/store';
+import db from '@/services/db';
+import constants from '@/common/constants';
 
 
 function joinName(target, type, newId) {
@@ -130,16 +132,21 @@ function getMaxId(dataSet) {
   return maxId + 1;
 }
 
+async function isCurrentSameAsSavedTarget() {
+  const savedSimConfig = await db.getSavedConfig(constants.saveParamNames.SIM_PARAMS);
+  return store.state.simulationPopulation === savedSimConfig.circuitTarget;
+}
+
 export default {
   editItem,
   deleteItem,
   updatedItem,
   showTooltip,
-  // setupGroups,
   createTimeline,
   createCustomTimeLabel,
   getItemId,
   getMaxId,
   DataSet,
   joinName,
+  isCurrentSameAsSavedTarget,
 };

@@ -23,6 +23,7 @@ This component allows to create or modify the connections in the circuit for the
       <i-table
         :columns="columns"
         :data="connectionsArray"
+        :loading="connectionsAreLoading"
         border
         class="custom-manipulation-table"
       >
@@ -129,6 +130,8 @@ import SynapseConfigurator from '@/components/run-simulation/connection-manipula
 import { getDefaultConnections } from '@/services/helper/connection-helper';
 import { mapBlueConfigTerms } from '@/common/utils';
 import eventBus from '@/services/event-bus';
+import constants from '@/common/constants';
+import db from '@/services/db';
 import '@/assets/css/manipulations-blocks.scss';
 
 export default {
@@ -139,8 +142,9 @@ export default {
   },
   data() {
     return {
-      connectionsArray: {},
+      connectionsArray: [],
       sectionCollapsed: true,
+      connectionsAreLoading: true,
       changeTargetModal: {
         currentTarget: null,
         currentConnectionObj: null,
@@ -210,10 +214,11 @@ export default {
       return this.$store.state.connectionTargets.map(target => target.displayName);
     },
   },
-  created() {
-    this.connectionsArray = getDefaultConnections();
+  async created() {
     this.creationConfigHandlerBinded = this.creationConfigHandler.bind(this);
     eventBus.$on('create-connection-config', this.creationConfigHandlerBinded);
+    this.connectionsArray = await this.loadPreviousConfig();
+    this.connectionsAreLoading = false;
   },
   methods: {
     addNewConnection() {
@@ -226,6 +231,7 @@ export default {
     },
     creationConfigHandler(resolve) {
       const connections = this.pruneConnections();
+      db.setSavedConfig(constants.saveParamNames.CONNECTION, this.connectionsArray);
       resolve(connections);
     },
     pruneConnections() {
@@ -273,6 +279,13 @@ export default {
       );
       this.$set(this.changeTargetModal, 'showModal', false);
       this.$set(this.changeTargetModal, 'currentTarget', '');
+    },
+    async loadPreviousConfig() {
+      const savedConnections = await db.getSavedConfig(constants.saveParamNames.CONNECTION);
+      if (!savedConnections) {
+        return getDefaultConnections();
+      }
+      return savedConnections;
     },
   },
   beforeDestroy() {

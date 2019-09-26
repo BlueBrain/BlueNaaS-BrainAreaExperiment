@@ -20,6 +20,7 @@
       <i-table
         :columns="columns"
         :data="[currentProjection]"
+        :loading="isProjLoading"
         border
         class="custom-manipulation-table"
       >
@@ -68,6 +69,8 @@ import * as projectionConfig from '@/config/projection-config';
 import { replacePrefixPlaceholders } from '@/common/blueconfig-template';
 import eventBus from '@/services/event-bus';
 import { mapBlueConfigTerms } from '@/common/utils';
+import constants from '@/common/constants';
+import db from '@/services/db';
 
 export default {
   name: 'ProjectionManipulationList',
@@ -78,10 +81,11 @@ export default {
     return {
       isConfiguring: false,
       sectionCollapsed: true,
+      isProjLoading: true,
       projectionBeingEdited: {},
       notAvailableValue: '-',
-      simConfigToUse: this.$store.state.currentCircuitConfig.simConfigToUse,
       currentProjection: {},
+      simConfigToUse: this.$store.state.currentCircuitConfig.simConfigToUse,
       globalProjectionBlock: {},
       columns: [
         {
@@ -130,11 +134,12 @@ export default {
       ],
     };
   },
-  created() {
+  async created() {
     eventBus.$on('create-projection-config', this.creationConfigHandler);
     eventBus.$on('create-projection-file', this.createProjectionFile);
-    this.currentProjection = projectionConfig.getDefaultProjection(this.simConfigToUse);
     this.globalProjectionBlock = projectionConfig.getProjectionBlocks(this.simConfigToUse);
+    this.currentProjection = await this.loadPreviousConfig();
+    this.isProjLoading = false;
   },
   methods: {
     editProjection() {
@@ -145,13 +150,13 @@ export default {
         {
           target: projTarget,
           isConfiguring: true,
-          freq: 0.1,
           type: 'Poisson',
         },
       );
     },
     projectionChanged(newProjectionInfo) {
       this.currentProjection = newProjectionInfo;
+      this.currentProjection.isConfiguring = false;
       this.resetEditableProjection();
     },
     creationConfigHandler(resolve) {
@@ -162,6 +167,7 @@ export default {
       const pBlocks = this.globalProjectionBlock;
       if (!pBlocks) this.$Message.error('No probjection blocks were configured');
 
+      db.setSavedConfig(constants.saveParamNames.PROJECTION, this.currentProjection);
       const connectionProjectionName = Object.keys(pBlocks.Connection)[0];
       const projConnection = pBlocks.Connection[connectionProjectionName];
       const { Connection } = pBlocks;
@@ -210,6 +216,13 @@ export default {
     },
     resetEditableProjection() {
       this.projectionBeingEdited = {};
+    },
+    async loadPreviousConfig() {
+      const savedProjection = await db.getSavedConfig(constants.saveParamNames.PROJECTION);
+      if (!savedProjection) {
+        return projectionConfig.getDefaultProjection(this.simConfigToUse);
+      }
+      return savedProjection;
     },
   },
   beforeDestroy() {

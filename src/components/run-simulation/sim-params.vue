@@ -35,11 +35,12 @@
 
 
 <script>
-import get from 'lodash/get';
 import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
 import db from '@/services/db';
 import eventBus from '@/services/event-bus';
-import { mapBlueConfigTerms, unmapBlueConfigTerms } from '@/common/utils';
+import constants from '@/common/constants';
+
+import { mapBlueConfigTerms } from '@/common/utils';
 
 export default {
   name: 'sim-params',
@@ -79,25 +80,27 @@ export default {
           },
         },
       };
+      const configUsed = {
+        duration: this.duration,
+        forwardSkip: this.$store.state.simulationForwardSkip,
+        circuitTarget: this.populationSelected,
+      };
+      db.setSavedConfig(constants.saveParamNames.SIM_PARAMS, configUsed);
       resolve(params);
     },
     async loadPreviousConfig() {
-      const prevConfig = await db.retrievePreviousConfig();
+      const prevConfig = await db.getSavedConfig(constants.saveParamNames.SIM_PARAMS);
 
-      const runDefaultSaved = get(prevConfig, 'bc.Run.Default', {});
-      const hasSavedParams = Boolean(runDefaultSaved.ForwardSkip
-        && runDefaultSaved.Duration
-        && runDefaultSaved.CircuitTarget);
-
-      this.duration = hasSavedParams ? runDefaultSaved.Duration : this.$store.state.simulationDuration;
-      this.forwardSkip = hasSavedParams ? runDefaultSaved.ForwardSkip : this.$store.state.simulationForwardSkip;
-      this.populationSelected = hasSavedParams
-        ? unmapBlueConfigTerms(runDefaultSaved.CircuitTarget)
-        : null;
+      this.duration = prevConfig ? prevConfig.duration : this.$store.state.simulationDuration;
+      this.forwardSkip = prevConfig ? prevConfig.forwardSkip : this.$store.state.simulationForwardSkip;
+      this.populationSelected = prevConfig ? prevConfig.circuitTarget : null;
 
       // setup default computer
-      const unicoreSavedParams = get(prevConfig, 'unicore.computerSelected', null);
-      const computerToUse = unicoreSavedParams || this.$store.state.computersAvailable[0];
+      const uncorePrevConfig = await db.getSavedConfig(constants.saveParamNames.UNICORE);
+
+      const computerToUse = uncorePrevConfig
+        ? uncorePrevConfig.computerSelected
+        : this.$store.state.computersAvailable[0];
       eventBus.$emit('change-computer', computerToUse);
     },
     targetChanged(newModel) {

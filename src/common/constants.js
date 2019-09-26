@@ -11,4 +11,12 @@ export default {
     HIPPOCAMPUS: 'HIPPOCAMPUS',
     SSCX: 'SSCX',
   },
+  saveParamNames: {
+    CONNECTION: 'CONNECTION',
+    PROJECTION: 'PROJECTION',
+    REPORT: 'REPORT',
+    STIMULATION: 'STIMULATION',
+    SIM_PARAMS: 'SIM_PARAMS',
+    UNICORE: 'UNICORE',
+  },
 };

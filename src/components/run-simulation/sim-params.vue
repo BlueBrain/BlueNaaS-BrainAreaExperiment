@@ -14,7 +14,7 @@
       <div class="subtitle">Subpopulation of neurons to be simulated (CircuitTarget)"</div>
     </div>
 
-    <div class="spaced"/>
+    <div class="space-divider"/>
 
     <div>
       <div class="inline">
@@ -118,13 +118,12 @@ export default {
 .sim-params {
   display: flex;
 
-  .spaced {
+  .space-divider {
     width: 250px;
   }
 
   .inline {
     display: flex;
-    align-items: flex-end;
     .margined-right {
       margin-right: 10px;
     }

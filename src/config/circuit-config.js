@@ -456,6 +456,7 @@ const sscxBbpMicrocircuit = {
     { name: 'dNAC_dSTUT', displayName: 'dNAC_dSTUT', src: `${sscxImgBase}/dNAC_dSTUT.png` },
     { name: 'Inhibitory_no_dNAC_dSTUT', displayName: 'Inhibitory_no_dNAC', src: `${sscxImgBase}/Inhibitory_no_dNAC_dSTUT.png` },
     { name: 'proj_Thalamocortical_VPM_Source', displayName: 'proj_Thalamocortical_VPM_Source' },
+    { name: '5Cells', displayName: '5Cells' },
     {
       name: 'AllCompartments',
       displayName: 'AllCompartments',

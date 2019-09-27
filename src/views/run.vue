@@ -183,7 +183,6 @@ export default {
   .right-align {
     text-align: right;
     margin-bottom: 8px;
-
   }
   .border-container {
     background-color: rgba(216, 223, 239, 0.38);
@@ -199,6 +198,7 @@ export default {
     display: flex;
     align-self: stretch;
     width: 20%;
+    justify-content: center;
   }
   .shared-flex-block {
     display: flex;

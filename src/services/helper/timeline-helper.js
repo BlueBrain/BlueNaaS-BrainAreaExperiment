@@ -134,6 +134,7 @@ function getMaxId(dataSet) {
 
 async function isCurrentSameAsSavedTarget() {
   const savedSimConfig = await db.getSavedConfig(constants.saveParamNames.SIM_PARAMS);
+  if (!savedSimConfig) return false;
   return store.state.simulationPopulation === savedSimConfig.circuitTarget;
 }
 

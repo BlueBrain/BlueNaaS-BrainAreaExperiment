@@ -5,6 +5,7 @@
       v-model="populationSelected"
       filterable
       class="custom-autocomplete-targets"
+      :class="{ 'ivu-form-item-error': !populationSelected }"
       ref="targetDropdown"
       @on-change="itemSelected"
     >

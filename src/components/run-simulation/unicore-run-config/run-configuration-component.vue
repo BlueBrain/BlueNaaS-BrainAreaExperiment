@@ -37,6 +37,7 @@
       size="default"
       @click="configureSimulation"
       class="baseline-align"
+      :class="{ disabled: !populationWasSelected }"
     >Continue</i-button>
   </div>
 </template>
@@ -69,6 +70,11 @@ export default {
       this.closeTip();
     }
   },
+  computed: {
+    populationWasSelected() {
+      return this.$store.state.simulationPopulation;
+    },
+  },
   methods: {
     closeTip() {
       const tipElement = this.$el.querySelector('#tip');
@@ -78,6 +84,10 @@ export default {
 
     async configureSimulation() {
       // make blueConfig to check if all the params are correct
+      if (!this.populationWasSelected) {
+        this.$Message.error('Please select a Population to run simulation');
+        return;
+      }
       const partialBlueConfig = await this.generatePartialBlueConfig();
       const populationSelected = this.$store.state.simulationPopulation;
       const isConsistant = this.checkSimulationConsistancy(partialBlueConfig, populationSelected);

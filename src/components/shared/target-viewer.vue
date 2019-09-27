@@ -5,7 +5,7 @@
     :class="{ 'rotate': !localSrc, 'loading': isLoading }"
   >
     <section class="img-container">
-      <span v-if="!localSrc" >Preview Not Available</span>
+      <span v-if="!localSrc">Preview Not Available</span>
       <img :src="localSrc">
     </section>
   </div>
@@ -18,7 +18,7 @@ export default {
   props: ['targetSelectedUrl'],
   data() {
     return {
-      isLoading: true,
+      isLoading: false,
       localSrc: null,
     };
   },
@@ -38,7 +38,6 @@ export default {
 <style scoped lang="scss">
   .img-container > img {
     max-width: 100%;
-    transform: scale(1.2);
   }
   .target-viewer-container {
     align-self: center;

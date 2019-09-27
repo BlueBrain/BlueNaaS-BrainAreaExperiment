@@ -94,7 +94,7 @@ export default {
       script: [
         '#!/bin/bash -l',
         '. /etc/profile',
-        'module load nix/hpc/neurodamus',
+        'module load neurodamus-neocortex',
         'module load py-bluepy',
         'module load brion/3.0.0/python3/serial',
         'python /gpfs/bbp.cscs.ch/home/antonel/scripts_unicore/create_replay_bb5_0.11.py',

@@ -86,15 +86,15 @@ export default {
     analysisOverallStatus() {
       let outputText = '';
       if (!Object.keys(this.simulationDetails).length) {
-        outputText = 'Fetching simulation information...';
+        outputText = 'Fetching simulation information ...';
       } else if (isRunning(this.simulationDetails.status)) {
-        outputText = 'Simulation not finished yet. Wait until it finishes to run analysis';
+        outputText = 'No analysis available. You must launch analysis after the simulation is completed.';
       } else if (this.simulationDetails.status === jobStatus.FAILED) {
         outputText = 'Simulation failed. No analysis could be run.';
       } else if (this.analysisDetails.length === 0 && this.overallLoading) {
-        outputText = 'loading';
+        outputText = 'Loading ...';
       } else if (this.analysisDetails.length === 0 && !this.overallLoading) {
-        outputText = 'No analysis have been run';
+        outputText = 'No analysis have been run yet';
       }
       return outputText;
     },

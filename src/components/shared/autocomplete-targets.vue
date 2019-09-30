@@ -26,11 +26,11 @@
 
     <div
       class="poptip-preview-container"
-      :class="{ showing: currentPreviewSrc }"
+      ref="targetImgContainerRef"
     >
       <img
         class="preview-target-popover"
-        :src="currentPreviewSrc"
+        ref="targetImgRef"
       />
     </div>
   </div>
@@ -40,24 +40,21 @@
 <script>
 export default {
   props: ['targetSelected', 'itemsAvailable'],
-  data() {
-    return {
-      currentPreviewSrc: '',
-    };
-  },
   methods: {
     itemSelected(selection) {
       if (!selection) return;
       this.$emit('target-changed', selection);
     },
     showPoptipTarget(targetSrc) {
-      this.currentPreviewSrc = targetSrc;
+      // using the ref due an issue in iview select losing focus while searching
+      this.$refs.targetImgRef.src = targetSrc;
+      this.$refs.targetImgContainerRef.classList.add('showing');
     },
   },
   mounted() {
     // to hide the poptip only when hover outside the i-select
     const targetDropdown = this.$refs.targetDropdown.$el;
-    targetDropdown.onmouseleave = () => { this.currentPreviewSrc = ''; };
+    targetDropdown.onmouseleave = () => { this.$refs.targetImgContainerRef.classList.remove('showing'); };
   },
   computed: {
     targets() {

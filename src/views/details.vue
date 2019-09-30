@@ -51,24 +51,6 @@ This will display the details of a certain simulation and the analysis.
 
       <collapse-title
         :collapsed="true"
-        title="Unicore Logs"
-        @expanded="parseUnicoreLogs"
-      >
-        <div slot="element">
-          <div v-if="parsedFiles.unicoreLog">
-            <display-or-download
-              :file-content="parsedFiles.unicoreLog"
-              file-name="unicore_log"
-            />
-          </div>
-          <div v-else>
-            <icon type="md-sync" size="20" class="spin" />
-          </div>
-        </div>
-      </collapse-title>
-
-      <collapse-title
-        :collapsed="true"
         title="Files"
         @expanded="parseUnicoreFiles"
       >
@@ -95,33 +77,63 @@ This will display the details of a certain simulation and the analysis.
         </div>
       </collapse-title>
 
-      <collapse-title
-        :collapsed="true"
-        title="Stderr"
-        @expanded="getFileExpanded('stderr', downloadedFiles)"
-      >
-        <div
-          slot="element"
-          class="log-item" >
-          <display-or-download
-            :file-content="downloadedFiles.stderr"
-            file-name="stderr"
-          />
-        </div>
-      </collapse-title>
 
       <collapse-title
         :collapsed="true"
-        title="Stdout"
+        title="Technical Logs"
         @expanded="getFileExpanded('stdout', downloadedFiles)"
       >
-        <div
-          slot="element"
-          class="log-item">
-          <display-or-download
-            :file-content="downloadedFiles.stdout"
-            file-name="stdout"
-          />
+        <div slot="element">
+          <collapse-title
+            :collapsed="true"
+            :sublevel="true"
+            title="Unicore Logs"
+            @expanded="parseUnicoreLogs"
+          >
+            <div slot="element">
+              <div v-if="parsedFiles.unicoreLog">
+                <display-or-download
+                  :file-content="parsedFiles.unicoreLog"
+                  file-name="unicore_log"
+                />
+              </div>
+              <div v-else>
+                <icon type="md-sync" size="20" class="spin" />
+              </div>
+            </div>
+          </collapse-title>
+
+          <collapse-title
+            :collapsed="true"
+            :sublevel="true"
+            title="Stderr"
+            @expanded="getFileExpanded('stderr', downloadedFiles)"
+          >
+            <div
+              slot="element"
+              class="log-item" >
+              <display-or-download
+                :file-content="downloadedFiles.stderr"
+                file-name="stderr"
+              />
+            </div>
+          </collapse-title>
+
+          <collapse-title
+            :collapsed="true"
+            :sublevel="true"
+            title="Stdout"
+            @expanded="getFileExpanded('stdout', downloadedFiles)"
+          >
+            <div
+              slot="element"
+              class="log-item">
+              <display-or-download
+                :file-content="downloadedFiles.stdout"
+                file-name="stdout"
+              />
+            </div>
+          </collapse-title>
         </div>
       </collapse-title>
     </div>

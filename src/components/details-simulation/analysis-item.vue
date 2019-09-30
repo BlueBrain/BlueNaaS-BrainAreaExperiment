@@ -23,6 +23,7 @@
       </div>
     </div>
     <collapse-title
+      v-if="itemDetails.jobURL"
       :collapsed="true"
       title="Analysis Logs"
       :sublevel="true"

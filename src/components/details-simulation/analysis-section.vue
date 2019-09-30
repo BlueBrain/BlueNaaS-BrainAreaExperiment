@@ -103,7 +103,7 @@ export default {
     // open after some seconds to avoid overload
     setTimeout(() => {
       this.sectionCollapsed = false;
-    }, 2000);
+    }, 1500);
   },
   methods: {
     async getAnalysisInfo() {

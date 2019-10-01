@@ -18,7 +18,7 @@
 
         <div
           class="custom-select-item-for-preview"
-          @mouseenter="showPoptipTarget(target.src)"
+          @mouseenter="showPoptipTarget(target)"
         >{{ target.displayName }}</div>
 
       </i-option>
@@ -28,6 +28,7 @@
       class="poptip-preview-container"
       ref="targetImgContainerRef"
     >
+      <div class="cells-count" ref="cellCount"/>
       <img
         class="preview-target-popover"
         ref="targetImgRef"
@@ -45,16 +46,33 @@ export default {
       if (!selection) return;
       this.$emit('target-changed', selection);
     },
-    showPoptipTarget(targetSrc) {
+    showPoptipTarget(targetObj) {
+      if (!targetObj.src) {
+        this.hideImg();
+        return;
+      }
       // using the ref due an issue in iview select losing focus while searching
-      this.$refs.targetImgRef.src = targetSrc;
+      this.$refs.targetImgRef.src = targetObj.src;
       this.$refs.targetImgContainerRef.classList.add('showing');
+      this.setCellsCount(targetObj);
+    },
+    setCellsCount(targetObj) {
+      this.$refs.cellCount.innerHTML = `Cells: ${targetObj.cells || '?'} / ${this.fullCellsAmount}`;
+    },
+    hideImg() {
+      this.$refs.targetImgContainerRef.classList.remove('showing');
     },
   },
   mounted() {
     // to hide the poptip only when hover outside the i-select
     const targetDropdown = this.$refs.targetDropdown.$el;
-    targetDropdown.onmouseleave = () => { this.$refs.targetImgContainerRef.classList.remove('showing'); };
+    targetDropdown.onmouseleave = () => { this.hideImg(); };
+
+    const circuitConfig = this.$store.state.currentCircuitConfig;
+    const biggestTargetObj = circuitConfig.targets.find(target => (
+      target.displayName === circuitConfig.biggestTarget
+    ));
+    this.fullCellsAmount = biggestTargetObj.cells;
   },
   computed: {
     targets() {
@@ -102,6 +120,11 @@ export default {
     &.showing {
       opacity: 1;
       z-index: 2;
+    }
+    .cells-count {
+      font-size: 14px;
+      text-align: center;
+      font-weight: bold;
     }
   }
 </style>

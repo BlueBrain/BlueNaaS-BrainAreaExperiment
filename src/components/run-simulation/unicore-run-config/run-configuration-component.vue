@@ -186,7 +186,7 @@ export default {
         if (populationSelected !== circuitConf.biggestTarget) {
           alert.warning({
             content: `This simulation may not run.
-            Check if Population-Stimulation-Report union is not empty`,
+            Check if Population-Stimulation-Report intersection is not empty`,
             duration: 10,
           });
         }

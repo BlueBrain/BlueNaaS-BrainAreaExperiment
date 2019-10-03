@@ -3,6 +3,12 @@ import constants from '@/common/constants';
 
 const { computers, areas } = constants;
 
+const reportOnGeneric = {
+  voltage: 'Voltage',
+  calcium: 'Calcium Concentration',
+  lfp: 'Current Summation (for LFP)',
+  currentSummation: 'All Currents Summation',
+};
 export default {
   [areas.HIPPOCAMPUS]: {
     [computers.JURECA]: {
@@ -82,11 +88,7 @@ export default {
       { name: 'NPoisson', params: ['Lambda', 'Weight', 'NumOfSynapses'] },
       { name: 'Noise', params: ['MeanPercent', 'Variance'] },
     ],
-    reportOn: {
-      voltage: 'Voltage',
-      calcium: 'Calcium Concentration',
-      lfp: 'Total Current for LFP',
-    },
+    reportOn: Object.assign({}, reportOnGeneric),
     checksForLFP: ['AllCompartments', 'Summation'],
   },
   [areas.SSCX]: {
@@ -117,11 +119,7 @@ export default {
       { name: 'NPoisson', params: ['Lambda', 'Weight', 'NumOfSynapses'] },
       { name: 'Noise', params: ['MeanPercent', 'Variance'] },
     ],
-    reportOn: {
-      voltage: 'Voltage',
-      calcium: 'Calcium Concentration',
-      lfp: 'Total Current for LFP',
-    },
+    reportOn: Object.assign({}, reportOnGeneric),
     checksForLFP: ['AllCompartments', 'Summation'],
   },
 };

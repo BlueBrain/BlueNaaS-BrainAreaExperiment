@@ -55,15 +55,15 @@
             <tooltip
               slot="label"
               content="Soma (compartment) means that each compartment outputs separately
-              in the report file. Synapse indicates that each synapse will have a
-              separate entry in the report"
-            >Type</tooltip>
+              in the report file. Soma + Dendrites (AllCompartments + Summation) will sum up the
+              compartments and write a single value to the report"
+            >Compartments</tooltip>
             <i-select
               v-model="localReportInfo.Type"
               placeholder="Type"
             >
               <i-option value="Soma">Soma</i-option>
-              <i-option value="Summation">Summation</i-option>
+              <i-option :value="allCompartmentTargetObj.type">{{ allCompartmentTargetObj.displayName }}</i-option>
             </i-select>
           </form-item>
 
@@ -139,6 +139,7 @@ export default {
     return {
       formInvalid: false,
       localReportInfo: Object.assign({}, this.reportInfo),
+      allCompartmentTargetObj: this.$store.state.currentCircuitConfig.allCompartmentTargetObj,
 
       ruleValidate: {
         StartTime: [{
@@ -176,7 +177,7 @@ export default {
       return this.$store.state.reportTargets;
     },
     reportOptions() {
-      if (!this.allowRunLfp) {
+      if (!this.allCompartmentTargetObj) {
         const newReportOptions = Object.assign({}, this.$store.state.currentSimulationConfig.reportOn);
         delete newReportOptions.lfp;
         return newReportOptions;
@@ -207,10 +208,7 @@ export default {
     reportOnChanged(newReportOn) {
       if (newReportOn !== this.reportOptions.lfp) return;
       // if report on lfp change other params to run simulation full lfp compatible
-      this.$Message.warning('Simulation for LFP is an expensive operation');
-      this.$set(this.localReportInfo, 'Type', 'Summation');
-      const lfpTarget = this.reportTargets.find(t => t.lfp);
-      this.$set(this.localReportInfo, 'Target', lfpTarget.displayName);
+      this.$set(this.localReportInfo, 'Type', this.allCompartmentTargetObj.type);
     },
   },
 };

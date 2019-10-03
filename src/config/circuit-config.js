@@ -4,6 +4,13 @@
 import constants from '@/common/constants';
 
 const { computers } = constants;
+
+const allCompartmentGenericTarget = {
+  target: 'AllCompartments',
+  type: 'Summation',
+  displayName: 'Soma + Dendrites',
+};
+
 /*
 |--------------------------------------------------------------------------
 | Hippocampus Full CA1
@@ -143,10 +150,10 @@ const hippoHbpFullCa1 = {
     { name: 'SO', displayName: 'SO', src: `${slicesImgBase}/SO.png`, cells: '6146' },
     { name: 'SR', displayName: 'SR', src: `${slicesImgBase}/SR.png`, cells: '82' },
     { name: 'SC', displayName: 'Schaffer Collateral Projection', cells: '' },
-    { name: 'AllCompartments', displayName: 'AllCompartments', lfp: true, src: `${slicesImgBase}/All.png` },
   ],
   defaultPopulation: 'Slice 05',
   biggestTarget: 'Full Circuit',
+  allCompartmentTargetObj: Object.assign({}, allCompartmentGenericTarget),
   displayName: 'Hippocampus Full CA1',
   simConfigToUse: constants.areas.HIPPOCAMPUS,
   hipperpolarizingStim: {
@@ -246,10 +253,10 @@ const hippoHbpMicrocircuit = {
     { name: 'SP_INT', displayName: 'SP_INT', src: `${microcircuitImgBase}/SP_INT.png`, cells: '1142' },
     { name: 'INT', displayName: 'INT', src: `${microcircuitImgBase}/INT.png`, cells: '1326' },
     { name: 'Minicolumn', displayName: 'Minicolumn', src: `${microcircuitImgBase}/Minicolumn.png`, cells: '2638' },
-    { name: 'AllCompartments', displayName: 'AllCompartments', lfp: true, src: `${microcircuitImgBase}/Mosaic.png` },
   ],
   biggestTarget: 'Full Circuit',
   defaultPopulation: 'Central Column',
+  allCompartmentTargetObj: Object.assign({}, allCompartmentGenericTarget),
   displayName: 'Hippocampus CA1 Microcircuit',
   simConfigToUse: constants.areas.HIPPOCAMPUS,
   extraParamsInBC: {},
@@ -445,10 +452,10 @@ const sscxBbpMicrocircuit = {
     { name: 'dNAC_dSTUT', displayName: 'dNAC_dSTUT', src: `${sscxImgBase}/dNAC_dSTUT.png`, cells: '2885' },
     { name: 'Inhibitory_no_dNAC_dSTUT', displayName: 'Inhibitory_no_dNAC', src: `${sscxImgBase}/Inhibitory_no_dNAC_dSTUT.png`, cells: '17914' },
     { name: 'proj_Thalamocortical_VPM_Source', displayName: 'proj_Thalamocortical_VPM_Source', cells: '' },
-    { name: 'AllCompartments', displayName: 'AllCompartments', lfp: true, src: `${sscxImgBase}/All.png`, cells: '162048' },
   ],
   biggestTarget: 'Full Circuit',
   defaultPopulation: 'Central Column',
+  allCompartmentTargetObj: Object.assign({}, allCompartmentGenericTarget),
   displayName: 'SomatosensoryCortex Microcircuit',
   simConfigToUse: constants.areas.SSCX,
   extraParamsInBC: {},

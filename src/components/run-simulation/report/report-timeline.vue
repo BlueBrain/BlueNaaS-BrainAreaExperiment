@@ -73,6 +73,7 @@ export default {
       tooltipElem: null,
       sectionCollapsed: true,
       isTimelineLoading: true,
+      allCompartmentTargetObj: this.$store.state.currentCircuitConfig.allCompartmentTargetObj,
     };
   },
   computed: {
@@ -242,13 +243,18 @@ export default {
       const reportItems = this.timeline.getVisibleItems();
       reportItems.forEach((reportName, index) => {
         const reportObj = this.timeline.itemsData.get(reportName);
+        const { reportInfo } = reportObj;
         configToSave.push(reportObj);
-        const reportMapped = mapBlueConfigTerms(reportObj.reportInfo);
+        const reportMapped = mapBlueConfigTerms(reportInfo);
         const repName = simTimelineLib.joinName(
           reportMapped.Target,
           'report',
           index,
         );
+        // change target if soma + dendrites apply AllCompartments target
+        if (reportMapped.Type === this.allCompartmentTargetObj.type) {
+          reportMapped.Target = this.allCompartmentTargetObj.target;
+        }
         reportMapped.Unit = this.getReportUnit(reportMapped);
         config.Report[repName] = reportMapped;
       });

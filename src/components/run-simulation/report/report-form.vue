@@ -2,7 +2,7 @@
 <template>
   <div>
     <modal
-      width="350"
+      width="390"
       v-model="formInvalid"
       @on-cancel="onCancel"
       class="report-form larger-inputs"
@@ -171,6 +171,10 @@ export default {
       if (!newInfo) return;
       this.localReportInfo = Object.assign({}, newInfo);
     },
+    reportType(newType) {
+      if (newType !== this.allCompartmentTargetObj.type) return;
+      this.showWarningAllCompartments();
+    },
   },
   computed: {
     reportTargets() {
@@ -184,9 +188,8 @@ export default {
       }
       return this.$store.state.currentSimulationConfig.reportOn;
     },
-    allowRunLfp() {
-      if (!this.reportTargets || !this.reportTargets.length) return false;
-      return !!this.reportTargets.find(t => t.lfp);
+    reportType() {
+      return this.localReportInfo.Type;
     },
   },
   methods: {
@@ -200,10 +203,12 @@ export default {
       this.$emit('item-edited', this.localReportInfo);
       this.formInvalid = false;
     },
-
     targetChanged(newTarget) {
       if (this.localReportInfo.Target === newTarget) return;
       this.$set(this.localReportInfo, 'Target', newTarget);
+    },
+    showWarningAllCompartments() {
+      this.$Message.warning('Current Summation Simulation is an expensive operation');
     },
     reportOnChanged(newReportOn) {
       if (newReportOn !== this.reportOptions.lfp) return;

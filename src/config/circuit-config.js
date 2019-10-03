@@ -11,6 +11,23 @@ const allCompartmentGenericTarget = {
   displayName: 'Soma + Dendrites',
 };
 
+const hipperpolarizingGenericStim = {
+  Stimulus: {
+    hypamp: {
+      Mode: 'Current',
+      Pattern: 'Hyperpolarizing',
+      Delay: '0.0',
+      Duration: '20000',
+    },
+  },
+  StimulusInject: {
+    hypamp_mosaic: {
+      Stimulus: 'hypamp',
+      Target: 'Mosaic',
+    },
+  },
+};
+
 /*
 |--------------------------------------------------------------------------
 | Hippocampus Full CA1
@@ -38,7 +55,7 @@ const hippoHbpFullCa1 = {
     OutputRoot: '.',
   },
   targets: [
-    { name: '5Cells', displayName: '5Cells', cells: '5' },
+    { name: '5Cells', displayName: '5Cells', src: `${slicesImgBase}/5Cells.png`, cells: '5' },
     { name: 'Mosaic', displayName: 'Full Circuit', src: `${slicesImgBase}/Mosaic.png`, cells: '456290' },
     { name: 'slice0', displayName: 'Slice 0', src: `${slicesImgBase}/slice0.png`, cells: '1' },
     { name: 'slice1', displayName: 'Slice 01', src: `${slicesImgBase}/slice1.png`, cells: '175' },
@@ -156,22 +173,7 @@ const hippoHbpFullCa1 = {
   allCompartmentTargetObj: Object.assign({}, allCompartmentGenericTarget),
   displayName: 'Hippocampus Full CA1',
   simConfigToUse: constants.areas.HIPPOCAMPUS,
-  hipperpolarizingStim: {
-    Stimulus: {
-      hypamp: {
-        Mode: 'Current',
-        Pattern: 'Hyperpolarizing',
-        Delay: '0.0',
-        Duration: '20000',
-      },
-    },
-    StimulusInject: {
-      hypamp_mosaic: {
-        Stimulus: 'hypamp',
-        Target: 'Mosaic',
-      },
-    },
-  },
+  hipperpolarizingStim: Object.assign({}, hipperpolarizingGenericStim),
 };
 
 
@@ -210,7 +212,7 @@ const hippoHbpMicrocircuit = {
     OutputRoot: '.',
   },
   targets: [
-    { name: '5Cells', displayName: '5Cells', cells: '5' },
+    { name: '5Cells', displayName: '5Cells', src: `${microcircuitImgBase}/5Cells.png`, cells: '5' },
     { name: 'Mosaic', displayName: 'Full Circuit', src: `${microcircuitImgBase}/Mosaic.png`, cells: '18186' },
     { name: 'Random1PercFull', displayName: 'Random 1% full circuit', src: `${microcircuitImgBase}/Random1PercFull.png`, cells: '6' },
     { name: 'Random5PercFull', displayName: 'Random 5% full circuit', src: `${microcircuitImgBase}/Random5PercFull.png`, cells: '13' },
@@ -260,22 +262,7 @@ const hippoHbpMicrocircuit = {
   displayName: 'Hippocampus CA1 Microcircuit',
   simConfigToUse: constants.areas.HIPPOCAMPUS,
   extraParamsInBC: {},
-  hipperpolarizingStim: {
-    Stimulus: {
-      hypamp: {
-        Mode: 'Current',
-        Pattern: 'Hyperpolarizing',
-        Delay: '0.0',
-        Duration: '20000',
-      },
-    },
-    StimulusInject: {
-      hypamp_mosaic: {
-        Stimulus: 'hypamp',
-        Target: 'Mosaic',
-      },
-    },
-  },
+  hipperpolarizingStim: Object.assign({}, hipperpolarizingGenericStim),
 };
 
 
@@ -332,7 +319,7 @@ const sscxBbpMicrocircuit = {
     OutputRoot: '.',
   },
   targets: [
-    { name: '5Cells', displayName: '5Cells', cells: '5' },
+    { name: '5Cells', displayName: '5Cells', src: `${sscxImgBase}/5Cells.png`, cells: '5' },
     { name: 'Mosaic', displayName: 'Full Circuit', src: `${sscxImgBase}/Mosaic.png`, cells: '162048' },
     { name: 'Excitatory', displayName: 'Excitatory', src: `${sscxImgBase}/Excitatory.png`, cells: '141249' },
     { name: 'Inhibitory', displayName: 'Inhibitory', src: `${sscxImgBase}/Inhibitory.png`, cells: '20799' },
@@ -459,22 +446,7 @@ const sscxBbpMicrocircuit = {
   displayName: 'SomatosensoryCortex Microcircuit',
   simConfigToUse: constants.areas.SSCX,
   extraParamsInBC: {},
-  hipperpolarizingStim: {
-    Stimulus: {
-      hypamp: {
-        Mode: 'Current',
-        Pattern: 'Hyperpolarizing',
-        Delay: '0.0',
-        Duration: '20000',
-      },
-    },
-    StimulusInject: {
-      hypamp_mosaic: {
-        Stimulus: 'hypamp',
-        Target: 'Mosaic',
-      },
-    },
-  },
+  hipperpolarizingStim: Object.assign({}, hipperpolarizingGenericStim),
 };
 
 const mapCircuitNameWithUrl = {

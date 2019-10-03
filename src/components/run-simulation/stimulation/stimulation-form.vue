@@ -2,7 +2,7 @@
 <template>
   <div>
     <modal
-      width="350"
+      width="390"
       v-model="formInvalid"
       @on-cancel="onCancel"
       class="stimulation-form larger-inputs"

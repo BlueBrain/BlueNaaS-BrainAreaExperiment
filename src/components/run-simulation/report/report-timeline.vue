@@ -228,6 +228,7 @@ export default {
           unit = 'mM';
           break;
         case 'i_membrane IClamp':
+        case 'AllCurrents':
           unit = 'nA';
           break;
         default:

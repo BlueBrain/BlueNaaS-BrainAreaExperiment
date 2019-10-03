@@ -9,6 +9,13 @@ const reportOnGeneric = {
   lfp: 'Current Summation (for LFP)',
   currentSummation: 'All Currents Summation',
 };
+
+const stimuliGeneric = [
+  { name: 'Linear', params: ['AmpStart', 'AmpEnd'] },
+  { name: 'NPoisson', params: ['Lambda', 'Weight', 'NumOfSynapses'] },
+  { name: 'Noise', params: ['MeanPercent', 'Variance'] },
+];
+
 export default {
   [areas.HIPPOCAMPUS]: {
     [computers.JURECA]: {
@@ -83,11 +90,7 @@ export default {
     defaultDuration: 300,
     defaultForwardSkip: 5000,
     importSimulationScript: 'ln -sf SIMFOLDERPATH/* . && rm ./BlueConfig && cp SIMFOLDERPATH/BlueConfig .',
-    stimuli: [
-      { name: 'Linear', params: ['AmpStart', 'AmpEnd'] },
-      { name: 'NPoisson', params: ['Lambda', 'Weight', 'NumOfSynapses'] },
-      { name: 'Noise', params: ['MeanPercent', 'Variance'] },
-    ],
+    stimuli: Object.assign([], stimuliGeneric),
     reportOn: Object.assign({}, reportOnGeneric),
     checksForLFP: ['AllCompartments', 'Summation'],
   },
@@ -114,11 +117,7 @@ export default {
     defaultDuration: 300,
     defaultForwardSkip: 5000,
     importSimulationScript: 'ln -sf SIMFOLDERPATH/* .',
-    stimuli: [
-      { name: 'Linear', params: ['AmpStart', 'AmpEnd'] },
-      { name: 'NPoisson', params: ['Lambda', 'Weight', 'NumOfSynapses'] },
-      { name: 'Noise', params: ['MeanPercent', 'Variance'] },
-    ],
+    stimuli: Object.assign([], stimuliGeneric),
     reportOn: Object.assign({}, reportOnGeneric),
     checksForLFP: ['AllCompartments', 'Summation'],
   },

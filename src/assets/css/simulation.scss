@@ -79,13 +79,16 @@
 .stimulation-form.larger-inputs,
 .report-form.larger-inputs {
   .ivu-input-number, .ivu-select {
-    width: 140px;
+    width: 180px;
   }
   .custom-autocomplete-targets .ivu-select-dropdown {
     overflow-x: hidden;
   }
 }
 
+.sim-params .custom-autocomplete-targets .ivu-select-dropdown {
+  overflow-x: hidden;
+}
 
 /* ----------- steps number ----------- */
 .border-container .circle-number {

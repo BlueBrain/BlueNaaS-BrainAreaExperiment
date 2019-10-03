@@ -86,8 +86,8 @@ export default {
     padding-left: 24px;
   }
   .collapse-title .item.sublevel {
-    color: #5b6376;
-    font-size: 14px;
+    color: #4b7a76;
+    font-size: 16px;
   }
   .collapse-title .toggle-arrow {
     transition: transform 0.3s;

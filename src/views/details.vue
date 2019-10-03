@@ -81,7 +81,6 @@ This will display the details of a certain simulation and the analysis.
       <collapse-title
         :collapsed="true"
         title="Technical Logs"
-        @expanded="getFileExpanded('stdout', downloadedFiles)"
       >
         <div slot="element">
           <collapse-title

@@ -206,7 +206,7 @@ export default {
 <style scoped>
   .centered {
     text-align: center;
-    width: 230px;
+    width: 250px;
     margin: 0 auto;
   }
   .spaced-row {
@@ -224,6 +224,6 @@ export default {
   }
   .scollable-points {
     max-height: 150px;
-    overflow: scroll;
+    overflow-y: scroll;
   }
 </style>

@@ -9,6 +9,7 @@
           :target-selected="populationSelected"
           :itemsAvailable="populationTargets"
           @target-changed="targetChanged"
+          class="custom-autocomplete-targets"
         />
       </div>
       <div class="subtitle">Subpopulation of neurons to be simulated (CircuitTarget)"</div>
@@ -127,12 +128,13 @@ export default {
     .margined-right {
       margin-right: 10px;
     }
+    .custom-autocomplete-targets {
+      width: 180px;
+    }
   }
   .container-grow {
     flex-grow: 1;
   }
-  .custom-autocomplete-targets {
-    max-width: 400px;
-  }
+
 }
 </style>

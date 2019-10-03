@@ -13,6 +13,7 @@ const mapper = {
   Poisson: 'NPoisson',
   'Calcium Concentration': 'cai',
   'Current Summation (for LFP)': 'i_membrane IClamp',
+  'All Currents Summation': 'AllCurrents',
 };
 
 // add targets to mapper for later conversion to BlueConfig and vice-versa

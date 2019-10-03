@@ -37,6 +37,8 @@ export default {
       'python /gpfs/bbp.cscs.ch/home/antonel/scripts_unicore/analysis_launch_bb5_0.11.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
     ],
     executable: '/bin/bash input.sh',
+    partitions: { '*': 'prod_small' },
+    qos: 'normal',
   },
   [computers.NUVLA]: {
     dynamicAnalysisConfig: 'https://raw.githubusercontent.com/BlueBrain/MOOC-hippocampus-network-simulation-2019/master/analysis_config.json',
@@ -66,7 +68,7 @@ export default {
   ],
   configFileName: 'analysis_config.json',
   analysisConnectionFileName: 'analysis_path.json',
-  nodes: 4,
+  nodes: 1,
   runtime: 1800,
   usecasesCreationForm: 'https://bbp.epfl.ch/public/usecases-wizard/index.html#/entitydashboard?',
 };

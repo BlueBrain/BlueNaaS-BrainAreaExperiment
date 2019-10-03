@@ -333,7 +333,7 @@ async function generateUnicoreConfig(configParams) {
       const selectedPartition = partitionsMap[selectedProject];
       return selectedPartition;
     }
-    const partitionsMap = simStaticParams.partitions;
+    const partitionsMap = configParams.partitions || simStaticParams.partitions;
     if (!partitionsMap) return null;
     return filterPartition(partitionsMap, store.state.userGroup);
   }
@@ -387,7 +387,7 @@ async function generateUnicoreConfig(configParams) {
       Queue: getPartition(),
       Project: configParams.accountSelected || null,
       CPUs: nodes ? nodes * simStaticParams.cpus : null,
-      QoS: simStaticParams.qos || null,
+      QoS: configParams.qos || simStaticParams.qos || null,
     },
     Tags: configParams.tags,
     Imports: configParams.imports,

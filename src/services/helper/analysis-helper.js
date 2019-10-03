@@ -53,6 +53,8 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
   const newAnalysisAndTransferInfo = analysisAndTransferInfo;
   const computer = store.state.currentComputer;
   newAnalysisAndTransferInfo.executable = analysisConfig[computer].executable;
+  newAnalysisAndTransferInfo.partitions = analysisConfig[computer].partitions;
+  newAnalysisAndTransferInfo.qos = analysisConfig[computer].qos;
 
   // get all the files to be copied
   const filesToCopy = await getFilesToCopy(`${newAnalysisAndTransferInfo.from.workingDirectory}/files`);

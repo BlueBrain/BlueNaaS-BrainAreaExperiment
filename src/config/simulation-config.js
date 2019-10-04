@@ -4,10 +4,24 @@ import constants from '@/common/constants';
 const { computers, areas } = constants;
 
 const reportOnGeneric = {
-  voltage: 'Voltage',
-  calcium: 'Calcium Concentration',
-  lfp: 'Current Summation (for LFP)',
-  currentSummation: 'All Currents Summation',
+  voltage: {
+    displayName: 'Voltage',
+    name: 'v',
+    type: 'compartment',
+    unit: 'mV',
+  },
+  calcium: {
+    displayName: 'Calcium Concentration',
+    name: 'cai',
+    type: 'compartment',
+    unit: 'mM',
+  },
+  lfp: {
+    displayName: 'Current Summation (for LFP)',
+    name: 'i_membrane IClamp',
+    type: 'Summation',
+    unit: 'nA',
+  },
 };
 
 const stimuliGeneric = [

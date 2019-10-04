@@ -8,12 +8,9 @@ import isEqual from 'lodash/isEqual';
 import store from '@/services/store';
 
 const mapper = {
-  Voltage: 'v',
   Soma: 'compartment',
+  'Soma + Dendrites': 'AllCompartments',
   Poisson: 'NPoisson',
-  'Calcium Concentration': 'cai',
-  'Current Summation (for LFP)': 'i_membrane IClamp',
-  'All Currents Summation': 'AllCurrents',
 };
 
 // add targets to mapper for later conversion to BlueConfig and vice-versa

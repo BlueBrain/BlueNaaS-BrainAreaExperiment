@@ -49,6 +49,7 @@
 
 <script>
 import get from 'lodash/get';
+import find from 'lodash/find';
 import cloneDeep from 'lodash/cloneDeep';
 
 import ReportForm from '@/components/run-simulation/report/report-form.vue';
@@ -221,26 +222,10 @@ export default {
       }
     },
 
-    getReportUnit(reportMapped) {
-      let unit = '';
-      switch (reportMapped.ReportOn) {
-        case 'cai':
-          unit = 'mM';
-          break;
-        case 'i_membrane IClamp':
-        case 'AllCurrents':
-          unit = 'nA';
-          break;
-        default:
-          unit = 'mV';
-      }
-      return unit;
-    },
-
     createConfig() {
-      const config = {};
+      const config = { Report: {} };
       const configToSave = [];
-      config.Report = {};
+      const reportOnObj = this.$store.state.currentSimulationConfig.reportOn;
       const reportItems = this.timeline.getVisibleItems();
       reportItems.forEach((reportName, index) => {
         const reportObj = this.timeline.itemsData.get(reportName);
@@ -252,15 +237,24 @@ export default {
           'report',
           index,
         );
-        // change target if soma + dendrites apply AllCompartments target
-        if (reportMapped.Type === this.allCompartmentTargetObj.type) {
-          reportMapped.Target = this.allCompartmentTargetObj.target;
-        }
-        reportMapped.Unit = this.getReportUnit(reportMapped);
-        config.Report[repName] = reportMapped;
+
+        config.Report[repName] = this.createReportToBC(reportMapped, reportOnObj);
       });
       db.setSavedConfig(constants.saveParamNames.REPORT, configToSave);
       return config;
+    },
+
+    createReportToBC(reportMapped, reportOnObj) {
+      const report = Object.assign({}, reportMapped);
+      const reportObjMatched = find(reportOnObj, r => r.displayName === reportMapped.ReportOn);
+      // change target if soma + dendrites apply AllCompartments target
+      if (reportMapped.Type === this.allCompartmentTargetObj.type) {
+        report.Target = this.allCompartmentTargetObj.target;
+      }
+      report.Unit = reportObjMatched.unit;
+      report.ReportOn = reportObjMatched.name;
+      report.Type = reportObjMatched.type;
+      return report;
     },
 
     createItem(newItem, id = 0) {

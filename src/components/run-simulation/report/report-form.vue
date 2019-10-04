@@ -63,7 +63,7 @@
               placeholder="Type"
             >
               <i-option value="Soma">Soma</i-option>
-              <i-option :value="allCompartmentTargetObj.type">{{ allCompartmentTargetObj.displayName }}</i-option>
+              <i-option :value="allCompartmentTargetObj.displayName">{{allCompartmentTargetObj.displayName}}</i-option>
             </i-select>
           </form-item>
 
@@ -77,10 +77,10 @@
               @on-change="reportOnChanged"
             >
               <i-option
-                v-for="(name, value) in reportOptions"
-                :key="value"
-                :value="name"
-              >{{ name }}</i-option>
+                v-for="(reportOnInfo, key) in reportOptions"
+                :key="key"
+                :value="reportOnInfo.displayName"
+              >{{ reportOnInfo.displayName }}</i-option>
             </i-select>
           </form-item>
 
@@ -171,10 +171,6 @@ export default {
       if (!newInfo) return;
       this.localReportInfo = Object.assign({}, newInfo);
     },
-    reportType(newType) {
-      if (newType !== this.allCompartmentTargetObj.type) return;
-      this.showWarningAllCompartments();
-    },
   },
   computed: {
     reportTargets() {
@@ -207,13 +203,19 @@ export default {
       if (this.localReportInfo.Target === newTarget) return;
       this.$set(this.localReportInfo, 'Target', newTarget);
     },
-    showWarningAllCompartments() {
-      this.$Message.warning('Current Summation Simulation is an expensive operation');
+    showWarningAllCompartments(type) {
+      this.$Message.warning(`Simulation for ${type} is an expensive operation`);
     },
     reportOnChanged(newReportOn) {
-      if (newReportOn !== this.reportOptions.lfp) return;
-      // if report on lfp change other params to run simulation full lfp compatible
-      this.$set(this.localReportInfo, 'Type', this.allCompartmentTargetObj.type);
+      if (newReportOn === this.reportOptions.lfp.displayName) {
+        // if report on lfp change other params to run simulation full lfp compatible
+        this.$set(this.localReportInfo, 'Type', this.allCompartmentTargetObj.displayName);
+        this.showWarningAllCompartments('LFP');
+      }
+      if (newReportOn === this.reportOptions.calcium.displayName) {
+        this.$set(this.localReportInfo, 'Type', this.allCompartmentTargetObj.displayName);
+        this.showWarningAllCompartments('Calcium');
+      }
     },
   },
 };

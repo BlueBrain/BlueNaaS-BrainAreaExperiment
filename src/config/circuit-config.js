@@ -7,7 +7,7 @@ const { computers } = constants;
 
 const allCompartmentGenericTarget = {
   target: 'AllCompartments',
-  type: 'Summation',
+  type: 'AllCompartments',
   displayName: 'Soma + Dendrites',
 };
 

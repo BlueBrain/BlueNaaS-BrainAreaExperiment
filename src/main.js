@@ -1,9 +1,9 @@
 
 import Vue from 'vue';
-import iView from 'iview';
+import ViewUI from 'view-design';
 import '@/assets/css/style.css';
-import 'iview/dist/styles/iview.css';
-import locale from 'iview/dist/locale/en-US';
+import 'view-design/dist/styles/iview.css';
+import locale from 'view-design/dist/locale/en-US';
 
 import auth from '@/services/auth';
 import App from '@/components/shared/frame-template.vue';
@@ -13,7 +13,7 @@ import '@/common/sentry';
 
 Vue.config.productionTip = false;
 
-Vue.use(iView, {
+Vue.use(ViewUI, {
   size: 'small',
   locale,
 });

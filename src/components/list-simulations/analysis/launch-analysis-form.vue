@@ -117,8 +117,8 @@
 import intersection from 'lodash/intersection';
 import analysisConfig from '@/config/analysis-config';
 import { unmapBlueConfigTerms, mapBlueConfigTerms } from '@/common/utils';
-import AnalysisPicker from '@/components/list-simulations/analysis-picker.vue';
-import LfpAnalysisPicker from '@/components/list-simulations/lfp-analysis-picker.vue';
+import AnalysisPicker from './analysis-picker.vue';
+import LfpAnalysisPicker from './lfp-analysis-picker.vue';
 import { jobTags } from '@/common/job-status';
 import {
   findAnalysisTargets, findDuration, findLfpAnalysisTargets, getBlueConfigStr,

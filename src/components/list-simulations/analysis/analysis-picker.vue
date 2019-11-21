@@ -3,34 +3,23 @@
   <div>
     <divider>Choose Plot(s)</divider>
 
-    <form-item
-      v-for="(analysisObj, analysisRawName) in analysisConfigObj"
-      :key="analysisRawName"
-      v-if="!skipAnalysis(analysisRawName)"
-      :label="analysisObj.name"
+    <collapse
+      simple
+      @on-change="analysisSelectionChanged"
     >
-      <div>
-        <radio-group
-          v-model="analysisObj.mode"
-          type="button"
-          size="small"
-        >
-          <radio :label="modes.NO"/>
-          <radio :label="modes.ALL" :disabled="isVoltagePlot(analysisRawName)"/>
-          <radio :label="modes.CELLS"/>
-        </radio-group>
-
-        <input-number
-          v-if="analysisObj.mode === modes.CELLS"
-          v-model="analysisObj.cells"
-          :min="1"
-          :max="getMaxBoundry(analysisRawName)"
-          size="small"
-          class="small-width"
-        />
-
-      </div>
-    </form-item>
+      <panel
+        v-for="(analysisObj, analysisRawName) in analysisConfigObj"
+        :key="analysisRawName"
+        v-if="!skipAnalysis(analysisRawName)"
+        :hide-arrow="true"
+      >
+        <p class="title-container">
+          <checkbox v-model="analysisObj.active"/>
+          <span>{{ analysisObj.name }}</span>
+        </p>
+        <p slot="content"></p>
+      </panel>
+    </collapse>
 
   </div>
 </template>
@@ -52,6 +41,7 @@ const analysisConfigObjReduceFn = ((endObj, analysisObj) => ({
     mode: defaultMode,
     cells: defaultCellsNumber,
     name: analysisObj.displayName,
+    active: false,
   },
 }));
 
@@ -63,6 +53,11 @@ export default {
       analysisConfigObj: this.analysisList.reduce(analysisConfigObjReduceFn, {}),
       modes,
     };
+  },
+  computed: {
+    analysisAvailableKeys() {
+      return Object.keys(this.analysisConfigObj);
+    },
   },
   methods: {
     getMaxBoundry(analysisName) {
@@ -86,6 +81,13 @@ export default {
       });
       if (!Object.keys(plotConfig).length) return false;
       return plotConfig;
+    },
+    analysisSelectionChanged(analysisSelectedList) {
+      // tick or untick checkboxes based on expanded panels
+      this.analysisAvailableKeys.forEach((analysisName, index) => {
+        const isActive = analysisSelectedList.includes(index.toString());
+        this.$set(this.analysisConfigObj[analysisName], 'active', isActive);
+      });
     },
   },
 };

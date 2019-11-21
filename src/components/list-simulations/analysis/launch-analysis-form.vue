@@ -2,7 +2,7 @@
 <template>
   <div>
     <modal
-      width="440"
+      width="400"
       v-model="showModalLocal"
       @on-cancel="$emit('change-modal-visibility')"
       :mask-closable="false"
@@ -112,6 +112,7 @@
     </modal>
   </div>
 </template>
+
 
 <script>
 import intersection from 'lodash/intersection';

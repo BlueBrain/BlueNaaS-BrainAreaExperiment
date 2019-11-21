@@ -42,25 +42,10 @@
 
             <tabs>
               <tab-pane label="Raster/Traces">
-                <form-item prop="target">
-                  <tooltip
-                    slot="label"
-                    content="Define report name to analyze"
-                  >
-                    Population:
-                  </tooltip>
-                  <i-select v-model="target">
-                    <i-option
-                      v-for="targetElem in targets"
-                      :key="targetElem"
-                      :value="targetElem"
-                    >{{ targetElem }}</i-option>
-                  </i-select>
-                </form-item>
-
                 <analysis-picker
                   :analysis-list="analysisToRun"
                   :has-report="!!reports.length"
+                  :default-population="target"
                   ref="analysisPickerRef"
                 />
               </tab-pane>
@@ -185,15 +170,11 @@ export default {
     async editItem() {
       this.$emit('analysis-config-ready', this.generateAnalysisObjectToRun());
     },
-    targetChanged(newTarget) {
-      this.target = newTarget;
-    },
     async parseBlueConfig(job) {
-      // setup targets for default analysis
+      // setup target for default analysis
       const blueConfigStr = await getBlueConfigStr(job);
       const defaultAnalysisTargets = intersection(findAnalysisTargets(blueConfigStr));
-      this.targets = unmapBlueConfigTerms(defaultAnalysisTargets);
-      [this.target] = this.targets;
+      [this.target] = unmapBlueConfigTerms(defaultAnalysisTargets);
 
       // setup targets for lfp
       const lfpAnalysisTarget = unmapBlueConfigTerms(findLfpAnalysisTargets(blueConfigStr));

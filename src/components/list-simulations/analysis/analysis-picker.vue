@@ -17,7 +17,9 @@
           <checkbox v-model="analysisObj.active"/>
           <span>{{ analysisObj.name }}</span>
         </p>
-        <p slot="content"></p>
+        <p slot="content">
+          <generic-selector :default-population="defaultPopulation"/>
+        </p>
       </panel>
     </collapse>
 
@@ -27,6 +29,7 @@
 
 <script>
 import forEach from 'lodash/forEach';
+import GenericSelector from './generic-selector.vue';
 
 const modes = {
   NO: 'NO',
@@ -47,12 +50,15 @@ const analysisConfigObjReduceFn = ((endObj, analysisObj) => ({
 
 export default {
   name: 'analysis-picker',
-  props: ['analysisList', 'hasReport'],
+  props: ['analysisList', 'hasReport', 'defaultPopulation'],
   data() {
     return {
       analysisConfigObj: this.analysisList.reduce(analysisConfigObjReduceFn, {}),
       modes,
     };
+  },
+  components: {
+    GenericSelector,
   },
   computed: {
     analysisAvailableKeys() {

@@ -27,11 +27,16 @@
 
 <script>
 import PopupTargetSelector from './popup-target-selector.vue';
+import GidsSelector from './gids-selector.vue';
 
 const pupulationSelectorTypes = {
   entirePopulation: {
     name: 'Whole Population',
     component: 'popup-target-selector',
+  },
+  gids: {
+    name: 'Cells GIDs',
+    component: 'gids-selector',
   },
 };
 
@@ -46,6 +51,7 @@ export default {
   },
   components: {
     PopupTargetSelector,
+    GidsSelector,
   },
 };
 </script>

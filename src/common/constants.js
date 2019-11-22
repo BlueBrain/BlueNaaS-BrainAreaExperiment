@@ -19,4 +19,12 @@ export default {
     SIM_PARAMS: 'SIM_PARAMS',
     UNICORE: 'UNICORE',
   },
+  analysis: {
+    voltageCollage: {
+      MAX_AMOUNT_GIDS: 20,
+    },
+    default: {
+      MAX_AMOUNT_GIDS: 80,
+    },
+  },
 };

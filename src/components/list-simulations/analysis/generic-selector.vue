@@ -18,6 +18,7 @@
       <component
         :is="currentComponentToRender"
         :default-population="defaultPopulation"
+        :analysis-obj="analysisObj"
       ></component>
     </i-col>
 
@@ -28,6 +29,7 @@
 <script>
 import PopupTargetSelector from './popup-target-selector.vue';
 import GidsSelector from './gids-selector.vue';
+import RandomGidSelector from './random-gid-selector.vue';
 
 const pupulationSelectorTypes = {
   entirePopulation: {
@@ -38,11 +40,15 @@ const pupulationSelectorTypes = {
     name: 'Cells GIDs',
     component: 'gids-selector',
   },
+  randomCells: {
+    name: 'Random Cells (Nº)',
+    component: 'random-gid-selector',
+  },
 };
 
 export default {
   name: 'generic-selector',
-  props: ['defaultPopulation'],
+  props: ['defaultPopulation', 'analysisObj'],
   data() {
     return {
       currentComponentToRender: '',
@@ -52,6 +58,7 @@ export default {
   components: {
     PopupTargetSelector,
     GidsSelector,
+    RandomGidSelector,
   },
 };
 </script>

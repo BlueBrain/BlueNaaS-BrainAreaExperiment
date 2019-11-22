@@ -18,7 +18,10 @@
           <span>{{ analysisObj.name }}</span>
         </p>
         <p slot="content">
-          <generic-selector :default-population="defaultPopulation"/>
+          <generic-selector
+            :default-population="defaultPopulation"
+            :analysis-obj="analysisObj"
+          />
         </p>
       </panel>
     </collapse>
@@ -44,6 +47,7 @@ const analysisConfigObjReduceFn = ((endObj, analysisObj) => ({
     mode: defaultMode,
     cells: defaultCellsNumber,
     name: analysisObj.displayName,
+    id: analysisObj.realName,
     active: false,
   },
 }));
@@ -66,9 +70,6 @@ export default {
     },
   },
   methods: {
-    getMaxBoundry(analysisName) {
-      return this.isVoltagePlot(analysisName) ? 20 : 800;
-    },
     skipAnalysis(analysisName) {
       return this.isVoltagePlot(analysisName) && !this.hasReport;
     },

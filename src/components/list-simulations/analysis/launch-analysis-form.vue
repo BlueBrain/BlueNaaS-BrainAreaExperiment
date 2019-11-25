@@ -51,26 +51,10 @@
               </tab-pane>
 
               <tab-pane label="LFP" :disabled="!isLFP">
-                <form-item prop="lfpTarget">
-                  <tooltip
-                    slot="label"
-                    content="Define report name to analyze"
-                  >
-                    Population:
-                  </tooltip>
-                  <i-select v-model="lfpTarget">
-                    <i-option
-                      v-for="targetElem in lfpTargets"
-                      :key="targetElem"
-                      :value="targetElem"
-                    >{{ targetElem }}</i-option>
-                  </i-select>
-                </form-item>
-
                 <lfp-analysis-picker
-                  :analysis-list="analysisToRun"
-                  :has-report="!!reports.length"
                   :sim-duration="simDuration"
+                  :lfp-targets="lfpTargets"
+                  :default-population="lfpTarget"
                   ref="lfpAnalysisPickerRef"
                 />
 
@@ -159,7 +143,7 @@ export default {
       const configArray = Object.values(this.$store.state.analysis.analysisConfigObj);
       const someIsActive = configArray.some(analysis => analysis.active);
       // TODO: check if the lfp analysis is fulfilled
-      return this.isLFP || someIsActive;
+      return (this.isLFP && this.$store.state.analysis.lfpAnalysisFulfilled) || someIsActive;
     },
     isLFP() {
       return this.jobSelectedForAnalysis.tags.includes(jobTags.LFP_SIMULATION);

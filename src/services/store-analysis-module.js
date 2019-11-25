@@ -45,6 +45,7 @@ export default {
     analysisConfigObj: analysisConfig.analysisAvailable.reduce(analysisConfigObjReduceFn, {}),
     analysisToRun: analysisConfig.analysisAvailable,
     analysisConfigToSend: {},
+    lfpAnalysisFulfilled: false,
     modes,
   },
   mutations: {
@@ -59,6 +60,9 @@ export default {
     changeAnalysisMode(state, payload) {
       const currentAnalysisConfig = getCurrentAnalysisObj(state, payload.analysisObj.id);
       currentAnalysisConfig.mode = payload.value;
+    },
+    setLfpFulfilled(state, value) {
+      state.lfpAnalysisFulfilled = value;
     },
   },
 };

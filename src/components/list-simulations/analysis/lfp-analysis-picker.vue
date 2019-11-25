@@ -1,6 +1,17 @@
 
 <template>
   <div>
+
+    <form-item prop="lfpTarget" label="Population:">
+      <i-select v-model="lfpTarget" class="custom-small-input">
+        <i-option
+          v-for="targetElem in lfpTargets"
+          :key="targetElem"
+          :value="targetElem"
+        >{{ targetElem }}</i-option>
+      </i-select>
+    </form-item>
+
     <form-item label="Plots:">
       <checkbox-group v-model="lfpAnalysisChosen">
         <checkbox label="spectrum">Spectrum</checkbox>
@@ -8,20 +19,25 @@
       </checkbox-group>
     </form-item>
 
-    <form-item label="Start Time (ms):">
-      <input-number v-model="startTime" :min="0"/>
-    </form-item>
-
-    <form-item label="End Time (ms):">
-      <input-number v-model="endTime" :min="1"/>
+    <form-item label="Duration (ms):" class="inline-time">
+      <input-number
+        v-model="startTime"
+        placeholder="Start"
+        class="short-input"
+        :min="0"
+      />
+      <span> - </span>
+      <input-number
+        v-model="endTime"
+        placeholder="End"
+        class="short-input"
+        :min="1"
+      />
     </form-item>
 
     <divider>Specify Point(s)</divider>
     <div class="centered">
-      <row
-        type="flex"
-        justify="space-between"
-      >
+      <row type="flex" justify="space-between">
         <i-col span="3"></i-col>
         <i-col span="13">Points:</i-col>
         <i-col span="3">
@@ -95,11 +111,12 @@ const maxUploadFileSize = 400;
 
 export default {
   name: 'lfp-analysis-picker',
-  props: ['simDuration'],
+  props: ['simDuration', 'lfpTargets', 'defaultPopulation'],
   data() {
     return {
       pointsCollection: [],
       lfpAnalysisChosen: [],
+      lfpTarget: this.defaultPopulation,
       startTime: 0,
       endTime: 1,
     };
@@ -107,6 +124,20 @@ export default {
   watch: {
     simDuration(newDuration) {
       this.endTime = newDuration;
+    },
+    defaultPopulation(newLfpTarget) {
+      this.lfpTarget = newLfpTarget;
+    },
+    isFulfilled(isOk) {
+      this.$store.commit('setLfpFulfilled', isOk);
+    },
+  },
+  computed: {
+    isFulfilled() {
+      return this.pointsCollection.length
+        && this.lfpAnalysisChosen.length
+        && this.lfpTarget
+        && (this.endTime > this.startTime);
     },
   },
   methods: {
@@ -225,5 +256,11 @@ export default {
   .scollable-points {
     max-height: 150px;
     overflow-y: scroll;
+  }
+  .inline-time .short-input {
+    width: 70px;
+  }
+  .custom-small-input {
+    width: 150px;
   }
 </style>

@@ -46,7 +46,7 @@ import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
 
 export default {
   name: 'popup-target-selector',
-  props: ['defaultPopulation'],
+  props: ['defaultPopulation', 'analysisObj'],
   data() {
     return {
       isModalVisible: false,
@@ -56,10 +56,24 @@ export default {
   components: {
     AutocompleteTargets,
   },
+  watch: {
+    defaultPopulation(newPopulation) {
+      // if default population is loaded later, set it
+      this.changePopulation(newPopulation);
+    },
+  },
+  created() {
+    if (!this.defaultPopulation) return;
+    this.updateTargetInStore(this.defaultPopulation);
+  },
   methods: {
     changePopulation(newPopulation) {
       this.targetSelected = newPopulation;
+      this.updateTargetInStore(newPopulation);
       this.closeModal();
+    },
+    updateTargetInStore(newPopulation) {
+      this.$store.commit('updateAnalysisValue', { analysisObj: this.analysisObj, value: newPopulation });
     },
     closeModal() {
       this.isModalVisible = false;

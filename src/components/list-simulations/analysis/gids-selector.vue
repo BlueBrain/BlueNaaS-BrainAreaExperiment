@@ -32,7 +32,7 @@ const checkRanges = (prunedSpaces) => {
 const inputValidator = (inputText) => {
   // perform checks on numbers and ranges
   const prunedSpaces = inputText.replace(/ /g, '');
-  const searchWrongFormatRe = /,{2,}|-{2,}|[0-9]+-[0-9]+(?=-)|^[^0-9]|[a-zA-Z]|,-|-,|[,-]$/;
+  const searchWrongFormatRe = /^$|,{2,}|-{2,}|[0-9]+-[0-9]+(?=-)|^[^0-9]|[a-zA-Z]|,-|-,|[,-]$/;
   const hasCorrectFormat = !searchWrongFormatRe.test(prunedSpaces);
   const isRangeCorrect = prunedSpaces.includes('-') ? checkRanges(prunedSpaces) : true;
   return hasCorrectFormat && isRangeCorrect;
@@ -40,6 +40,7 @@ const inputValidator = (inputText) => {
 
 export default {
   name: 'gids-selector',
+  props: ['analysisObj'],
   data() {
     return {
       gids: '',
@@ -52,6 +53,9 @@ export default {
   components: {
     AutocompleteTargets,
   },
+  mounted() {
+    this.$refs.formValidate.validate();
+  },
   methods: {
     changePopulation(newPopulation) {
       this.targetSelected = newPopulation;
@@ -61,6 +65,7 @@ export default {
       const isValid = this.inputValidator(this.gids);
       if (!isValid) { callback('format not correct'); }
       callback();
+      this.$store.commit('updateAnalysisValue', { analysisObj: this.analysisObj, value: this.gids });
     },
   },
 };

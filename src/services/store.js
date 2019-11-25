@@ -2,6 +2,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import listModule from '@/services/store-list-module';
+import analysisModule from '@/services/store-analysis-module';
 
 import initialStateGenerator from '@/services/helper/initial-state-generator';
 
@@ -33,6 +34,7 @@ const store = new Vuex.Store({
   },
   modules: {
     list: listModule,
+    analysis: analysisModule,
   },
   mutations: {
     /* eslint-disable no-param-reassign */

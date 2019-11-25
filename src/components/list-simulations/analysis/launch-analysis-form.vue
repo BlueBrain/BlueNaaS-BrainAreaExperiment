@@ -89,7 +89,7 @@
 
         <i-button
           type="primary"
-          :disabled="processing"
+          :disabled="!hasAnalysisSelected || !valuesFilled"
           :loading="processing"
           @click="editItem"
         >Run Analysis</i-button>
@@ -147,6 +147,20 @@ export default {
     processing() {
       return this.isRunningAnalysis || !this.target;
     },
+    valuesFilled() {
+      if (!this.showModalLocal) return false;
+      // check based on the selected analysis if each have some value defined
+      const configArray = Object.values(this.$store.state.analysis.analysisConfigObj);
+      const isEmpty = configArray.some(analysis => !analysis.value);
+      return !isEmpty;
+    },
+    hasAnalysisSelected() {
+      if (!this.showModalLocal) return false;
+      const configArray = Object.values(this.$store.state.analysis.analysisConfigObj);
+      const someIsActive = configArray.some(analysis => analysis.active);
+      // TODO: check if the lfp analysis is fulfilled
+      return this.isLFP || someIsActive;
+    },
     isLFP() {
       return this.jobSelectedForAnalysis.tags.includes(jobTags.LFP_SIMULATION);
     },
@@ -195,6 +209,7 @@ export default {
     },
     generateAnalysisObjectToRun() {
       const analysisObj = this.$refs.analysisPickerRef.generatePlotsConfig();
+
       if (analysisObj && !this.target) {
         this.$Message.error('Please select Population to analyze');
         return false;

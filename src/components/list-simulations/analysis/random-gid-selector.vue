@@ -29,6 +29,19 @@ export default {
         : constants.analysis.default.MAX_AMOUNT_GIDS;
     },
   },
+  created() {
+    this.updateTargetInStore(this.randomGids);
+  },
+  watch: {
+    randomGids(newVal) {
+      this.updateTargetInStore(newVal);
+    },
+  },
+  methods: {
+    updateTargetInStore(newVal) {
+      this.$store.commit('updateAnalysisValue', { analysisObj: this.analysisObj, value: newVal });
+    },
+  },
 };
 </script>
 

@@ -31,34 +31,14 @@
 
 
 <script>
-import forEach from 'lodash/forEach';
 import GenericSelector from './generic-selector.vue';
-
-const modes = {
-  NO: 'NO',
-  ALL: 'ALL',
-  CELLS: 'RANDOM CELLS',
-};
-const defaultMode = modes.NO;
-const defaultCellsNumber = 5;
-const analysisConfigObjReduceFn = ((endObj, analysisObj) => ({
-  ...endObj,
-  [analysisObj.realName]: {
-    mode: defaultMode,
-    cells: defaultCellsNumber,
-    name: analysisObj.displayName,
-    id: analysisObj.realName,
-    active: false,
-  },
-}));
 
 export default {
   name: 'analysis-picker',
-  props: ['analysisList', 'hasReport', 'defaultPopulation'],
+  props: ['hasReport', 'defaultPopulation'],
   data() {
     return {
-      analysisConfigObj: this.analysisList.reduce(analysisConfigObjReduceFn, {}),
-      modes,
+      analysisConfigObj: this.$store.state.analysis.analysisConfigObj,
     };
   },
   components: {
@@ -76,25 +56,16 @@ export default {
     isVoltagePlot(analysisName) {
       return analysisName === 'voltage_collage';
     },
-    generatePlotsConfig() {
-      const plotConfig = {};
-      forEach(this.analysisConfigObj, (analysisValue, analysisKey) => {
-        if (analysisValue.mode === this.modes.NO) return;
-        if (analysisValue.mode === this.modes.CELLS) {
-          plotConfig[analysisKey] = analysisValue.cells || 1;
-          return;
-        }
-        plotConfig[analysisKey] = analysisValue.mode;
-      });
-      if (!Object.keys(plotConfig).length) return false;
-      return plotConfig;
-    },
     analysisSelectionChanged(analysisSelectedList) {
       // tick or untick checkboxes based on expanded panels
       this.analysisAvailableKeys.forEach((analysisName, index) => {
         const isActive = analysisSelectedList.includes(index.toString());
         this.$set(this.analysisConfigObj[analysisName], 'active', isActive);
       });
+    },
+    generatePlotsConfig() {
+      this.$store.commit('generateFinalPlotsConfig');
+      return this.$store.state.analysis.analysisConfigToSend;
     },
   },
 };

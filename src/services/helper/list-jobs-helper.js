@@ -20,7 +20,7 @@ async function analysisProducedResults(analysisWithFiles) {
   const imagesList = analysisWithFiles.children.filter(file => file.endsWith('.png'));
   const configFileBlob = await unicore.getFiles(`${analysisWDUrl}/files/${analysisConfig.configFileName}`);
   const configFileJson = await new Response(configFileBlob).json();
-  let imgReqCount = Object.keys(configFileJson.plots_config).length;
+  let imgReqCount = Object.keys(configFileJson.basic_plots_config).length;
   imgReqCount += get(configFileJson, 'lfp_plots_config.points.length', 0);
   return imgReqCount === imagesList.length;
 }

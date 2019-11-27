@@ -224,7 +224,6 @@ export default {
         plotsConfig: basicAnalysisObj.configValues,
         lfpPlotsConfig: lfpAnalysisObj,
         reportForAnalysis: this.reportForAnalysis,
-        target: mapBlueConfigTerms(this.target),
         lfpTarget: mapBlueConfigTerms(this.lfpTarget),
       };
     },

@@ -77,8 +77,7 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
    * Create analysis job
    * --------------------------------------------------------------------- */
   const analysisParamsConfig = {
-    plots_config: newAnalysisAndTransferInfo.plotsConfig,
-    target_analysis: newAnalysisAndTransferInfo.target,
+    basic_plots_config: newAnalysisAndTransferInfo.basicPlotsConfig,
     report_analysis: newAnalysisAndTransferInfo.reportForAnalysis,
     lfp_plots_config: newAnalysisAndTransferInfo.lfpPlotsConfig,
     lfp_target: newAnalysisAndTransferInfo.lfpTarget,

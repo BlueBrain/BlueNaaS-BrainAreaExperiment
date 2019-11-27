@@ -19,6 +19,13 @@
               class="analysis-plot"
             >
           </a>
+          <i-button
+            @click="downloadPlotRawData(plot)"
+            type="info"
+            icon="md-download"
+            :disabled="rawDataIsDownloading"
+            ghost
+          >Download Raw Data</i-button>
         </div>
       </div>
     </div>
@@ -47,7 +54,7 @@
 
 <script>
 import isEqual from 'lodash/isEqual';
-
+import fileSaver from 'file-saver';
 import collapseTitle from '@/components/shared/collapse-title.vue';
 import analysisConfig from '@/config/analysis-config';
 import unicore from '@/services/unicore';
@@ -62,6 +69,7 @@ export default {
     return {
       analysisConfig,
       plotNames: [],
+      rawDataIsDownloading: false,
     };
   },
   computed: {
@@ -96,6 +104,16 @@ export default {
         this.$set(childAnalysis, plotName, plot);
         this.$set(childAnalysis, 'fetchingImages', false);
       }
+    },
+    async downloadPlotRawData(plot) {
+      this.rawDataIsDownloading = true;
+      const fileName = plot.replace('.png', '_raw_data.json');
+      const url = `${this.itemDetails.workingDirectory}/files/${fileName}`;
+      this.$Message.loading('Downloading Data...');
+      unicore.getFiles(url)
+        .catch(() => { this.$Message.error('Data not available'); })
+        .then((rawDataBlob) => { fileSaver.saveAs(rawDataBlob, fileName); })
+        .finally(() => { this.rawDataIsDownloading = false; });
     },
   },
 };

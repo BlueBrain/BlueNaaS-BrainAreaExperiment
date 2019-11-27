@@ -57,6 +57,9 @@ export default {
     generateFinalPlotsConfig(state) {
       state.analysisConfigToSend = generatePlotsConfig(state);
     },
+    resetAnalysisConfigObj(state) {
+      state.analysisConfigObj = analysisConfig.analysisAvailable.reduce(analysisConfigObjReduceFn, {});
+    },
     changeAnalysisMode(state, payload) {
       const currentAnalysisConfig = getCurrentAnalysisObj(state, payload.analysisObj.id);
       currentAnalysisConfig.mode = payload.value;

@@ -158,6 +158,7 @@ export default {
         this.lfpTarget = null;
         this.simDuration = null;
         this.parseBlueConfig(this.jobSelectedForAnalysis);
+        this.$store.commit('resetAnalysisConfigObj');
       }
     },
     reports(newVal) {

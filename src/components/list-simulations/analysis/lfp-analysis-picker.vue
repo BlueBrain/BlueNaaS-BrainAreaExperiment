@@ -173,8 +173,11 @@ export default {
         isOkObj.errorMessage = 'Start time should be smaller than end time';
         return isOkObj;
       }
+      if (!this.lfpTarget) {
+        isOkObj.errorMessage = 'Please select LFP Population';
+        return isOkObj;
+      }
       isOkObj.configOk = true;
-      isOkObj.errorMessage = null;
 
       return {
         plots: this.lfpAnalysisChosen,

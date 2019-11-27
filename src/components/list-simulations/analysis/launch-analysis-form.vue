@@ -197,28 +197,18 @@ export default {
       this.simDuration = simulationDuration;
     },
     generateAnalysisObjectToRun() {
-      const analysisObj = this.$refs.analysisPickerRef.generatePlotsConfig();
-
-      if (analysisObj && !this.target) {
-        this.$Message.error('Please select Population to analyze');
-        return false;
-      }
-
       let lfpAnalysisObj = {};
       if (this.isLFP) {
         lfpAnalysisObj = this.$refs.lfpAnalysisPickerRef.generatePlotsConfig();
-        if (lfpAnalysisObj.hasLFPAnalysis && !this.lfpTarget) {
-          this.$Message.error('Please select LFP Population');
-          return false;
-        }
         if (lfpAnalysisObj.hasLFPAnalysis && !lfpAnalysisObj.configOk) {
           this.$Message.error(lfpAnalysisObj.errorMessage);
           return false;
         }
       }
 
-      if (!analysisObj && !lfpAnalysisObj.hasLFPAnalysis) {
-        this.$Message.warning('Please select at least one analysis to run');
+      const basicAnalysisObj = this.$refs.analysisPickerRef.generatePlotsConfig();
+      if (!lfpAnalysisObj.hasLFPAnalysis && !basicAnalysisObj.configOk) {
+        this.$Message.error(basicAnalysisObj.errorMessage);
         return false;
       }
 
@@ -231,7 +221,7 @@ export default {
         nodes: analysisConfig.nodes,
         runtime: analysisRunTime,
         title: this.title,
-        plotsConfig: analysisObj,
+        plotsConfig: basicAnalysisObj.configValues,
         lfpPlotsConfig: lfpAnalysisObj,
         reportForAnalysis: this.reportForAnalysis,
         target: mapBlueConfigTerms(this.target),

@@ -17,16 +17,24 @@ function analysisConfigObjReduceFn(endObj, analysisObj) {
 }
 
 function generatePlotsConfig(state) {
-  const plotConfig = {};
+  const plotConfig = {
+    configOk: false,
+    errorMessage: '',
+    configValues: {},
+  };
   Object.values(state.analysisConfigObj).forEach((analysisValue) => {
     if (!analysisValue.active || !analysisValue.mode) return;
 
-    plotConfig[analysisValue.id] = {
+    plotConfig.configValues[analysisValue.id] = {
       mode: analysisValue.mode,
       value: mapBlueConfigTerms(analysisValue.value),
     };
   });
-  if (!Object.keys(plotConfig).length) return false;
+  if (!Object.keys(plotConfig.configValues).length) {
+    plotConfig.errorMessage = 'Please fill out the analysis information';
+  } else {
+    plotConfig.configOk = true;
+  }
   return plotConfig;
 }
 

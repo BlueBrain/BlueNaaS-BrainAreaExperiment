@@ -29,6 +29,7 @@
 
     <i-input
       :value="targetSelected"
+      class="full-width"
       readonly
     >
       <i-button

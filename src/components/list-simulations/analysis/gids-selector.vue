@@ -12,6 +12,7 @@
         <i-input
           v-model="gids"
           placeholder="e.g. 1-5,8,50"
+          class="full-width"
         />
       </form-item>
     </i-form>

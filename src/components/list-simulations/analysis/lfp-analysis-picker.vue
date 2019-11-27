@@ -1,6 +1,6 @@
 
 <template>
-  <div>
+  <div class="lfp-analysis-picker">
 
     <form-item prop="lfpTarget" label="Population:">
       <i-select v-model="lfpTarget" class="custom-small-input">
@@ -38,8 +38,8 @@
     <divider>Specify Point(s)</divider>
     <div class="centered">
       <row type="flex" justify="space-between">
-        <i-col span="3"></i-col>
-        <i-col span="13">Points:</i-col>
+        <i-col span="2"></i-col>
+        <i-col span="16">Points:</i-col>
         <i-col span="3">
           <i-button
             type="success"
@@ -58,7 +58,7 @@
             justify="space-between"
             class="spaced-row"
           >
-            <i-col span="3">
+            <i-col span="2">
               <icon
                 v-if="!pointObj.isValid"
                 title="This point is not correct"
@@ -66,7 +66,7 @@
                 class="not-valid"
               />
             </i-col>
-            <i-col span="13">
+            <i-col span="16">
               <i-input
                 v-model="pointObj.value"
                 @on-blur="checkPoint(pointObj)"
@@ -257,10 +257,10 @@ export default {
     max-height: 150px;
     overflow-y: scroll;
   }
-  .inline-time .short-input {
-    width: 70px;
+  .lfp-analysis-picker .inline-time .short-input {
+    width: 83px;
   }
-  .custom-small-input {
-    width: 150px;
+  .lfp-analysis-picker .custom-small-input {
+    width: 180px;
   }
 </style>

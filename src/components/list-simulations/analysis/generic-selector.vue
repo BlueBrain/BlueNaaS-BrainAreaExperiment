@@ -1,10 +1,11 @@
 
 <template>
-  <row :gutter="16">
-    <i-col span="11">
+  <row :gutter="12" class="generic-selector">
+    <i-col span="12">
       <i-select
         v-model="currentComponentToRender"
         placement="top"
+        class="full-width"
       >
         <i-option
           v-for="option in pupulationSelectorTypes"
@@ -14,11 +15,12 @@
       </i-select>
     </i-col>
 
-    <i-col span="13">
+    <i-col span="12">
       <component
         :is="currentComponentToRender"
         :default-population="defaultPopulation"
         :analysis-obj="analysisObj"
+        class="full-width"
       ></component>
     </i-col>
 
@@ -76,3 +78,10 @@ export default {
   },
 };
 </script>
+
+
+<style>
+  .generic-selector .ivu-col .full-width {
+    width: 100%;
+  }
+</style>

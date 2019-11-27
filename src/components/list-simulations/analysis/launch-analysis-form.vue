@@ -24,12 +24,14 @@
                 required
                 v-model="title"
                 placeholder="Title of the analysis"
+                class="custom-small-width"
               />
             </form-item>
 
             <form-item prop="report" label="Report">
              <i-select
                 v-model="reportForAnalysis"
+                class="custom-small-width"
                 :disabled="!reports.length"
               >
                 <i-option
@@ -239,3 +241,10 @@ export default {
   },
 };
 </script>
+
+
+<style scoped>
+  .report-form .custom-small-width {
+    width: 180px;
+  }
+</style>

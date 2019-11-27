@@ -35,7 +35,7 @@ import GenericSelector from './generic-selector.vue';
 
 export default {
   name: 'analysis-picker',
-  props: ['hasReport', 'defaultPopulation'],
+  props: ['disable', 'defaultPopulation'],
   data() {
     return {
       analysisConfigObj: this.$store.state.analysis.analysisConfigObj,
@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     skipAnalysis(analysisName) {
-      return this.isVoltagePlot(analysisName) && !this.hasReport;
+      return this.isVoltagePlot(analysisName) && this.disable;
     },
     isVoltagePlot(analysisName) {
       return analysisName === 'voltage_collage';

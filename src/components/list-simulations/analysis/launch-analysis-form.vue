@@ -44,13 +44,13 @@
               <tab-pane label="Raster/Traces">
                 <analysis-picker
                   :analysis-list="analysisToRun"
-                  :has-report="!!reports.length"
+                  :disable="!reports.length"
                   :default-population="target"
                   ref="analysisPickerRef"
                 />
               </tab-pane>
 
-              <tab-pane label="LFP" :disabled="!isLFP">
+              <tab-pane label="LFP" :disabled="!isLFP || !reports.length">
                 <lfp-analysis-picker
                   :sim-duration="simDuration"
                   :lfp-targets="lfpTargets"
@@ -109,6 +109,7 @@ export default {
       checkedAnalysis: [],
       targets: [],
       reportForAnalysis: null,
+      reportsWereLoaded: false,
       numberOfCells: 5,
       target: null,
       lfpTarget: null,
@@ -129,7 +130,7 @@ export default {
       return filteredNames;
     },
     processing() {
-      return this.isRunningAnalysis || !this.target;
+      return this.isRunningAnalysis || (!this.target && !this.reportsWereLoaded);
     },
     valuesFilled() {
       if (!this.showModalLocal) return false;
@@ -163,6 +164,7 @@ export default {
     },
     reports(newVal) {
       [this.reportForAnalysis] = newVal;
+      this.reportsWereLoaded = true;
     },
   },
   methods: {

@@ -1,9 +1,10 @@
 
 import get from 'lodash/get';
 import { getFiles } from '@/services/unicore';
+import store from '@/services/store';
 
-function findReportTargets(bcStr, rexp) {
-  const regex = rexp;
+function findByRegexp(bcStr, re) {
+  const regex = re;
   const matches = [];
   let m = regex.exec(bcStr);
   while (m !== null) {
@@ -15,28 +16,15 @@ function findReportTargets(bcStr, rexp) {
   return matches;
 }
 
-function findAnalysisTargetsFallback(bcStr) {
-  // find targets when the BlueConfig was not produced by the sim-ui
-  const regexp = /Report\s.*?{.*?Target\s(.*?)\s/gm;
-  const inlineBC = bcStr.replace(/\n/g, '');
-  return findReportTargets(inlineBC, regexp);
-}
-
-function findAnalysisTargets(bcStr) {
-  if (!bcStr.includes('_report_')) return findAnalysisTargetsFallback(bcStr);
-  const regexp = /Report (.+)_report/gm;
-  return findReportTargets(bcStr, regexp);
-}
-
 function findDuration(bcStr) {
-  const regexp = /Duration (.+)/;
+  const regexp = /Run Default.*?Duration\s(.+?)\s/;
   const simulationDurationMatched = bcStr.match(regexp);
   const durationStr = get(simulationDurationMatched, '[1]', 100).trim();
   return Number(durationStr);
 }
 
-function findLfpAnalysisTargets(bcStr) {
-  const regexp = /CircuitTarget (.+)/;
+function findCircuitTarget(bcStr) {
+  const regexp = /CircuitTarget\s(.+?)\s/;
   const circuitTargetMatched = bcStr.match(regexp);
   return get(circuitTargetMatched, '[1]', '').trim();
 }
@@ -45,13 +33,33 @@ async function getBlueConfigStr(job) {
   const workingDirectory = get(job, '_links.workingDirectory.href');
   const blueConfigBlob = await getFiles(`${workingDirectory}/files/BlueConfig`);
   const blueConfigStr = await new Response(blueConfigBlob).text();
-  return blueConfigStr;
+  // return one line string for easier regexp finding
+  return blueConfigStr.replace(/(\r\n|\n|\r)/gm, ' ');
 }
 
+function checkReportIsLFP(bcStr, reportName) {
+  const regexp = new RegExp(`${reportName}\\s\\{(.+?)\\}`, 'gm');
+  const [reportContent] = findByRegexp(bcStr, regexp);
+  if (!reportContent) return false;
+  const lfpChecks = store.state.currentSimulationConfig.checksForLFP;
+  return lfpChecks.every(check => reportContent.includes(check));
+}
+
+function getTargetByReport(bcStr, reportName) {
+  const isLFP = checkReportIsLFP(bcStr, reportName);
+  if (isLFP) { return findCircuitTarget(bcStr); }
+
+  const regexp = new RegExp(`${reportName}.*?Target\\s(.*?)\\s`, 'gm');
+  const matches = findByRegexp(bcStr, regexp);
+  if (!matches.length) {
+    return findCircuitTarget(bcStr);
+  }
+  return matches[0];
+}
 
 export {
-  findAnalysisTargets,
+  getTargetByReport,
   findDuration,
-  findLfpAnalysisTargets,
+  findCircuitTarget,
   getBlueConfigStr,
 };

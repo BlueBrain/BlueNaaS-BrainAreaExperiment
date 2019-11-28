@@ -86,14 +86,13 @@
 
 
 <script>
-import intersection from 'lodash/intersection';
 import analysisConfig from '@/config/analysis-config';
 import { unmapBlueConfigTerms, mapBlueConfigTerms } from '@/common/utils';
 import AnalysisPicker from './analysis-picker.vue';
 import LfpAnalysisPicker from './lfp-analysis-picker.vue';
 import { jobTags } from '@/common/job-status';
 import {
-  findAnalysisTargets, findDuration, findLfpAnalysisTargets, getBlueConfigStr,
+  findDuration, getBlueConfigStr, getTargetByReport,
 } from '@/services/helper/blueconfig-helper';
 
 export default {
@@ -108,11 +107,7 @@ export default {
       showModalLocal: false,
       title: '',
       analysisToRun: analysisConfig.analysisAvailable,
-      checkedAnalysis: [],
-      targets: [],
       reportForAnalysis: null,
-      reportsWereLoaded: false,
-      numberOfCells: 5,
       target: null,
       lfpTarget: null,
       lfpTargets: [],
@@ -132,7 +127,7 @@ export default {
       return filteredNames;
     },
     processing() {
-      return this.isRunningAnalysis || (!this.target && !this.reportsWereLoaded);
+      return this.isRunningAnalysis || !this.target;
     },
     valuesFilled() {
       if (!this.showModalLocal) return false;
@@ -157,30 +152,35 @@ export default {
       this.showModalLocal = newVal;
       if (newVal) {
         // reset params
+        this.reportForAnalysis = null;
         this.target = null;
         this.lfpTarget = null;
+        this.lfpTargets = [];
         this.simDuration = null;
-        this.parseBlueConfig(this.jobSelectedForAnalysis);
         this.$store.commit('resetAnalysisConfigObj');
+        this.parseJobBlueConfig(this.jobSelectedForAnalysis);
       }
     },
     reports(newVal) {
       [this.reportForAnalysis] = newVal;
-      this.reportsWereLoaded = true;
+    },
+    reportForAnalysis() {
+      this.target = null;
+      this.parseJobBlueConfig(this.jobSelectedForAnalysis);
     },
   },
   methods: {
     async editItem() {
       this.$emit('analysis-config-ready', this.generateAnalysisObjectToRun());
     },
-    async parseBlueConfig(job) {
-      // setup target for default analysis
+    async parseJobBlueConfig(job) {
+      // setup target for basic analysis
       const blueConfigStr = await getBlueConfigStr(job);
-      const defaultAnalysisTargets = intersection(findAnalysisTargets(blueConfigStr));
-      [this.target] = unmapBlueConfigTerms(defaultAnalysisTargets);
+      const circuitTarget = unmapBlueConfigTerms(getTargetByReport(blueConfigStr, this.reportForAnalysis));
+      this.target = circuitTarget;
 
       // setup targets for lfp
-      const lfpAnalysisTarget = unmapBlueConfigTerms(findLfpAnalysisTargets(blueConfigStr));
+      const lfpAnalysisTarget = circuitTarget;
 
       if (lfpAnalysisTarget === this.$store.state.currentCircuitConfig.biggestTarget) {
         // show the full list of targets
@@ -188,7 +188,7 @@ export default {
         this.lfpTargets = targetDisplayNames;
         this.lfpTarget = this.$store.state.currentCircuitConfig.biggestTarget;
       } else {
-        this.lfpTargets = [unmapBlueConfigTerms(lfpAnalysisTarget)];
+        this.lfpTargets = [lfpAnalysisTarget];
         [this.lfpTarget] = this.lfpTargets;
       }
 

@@ -26,13 +26,16 @@ function fillMapper() {
 
 function mapBlueConfigTerms(params) {
   if (!fullMapper) fillMapper();
-  if (typeof params === 'string') {
-    return fullMapper[params] || params;
-  }
+
+  if (typeof params === 'string') { return fullMapper[params] || params; }
+
+  if (typeof params === 'number') { return params; }
+
   const clone = cloneDeep(params);
   forEach(params, (value, key) => {
     clone[key] = fullMapper[value] || value;
   });
+
   return clone;
 }
 

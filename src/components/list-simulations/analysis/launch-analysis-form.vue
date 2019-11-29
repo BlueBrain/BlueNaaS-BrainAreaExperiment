@@ -59,7 +59,6 @@
                   :default-population="lfpTarget"
                   ref="lfpAnalysisPickerRef"
                 />
-
               </tab-pane>
             </tabs>
 

@@ -29,12 +29,10 @@ body {
   min-height: 93vh;
 }
 
-form.ivu-form .target-autocomplete,
-form.ivu-form .ivu-input-number,
-form.ivu-form .ivu-input-wrapper,
-form.ivu-form .ivu-select {
-  width: 120px;
+.ivu-form-item-content .small-width-component {
+  width: 150px;
 }
+
 form.ivu-form .ivu-form-item {
   margin-bottom: 15px;
 }

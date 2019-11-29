@@ -42,8 +42,9 @@ function init() {
 
   const authorization = client.getToken();
   authorization.then((session) => {
-    const nowTime = parseInt(Date.now().toString().substr(0, 10), 10);
-    if (session.expires < nowTime) { // makes sure to reload the token if expires
+    const nowTime6Char = parseInt(Date.now().toString().substr(0, 6), 10);
+    const expiration6Char = parseInt(session.expires.toString().substr(0, 6), 10);
+    if (expiration6Char <= nowTime6Char) { // makes sure to reload the token if expires
       client.wipeTokens();
       window.location.reload();
     }

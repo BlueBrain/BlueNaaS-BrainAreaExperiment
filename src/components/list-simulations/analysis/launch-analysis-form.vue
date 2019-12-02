@@ -74,7 +74,7 @@
 
         <i-button
           type="primary"
-          :disabled="!hasAnalysisSelected || !valuesFilled"
+          :disabled="!hasAnalysisSelected"
           :loading="processing"
           @click="editItem"
         >Run Analysis</i-button>
@@ -128,17 +128,10 @@ export default {
     processing() {
       return this.isRunningAnalysis || !this.target;
     },
-    valuesFilled() {
-      if (!this.showModalLocal) return false;
-      // check based on the selected analysis if each have some value defined
-      const configArray = Object.values(this.$store.state.analysis.analysisConfigObj);
-      const isEmpty = configArray.some(analysis => !analysis.value);
-      return !isEmpty;
-    },
     hasAnalysisSelected() {
       if (!this.showModalLocal) return false;
       const configArray = Object.values(this.$store.state.analysis.analysisConfigObj);
-      const someIsActive = configArray.some(analysis => analysis.active);
+      const someIsActive = configArray.some(analysis => analysis.active && !!analysis.value);
       // TODO: check if the lfp analysis is fulfilled
       return (this.isLFP && this.$store.state.analysis.lfpAnalysisFulfilled) || someIsActive;
     },

@@ -213,7 +213,7 @@ export default {
         nodes: analysisConfig.nodes,
         runtime: analysisRunTime,
         title: this.title,
-        plotsConfig: basicAnalysisObj.configValues,
+        basicPlotsConfig: basicAnalysisObj.configValues,
         lfpPlotsConfig: lfpAnalysisObj,
         reportForAnalysis: this.reportForAnalysis,
         lfpTarget: mapBlueConfigTerms(this.lfpTarget),

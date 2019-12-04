@@ -46,7 +46,7 @@
               <tab-pane label="Raster/Traces">
                 <analysis-picker
                   :analysis-list="analysisToRun"
-                  :disable="!reports.length"
+                  :has-reports="!!reports.length"
                   :default-population="target"
                   ref="analysisPickerRef"
                 />

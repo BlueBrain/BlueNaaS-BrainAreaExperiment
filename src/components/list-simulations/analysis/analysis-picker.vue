@@ -8,9 +8,8 @@
       @on-change="analysisSelectionChanged"
     >
       <panel
-        v-for="(analysisObj, analysisRawName) in analysisConfigObj"
+        v-for="(analysisObj, analysisRawName) in filteredAnalysisAvailable"
         :key="analysisRawName"
-        v-if="!skipAnalysis(analysisRawName)"
         :hide-arrow="true"
       >
         <p class="title-container">
@@ -31,12 +30,13 @@
 
 
 <script>
+import pick from 'lodash/pick';
 import GenericSelector from './generic-selector.vue';
 import { analysis } from '@/common/constants';
 
 export default {
   name: 'analysis-picker',
-  props: ['disable', 'defaultPopulation'],
+  props: ['hasReports', 'defaultPopulation'],
   data() {
     return {
       analysisConfigObj: this.$store.state.analysis.analysisConfigObj,
@@ -49,14 +49,18 @@ export default {
     analysisAvailableKeys() {
       return Object.keys(this.analysisConfigObj);
     },
+    filteredAnalysisAvailable() {
+      const analysisToPick = [
+        analysis.types.FIRING_RATE_HISTOGRAM,
+        analysis.types.RASTER,
+      ];
+      if (this.hasReports) {
+        analysisToPick.push(analysis.types.VOLTAGE_COLLAGE);
+      }
+      return pick(this.analysisConfigObj, analysisToPick);
+    },
   },
   methods: {
-    skipAnalysis(analysisName) {
-      return this.isVoltagePlot(analysisName) && this.disable;
-    },
-    isVoltagePlot(analysisName) {
-      return analysisName === analysis.types.VOLTAGE_COLLAGE;
-    },
     analysisSelectionChanged(analysisSelectedList) {
       // tick or untick checkboxes based on expanded panels
       this.analysisAvailableKeys.forEach((analysisName, index) => {

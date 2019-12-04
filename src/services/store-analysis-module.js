@@ -10,7 +10,7 @@ function analysisConfigObjReduceFn(endObj, analysisObj) {
     [analysisObj.realName]: {
       mode: null,
       name: analysisObj.displayName,
-      id: analysisObj.realName,
+      type: analysisObj.realName,
       active: false,
     },
   };
@@ -25,7 +25,7 @@ function generatePlotsConfig(state) {
   Object.values(state.analysisConfigObj).forEach((analysisValue) => {
     if (!analysisValue.active || !analysisValue.mode) return;
 
-    plotConfig.configValues[analysisValue.id] = {
+    plotConfig.configValues[analysisValue.type] = {
       mode: analysisValue.mode,
       value: mapBlueConfigTerms(analysisValue.value),
     };
@@ -59,7 +59,7 @@ export default {
   mutations: {
     /* eslint-disable no-param-reassign */
     updateAnalysisValue(state, payload) {
-      const currentAnalysisConfig = getCurrentAnalysisObj(state, payload.analysisObj.id);
+      const currentAnalysisConfig = getCurrentAnalysisObj(state, payload.analysisObj.type);
       Vue.set(currentAnalysisConfig, 'value', payload.value);
     },
     generateFinalPlotsConfig(state) {
@@ -69,7 +69,7 @@ export default {
       state.analysisConfigObj = analysisConfig.analysisAvailable.reduce(analysisConfigObjReduceFn, {});
     },
     changeAnalysisMode(state, payload) {
-      const currentAnalysisConfig = getCurrentAnalysisObj(state, payload.analysisObj.id);
+      const currentAnalysisConfig = getCurrentAnalysisObj(state, payload.analysisObj.type);
       currentAnalysisConfig.mode = payload.value;
     },
     setLfpFulfilled(state, value) {

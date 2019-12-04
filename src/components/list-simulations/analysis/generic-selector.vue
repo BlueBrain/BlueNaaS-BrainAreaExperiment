@@ -8,7 +8,7 @@
         class="full-width"
       >
         <i-option
-          v-for="option in pupulationSelectorTypes"
+          v-for="option in filteredPopulationSelectorTypes"
           :key="option.name"
           :value="option.component"
         >{{ option.name }}</i-option>
@@ -30,10 +30,12 @@
 
 <script>
 import findKey from 'lodash/findKey';
+import pick from 'lodash/pick';
 import PopupTargetSelector from './popup-target-selector.vue';
 import GidsSelector from './gids-selector.vue';
 import RandomGidSelector from './random-gid-selector.vue';
 import store from '@/services/store';
+import { analysis } from '@/common/constants';
 
 const pupulationSelectorTypes = {
   entirePopulation: {
@@ -61,6 +63,15 @@ export default {
       currentComponentToRender: '',
       pupulationSelectorTypes,
     };
+  },
+  computed: {
+    filteredPopulationSelectorTypes() {
+      let typesToPick = ['gids', 'randomCells'];
+      if (this.analysisObj.type !== analysis.types.VOLTAGE_COLLAGE) {
+        typesToPick = ['entirePopulation', ...typesToPick];
+      }
+      return pick(pupulationSelectorTypes, typesToPick);
+    },
   },
   watch: {
     currentComponentToRender(newVal) {

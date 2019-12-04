@@ -158,7 +158,7 @@ import isEqual from 'lodash/isEqual';
 import auth from '@/services/auth';
 import eventBus from '@/services/event-bus';
 import db from '@/services/db';
-import constants from '@/common/constants';
+import { saveParamNames, computers } from '@/common/constants';
 
 export default {
   name: 'UnicoreConfigForm',
@@ -274,7 +274,7 @@ export default {
     },
 
     runtimeIsHidden() {
-      return this.$store.state.currentComputer === constants.computers.NUVLA;
+      return this.$store.state.currentComputer === computers.NUVLA;
     },
 
     isLoading() {
@@ -289,7 +289,7 @@ export default {
       if (isValid) {
         this.runParameters.computerSelected = this.computerSelected;
         this.runParameters.groupSelected = this.groupSelected;
-        db.setSavedConfig(constants.saveParamNames.UNICORE, this.runParameters);
+        db.setSavedConfig(saveParamNames.UNICORE, this.runParameters);
         // to start spinner
         this.$emit('run-simulation', this.runParameters);
       }
@@ -304,7 +304,7 @@ export default {
     },
 
     async loadPreviousConfig() {
-      const savedConfig = await db.getSavedConfig(constants.saveParamNames.UNICORE);
+      const savedConfig = await db.getSavedConfig(saveParamNames.UNICORE);
       if (!savedConfig) {
         const defaultComputer = this.$store.state.currentComputer || this.computersAvailable[0];
         this.loadDefaultValues();
@@ -336,7 +336,7 @@ export default {
     },
 
     loadAccount(computer) {
-      const isHidden = computer !== constants.computers.BB5;
+      const isHidden = computer !== computers.BB5;
       if (!isHidden) { this.getUserProjects(); }
       this.accountIsHidden = isHidden;
     },

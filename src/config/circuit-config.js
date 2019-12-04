@@ -1,9 +1,7 @@
 
 /* eslint-disable object-curly-newline */
 
-import constants from '@/common/constants';
-
-const { computers } = constants;
+import { computers, areas } from '@/common/constants';
 
 const allCompartmentGenericTarget = {
   target: 'AllCompartments',
@@ -172,7 +170,7 @@ const hippoHbpFullCa1 = {
   biggestTarget: 'Full Circuit',
   allCompartmentTargetObj: Object.assign({}, allCompartmentGenericTarget),
   displayName: 'Hippocampus Full CA1',
-  simConfigToUse: constants.areas.HIPPOCAMPUS,
+  simConfigToUse: areas.HIPPOCAMPUS,
   hipperpolarizingStim: Object.assign({}, hipperpolarizingGenericStim),
 };
 
@@ -260,7 +258,7 @@ const hippoHbpMicrocircuit = {
   defaultPopulation: 'Central Column',
   allCompartmentTargetObj: Object.assign({}, allCompartmentGenericTarget),
   displayName: 'Hippocampus CA1 Microcircuit',
-  simConfigToUse: constants.areas.HIPPOCAMPUS,
+  simConfigToUse: areas.HIPPOCAMPUS,
   extraParamsInBC: {},
   hipperpolarizingStim: Object.assign({}, hipperpolarizingGenericStim),
 };
@@ -444,7 +442,7 @@ const sscxBbpMicrocircuit = {
   defaultPopulation: 'Central Column',
   allCompartmentTargetObj: Object.assign({}, allCompartmentGenericTarget),
   displayName: 'SomatosensoryCortex Microcircuit',
-  simConfigToUse: constants.areas.SSCX,
+  simConfigToUse: areas.SSCX,
   extraParamsInBC: {},
   hipperpolarizingStim: Object.assign({}, hipperpolarizingGenericStim),
 };

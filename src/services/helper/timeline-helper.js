@@ -4,7 +4,7 @@ import flatMap from 'lodash/flatMap';
 import { Timeline, DataSet } from 'timeline-plus';
 import store from '@/services/store';
 import db from '@/services/db';
-import constants from '@/common/constants';
+import { saveParamNames } from '@/common/constants';
 
 
 function joinName(target, type, newId) {
@@ -133,7 +133,7 @@ function getMaxId(dataSet) {
 }
 
 async function isCurrentSameAsSavedTarget() {
-  const savedSimConfig = await db.getSavedConfig(constants.saveParamNames.SIM_PARAMS);
+  const savedSimConfig = await db.getSavedConfig(saveParamNames.SIM_PARAMS);
   if (!savedSimConfig) return false;
   return store.state.simulationPopulation === savedSimConfig.circuitTarget;
 }

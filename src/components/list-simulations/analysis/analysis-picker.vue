@@ -32,6 +32,7 @@
 
 <script>
 import GenericSelector from './generic-selector.vue';
+import { analysis } from '@/common/constants';
 
 export default {
   name: 'analysis-picker',
@@ -54,7 +55,7 @@ export default {
       return this.isVoltagePlot(analysisName) && this.disable;
     },
     isVoltagePlot(analysisName) {
-      return analysisName === 'voltage_collage';
+      return analysisName === analysis.types.VOLTAGE_COLLAGE;
     },
     analysisSelectionChanged(analysisSelectedList) {
       // tick or untick checkboxes based on expanded panels

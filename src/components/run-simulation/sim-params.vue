@@ -39,7 +39,7 @@
 import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
 import db from '@/services/db';
 import eventBus from '@/services/event-bus';
-import constants from '@/common/constants';
+import { saveParamNames } from '@/common/constants';
 
 import { mapBlueConfigTerms } from '@/common/utils';
 
@@ -86,18 +86,18 @@ export default {
         forwardSkip: this.$store.state.simulationForwardSkip,
         circuitTarget: this.populationSelected,
       };
-      db.setSavedConfig(constants.saveParamNames.SIM_PARAMS, configUsed);
+      db.setSavedConfig(saveParamNames.SIM_PARAMS, configUsed);
       resolve(params);
     },
     async loadPreviousConfig() {
-      const prevConfig = await db.getSavedConfig(constants.saveParamNames.SIM_PARAMS);
+      const prevConfig = await db.getSavedConfig(saveParamNames.SIM_PARAMS);
 
       this.duration = prevConfig ? prevConfig.duration : this.$store.state.simulationDuration;
       this.forwardSkip = prevConfig ? prevConfig.forwardSkip : this.$store.state.simulationForwardSkip;
       this.populationSelected = prevConfig ? prevConfig.circuitTarget : null;
 
       // setup default computer
-      const uncorePrevConfig = await db.getSavedConfig(constants.saveParamNames.UNICORE);
+      const uncorePrevConfig = await db.getSavedConfig(saveParamNames.UNICORE);
 
       const computerToUse = uncorePrevConfig
         ? uncorePrevConfig.computerSelected

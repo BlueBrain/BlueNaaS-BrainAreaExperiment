@@ -69,7 +69,7 @@ import * as projectionConfig from '@/config/projection-config';
 import { replacePrefixPlaceholders } from '@/common/blueconfig-template';
 import eventBus from '@/services/event-bus';
 import { mapBlueConfigTerms } from '@/common/utils';
-import constants from '@/common/constants';
+import { saveParamNames } from '@/common/constants';
 import db from '@/services/db';
 
 export default {
@@ -167,7 +167,7 @@ export default {
       const pBlocks = this.globalProjectionBlock;
       if (!pBlocks) this.$Message.error('No probjection blocks were configured');
 
-      db.setSavedConfig(constants.saveParamNames.PROJECTION, this.currentProjection);
+      db.setSavedConfig(saveParamNames.PROJECTION, this.currentProjection);
       const connectionProjectionName = Object.keys(pBlocks.Connection)[0];
       const projConnection = pBlocks.Connection[connectionProjectionName];
       const { Connection } = pBlocks;
@@ -218,7 +218,7 @@ export default {
       this.projectionBeingEdited = {};
     },
     async loadPreviousConfig() {
-      const savedProjection = await db.getSavedConfig(constants.saveParamNames.PROJECTION);
+      const savedProjection = await db.getSavedConfig(saveParamNames.PROJECTION);
       if (!savedProjection) {
         return projectionConfig.getDefaultProjection(this.simConfigToUse);
       }

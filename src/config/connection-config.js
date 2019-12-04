@@ -1,6 +1,6 @@
 
 import store from '@/services/store';
-import constants from '@/common/constants';
+import { areas } from '@/common/constants';
 
 const hippocampusConnections = [
   {
@@ -241,8 +241,8 @@ const sscxConnections = [
 
 
 const connections = {
-  [constants.areas.HIPPOCAMPUS]: hippocampusConnections,
-  [constants.areas.SSCX]: sscxConnections,
+  [areas.HIPPOCAMPUS]: hippocampusConnections,
+  [areas.SSCX]: sscxConnections,
 };
 
 function getDefaultConnections() {

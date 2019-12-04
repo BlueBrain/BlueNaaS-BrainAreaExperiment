@@ -9,7 +9,7 @@ import prettyBytes from 'pretty-bytes';
 import computeProvider from '@/common/compute-provider.json';
 import store from '@/services/store';
 import db from '@/services/db';
-import constants from '@/common/constants';
+import { computers } from '@/common/constants';
 import { getDate3YearFromNow } from '@/common/utils';
 import { jobTags, addTag } from '@/common/job-status';
 
@@ -348,7 +348,7 @@ async function generateUnicoreConfig(configParams) {
 
   function getEnvironment() {
     const environment = {};
-    if (configParams.computerSelected !== constants.computers.NUVLA) return environment;
+    if (configParams.computerSelected !== computers.NUVLA) return environment;
 
     if (configParams.tags.includes(jobTags.SIMULATION)) {
       // is a simulation

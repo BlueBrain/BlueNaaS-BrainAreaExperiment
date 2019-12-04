@@ -57,7 +57,7 @@ import EditButtons from '@/components/run-simulation/edit-buttons.vue';
 import simTimelineLib from '@/services/helper/timeline-helper';
 import eventBus from '@/services/event-bus';
 import { mapBlueConfigTerms } from '@/common/utils';
-import constants from '@/common/constants';
+import { saveParamNames } from '@/common/constants';
 import db from '@/services/db';
 
 export default {
@@ -266,7 +266,7 @@ export default {
           Target: target,
         };
       });
-      db.setSavedConfig(constants.saveParamNames.STIMULATION, configToSave);
+      db.setSavedConfig(saveParamNames.STIMULATION, configToSave);
 
       // if Noise stimulus -> Hyperpolarizing
       const stims = Object.keys(config.Stimulus);
@@ -280,7 +280,7 @@ export default {
 
     async loadPreviousConfig() {
       const targetSame = await simTimelineLib.isCurrentSameAsSavedTarget();
-      const savedConfig = await db.getSavedConfig(constants.saveParamNames.STIMULATION);
+      const savedConfig = await db.getSavedConfig(saveParamNames.STIMULATION);
       if (!savedConfig || !targetSame) {
         return [this.createItem(this.createNewStimulus())];
       }

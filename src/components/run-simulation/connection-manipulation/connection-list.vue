@@ -130,7 +130,7 @@ import SynapseConfigurator from '@/components/run-simulation/connection-manipula
 import { getDefaultConnections } from '@/services/helper/connection-helper';
 import { mapBlueConfigTerms } from '@/common/utils';
 import eventBus from '@/services/event-bus';
-import constants from '@/common/constants';
+import { saveParamNames } from '@/common/constants';
 import db from '@/services/db';
 import '@/assets/css/manipulations-blocks.scss';
 
@@ -231,7 +231,7 @@ export default {
     },
     creationConfigHandler(resolve) {
       const connections = this.pruneConnections();
-      db.setSavedConfig(constants.saveParamNames.CONNECTION, this.connectionsArray);
+      db.setSavedConfig(saveParamNames.CONNECTION, this.connectionsArray);
       resolve(connections);
     },
     pruneConnections() {
@@ -281,7 +281,7 @@ export default {
       this.$set(this.changeTargetModal, 'currentTarget', '');
     },
     async loadPreviousConfig() {
-      const savedConnections = await db.getSavedConfig(constants.saveParamNames.CONNECTION);
+      const savedConnections = await db.getSavedConfig(saveParamNames.CONNECTION);
       if (!savedConnections) {
         return getDefaultConnections();
       }

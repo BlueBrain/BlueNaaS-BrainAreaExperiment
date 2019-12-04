@@ -57,7 +57,7 @@ import EditButtons from '@/components/run-simulation/edit-buttons.vue';
 import simTimelineLib from '@/services/helper/timeline-helper';
 import eventBus from '@/services/event-bus';
 import { mapBlueConfigTerms } from '@/common/utils';
-import constants from '@/common/constants';
+import { saveParamNames } from '@/common/constants';
 import db from '@/services/db';
 
 export default {
@@ -240,7 +240,7 @@ export default {
 
         config.Report[repName] = this.createReportToBC(reportMapped, reportOnObj);
       });
-      db.setSavedConfig(constants.saveParamNames.REPORT, configToSave);
+      db.setSavedConfig(saveParamNames.REPORT, configToSave);
       return config;
     },
 
@@ -270,7 +270,7 @@ export default {
 
     async loadPreviousConfig() {
       const targetSame = await simTimelineLib.isCurrentSameAsSavedTarget();
-      const savedConfig = await db.getSavedConfig(constants.saveParamNames.REPORT);
+      const savedConfig = await db.getSavedConfig(saveParamNames.REPORT);
       if (!savedConfig || !targetSame) {
         return [this.createItem(this.createNewReport())];
       }

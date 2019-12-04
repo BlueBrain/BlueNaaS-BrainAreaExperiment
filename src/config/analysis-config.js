@@ -1,7 +1,5 @@
 
-import constants from '@/common/constants';
-
-const { computers } = constants;
+import { computers, analysis } from '@/common/constants';
 
 export default {
   [computers.JURECA]: {
@@ -60,11 +58,10 @@ export default {
     'mcomplex.dat',
     'cxinfo_',
   ],
-  plots: ['firing_rate_histogram', 'raster', 'voltage_collage'],
   analysisAvailable: [
-    { realName: 'firing_rate_histogram', displayName: 'Peristimulus Time Histogram' },
-    { realName: 'raster', displayName: 'Spike Raster Plot' },
-    { realName: 'voltage_collage', displayName: 'Trace Plot of Report', report_select: true },
+    { realName: analysis.types.FIRING_RATE_HISTOGRAM, displayName: 'Peristimulus Time Histogram' },
+    { realName: analysis.types.RASTER, displayName: 'Spike Raster Plot' },
+    { realName: analysis.types.VOLTAGE_COLLAGE, displayName: 'Trace Plot of Report', report_select: true },
   ],
   configFileName: 'analysis_config.json',
   analysisConnectionFileName: 'analysis_path.json',

@@ -58,7 +58,7 @@
 <script>
 import { urlToComputerAndId, importPersonalSimulation } from '@/services/unicore';
 import auth from '@/services/auth';
-import constants from '@/common/constants';
+import { computers } from '@/common/constants';
 
 export default {
   name: 'ImportSimulation',
@@ -113,7 +113,7 @@ export default {
       });
     },
     getUserProjects() {
-      if (this.$store.state.currentComputer !== constants.computers.BB5) return;
+      if (this.$store.state.currentComputer !== computers.BB5) return;
       auth.getUserProjects().then((projects) => {
         [this.userProject] = projects;
       }).catch((e) => {

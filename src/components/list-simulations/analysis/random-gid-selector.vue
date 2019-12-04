@@ -12,7 +12,7 @@
 
 
 <script>
-import constants from '@/common/constants';
+import { analysis } from '@/common/constants';
 
 export default {
   name: 'random-gid-selector',
@@ -24,9 +24,9 @@ export default {
   },
   computed: {
     getMaxBoundary() {
-      return this.analysisObj.id === 'voltage_collage'
-        ? constants.analysis.voltageCollage.MAX_AMOUNT_GIDS
-        : constants.analysis.default.MAX_AMOUNT_GIDS;
+      return this.analysisObj.id === analysis.types.VOLTAGE_COLLAGE
+        ? analysis.voltageCollage.MAX_AMOUNT_GIDS
+        : analysis.default.MAX_AMOUNT_GIDS;
     },
   },
   created() {

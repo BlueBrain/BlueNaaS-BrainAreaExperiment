@@ -1,6 +1,6 @@
 
 import get from 'lodash/get';
-import constants from '@/common/constants';
+import { areas } from '@/common/constants';
 
 const configFileName = 'projection-config.json';
 
@@ -78,8 +78,8 @@ const sscxProjections = Object.assign(
 );
 
 const projections = {
-  [constants.areas.HIPPOCAMPUS]: hippocampusProjections,
-  [constants.areas.SSCX]: sscxProjections,
+  [areas.HIPPOCAMPUS]: hippocampusProjections,
+  [areas.SSCX]: sscxProjections,
 };
 
 function getDefaultProjection(area) {

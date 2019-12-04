@@ -1,7 +1,5 @@
 
-import constants from '@/common/constants';
-
-const { computers, areas } = constants;
+import { computers, areas } from '@/common/constants';
 
 const reportOnGeneric = {
   voltage: {

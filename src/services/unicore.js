@@ -13,6 +13,8 @@ import constants from '@/common/constants';
 import { getDate3YearFromNow } from '@/common/utils';
 import { jobTags, addTag } from '@/common/job-status';
 
+const NOT_FOUND = 404;
+
 const axiosInstance = axios.create({
   headers: {
     Accept: 'application/json',
@@ -123,7 +125,13 @@ async function deleteJob(url) {
     url,
     method: 'delete',
     data: JSON.stringify({}),
-  });
+  })
+    .catch((error) => {
+      // if not found continue and delete it from the local storage
+      if (!error.response || error.response.status !== NOT_FOUND) {
+        throw error;
+      }
+    });
   return db.deleteJob(url);
 }
 

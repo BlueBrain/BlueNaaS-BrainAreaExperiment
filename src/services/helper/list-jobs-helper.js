@@ -1,7 +1,6 @@
 
 import Vue from 'vue';
 import sortBy from 'lodash/sortBy';
-import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import difference from 'lodash/difference';
 import last from 'lodash/last';
@@ -37,15 +36,29 @@ async function getSimulationUrlList() {
   // compare saved list and sorted list
   const savedJobUrls = await db.getAllJobsSortedList() || [];
 
-  let listToFetch = null;
+  let listToFetch = [];
   // sorting with lodash to avoid mutation
-  if (savedJobUrls.length && isEqual(sortBy(networkJobUrls), sortBy(savedJobUrls))) {
-    // use saved
-    listToFetch = savedJobUrls;
-  } else {
-    const newJobsArray = difference(networkJobUrls, savedJobUrls);
+
+  if (!savedJobUrls.length) {
+    return networkJobUrls;
+  }
+
+  // use saved
+  listToFetch = savedJobUrls;
+  // if new jobs
+  const newJobsArray = difference(networkJobUrls, savedJobUrls);
+  if (newJobsArray.length) {
     console.debug('New jobs found', newJobsArray.length);
     listToFetch = newJobsArray.concat(savedJobUrls);
+  }
+  // if jobs were deleted
+  const removedJobsArray = difference(savedJobUrls, networkJobUrls);
+  if (listToFetch.length && removedJobsArray.length) {
+    console.debug('Removing deleted jobs from list', removedJobsArray);
+    removedJobsArray.forEach((removedJob) => {
+      listToFetch.splice(listToFetch.indexOf(removedJob), 1);
+      unicore.deleteJob(removedJob);
+    });
   }
   return listToFetch;
 }

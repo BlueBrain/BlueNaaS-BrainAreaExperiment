@@ -77,19 +77,22 @@ eventBus.$on('setup-from-storage', () => {
   setupFromStorage();
 });
 
+function setupUserProjectsShared(group) {
+  return setupUserProjects(group)
+    .catch((error) => {
+      eventBus.$emit('show-error', error.message);
+    });
+}
+
 eventBus.$on('change-user-group', (group, callback) => {
   if (store.state.userGroup === group) return;
-  setupUserProjects(group).then(() => {
-    if (callback) callback();
-  });
+  setupUserProjectsShared(group).then(callback);
 });
 
 eventBus.$on('change-computer', (computer, callback) => {
   store.commit('setCurrentComputer', computer);
   store.dispatch('setupCurrentSimulationConfig');
-  setupUserProjects().then(() => {
-    if (callback) callback();
-  });
+  setupUserProjectsShared(null).then(callback);
 });
 
 export default {};

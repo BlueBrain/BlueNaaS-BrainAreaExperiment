@@ -21,6 +21,8 @@
 
 
 <script>
+import eventBus from '@/services/event-bus';
+
 export default {
   name: 'FrameTemplate',
   computed: {
@@ -32,6 +34,9 @@ export default {
     this.$Message.config({
       top: 50,
       duration: 5,
+    });
+    eventBus.$on('show-error', (message) => {
+      this.$Message.error(`Error ${message}`);
     });
   },
   methods: {

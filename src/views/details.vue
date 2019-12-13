@@ -315,7 +315,7 @@ export default {
       const filesList = await unicore.getFilesWithSizes(url);
       this.$set(this.parsedFiles, 'unicoreSimulationFiles', filesList);
       const physicalLocation = unicore.getJobPhysicalLocation(this.job.log);
-      this.parsedFiles.physicalLocation = physicalLocation;
+      this.parsedFiles.physicalLocation = physicalLocation || '(Location not available)';
     },
 
     parseUnicoreLogs() {

@@ -19,7 +19,7 @@ export default {
   props: ['analysisObj'],
   data() {
     return {
-      randomGids: 1,
+      randomGids: 5,
     };
   },
   computed: {

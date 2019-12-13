@@ -218,12 +218,10 @@ async function getFilesWithSizes(jobURL) {
 }
 
 function getJobPhysicalLocation(log) {
-  let location = '(Location not available)';
-  if (!log) return location;
-  // set physical location
-  const matches = log[7].match(/TSI_USPACE_DIR (.*)/);
-  if (!matches || !matches.length > 0) return location;
-  [, location] = matches;
+  const regexp = /TSI_USPACE_DIR (.*)/;
+  const matchesStr = log.find(logLine => logLine.match(regexp));
+  if (!matchesStr) return null;
+  const [, location] = matchesStr.match(regexp);
   return location;
 }
 

@@ -30,7 +30,7 @@ const analysis = {
     MAX_AMOUNT_GIDS: 20,
   },
   default: {
-    MAX_AMOUNT_GIDS: 80,
+    MAX_AMOUNT_GIDS: 1000,
   },
 };
 

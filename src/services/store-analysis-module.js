@@ -22,19 +22,27 @@ function generatePlotsConfig(state) {
     errorMessage: '',
     configValues: {},
   };
-  Object.values(state.analysisConfigObj).forEach((analysisValue) => {
-    if (!analysisValue.active || !analysisValue.mode) return;
+  const analysisValues = Object.values(state.analysisConfigObj);
+
+  const isIncomplete = analysisValues.some(analysisValue => (
+    analysisValue.active && (!analysisValue.mode || !analysisValue.value)
+  ));
+
+  if (isIncomplete) {
+    plotConfig.errorMessage = 'Please fill out the analysis information';
+    return plotConfig;
+  }
+
+  analysisValues.forEach((analysisValue) => {
+    if (!analysisValue.mode || !analysisValue.value) return;
 
     plotConfig.configValues[analysisValue.type] = {
       mode: analysisValue.mode,
       value: mapBlueConfigTerms(analysisValue.value),
     };
   });
-  if (!Object.keys(plotConfig.configValues).length) {
-    plotConfig.errorMessage = 'Please fill out the analysis information';
-  } else {
-    plotConfig.configOk = true;
-  }
+
+  plotConfig.configOk = true;
   return plotConfig;
 }
 

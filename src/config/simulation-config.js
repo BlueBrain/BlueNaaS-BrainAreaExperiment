@@ -1,5 +1,6 @@
 
 import { computers, areas } from '@/common/constants';
+import { copyToDestinationScript, copyFromDestinationScript } from '@/common/bbp-unicore-move-script';
 
 const reportOnGeneric = {
   voltage: {
@@ -82,12 +83,14 @@ export default {
       script: [
         '#!/bin/bash -l',
         '. /etc/profile',
+        ...copyToDestinationScript,
         'module purge',
         'module load py-bluepy',
         'module load neurodamus-hippocampus',
         'module load brion/3.0.0/python3/serial',
         'python /gpfs/bbp.cscs.ch/home/antonel/scripts_unicore/create_replay_bb5_0.11.py',
         'srun special -NFRAME 1000 $HOC_LIBRARY_PATH/init.hoc -mpi',
+        ...copyFromDestinationScript,
       ],
       runtime: 3600,
       nodes: 2,
@@ -98,6 +101,7 @@ export default {
       nodeType: 'uc3',
       partitions: { '*': 'prod' },
       qos: 'bigjob',
+      moveSimulation: true,
     },
     defaultDuration: 300,
     defaultForwardSkip: 5000,
@@ -111,11 +115,13 @@ export default {
       script: [
         '#!/bin/bash -l',
         '. /etc/profile',
+        ...copyToDestinationScript,
         'module load neurodamus-neocortex',
         'module load py-bluepy',
         'module load brion/3.0.0/python3/serial',
         'python /gpfs/bbp.cscs.ch/home/antonel/scripts_unicore/create_replay_bb5_0.11.py',
         'srun special -NFRAME 256 $HOC_LIBRARY_PATH/init.hoc -mpi',
+        ...copyFromDestinationScript,
       ],
       runtime: 3600,
       nodes: 5,
@@ -125,6 +131,7 @@ export default {
       memory: 128000,
       partitions: { '*': 'prod' },
       qos: 'bigjob',
+      moveSimulation: true,
     },
     defaultDuration: 300,
     defaultForwardSkip: 5000,

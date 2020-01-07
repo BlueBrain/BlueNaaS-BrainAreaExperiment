@@ -1,4 +1,5 @@
 
+import template from 'lodash/template';
 import unicore from '@/services/unicore';
 import analysisConfig from '@/config/analysis-config';
 import store from '@/services/store';
@@ -90,7 +91,11 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
     /* ---------------------------------------------------------------------
      * Create file to start analysis
      * --------------------------------------------------------------------- */
-    inputs.push({ To: 'input.sh', Data: script.join('\n') });
+    let runScript = script.join('\n');
+    if (analysisConfig[computer].moveAnalysis && newAnalysisAndTransferInfo.accountSelected) {
+      runScript = template(runScript)({ projSelected: newAnalysisAndTransferInfo.accountSelected });
+    }
+    inputs.push({ To: 'input.sh', Data: runScript });
   }
 
   const destinationJobObject = await unicore.submitJob(newAnalysisAndTransferInfo, inputs);

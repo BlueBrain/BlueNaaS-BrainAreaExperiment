@@ -48,6 +48,7 @@
 
 <script>
 import sortBy from 'lodash/sortBy';
+import template from 'lodash/template';
 import SimulationParams from '@/components/run-simulation/sim-params.vue';
 import StimulationTimeline from '@/components/run-simulation/stimulation/stimulation-timeline.vue';
 import ReportTimeline from '@/components/run-simulation/report/report-timeline.vue';
@@ -124,11 +125,13 @@ export default {
     async launchSim(blueConfigStr, runConfig, hideModalFn, extraFiles = null) {
       const newRunConfig = runConfig;
       const simResources = this.$store.state.currentSimulationConfig[this.$store.state.currentComputer];
-
       const files = [{ To: 'BlueConfig', Data: blueConfigStr }];
       let { script } = simResources;
       if (script) {
         script = script.join('\n');
+        if (simResources.moveSimulation && runConfig.accountSelected) {
+          script = template(script)({ projSelected: runConfig.accountSelected });
+        }
         files.push({ To: 'input.sh', Data: script });
       }
 

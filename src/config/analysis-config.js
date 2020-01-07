@@ -1,5 +1,6 @@
 
 import { computers, analysis } from '@/common/constants';
+import { copyToDestinationScript, copyFromDestinationScript } from '@/common/bbp-unicore-move-script';
 
 export default {
   [computers.JURECA]: {
@@ -28,14 +29,17 @@ export default {
       '. /etc/profile',
       'HDF5_USE_FILE_LOCKING=FALSE',
       'export HDF5_USE_FILE_LOCKING',
+      ...copyToDestinationScript,
       'module load emsim',
       'module load py-bluepy',
       'module load brion',
       'export EMSIM=emsim',
       'python /gpfs/bbp.cscs.ch/home/antonel/scripts_unicore/analysis_launch_bb5_0.15.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
+      ...copyFromDestinationScript,
     ],
     executable: '/bin/bash input.sh',
-    partitions: { '*': 'prod_small' },
+    moveAnalysis: true,
+    partitions: { '*': 'prod' },
     qos: 'normal',
   },
   [computers.NUVLA]: {
@@ -57,6 +61,7 @@ export default {
     'TSI_temp_file',
     'mcomplex.dat',
     'cxinfo_',
+    'processing_at',
   ],
   analysisAvailable: [
     { realName: analysis.types.FIRING_RATE_HISTOGRAM, displayName: 'Peristimulus Time Histogram' },

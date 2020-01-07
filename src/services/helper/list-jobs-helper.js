@@ -6,9 +6,7 @@ import difference from 'lodash/difference';
 import last from 'lodash/last';
 import unicore from '@/services/unicore';
 import analysisConfig from '@/config/analysis-config';
-import {
-  jobStatus, isRunning,
-} from '@/common/job-status';
+import { jobStatus, isRunning } from '@/common/job-status';
 import { getComputerUrlCombo } from '@/common/utils';
 import db from '@/services/db';
 import store from '@/services/store';

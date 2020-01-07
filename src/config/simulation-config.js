@@ -67,7 +67,7 @@ export default {
         '. /etc/profile',
         'export MODULEPATH=/apps/hbp/ich002/hbp-spack-deployments/modules:$MODULEPATH',
         'module swap PrgEnv-cray PrgEnv-intel',
-        'module load neurodamus-hippocampus/0.4/intel neuron/7.6.8/intel cray-python/2.7.15.7',
+        'module load neurodamus-hippocampus neuron cray-python/2.7.15.7',
         'export HDF5_USE_FILE_LOCKING=FALSE',
         '/apps/hbp/ich002/home/antonel/create_replay_piz_daint_0.11.py',
         'srun special -NFRAME 1000 $HOC_LIBRARY_PATH/init.hoc -mpi',

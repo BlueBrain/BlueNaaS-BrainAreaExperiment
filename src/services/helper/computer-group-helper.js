@@ -52,7 +52,7 @@ async function setupUserProjects(newGroup) {
     throw new Error('retrieving projects for this computer');
   }
   if (!userInfo.client.xlogin.availableGroups) {
-    throw new Error('Error getting available groups');
+    throw new Error('getting available groups');
   }
 
   const groupsAvailable = userInfo.client.xlogin.availableGroups.length ?

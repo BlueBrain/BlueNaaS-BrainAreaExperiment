@@ -203,7 +203,7 @@ export default {
           this.$set(childAnalysis, 'stderr', [content]);
         };
       } catch (e) {
-        this.$Message.error('error retrieving the analysis log');
+        this.$Message.error('Error retrieving the analysis log');
         const stderr = [];
         if (isRunning(childAnalysis.status)) {
           stderr.push('No log available yet');

@@ -152,7 +152,7 @@ async function getAllJobs(computer) {
     response = await axiosInstance(`${unicoreURL}/jobs`);
   } catch (error) {
     if (error.message !== 'Stop from the user') {
-      throw new Error('Error getting all jobs for list');
+      throw new Error('getting all jobs for list');
     }
   }
   return response.data.jobs;
@@ -168,7 +168,7 @@ async function getSimUrls(computer, circuit) {
     response = await axiosInstance(`${unicoreURL}/jobs?${queryStr}`);
   } catch (error) {
     if (error.message !== 'Stop from the user') {
-      throw new Error('Error getting all jobs for list');
+      throw new Error('getting all jobs for list');
     }
   }
   return get(response, 'data.jobs', []);

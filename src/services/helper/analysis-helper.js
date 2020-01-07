@@ -53,9 +53,10 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
 
   const newAnalysisAndTransferInfo = analysisAndTransferInfo;
   const computer = store.state.currentComputer;
-  newAnalysisAndTransferInfo.executable = analysisConfig[computer].executable;
-  newAnalysisAndTransferInfo.partitions = analysisConfig[computer].partitions;
-  newAnalysisAndTransferInfo.qos = analysisConfig[computer].qos;
+  const currentAnalysisConfig = analysisConfig[computer];
+  newAnalysisAndTransferInfo.executable = currentAnalysisConfig.executable;
+  newAnalysisAndTransferInfo.partitions = currentAnalysisConfig.partitions;
+  newAnalysisAndTransferInfo.qos = currentAnalysisConfig.qos;
 
   // get all the files to be copied
   const filesToCopy = await getFilesToCopy(`${newAnalysisAndTransferInfo.from.workingDirectory}/files`);
@@ -92,7 +93,7 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
      * Create file to start analysis
      * --------------------------------------------------------------------- */
     let runScript = script.join('\n');
-    if (analysisConfig[computer].moveAnalysis && newAnalysisAndTransferInfo.accountSelected) {
+    if (currentAnalysisConfig.moveAnalysis && newAnalysisAndTransferInfo.accountSelected) {
       runScript = template(runScript)({ projSelected: newAnalysisAndTransferInfo.accountSelected });
     }
     inputs.push({ To: 'input.sh', Data: runScript });

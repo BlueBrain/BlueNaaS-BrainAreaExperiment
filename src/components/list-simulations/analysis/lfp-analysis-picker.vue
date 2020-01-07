@@ -87,6 +87,7 @@
 
       <upload
         action="/dummy-endpoint"
+        accept=".txt"
         :before-upload="fileUploaded"
         class="big-spaced-top"
       >
@@ -94,7 +95,7 @@
           icon="ios-cloud-upload-outline"
           type="primary"
           ghost
-        >Upload files</i-button>
+        >Upload '.txt' file</i-button>
       </upload>
 
     </div>
@@ -189,10 +190,12 @@ export default {
     },
     fileUploaded(file) {
       let error = null;
-      if (file.type !== 'text/plain') { error = 'File format is not txt'; }
-      if (file.size > maxUploadFileSize) { error = 'File to big or too many points'; }
+
+      if (!file.name.endsWith('.txt')) error = 'File format is not txt';
+      else if (file.size > maxUploadFileSize) error = 'File to big or too many points';
+
       if (error) {
-        this.$Message.info('File to big or too many points');
+        this.$Message.info(error);
         return false;
       }
 

@@ -46,7 +46,7 @@ export default {
         params: {
           circuitName: this.$store.state.currentCircuit,
         },
-      });
+      }).catch(() => {});
     },
   },
 };

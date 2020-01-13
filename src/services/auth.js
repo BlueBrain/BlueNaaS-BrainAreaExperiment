@@ -1,58 +1,79 @@
 
-import { JSO } from 'jso';
+import Oidc from 'oidc-client';
 import { setAxiosToken, axiosInstance } from '@/services/unicore';
-
-
 import store from '@/services/store';
 import { configHBP, configBBP } from '@/config';
 
-let client = null;
 let actualAuthProvider = null;
-if (store.state.currentCircuit) {
+
+function removeExtraURLParams() {
+  const url = window.location.href;
+  if (window.location.href.includes('access_token')) {
+    const accessTokenIndex = url.match(/\/&+/);
+    const newUrl = url.substr(0, accessTokenIndex.index);
+    return newUrl;
+  }
+  return url;
+}
+
+function windowSignin(authMgr) {
+  console.debug('[windowSignin]');
+  return authMgr.signinRedirect().then(() => {
+    console.debug('signinRedirect done');
+  });
+}
+
+function iframeSignin(authMgr) {
+  console.debug('[iframeSignin]');
+  return authMgr.signinSilent().then((user) => {
+    console.debug('signinSilent done');
+    return user;
+  });
+}
+
+function createAuthConfig() {
   const isBBP = store.state.currentCircuit.includes('bbp_');
   actualAuthProvider = isBBP ? configBBP : configHBP;
 
-  client = new JSO({
+  const oidcConfig = {
+    authority: actualAuthProvider.auth.authUrl,
     client_id: actualAuthProvider.auth.clientId,
-    redirect_uri: `${window.location.href}/`,
-    authorization: actualAuthProvider.auth.authUrl,
+    redirect_uri: `${removeExtraURLParams()}/`,
     response_type: 'id_token token',
-    request: actualAuthProvider.auth.request,
-  });
+    extraQueryParams: actualAuthProvider.auth.request,
+  };
+  return oidcConfig;
+}
+
+async function login(authMgr) {
+  new Oidc.UserManager().signinSilentCallback();
+
+  if (window.location.href.includes('access_token')) {
+    window.location.href = removeExtraURLParams();
+  }
+
+  let user = await authMgr.getUser().catch(err => console.error(err));
+
+  if (!user) {
+    user = await iframeSignin(authMgr).catch(() => windowSignin(authMgr));
+  }
+  const client = user || {};
+  if (client.expired) {
+    console.debug('Token expired');
+    await authMgr.removeUser();
+    await authMgr.signoutRedirect();
+  }
+  store.commit('setToken', client.access_token);
+  setAxiosToken(client.access_token);
 }
 
 function init() {
   const isIndex = window.location.hash === '#/';
-  if (!client && isIndex) { return Promise.resolve(); }
+  if (isIndex) { return Promise.resolve(); }
 
-  client.callback();
-
-  /*
-   * check if the access_token is in the URL and remove it to avoid
-   * going to another page that consider access_token as param
-   */
-  if (window.location.href.includes('access_token')) {
-    /* eslint-disable no-console */
-    console.debug('URL has token, removing it ...');
-    /* eslint-enable no-console */
-    const url = window.location.href;
-    const accessTokenIndex = url.indexOf('%2F&access_token') || url.indexOf('access_token');
-    window.location.href = url.substr(0, accessTokenIndex);
-  }
-
-  const authorization = client.getToken();
-  authorization.then((session) => {
-    const nowTime6Char = parseInt(Date.now().toString().substr(0, 5), 10);
-    const expiration6Char = parseInt(session.expires.toString().substr(0, 5), 10);
-    if (expiration6Char <= nowTime6Char) { // makes sure to reload the token if expires
-      client.wipeTokens();
-      window.location.reload();
-    }
-    store.commit('setToken', session.access_token);
-    setAxiosToken(session.access_token);
-  });
-
-  return authorization;
+  const oidcConfig = createAuthConfig();
+  const authMgr = new Oidc.UserManager(oidcConfig);
+  return login(authMgr);
 }
 
 async function getUserInfo() {

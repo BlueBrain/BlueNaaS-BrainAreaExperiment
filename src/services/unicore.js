@@ -76,6 +76,10 @@ function getComputeProviders() {
   return computeProvider;
 }
 
+function getComputerUrl(computerName) {
+  return get(getComputeProviders(), `[${computerName.toUpperCase()}].url`);
+}
+
 function actionJob(actionURL) {
   // initiate some actions like start, restart, abort
   return axiosInstance({
@@ -146,7 +150,7 @@ function uploadData(dataToUpload, uploadURL) {
 }
 
 async function getAllJobs(computer) {
-  const unicoreURL = getComputeProviders()[computer.toUpperCase()].url;
+  const unicoreURL = getComputerUrl(computer);
   let response;
   try {
     response = await axiosInstance(`${unicoreURL}/jobs`);
@@ -159,7 +163,7 @@ async function getAllJobs(computer) {
 }
 
 async function getSimUrls(computer, circuit) {
-  const unicoreURL = get(getComputeProviders(), `[${computer.toUpperCase()}].url`);
+  const unicoreURL = getComputerUrl(computer);
   // get sims only for this specific circuit
   const queryStr = `tags=${jobTags.SIMULATION},${circuit}`;
   let response;
@@ -421,7 +425,7 @@ async function getImage(imageURL) {
 }
 
 function getJobById(jobId) {
-  const computer = getComputeProviders()[store.state.currentComputer.toUpperCase()].url;
+  const computer = getComputerUrl(store.state.currentComputer);
   const url = `${computer}/jobs/${jobId}`;
   return getJobProperties(url);
 }
@@ -450,7 +454,7 @@ async function submitJob(runConfig, inputs = [], startLater = false) {
   const newRunConfig = runConfig;
 
   newRunConfig.computerSelected = runConfig.computerSelected.toUpperCase();
-  const unicoreURL = getComputeProviders()[newRunConfig.computerSelected].url;
+  const unicoreURL = getComputerUrl(newRunConfig.computerSelected);
 
   try {
     const launchParams = await generateUnicoreConfig(newRunConfig);
@@ -535,8 +539,8 @@ export default {
   uploadData,
   submitJob,
   actionJob,
-  getComputeProviders,
   populateJobsUrlWithFiles,
+  getComputerUrl,
   getJobById,
   getJobProperties,
   getFiles,
@@ -556,7 +560,7 @@ export default {
 
 export {
   urlToComputerAndId,
-  getComputeProviders,
+  getComputerUrl,
   getFiles,
   importPersonalSimulation,
   populateJobsUrlWithFiles,

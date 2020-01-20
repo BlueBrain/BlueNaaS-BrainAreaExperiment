@@ -60,7 +60,7 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
 
   // get all the files to be copied
   const filesToCopy = await getFilesToCopy(`${newAnalysisAndTransferInfo.from.workingDirectory}/files`);
-  const computeUrl = unicore.getComputeProviders()[computer.toUpperCase()].url;
+  const computeUrl = unicore.getComputerUrl(computer);
   const originalSM = computeUrl.replace('rest/core', 'services/StorageManagement?res=');
   const originalWorkId = newAnalysisAndTransferInfo.from.workingDirectory.split('/').pop();
 

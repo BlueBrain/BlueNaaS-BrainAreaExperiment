@@ -44,7 +44,7 @@ async function submitVisualization(simulationDetails) {
   const files = await getFilesToCopy(`${simulationDetails.workingDirectory}/files`);
   if (!files) throw new Error('Error getting files for visualization');
 
-  const computerUrl = unicore.getComputeProviders()[store.state.currentComputer].url;
+  const computerUrl = unicore.getComputerUrl(store.state.currentComputer);
   const originalSM = computerUrl.replace('rest/core', 'services/StorageManagement?res=');
   const originalWorkId = simulationDetails.workingDirectory.split('/').pop();
 

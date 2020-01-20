@@ -1,10 +1,10 @@
 
 import store from '@/services/store';
-import { getComputeProviders, axiosInstance } from '@/services/unicore';
+import { getComputerUrl, axiosInstance } from '@/services/unicore';
 import eventBus from '@/services/event-bus';
 
 function getUser(computer) {
-  const unicoreURL = getComputeProviders()[computer.toUpperCase()].url;
+  const unicoreURL = getComputerUrl(computer);
   return axiosInstance(unicoreURL).then(r => r.data);
 }
 

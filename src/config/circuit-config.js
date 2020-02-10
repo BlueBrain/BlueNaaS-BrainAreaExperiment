@@ -26,6 +26,8 @@ const hipperpolarizingGenericStim = {
   },
 };
 
+const objectStorageBaseURL = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui';
+
 /*
 |--------------------------------------------------------------------------
 | Hippocampus Full CA1
@@ -280,15 +282,91 @@ const hippoBbpMicrocircuit = Object.assign(
 |--------------------------------------------------------------------------
 */
 
-const newPaths = Object.assign({}, { ...hippoHbpMicrocircuit.paths }, { CurrentDir: '/io', OutputRoot: '/io' });
-const hippoMoocMicrocircuit = Object.assign(
+const moocMicrocircuitImgBase = `${objectStorageBaseURL}/O1.20191017`;
+const hippoMoocSvcAccMicrocircuit = Object.assign(
   {},
   { ...hippoHbpMicrocircuit },
   {
     prefix: {
-      [computers.NUVLA]: '/mooc',
+      [computers.MOOC_SA]: '/store/hbp/ich002/antonel/O1/20191017',
     },
-    paths: newPaths,
+    paths: Object.assign(
+      {},
+      { ...hippoHbpMicrocircuit.paths },
+      {
+        METypePath: '<%= prefix %>/entities/emodels/20190402/hoc/',
+        MEComboInfoFile: '<%= prefix %>/entities/emodels/20190402/mecombo_emodel.tsv',
+      },
+    ),
+    targets: [
+      { name: '5Cells', displayName: '5Cells', src: `${moocMicrocircuitImgBase}/5Cells.png`, cells: '5' },
+      { name: 'Mosaic', displayName: 'Full Circuit', src: `${moocMicrocircuitImgBase}/Mosaic.png`, cells: '18198' },
+      { name: 'Excitatory', displayName: 'Excitatory', src: `${moocMicrocircuitImgBase}/Excitatory.png`, cells: '16860' },
+      { name: 'Inhibitory', displayName: 'Inhibitory', src: `${moocMicrocircuitImgBase}/Inhibitory.png`, cells: '1338' },
+      { name: 'SLM_PPA', displayName: 'SLM_PPA', src: `${moocMicrocircuitImgBase}/SLM_PPA.png`, cells: '3' },
+      { name: 'SO_BP', displayName: 'SO_BP', src: `${moocMicrocircuitImgBase}/SO_BP.png`, cells: '10' },
+      { name: 'SO_BS', displayName: 'SO_BS', src: `${moocMicrocircuitImgBase}/SO_BS.png`, cells: '24' },
+      { name: 'SO_OLM', displayName: 'SO_OLM', src: `${moocMicrocircuitImgBase}/SO_OLM.png`, cells: '88' },
+      { name: 'SO_Tri', displayName: 'SO_Tri', src: `${moocMicrocircuitImgBase}/SO_Tri.png`, cells: '38' },
+      { name: 'SP_AA', displayName: 'SP_AA', src: `${moocMicrocircuitImgBase}/SP_AA.png`, cells: '80' },
+      { name: 'SP_BS', displayName: 'SP_BS', src: `${moocMicrocircuitImgBase}/SP_BS.png`, cells: '91' },
+      { name: 'SP_CCKBC', displayName: 'SP_CCKBC', src: `${moocMicrocircuitImgBase}/SP_CCKBC.png`, cells: '195' },
+      { name: 'SP_Ivy', displayName: 'SP_Ivy', src: `${moocMicrocircuitImgBase}/SP_Ivy.png`, cells: '477' },
+      { name: 'SP_PC', displayName: 'SP_PC', src: `${moocMicrocircuitImgBase}/SP_PC.png`, cells: '16860' },
+      { name: 'SP_PVBC', displayName: 'SP_PVBC', src: `${moocMicrocircuitImgBase}/SP_PVBC.png`, cells: '299' },
+      { name: 'SR_SCA', displayName: 'SR_SCA', src: `${moocMicrocircuitImgBase}/SR_SCA.png`, cells: '33' },
+      { name: 'bAC', displayName: 'bAC', src: `${moocMicrocircuitImgBase}/bAC.png`, cells: '539' },
+      { name: 'cAC', displayName: 'cAC', src: `${moocMicrocircuitImgBase}/cAC.png`, cells: '354' },
+      { name: 'cACpyr', displayName: 'cACpyr', src: `${moocMicrocircuitImgBase}/cACpyr.png`, cells: '16860' },
+      { name: 'cNAC', displayName: 'cNAC', src: `${moocMicrocircuitImgBase}/cNAC.png`, cells: '445' },
+      { name: 'mc0;SO', displayName: 'mc0;SO', src: `${moocMicrocircuitImgBase}/mc0;SO.png`, cells: '21' },
+      { name: 'mc0;SP', displayName: 'mc0;SP', src: `${moocMicrocircuitImgBase}/mc0;SP.png`, cells: '2529' },
+      { name: 'mc0;SR', displayName: 'mc0;SR', src: `${moocMicrocircuitImgBase}/mc0;SR.png`, cells: '3' },
+      { name: 'mc1;SO', displayName: 'mc1;SO', src: `${moocMicrocircuitImgBase}/mc1;SO.png`, cells: '28' },
+      { name: 'mc1;SP', displayName: 'mc1;SP', src: `${moocMicrocircuitImgBase}/mc1;SP.png`, cells: '2664' },
+      { name: 'mc1;SR', displayName: 'mc1;SR', src: `${moocMicrocircuitImgBase}/mc1;SR.png`, cells: '2' },
+      { name: 'mc2;SO', displayName: 'mc2;SO', src: `${moocMicrocircuitImgBase}/mc2;SO.png`, cells: '15' },
+      { name: 'mc2;SP', displayName: 'mc2;SP', src: `${moocMicrocircuitImgBase}/mc2;SP.png`, cells: '2466' },
+      { name: 'mc2;SR', displayName: 'mc2;SR', src: `${moocMicrocircuitImgBase}/mc2;SR.png`, cells: '3' },
+      { name: 'mc3;SLM', displayName: 'mc3;SLM', src: `${moocMicrocircuitImgBase}/mc3;SLM.png`, cells: '1' },
+      { name: 'mc3;SO', displayName: 'mc3;SO', src: `${moocMicrocircuitImgBase}/mc3;SO.png`, cells: '24' },
+      { name: 'mc3;SP', displayName: 'mc3;SP', src: `${moocMicrocircuitImgBase}/mc3;SP.png`, cells: '2604' },
+      { name: 'mc3;SR', displayName: 'mc3;SR', src: `${moocMicrocircuitImgBase}/mc3;SR.png`, cells: '4' },
+      { name: 'mc4;SO', displayName: 'mc4;SO', src: `${moocMicrocircuitImgBase}/mc4;SO.png`, cells: '21' },
+      { name: 'mc4;SP', displayName: 'mc4;SP', src: `${moocMicrocircuitImgBase}/mc4;SP.png`, cells: '2569' },
+      { name: 'mc4;SR', displayName: 'mc4;SR', src: `${moocMicrocircuitImgBase}/mc4;SR.png`, cells: '5' },
+      { name: 'mc5;SLM', displayName: 'mc5;SLM', src: `${moocMicrocircuitImgBase}/mc5;SLM.png`, cells: '1' },
+      { name: 'mc5;SO', displayName: 'mc5;SO', src: `${moocMicrocircuitImgBase}/mc5;SO.png`, cells: '24' },
+      { name: 'mc5;SP', displayName: 'mc5;SP', src: `${moocMicrocircuitImgBase}/mc5;SP.png`, cells: '2630' },
+      { name: 'mc5;SR', displayName: 'mc5;SR', src: `${moocMicrocircuitImgBase}/mc5;SR.png`, cells: '9' },
+      { name: 'mc6;SLM', displayName: 'mc6;SLM', src: `${moocMicrocircuitImgBase}/mc6;SLM.png`, cells: '1' },
+      { name: 'mc6;SO', displayName: 'mc6;SO', src: `${moocMicrocircuitImgBase}/mc6;SO.png`, cells: '27' },
+      { name: 'mc6;SP', displayName: 'mc6;SP', src: `${moocMicrocircuitImgBase}/mc6;SP.png`, cells: '2540' },
+      { name: 'mc6;SR', displayName: 'mc6;SR', src: `${moocMicrocircuitImgBase}/mc6;SR.png`, cells: '7' },
+      { name: 'mc0_Column', displayName: 'mc0_Column', src: `${moocMicrocircuitImgBase}/mc0_Column.png`, cells: '2553' },
+      { name: 'mc1_Column', displayName: 'mc1_Column', src: `${moocMicrocircuitImgBase}/mc1_Column.png`, cells: '2694' },
+      { name: 'mc2_Column', displayName: 'Central Column', src: `${moocMicrocircuitImgBase}/mc2_Column.png`, cells: '2484' },
+      { name: 'mc3_Column', displayName: 'mc3_Column', src: `${moocMicrocircuitImgBase}/mc3_Column.png`, cells: '2633' },
+      { name: 'mc4_Column', displayName: 'mc4_Column', src: `${moocMicrocircuitImgBase}/mc4_Column.png`, cells: '2595' },
+      { name: 'mc5_Column', displayName: 'mc5_Column', src: `${moocMicrocircuitImgBase}/mc5_Column.png`, cells: '2664' },
+      { name: 'mc6_Column', displayName: 'mc6_Column', src: `${moocMicrocircuitImgBase}/mc6_Column.png`, cells: '2575' },
+      { name: 'SLM', displayName: 'SLM', src: `${moocMicrocircuitImgBase}/SLM.png`, cells: '3' },
+      { name: 'SO', displayName: 'SO', src: `${moocMicrocircuitImgBase}/SO.png`, cells: '160' },
+      { name: 'SP', displayName: 'SP', src: `${moocMicrocircuitImgBase}/SP.png`, cells: '18002' },
+      { name: 'SR', displayName: 'SR', src: `${moocMicrocircuitImgBase}/SR.png`, cells: '33' },
+      { name: 'most_central_10_SP_PC', displayName: 'most_central_10_SP_PC', src: `${moocMicrocircuitImgBase}/most_central_10_SP_PC.png`, cells: '10' },
+      { name: 'most_central_20_SP_PC', displayName: 'most_central_20_SP_PC', src: `${moocMicrocircuitImgBase}/most_central_20_SP_PC.png`, cells: '20' },
+      { name: 'most_central_50_SP_PC', displayName: 'most_central_50_SP_PC', src: `${moocMicrocircuitImgBase}/most_central_50_SP_PC.png`, cells: '50' },
+      { name: 'most_central_100_SP_PC', displayName: 'most_central_100_SP_PC', src: `${moocMicrocircuitImgBase}/most_central_100_SP_PC.png`, cells: '100' },
+      { name: 'SOM', displayName: 'SOM', src: `${moocMicrocircuitImgBase}/SOM.png`, cells: '160' },
+      { name: 'CCK', displayName: 'CCK', src: `${moocMicrocircuitImgBase}/CCK.png`, cells: '231' },
+      { name: 'PV', displayName: 'PV', src: `${moocMicrocircuitImgBase}/PV.png`, cells: '470' },
+      { name: 'BC', displayName: 'BC', src: `${moocMicrocircuitImgBase}/BC.png`, cells: '494' },
+      { name: 'BS', displayName: 'BS', src: `${moocMicrocircuitImgBase}/BS.png`, cells: '115' },
+      { name: 'CA3_PC', displayName: 'CA3 Projection', cells: '' },
+    ],
+    displayName: 'Hippocampus MOOC Service Account Microcircuit',
+    simConfigToUse: areas.HIPPOCAMPUS_MOOC,
   },
 );
 
@@ -449,7 +527,7 @@ const sscxBbpMicrocircuit = {
 
 const mapCircuitNameWithUrl = {
   hippo_hbp_microcircuit: hippoHbpMicrocircuit,
-  hippo_mooc_microcircuit: hippoMoocMicrocircuit,
+  hippo_mooc_sa_microcircuit: hippoMoocSvcAccMicrocircuit,
   hippo_hbp_full_ca1: hippoHbpFullCa1,
   hippo_bbp_full_ca1: hippoBbpFullCa1,
   hippo_bbp_microcircuit: hippoBbpMicrocircuit,

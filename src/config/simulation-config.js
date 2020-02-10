@@ -110,6 +110,32 @@ export default {
     reportOn: Object.assign({}, reportOnGeneric),
     checksForLFP: ['AllCompartments', 'Summation'],
   },
+  [areas.HIPPOCAMPUS_MOOC]: {
+    [computers.MOOC_SA]: {
+      script: [
+        '#!/bin/bash -l',
+        '. /etc/profile',
+        'export MODULEPATH=/apps/hbp/ich002/hbp-spack-deployments/modules:$MODULEPATH',
+        'module swap PrgEnv-cray PrgEnv-intel',
+        'module load neurodamus-hippocampus neuron cray-python/2.7.15.7',
+        'export HDF5_USE_FILE_LOCKING=FALSE',
+        '/apps/hbp/ich002/home/antonel/create_replay_piz_daint_0.11.py',
+        'srun special -NFRAME 1000 $HOC_LIBRARY_PATH/init.hoc -mpi',
+      ],
+      runtime: 3600,
+      nodes: 1,
+      cpus: 36,
+      executable: '/bin/bash input.sh',
+      nodeType: 'mc',
+      memory: 64000,
+    },
+    defaultDuration: 300,
+    defaultForwardSkip: 5000,
+    importSimulationScript: 'ln -sf SIMFOLDERPATH/* . && rm ./BlueConfig && cp SIMFOLDERPATH/BlueConfig .',
+    stimuli: Object.assign([], stimuliGeneric),
+    reportOn: Object.assign({}, reportOnGeneric),
+    checksForLFP: ['AllCompartments', 'Summation'],
+  },
   [areas.SSCX]: {
     [computers.BB5]: {
       script: [

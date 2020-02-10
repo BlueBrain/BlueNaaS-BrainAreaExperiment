@@ -1,5 +1,6 @@
 
 import get from 'lodash/get';
+import merge from 'lodash/merge';
 import { areas } from '@/common/constants';
 
 const configFileName = 'projection-config.json';
@@ -22,6 +23,7 @@ const hippocampusProjections = {
         Type: 'Synaptic',
       },
     },
+    // This connection goes here because is added only if projection
     Connection: {
       SC_All: {
         Source: 'SC',
@@ -50,26 +52,24 @@ const hippocampusProjections = {
   },
 };
 
-
-const sscxProjections = Object.assign(
+const hippocampusMoocProjections = merge(
   {},
+  hippocampusProjections,
   {
-    defaultProjection: hippocampusProjections.defaultProjection,
     projectionBlock: {
-      projectionSrcTarget: 'proj_Thalamocortical_VPM_Source',
+      projectionSrcTarget: 'CA3 Projection',
       Projection: {
-        Thalamocortical_input_VPM: {
-          Path: '<%= prefix %>/gpfs/bbp.cscs.ch/project/proj64/circuits/O1.v6a/20171212/proj_Thalamocortical_VPM/20171214-2/',
-          Source: 'proj_Thalamocortical_VPM_Source',
+        SC: {
+          Path: '<%= prefix %>/circuit/projections/v3.2k/O1_ca1_20191017_projections_sorted.sonata',
         },
       },
+      // This connection goes here because is added only if projection
       Connection: {
-        scheme_CaUse_ee_tc2c: {
-          Source: 'proj_Thalamocortical_VPM_Source',
+        SC_All: {
+          Source: 'CA3_PC',
           Destination: 'Mosaic',
           // SpontMinis, // added if spontMinis proj was selected
           Weight: '1', // this will be changed by the user
-          SynapseConfigure: '%s.Use *= 0.158401372855',
         },
       },
       spikeReplay: hippocampusProjections.projectionBlock.spikeReplay,
@@ -77,9 +77,33 @@ const sscxProjections = Object.assign(
   },
 );
 
+const sscxProjections = {
+  defaultProjection: hippocampusProjections.defaultProjection,
+  projectionBlock: {
+    projectionSrcTarget: 'proj_Thalamocortical_VPM_Source',
+    Projection: {
+      Thalamocortical_input_VPM: {
+        Path: '<%= prefix %>/gpfs/bbp.cscs.ch/project/proj64/circuits/O1.v6a/20171212/proj_Thalamocortical_VPM/20171214-2/',
+        Source: 'proj_Thalamocortical_VPM_Source',
+      },
+    },
+    Connection: {
+      scheme_CaUse_ee_tc2c: {
+        Source: 'proj_Thalamocortical_VPM_Source',
+        Destination: 'Mosaic',
+        // SpontMinis, // added if spontMinis proj was selected
+        Weight: '1', // this will be changed by the user
+        SynapseConfigure: '%s.Use *= 0.158401372855',
+      },
+    },
+    spikeReplay: hippocampusProjections.projectionBlock.spikeReplay,
+  },
+};
+
 const projections = {
   [areas.HIPPOCAMPUS]: hippocampusProjections,
   [areas.SSCX]: sscxProjections,
+  [areas.HIPPOCAMPUS_MOOC]: hippocampusMoocProjections,
 };
 
 function getDefaultProjection(area) {

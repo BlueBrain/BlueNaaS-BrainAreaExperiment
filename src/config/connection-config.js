@@ -31,6 +31,44 @@ const hippocampusConnections = [
   },
 ];
 
+const hippocampusMoocConnections = [
+  {
+    name: 'All-All',
+    source: store.state.currentCircuitConfig.biggestTarget,
+    destination: store.state.currentCircuitConfig.biggestTarget,
+    weight: 1,
+    spontMinis: 0.01,
+    delay: 0,
+  },
+  {
+    name: 'AMPA_NMDA',
+    source: 'Excitatory',
+    destination: store.state.currentCircuitConfig.biggestTarget,
+    synapseConfigure: '%s.NMDA_ratio = 1.22 tau_r_NMDA_ProbAMPANMDA_EMS = 3.9 tau_d_NMDA_ProbAMPANMDA_EMS = 148.5',
+    weight: null,
+    spontMinis: null,
+    delay: 0,
+  },
+  {
+    name: 'GABA_AB',
+    source: 'Inhibitory',
+    destination: store.state.currentCircuitConfig.biggestTarget,
+    synapseConfigure: '%s.e_GABAA = -80.0 %s.GABAB_ratio = 0',
+    weight: null,
+    spontMinis: null,
+    delay: 0,
+  },
+  {
+    name: 'MGGate',
+    source: 'Excitatory',
+    destination: store.state.currentCircuitConfig.biggestTarget,
+    synapseConfigure: '%s.mg = 1.0',
+    weight: null,
+    spontMinis: null,
+    delay: 0,
+  },
+];
+
 const sscxConnections = [
   {
     name: 'ConL6Exc-Uni',
@@ -214,6 +252,7 @@ const sscxConnections = [
 
 const connections = {
   [areas.HIPPOCAMPUS]: hippocampusConnections,
+  [areas.HIPPOCAMPUS_MOOC]: hippocampusMoocConnections,
   [areas.SSCX]: sscxConnections,
 };
 

@@ -68,5 +68,10 @@
     "name": "BlueBrain 5",
     "id": "BB5",
     "url": "https://bbpunicore.epfl.ch:8080/BB5-CSCS/rest/core"
+  },
+  "MOOC_SA": {
+    "name": "MOOC Service Account",
+    "id": "MOOC_SA",
+    "url": "https://bspsa.cineca.it/advanced/pizdaint/rest/core"
   }
 }

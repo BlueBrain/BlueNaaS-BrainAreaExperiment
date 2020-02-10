@@ -4,11 +4,14 @@ const computers = {
   NUVLA: 'NUVLA',
   JURECA: 'JURECA',
   PIZ_DAINT: 'PIZ_DAINT',
+  MOOC_SA: 'MOOC_SA',
 };
 
 const areas = {
   HIPPOCAMPUS: 'HIPPOCAMPUS',
   SSCX: 'SSCX',
+  // TODO: change this mooc to specific config
+  HIPPOCAMPUS_MOOC: 'HIPPOCAMPUS_MOOC',
 };
 
 const saveParamNames = {

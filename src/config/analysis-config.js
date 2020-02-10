@@ -47,6 +47,17 @@ export default {
     bulkAnalysisConfig: 'https://raw.githubusercontent.com/BlueBrain/MOOC-hippocampus-network-simulation-2019/bulk-analysis/bulk_analysis_config.json',
     executable: 'epfl-mooc/analysis/launch_analysis',
   },
+  [computers.MOOC_SA]: {
+    script: [
+      '#!/bin/bash',
+      'export HDF5_USE_FILE_LOCKING=FALSE',
+      'export EMSIM="/apps/hbp/ich002/hbp-visualisation-deployements/emsim/emsim"',
+      '/apps/hbp/ich002/home/antonel/analysis_launch_piz_daint_0.17.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
+    ],
+    executable: '/bin/bash input.sh',
+    nodeType: 'mc',
+    memory: 64000,
+  },
   filesToAvoidCopy: [
     'analysis_path',
     'input.sh',

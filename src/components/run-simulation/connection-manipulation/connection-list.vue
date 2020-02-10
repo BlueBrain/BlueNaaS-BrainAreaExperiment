@@ -245,7 +245,7 @@ export default {
         conn.SpontMinis = connectionItem.spontMinis;
         conn.SynapseConfigure = connectionItem.synapseConfigure !== '' ? connectionItem.synapseConfigure : null;
         conn.Weight = connectionItem.weight;
-        let name = `${conn.Source}-${conn.Destination}`;
+        let name = connectionItem.name || `${conn.Source}-${conn.Destination}`;
         if (!conn.SpontMinis && !conn.SynapseConfigure) {
           const warning = `Connection ${conn.Source} to ${conn.Destination} missing parameters`;
           this.$Message.warning(warning);

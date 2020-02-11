@@ -128,7 +128,6 @@ async function deleteJob(url) {
   await axiosInstance({
     url,
     method: 'delete',
-    data: JSON.stringify({}),
   })
     .catch((error) => {
       // if not found continue and delete it from the local storage

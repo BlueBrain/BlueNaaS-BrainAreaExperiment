@@ -267,8 +267,13 @@ export default {
         let content = reader.result;
         if (content === '') {
           content = 'Empty File';
-        } else if (!content.startsWith('File not found') && !content.includes('\n')) {
-          content = JSON.stringify(JSON.parse(content), null, 2);
+        } else if (!content.startsWith('File not found') && !content.includes('\\n')) {
+          try {
+            content = JSON.stringify(JSON.parse(content), null, 2);
+          } catch (e) { console.debug('File is raw text'); }
+        } else if (content.includes('\\n') && content.includes('"')) {
+          // result from service account
+          content = content.replace(/\\n/g, '\n').replace(/"/g, '');
         }
         this.$set(parentObj, variableName, content);
       };

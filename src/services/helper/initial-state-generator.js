@@ -40,6 +40,14 @@ function getComputersAvailableForCircuit() {
   return computersAllowedToRun;
 }
 
+function getCurrentComputer() {
+  // if only one computer return it otherwise return null and check later with setupUserProjects()
+  const computerForCircuit = getCurrentCircuitConfig().prefix;
+  if (!computerForCircuit) return null;
+  const computerList = Object.keys(computerForCircuit);
+  return computerList.length === 1 ? computerList[0] : null;
+}
+
 function getCurrentSimConfig() {
   return simConfig[getCurrentCircuitConfig().simConfigToUse] || {};
 }
@@ -59,6 +67,7 @@ export default {
   getDefaultDuration,
   getDefaultForwardSkip,
   getComputersAvailableForCircuit,
+  getCurrentComputer,
   getCurrentCircuitConfig,
   setupInitialStates,
   getCircuitToUse,

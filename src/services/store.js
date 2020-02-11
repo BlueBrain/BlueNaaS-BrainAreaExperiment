@@ -13,7 +13,7 @@ initialStateGenerator.setupInitialStates();
 const store = new Vuex.Store({
   state: {
     title: 'Run Simulation',
-    currentComputer: null,
+    currentComputer: initialStateGenerator.getCurrentComputer(),
     simulationPopulation: null,
     currentCircuit: initialStateGenerator.getCircuitToUse(),
     currentCircuitConfig: initialStateGenerator.getCurrentCircuitConfig(),

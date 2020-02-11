@@ -71,7 +71,7 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
   newAnalysisAndTransferInfo.imports = imports;
 
   addTag(newAnalysisAndTransferInfo, jobTags.ANALYSIS);
-  if (newAnalysisAndTransferInfo.lfpPlotsConfig) {
+  if (Object.keys(newAnalysisAndTransferInfo.lfpPlotsConfig).length) {
     addTag(newAnalysisAndTransferInfo, jobTags.LFP_ANALYSIS);
   }
 

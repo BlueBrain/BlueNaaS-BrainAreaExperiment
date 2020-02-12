@@ -50,11 +50,11 @@
         </form-item>
         <form-item
           v-if="localProjItem.isSpikeReplay"
-          prop="freq"
+          prop="replayFreq"
           label="Frequency (Hz):"
         >
           <input-number
-            v-model="localProjItem.freq"
+            v-model="localProjItem.replayFreq"
             :step="0.1"
             placeholder="0.1"
           />
@@ -112,7 +112,7 @@ export default {
             return callback();
           },
         }],
-        freq: [{
+        replayFreq: [{
           validator: (rule, value, callback) => {
             if (!this.localProjItem.isSpikeReplay) return callback();
             if (!value) return callback(new Error('frequency is required'));

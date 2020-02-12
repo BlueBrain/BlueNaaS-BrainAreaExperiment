@@ -40,8 +40,8 @@
         <template slot-scope="{ row, index }" slot="target">
           {{ row.isSpikeReplay ? row.target : notAvailableValue}}
         </template>
-        <template slot-scope="{ row, index }" slot="freq">
-          {{ row.isSpikeReplay ? row.freq : notAvailableValue}}
+        <template slot-scope="{ row, index }" slot="replayFreq">
+          {{ row.isSpikeReplay ? row.replayFreq : notAvailableValue}}
         </template>
         <template slot-scope="{ row, index }" slot="type">
           {{ row.isSpikeReplay ? row.type : notAvailableValue}}
@@ -115,7 +115,7 @@ export default {
             },
             {
               title: 'Frequency (Hz)',
-              slot: 'freq',
+              slot: 'replayFreq',
               align: 'center',
             },
             {
@@ -151,6 +151,7 @@ export default {
           target: projTarget,
           isConfiguring: true,
           type: 'Poisson',
+          replayFreq: 0.1,
         },
       );
     },
@@ -209,7 +210,7 @@ export default {
       return resolve({
         name: projectionConfig.getConfigFileName(),
         data: JSON.stringify({
-          frequency: this.currentProjection.freq,
+          frequency: this.currentProjection.replayFreq,
           projectionSrcTarget: mapBlueConfigTerms(pBlocks.projectionSrcTarget),
         }),
       });

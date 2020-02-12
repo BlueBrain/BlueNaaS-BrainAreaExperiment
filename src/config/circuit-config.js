@@ -255,6 +255,7 @@ const hippoHbpMicrocircuit = {
     { name: 'SP_INT', displayName: 'SP_INT', src: `${microcircuitImgBase}/SP_INT.png`, cells: '1142' },
     { name: 'INT', displayName: 'INT', src: `${microcircuitImgBase}/INT.png`, cells: '1326' },
     { name: 'Minicolumn', displayName: 'Minicolumn', src: `${microcircuitImgBase}/Minicolumn.png`, cells: '2638' },
+    { name: 'SC-CA1', displayName: 'Schaffer Collateral Projection', cells: '' },
   ],
   biggestTarget: 'Full Circuit',
   defaultPopulation: 'Central Column',

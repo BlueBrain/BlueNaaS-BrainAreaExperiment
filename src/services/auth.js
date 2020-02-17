@@ -87,7 +87,7 @@ async function getUserInfo() {
 async function getUserProjects() {
   const userInfo = await getUserInfo();
   const projectPrefix = '/bbp-dev-proj';
-  const regexp = `${projectPrefix}(\\d{2})`;
+  const regexp = `${projectPrefix}(\\d+)`;
 
   const projects = userInfo.groups
     .filter(g => g.startsWith(projectPrefix))

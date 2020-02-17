@@ -338,7 +338,9 @@ export default {
 
     getUserProjects() {
       auth.getUserProjects().then((projects) => {
-        this.projectsAvailable = projects.sort();
+        // to sort with string and numbers
+        const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+        this.projectsAvailable = projects.sort(collator.compare);
       }).catch((e) => {
         this.$Message.error('Error fetching user groups', e);
       });

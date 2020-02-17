@@ -34,8 +34,7 @@ const objectStorageBaseURL = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-l
 |--------------------------------------------------------------------------
 */
 
-const slicesImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/images-slices-CA1/ca1-20181114';
-
+const slicesImgBase = `${objectStorageBaseURL}/images-slices-CA1/ca1-20181114`;
 const hippoHbpFullCa1 = {
   prefix: { // setting prefix allow to know which computer can run the circuit
     [computers.JURECA]: '/p/home/jusers/antonel1/jureca/vsk2512/CA1/20181114',
@@ -193,7 +192,7 @@ const hippoBbpFullCa1 = Object.assign(
 |--------------------------------------------------------------------------
 */
 
-const microcircuitImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/o1-20181114';
+const microcircuitImgBase = `${objectStorageBaseURL}/o1-20181114`;
 const hippoHbpMicrocircuit = {
   prefix: {
     [computers.JURECA]: '/p/project/cvsk25/vsk2512/O1/20181114',
@@ -377,7 +376,7 @@ const hippoMoocSvcAccMicrocircuit = Object.assign(
 |--------------------------------------------------------------------------
 */
 
-const sscxImgBase = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui/sscx-o1.v6a-20171212';
+const sscxImgBase = `${objectStorageBaseURL}/sscx-o1.v6a-20171212`;
 const sscxBbpMicrocircuit = {
   prefix: {
     [computers.BB5]: '',

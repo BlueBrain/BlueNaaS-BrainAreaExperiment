@@ -5,20 +5,18 @@ import { copyToDestinationScript, copyFromDestinationScript } from '@/common/bbp
 export default {
   [computers.JURECA]: {
     script: [
-      'OMP_NUM_THREADS=1',
-      'export OMP_NUM_THREADS',
+      'export OMP_NUM_THREADS=1',
       'export EMSIM="/p/project/cvsk25/bbp-viz-deployment/HBP/jurecavis/appimage/emsim/emsim"',
-      '/p/project/cvsk25/vsk2512/analysis/analysis_launch_jureca_0.17.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
+      '/p/project/cvsk25/vsk2512/analysis/analysis_launch_jureca_0.18.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
     ],
     executable: '/bin/bash input.sh',
   },
   [computers.PIZ_DAINT]: {
     script: [
       '#!/bin/bash',
-      'HDF5_USE_FILE_LOCKING=FALSE',
-      'export HDF5_USE_FILE_LOCKING',
-      'export EMSIM="/apps/hbp/ich002/hbp-visualisation-deployements/emsim/emsim"',
-      '/apps/hbp/ich002/home/antonel/analysis_launch_piz_daint_0.17.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
+      'export HDF5_USE_FILE_LOCKING=FALSE',
+      'export EMSIM="/apps/hbp/ich002/hbp-visualisation-deployements/emsim/startEmsim.sh"',
+      '/apps/hbp/ich002/home/antonel/analysis_launch_piz_daint_0.18.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
     ],
     executable: '/bin/bash input.sh',
     dynamicAnalysisConfig: 'https://raw.githubusercontent.com/antonelepfl/simulation-launcher-notebooks/analysis-notebooks/analysis_config.json',
@@ -27,14 +25,14 @@ export default {
     script: [
       '#!/bin/bash',
       '. /etc/profile',
-      'HDF5_USE_FILE_LOCKING=FALSE',
-      'export HDF5_USE_FILE_LOCKING',
+      'export HDF5_USE_FILE_LOCKING=FALSE',
       ...copyToDestinationScript,
+      'module load unstable',
       'module load emsim',
       'module load py-bluepy',
       'module load brion',
       'export EMSIM=emsim',
-      'python /gpfs/bbp.cscs.ch/home/antonel/scripts_unicore/analysis_launch_bb5_0.17.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
+      'python /gpfs/bbp.cscs.ch/home/antonel/scripts_unicore/analysis_launch_bb5_0.18.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
       ...copyFromDestinationScript,
     ],
     executable: '/bin/bash input.sh',

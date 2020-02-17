@@ -80,6 +80,9 @@ async function startReloadJob(simulationJob, paramCombo, analysisInfo) {
   const jobToUpdate = analysisInfo || simulationJob;
   const jobUrl = get(jobToUpdate, '_links.self.href');
   const updateJobInfo = await unicore.getJobProperties(jobUrl);
+
+  if (!updateJobInfo) return;
+
   let newStatus = updateJobInfo.status;
 
   // already classified and saved

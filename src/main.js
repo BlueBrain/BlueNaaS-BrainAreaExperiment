@@ -27,4 +27,8 @@ const app = new Vue({
 auth.init()
   .then(() => {
     app.$mount('#app');
+  })
+  .catch(() => {
+    console.warn('no end session endpoint defined');
+    window.location.reload();
   });

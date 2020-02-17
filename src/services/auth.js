@@ -40,6 +40,8 @@ function createAuthConfig() {
     client_id: actualAuthProvider.auth.clientId,
     redirect_uri: `${removeExtraURLParams()}/`,
     response_type: 'id_token token',
+    automaticSilentRenew: true,
+    loadUserInfo: false,
     extraQueryParams: actualAuthProvider.auth.request,
   };
   return oidcConfig;

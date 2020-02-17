@@ -94,7 +94,6 @@
           content="Time (seconds) to allocate"
         >RunTime (sec)</tooltip>
         <input-number
-          :disabled="runtimeIsHidden"
           v-model="runParameters.runtime"
           :min="1"
           placeholder="(optional)"
@@ -271,10 +270,6 @@ export default {
     disableGroupSelector() {
       const hasOneGroup = isEqual(this.groupsAvailable, ['*']);
       return !this.groupsAvailable.length || hasOneGroup;
-    },
-
-    runtimeIsHidden() {
-      return this.$store.state.currentComputer === computers.NUVLA;
     },
 
     isLoading() {

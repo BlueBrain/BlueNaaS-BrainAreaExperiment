@@ -9,7 +9,6 @@ import prettyBytes from 'pretty-bytes';
 import computeProvider from '@/common/compute-provider.json';
 import store from '@/services/store';
 import db from '@/services/db';
-import { computers } from '@/common/constants';
 import { getDate3YearFromNow } from '@/common/utils';
 import { jobTags, addTag } from '@/common/job-status';
 
@@ -347,23 +346,6 @@ async function generateUnicoreConfig(configParams) {
     return filterPartition(partitionsMap, store.state.userGroup);
   }
 
-  function getEnvironment() {
-    const environment = {};
-    if (configParams.computerSelected !== computers.NUVLA) return environment;
-
-    if (configParams.tags.includes(jobTags.SIMULATION)) {
-      // is a simulation
-      environment.NUVLA__worker__multiplicity = configParams.nodes;
-    } else if (configParams.tags.includes(jobTags.ANALYSIS)) {
-      // is analysis
-    } else {
-      // is visualization
-      environment.NUVLA__compute__collab_oidc = store.state.token;
-      environment.NUVLA__compute__collab_id = store.state.collabIdForViz;
-    }
-    return environment;
-  }
-
   function getNodes() {
     // avoid setting nodes for test job submission
     if (configParams.nodes === 0) return null;
@@ -381,7 +363,6 @@ async function generateUnicoreConfig(configParams) {
   return cleanDeep({
     Name: configParams.title || 'unnamed job',
     Executable: configParams.executable || '/bin/bash input.sh',
-    Environment: getEnvironment(),
     Arguments: [],
     Parameters: {
       UC_PREFER_INTERACTIVE_EXECUTION: configParams.isViz,

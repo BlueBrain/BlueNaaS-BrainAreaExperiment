@@ -1,7 +1,6 @@
 
 const computers = {
   BB5: 'BB5',
-  NUVLA: 'NUVLA',
   JURECA: 'JURECA',
   PIZ_DAINT: 'PIZ_DAINT',
   MOOC_SA: 'MOOC_SA',

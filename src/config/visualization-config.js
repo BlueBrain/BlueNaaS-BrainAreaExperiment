@@ -1,14 +1,5 @@
 
-import { computers } from '@/common/constants';
-
 const config = {
-  [computers.NUVLA]: {
-    to: 'NUVLA',
-    needsTransfer: true,
-    executable: 'brayns/BraynsUI',
-    nodes: 1,
-    runtime: 500,
-  },
   filesToAvoidCopy: [
     'stderr',
     'stdout',

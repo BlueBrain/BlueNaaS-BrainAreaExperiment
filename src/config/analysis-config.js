@@ -40,11 +40,6 @@ export default {
     partitions: { '*': 'prod' },
     qos: 'normal',
   },
-  [computers.NUVLA]: {
-    dynamicAnalysisConfig: 'https://raw.githubusercontent.com/BlueBrain/MOOC-hippocampus-network-simulation-2019/master/analysis_config.json',
-    bulkAnalysisConfig: 'https://raw.githubusercontent.com/BlueBrain/MOOC-hippocampus-network-simulation-2019/bulk-analysis/bulk_analysis_config.json',
-    executable: 'epfl-mooc/analysis/launch_analysis',
-  },
   [computers.MOOC_SA]: {
     script: [
       '#!/bin/bash',

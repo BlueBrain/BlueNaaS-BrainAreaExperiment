@@ -54,11 +54,6 @@
     "id": "S3-Kt",
     "url": "https://unicore.data.kit.edu:8080/HBP-KIT/rest/core"
   },
-  "NUVLA": {
-    "name": "NUVLA",
-    "id": "NUVLA",
-    "url": "https://zam2125.zam.kfa-juelich.de:9112/NUVLA/rest/core"
-  },
   "PIZ_DAINT": {
     "name": "PIZ_DAINT",
     "id": "PIZ_DAINT",

@@ -13,7 +13,6 @@ This component will be the frame for view the simulations.
       <div class="grow-space"/>
 
       <import-simulation
-        v-if="canImport"
         class="margined-right"
       />
 
@@ -42,7 +41,6 @@ import ListSimulations from '@/components/list-simulations/index.vue';
 import ListFilters from '@/components/list-simulations/list-filters.vue';
 import ImportSimulation from '@/components/list-simulations/import-simulation.vue';
 import BulkEdit from '@/components/list-simulations/bulk-edit.vue';
-import { computers } from '@/common/constants';
 
 export default {
   name: 'SimulationsList',
@@ -58,12 +56,6 @@ export default {
       statusSearch: 'ALL',
       nameFilter: '',
     };
-  },
-  computed: {
-    canImport() {
-      // import only Julich
-      return this.$store.state.currentComputer !== computers.NUVLA;
-    },
   },
   created() {
     this.$store.commit('setAppTitle', 'List of Simulations');

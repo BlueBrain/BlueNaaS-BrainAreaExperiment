@@ -441,6 +441,7 @@ async function submitJob(runConfig, inputs = [], startLater = false) {
     const job = await createJob(unicoreURL, launchParams);
 
     const jobURL = job.headers.location;
+    if (!jobURL) throw new Error('Location not present on response headers');
     await updateDeletionDate(jobURL);
     const jobProperties = await getJobProperties(jobURL);
     /* eslint-disable no-underscore-dangle */

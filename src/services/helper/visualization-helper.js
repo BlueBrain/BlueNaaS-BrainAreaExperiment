@@ -39,12 +39,12 @@ async function pollingVizIp() {
 
 async function submitVisualization(simulationDetails) {
   console.debug('Start submit visualization');
-  const vizConfig = visualizationConfig[store.state.currentComputer];
+  const vizConfig = visualizationConfig[store.state.fullConfig.computer];
 
   const files = await getFilesToCopy(`${simulationDetails.workingDirectory}/files`);
   if (!files) throw new Error('Error getting files for visualization');
 
-  const computerUrl = unicore.getComputerUrl(store.state.currentComputer);
+  const computerUrl = unicore.getComputerUrl(store.state.fullConfig.computer);
   const originalSM = computerUrl.replace('rest/core', 'services/StorageManagement?res=');
   const originalWorkId = simulationDetails.workingDirectory.split('/').pop();
 

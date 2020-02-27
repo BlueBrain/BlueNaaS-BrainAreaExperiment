@@ -50,7 +50,7 @@ export default {
   },
   computed: {
     computerHasVisualization() {
-      return !!visualizationConfig[this.$store.state.currentComputer];
+      return !!visualizationConfig[this.$store.state.fullConfig.computer];
     },
     hasReports() {
       if (!this.simulationDetails || !this.simulationDetails.children) return false;

@@ -52,7 +52,7 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
    */
 
   const newAnalysisAndTransferInfo = analysisAndTransferInfo;
-  const computer = store.state.currentComputer;
+  const { computer } = store.state.fullConfig;
   const currentAnalysisConfig = analysisConfig[computer];
   newAnalysisAndTransferInfo.executable = currentAnalysisConfig.executable;
   newAnalysisAndTransferInfo.partitions = currentAnalysisConfig.partitions;

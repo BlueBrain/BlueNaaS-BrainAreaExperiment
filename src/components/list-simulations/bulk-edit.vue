@@ -66,8 +66,8 @@ export default {
       return this.$store.state.list.simulationsToBulkAnalyse.length;
     },
     bulkNotebooksConfig() {
-      if (!this.$store.state.currentComputer) return false;
-      return analysisConfig[this.$store.state.currentComputer].bulkAnalysisConfig;
+      if (!this.$store.state.fullConfig.computer) return false;
+      return analysisConfig[this.$store.state.fullConfig.computer].bulkAnalysisConfig;
     },
   },
   methods: {

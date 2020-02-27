@@ -262,7 +262,7 @@ export default {
       return this.$store.state.stimulationTargets;
     },
     stimuliAvailable() {
-      const simConfig = this.$store.state.currentSimulationConfig;
+      const simConfig = this.$store.state.fullConfig.generalSimParams;
       return simConfig.stimuli.map(stimulus => unmapBlueConfigTerms(stimulus.name));
     },
     hasStimulusInfo() {
@@ -270,7 +270,7 @@ export default {
     },
     paramsToShow() {
       const patternName = mapBlueConfigTerms(this.localPattern);
-      const simConfig = this.$store.state.currentSimulationConfig;
+      const simConfig = this.$store.state.fullConfig.generalSimParams;
       const stimulus = simConfig.stimuli.find(s => s.name === patternName);
       return stimulus ? stimulus.params : [];
     },

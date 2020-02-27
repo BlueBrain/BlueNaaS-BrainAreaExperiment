@@ -87,15 +87,15 @@ export default {
     this.$store.commit('setAppTitle', 'Run Simulation');
     this.$store.dispatch('hideLoader');
 
-    const allTargets = this.$store.state.currentCircuitConfig.targets;
+    const allTargets = this.$store.state.fullConfig.circuitConfig.targets;
 
     // set the targets for stimulations
-    const stimulationRegExp = new RegExp(this.$store.state.currentCircuitConfig.stimulationTargetFilter);
+    const stimulationRegExp = new RegExp(this.$store.state.fullConfig.circuitConfig.stimulationTargetFilter);
     const filteredTargetsForStimulation = allTargets.filter(target => stimulationRegExp.test(target.name));
     this.$store.commit('setStimulationTargets', sortBy(filteredTargetsForStimulation, 'displayName'));
 
     // set targets for reports
-    const reportRegExp = new RegExp(this.$store.state.currentCircuitConfig.reportsTargetFilter);
+    const reportRegExp = new RegExp(this.$store.state.fullConfig.circuitConfig.reportsTargetFilter);
     const filteredTargetsForReport = allTargets.filter(target => reportRegExp.test(target.name));
     this.$store.commit('setReportTargets', sortBy(filteredTargetsForReport, 'displayName'));
 
@@ -116,8 +116,8 @@ export default {
   },
   methods: {
     viewList() {
-      const defaultComputer = this.$store.state.computersAvailable[0];
-      const computer = this.$store.state.currentComputer || defaultComputer;
+      const defaultComputer = this.$store.state.fullConfig.computersAvailable[0];
+      const computer = this.$store.state.fullConfig.computer || defaultComputer;
 
       // save params before changing page
       this.$refs.runConfigComponentRef.generatePartialBlueConfig();
@@ -131,7 +131,7 @@ export default {
     },
     async launchSim(blueConfigStr, runConfig, hideModalFn, extraFiles = null) {
       const newRunConfig = runConfig;
-      const simResources = this.$store.state.currentSimulationConfig[this.$store.state.currentComputer];
+      const simResources = this.$store.state.fullConfig.simulationConfig;
       const files = [{ To: 'BlueConfig', Data: blueConfigStr }];
       let { script } = simResources;
       if (script) {
@@ -152,8 +152,7 @@ export default {
 
       addTag(newRunConfig, jobTags.SIMULATION);
       // add from which circuit this simulation was launched
-      addTag(newRunConfig, this.$store.state.currentCircuit);
-
+      addTag(newRunConfig, this.$store.state.fullConfig.circuitName);
       let submittedJob;
       try {
         submittedJob = await unicore.submitJob(newRunConfig, files);

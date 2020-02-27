@@ -44,7 +44,7 @@ export default {
       this.$router.push({
         name: 'run',
         params: {
-          circuitName: this.$store.state.currentCircuit,
+          circuitName: this.$store.state.fullConfig.circuitName,
         },
       }).catch(() => {});
     },

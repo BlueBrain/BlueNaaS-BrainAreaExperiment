@@ -41,14 +41,14 @@ export default {
       if (this.itemsAvailable) {
         return this.itemsAvailable.filter(elem => elem.src);
       }
-      const allTargets = this.$store.state.currentCircuitConfig.targets;
+      const allTargets = this.$store.state.fullConfig.circuitConfig.targets;
       return allTargets.filter(elem => elem.src);
     },
   },
   mounted() {
     if (this.imagePoll && this.imagePoll.length) {
       const indexImgDefaultModel = this.imagePoll.findIndex(target => (
-        target.displayName === this.$store.state.currentCircuitConfig.defaultPopulation
+        target.displayName === this.$store.state.fullConfig.circuitConfig.defaultPopulation
       ));
       this.firstImgElement = this.imagePoll[indexImgDefaultModel];
       if (this.firstImgElement) { this.loadImage(); }

@@ -83,7 +83,7 @@ function getCollabIdForViz() {
 }
 
 function getConfigName(itemName) {
-  return `simConfig-${store.state.currentCircuit}-${itemName}`;
+  return `sim-config-${store.state.fullConfig.circuitName}-${itemName}`;
 }
 
 function getSavedConfig(itemName) {

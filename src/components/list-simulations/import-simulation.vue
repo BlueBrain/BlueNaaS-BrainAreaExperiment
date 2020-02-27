@@ -108,12 +108,12 @@ export default {
         name: 'details',
         params: {
           jobId: id,
-          computerParam: this.$store.state.currentComputer,
+          computerParam: this.$store.state.fullConfig.computer,
         },
       });
     },
     getUserProjects() {
-      if (this.$store.state.currentComputer !== computers.BB5) return;
+      if (this.$store.state.fullConfig.computer !== computers.BB5) return;
       auth.getUserProjects().then((projects) => {
         [this.userProject] = projects;
       }).catch((e) => {

@@ -330,8 +330,7 @@ async function generateUnicoreConfig(configParams) {
     * @params
     *   configParams { runtime, title, nodes, computerSelected, projectSelected }
     */
-
-  const simStaticParams = store.state.currentSimulationConfig[store.state.currentComputer];
+  const simStaticParams = store.state.fullConfig.simulationConfig;
 
   function getPartition() {
     function filterPartition(partitionsMap, userGroup) {
@@ -404,7 +403,7 @@ async function getImage(imageURL) {
 }
 
 function getJobById(jobId) {
-  const computer = getComputerUrl(store.state.currentComputer);
+  const computer = getComputerUrl(store.state.fullConfig.computer);
   const url = `${computer}/jobs/${jobId}`;
   return getJobProperties(url);
 }
@@ -488,10 +487,10 @@ async function workingDirToMachinePath(workingDirectory) {
 }
 
 function importPersonalSimulation(title, simFolderPath, account = null) {
-  const executable = store.state.currentSimulationConfig.importSimulationScript
+  const executable = store.state.fullConfig.generalSimParams.importSimulationScript
     .replace(/SIMFOLDERPATH/g, simFolderPath);
   const config = {
-    computerSelected: store.state.currentComputer,
+    computerSelected: store.state.fullConfig.computer,
     runtime: 500,
     nodes: 1,
     accountSelected: account,
@@ -500,7 +499,7 @@ function importPersonalSimulation(title, simFolderPath, account = null) {
   };
 
   addTag(config, jobTags.SIMULATION);
-  addTag(config, store.state.currentCircuit);
+  addTag(config, store.state.fullConfig.circuitName);
   addTag(config, jobTags.SIMULATION_IMPORTED);
 
   return submitJob(config);

@@ -29,7 +29,7 @@ function simulationProducedResults(simulationWithFiles) {
 }
 
 async function getSimulationUrlList() {
-  const networkJobUrls = await unicore.getSimUrls(store.state.currentComputer, store.state.currentCircuit);
+  const networkJobUrls = await unicore.getSimUrls(store.state.fullConfig.computer, store.state.fullConfig.circuitName);
 
   // compare saved list and sorted list
   const savedJobUrls = await db.getAllJobsSortedList() || [];
@@ -153,7 +153,7 @@ async function getSimulationsWithFiles(cbEach) {
     }
     // TODO: this is a workaround until the queryparam fetch jobs with AND
     allJobs.push(jobInfo);
-    if (!jobInfo.tags.includes(store.state.currentCircuit)) return false;
+    if (!jobInfo.tags.includes(store.state.fullConfig.circuitName)) return false;
     simulations.push(jobInfo);
     // if job is running poll the status
     if (isRunning(jobInfo.status)) { startReloadJob(jobInfo, getComputerUrlCombo()); }

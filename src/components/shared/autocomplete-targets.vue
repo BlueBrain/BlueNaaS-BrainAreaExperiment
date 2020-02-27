@@ -68,7 +68,7 @@ export default {
     const targetDropdown = this.$refs.targetDropdown.$el;
     targetDropdown.onmouseleave = () => { this.hideImg(); };
 
-    const circuitConfig = this.$store.state.currentCircuitConfig;
+    const { circuitConfig } = this.$store.state.fullConfig;
     const biggestTargetObj = circuitConfig.targets.find(target => (
       target.displayName === circuitConfig.biggestTarget
     ));
@@ -79,7 +79,7 @@ export default {
       if (this.itemsAvailable && this.itemsAvailable.length) {
         return this.itemsAvailable;
       }
-      return this.$store.state.currentCircuitConfig.targets;
+      return this.$store.state.fullConfig.circuitConfig.targets;
     },
     populationSelected: {
       get() { return this.targetSelected || null; },

@@ -174,11 +174,11 @@ export default {
       // setup targets for lfp
       const lfpAnalysisTarget = circuitTarget;
 
-      if (lfpAnalysisTarget === this.$store.state.currentCircuitConfig.biggestTarget) {
+      if (lfpAnalysisTarget === this.$store.state.fullConfig.circuitConfig.biggestTarget) {
         // show the full list of targets
-        const targetDisplayNames = this.$store.state.currentCircuitConfig.targets.map(t => t.displayName);
+        const targetDisplayNames = this.$store.state.fullConfig.circuitConfig.targets.map(t => t.displayName);
         this.lfpTargets = targetDisplayNames;
-        this.lfpTarget = this.$store.state.currentCircuitConfig.biggestTarget;
+        this.lfpTarget = this.$store.state.fullConfig.circuitConfig.biggestTarget;
       } else {
         this.lfpTargets = [lfpAnalysisTarget];
         [this.lfpTarget] = this.lfpTargets;
@@ -208,7 +208,7 @@ export default {
       const analysisRunTime = lfpAnalysisObj.hasLFPAnalysis ? defaultRunTime * 2 : defaultRunTime;
 
       return {
-        computerSelected: this.$store.state.currentComputer,
+        computerSelected: this.$store.state.fullConfig.computer,
         from: {},
         nodes: analysisConfig.nodes,
         runtime: analysisRunTime,

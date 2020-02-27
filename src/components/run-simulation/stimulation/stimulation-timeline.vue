@@ -208,7 +208,7 @@ export default {
         Pattern: 'Poisson',
         Target: target || this.$store.state.simulationPopulation,
         Mode: 'Current',
-        Duration: parseInt(this.$store.state.simulationDuration, 10),
+        Duration: parseInt(this.$store.state.fullConfig.generalSimParams.defaultDuration, 10),
         Delay: 0,
         Lambda: 5,
         Weight: 1,
@@ -272,7 +272,7 @@ export default {
       const stims = Object.keys(config.Stimulus);
       const hasNoise = !!stims.find(s => s.includes('Noise_'));
       if (hasNoise) {
-        config = merge(this.$store.state.currentCircuitConfig.hipperpolarizingStim, config);
+        config = merge(this.$store.state.fullConfig.circuitConfig.hipperpolarizingStim, config);
       }
 
       return config;

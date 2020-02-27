@@ -110,10 +110,10 @@ export default {
     },
     selectedComputer: {
       get() {
-        return this.$store.state.currentComputer;
+        return this.$store.state.fullConfig.computer;
       },
       set(newComputer) {
-        if (this.$store.state.currentComputer === newComputer) return;
+        if (this.$store.state.fullConfig.computer === newComputer) return;
 
         this.startLoadingList();
         eventBus.$emit('change-computer', newComputer, () => {
@@ -128,7 +128,7 @@ export default {
       return !isEqual(this.selectedGroupsAvailable, ['*']);
     },
     computersAvailable() {
-      return this.$store.state.computersAvailable;
+      return this.$store.state.fullConfig.computersAvailable;
     },
   },
   mounted() {

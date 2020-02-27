@@ -135,7 +135,7 @@ export default {
     },
 
     setIfSimulationIsLFP(blueConfigStr, unicoreConfig) {
-      const lfpCheckAttributes = this.$store.state.currentSimulationConfig.checksForLFP;
+      const lfpCheckAttributes = this.$store.state.fullConfig.generalSimParams.checksForLFP;
       if (!lfpCheckAttributes) return;
 
       const hasRequirements = lfpCheckAttributes.every(attr => (
@@ -144,7 +144,7 @@ export default {
       if (!hasRequirements) return;
       addTag(unicoreConfig, jobTags.SIMULATION);
       addTag(unicoreConfig, jobTags.LFP_SIMULATION);
-      addTag(unicoreConfig, this.$store.state.currentCircuit);
+      addTag(unicoreConfig, this.$store.state.fullConfig.circuitName);
     },
 
     async runSimulation(unicoreConfig) {
@@ -176,7 +176,7 @@ export default {
       const reportKeys = Object.keys(blueConfig.Report);
       const stimulusKeys = Object.keys(blueConfig.StimulusInject);
       const alert = this.$Message;
-      const circuitConf = this.$store.state.currentCircuitConfig;
+      const circuitConf = this.$store.state.fullConfig.circuitConfig;
 
       if (!reportKeys.length || !stimulusKeys.length) {
         alert.warning('Missing stimulus or report');

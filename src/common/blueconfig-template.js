@@ -13,10 +13,10 @@ function replacePrefixPlaceholders(obj, replaceText) {
 }
 
 function createBCTemplate() {
-  const circuitRunSection = store.state.currentCircuitConfig.paths;
-  const circuitPathsPrefixes = store.state.currentCircuitConfig.prefix[store.state.currentComputer];
+  const circuitRunSection = store.state.fullConfig.circuitConfig.paths;
+  const circuitPathsPrefixes = store.state.fullConfig.circuitConfig.prefix[store.state.fullConfig.computer];
   const fullPathAttributes = replacePrefixPlaceholders(circuitRunSection, circuitPathsPrefixes);
-  const extraParams = replacePrefixPlaceholders(store.state.currentCircuitConfig.extraParamsInBC, circuitPathsPrefixes);
+  const extraParams = replacePrefixPlaceholders(store.state.fullConfig.circuitConfig.extraParamsInBC, circuitPathsPrefixes);
   const bcTemplate = cleanDeep({
     Stimulus: {},
     Report: {},
@@ -25,8 +25,8 @@ function createBCTemplate() {
         ...fullPathAttributes,
         CircuitTarget: store.state.simulationPopulation,
         Dt: '0.025',
-        Duration: store.state.simulationDuration,
-        ForwardSkip: store.state.simulationForwardSkip,
+        Duration: store.state.fullConfig.generalSimParams.defaultDuration,
+        ForwardSkip: store.state.fullConfig.generalSimParams.defaultForwardSkip,
         NumSynapseFiles: circuitRunSection.NumSynapseFiles,
         BaseSeed: '10',
         RNGMode: 'UpdatedMCell',

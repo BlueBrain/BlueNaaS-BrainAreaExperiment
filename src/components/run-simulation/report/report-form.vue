@@ -139,7 +139,7 @@ export default {
     return {
       formInvalid: false,
       localReportInfo: Object.assign({}, this.reportInfo),
-      allCompartmentTargetObj: this.$store.state.currentCircuitConfig.allCompartmentTargetObj,
+      allCompartmentTargetObj: this.$store.state.fullConfig.circuitConfig.allCompartmentTargetObj,
 
       ruleValidate: {
         StartTime: [{
@@ -178,11 +178,11 @@ export default {
     },
     reportOptions() {
       if (!this.allCompartmentTargetObj) {
-        const newReportOptions = Object.assign({}, this.$store.state.currentSimulationConfig.reportOn);
+        const newReportOptions = Object.assign({}, this.$store.state.fullConfig.generalSimParams.reportOn);
         delete newReportOptions.lfp;
         return newReportOptions;
       }
-      return this.$store.state.currentSimulationConfig.reportOn;
+      return this.$store.state.fullConfig.generalSimParams.reportOn;
     },
     reportType() {
       return this.localReportInfo.Type;

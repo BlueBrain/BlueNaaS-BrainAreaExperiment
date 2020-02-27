@@ -74,7 +74,7 @@ export default {
       tooltipElem: null,
       sectionCollapsed: true,
       isTimelineLoading: true,
-      allCompartmentTargetObj: this.$store.state.currentCircuitConfig.allCompartmentTargetObj,
+      allCompartmentTargetObj: this.$store.state.fullConfig.circuitConfig.allCompartmentTargetObj,
     };
   },
   computed: {
@@ -196,7 +196,7 @@ export default {
     createNewReport(target) {
       return {
         StartTime: 0,
-        EndTime: parseInt(this.$store.state.simulationDuration, 10),
+        EndTime: parseInt(this.$store.state.fullConfig.generalSimParams.defaultDuration, 10),
         ReportOn: 'Voltage',
         Unit: 'mV',
         Target: target || this.$store.state.simulationPopulation,
@@ -225,7 +225,7 @@ export default {
     createConfig() {
       const config = { Report: {} };
       const configToSave = [];
-      const reportOnObj = this.$store.state.currentSimulationConfig.reportOn;
+      const reportOnObj = this.$store.state.fullConfig.generalSimParams.reportOn;
       const reportItems = this.timeline.getVisibleItems();
       reportItems.forEach((reportName, index) => {
         const reportObj = this.timeline.itemsData.get(reportName);

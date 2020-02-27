@@ -55,7 +55,7 @@ export default {
   },
   computed: {
     duration: {
-      get() { return this.$store.state.simulationDuration; },
+      get() { return this.$store.state.fullConfig.generalSimParams.defaultDuration; },
       set(newVal) {
         if (!newVal || newVal < 1) return;
         this.$store.commit('setSimulationDuration', newVal);
@@ -76,14 +76,14 @@ export default {
         Run: {
           Default: {
             Duration: this.duration,
-            ForwardSkip: this.$store.state.simulationForwardSkip,
+            ForwardSkip: this.$store.state.fullConfig.generalSimParams.defaultForwardSkip,
             CircuitTarget: mapBlueConfigTerms(this.populationSelected),
           },
         },
       };
       const configUsed = {
         duration: this.duration,
-        forwardSkip: this.$store.state.simulationForwardSkip,
+        forwardSkip: this.$store.state.fullConfig.generalSimParams.defaultForwardSkip,
         circuitTarget: this.populationSelected,
       };
       db.setSavedConfig(saveParamNames.SIM_PARAMS, configUsed);
@@ -92,17 +92,9 @@ export default {
     async loadPreviousConfig() {
       const prevConfig = await db.getSavedConfig(saveParamNames.SIM_PARAMS);
 
-      this.duration = prevConfig ? prevConfig.duration : this.$store.state.simulationDuration;
-      this.forwardSkip = prevConfig ? prevConfig.forwardSkip : this.$store.state.simulationForwardSkip;
+      this.duration = prevConfig ? prevConfig.duration : this.$store.state.fullConfig.generalSimParams.defaultDuration;
+      this.forwardSkip = prevConfig ? prevConfig.forwardSkip : this.$store.state.fullConfig.generalSimParams.defaultForwardSkip;
       this.populationSelected = prevConfig ? prevConfig.circuitTarget : null;
-
-      // setup default computer
-      const uncorePrevConfig = await db.getSavedConfig(saveParamNames.UNICORE);
-
-      const computerToUse = uncorePrevConfig
-        ? uncorePrevConfig.computerSelected
-        : this.$store.state.computersAvailable[0];
-      eventBus.$emit('change-computer', computerToUse);
     },
     targetChanged(newModel) {
       this.$store.commit('setSimulationPopulation', newModel);

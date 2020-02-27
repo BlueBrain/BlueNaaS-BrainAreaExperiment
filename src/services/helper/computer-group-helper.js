@@ -23,7 +23,7 @@ function setupFromStorage(newGroup) {
     if (store.state.userGroupsAvailable.toString() !== available.toString()) {
       store.commit('setUserGroupsAvailable', available);
     }
-    if (store.state.currentComputer !== computerSaved) {
+    if (store.state.fullConfig.computer !== computerSaved) {
       store.commit('setCurrentComputer', computerSaved);
     }
     if (store.state.userGroup !== groupSaved) {
@@ -35,11 +35,11 @@ function setupFromStorage(newGroup) {
 }
 
 async function setupUserProjects(newGroup) {
-  if (store.state.currentComputer === localStorage.getItem('userComputer')) {
+  if (store.state.fullConfig.computer === localStorage.getItem('userComputer')) {
     const wasSet = setupFromStorage(newGroup);
     if (wasSet) return store.state.userGroup;
   }
-  const computer = store.state.currentComputer;
+  const { computer } = store.state.fullConfig;
 
   if (store.state.userGroup) {
     // reset user project to fetch project information
@@ -90,8 +90,10 @@ eventBus.$on('change-user-group', (group, callback) => {
 });
 
 eventBus.$on('change-computer', (computer, callback) => {
-  store.commit('setCurrentComputer', computer);
-  store.dispatch('setupCurrentSimulationConfig');
+  if (computer !== store.state.fullConfig.computer) {
+    store.commit('setCurrentComputer', computer);
+    store.dispatch('setupFullConfig');
+  }
   setupUserProjectsShared(null).then(callback);
 });
 

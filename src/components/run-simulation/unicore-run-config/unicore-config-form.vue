@@ -240,15 +240,15 @@ export default {
   computed: {
     computersAvailable() {
       if (!this.showModalLocal) return [];
-      return this.$store.state.computersAvailable;
+      return this.$store.state.fullConfig.computersAvailable;
     },
 
     computerSelected: {
       get() {
-        return this.$store.state.currentComputer;
+        return this.$store.state.fullConfig.computer;
       },
       set(newComputer) {
-        if (!newComputer || newComputer === this.$store.state.currentComputer) return;
+        if (!newComputer || newComputer === this.$store.state.fullConfig.computer) return;
         this.refreshUnicoreProjects(newComputer, this.loadDefaultValues);
       },
     },
@@ -291,17 +291,16 @@ export default {
     },
 
     loadDefaultValues() {
-      const simConfig = this.$store.state.currentSimulationConfig;
-      const defaultParams = simConfig[this.$store.state.currentComputer];
-      this.runParameters.runtime = defaultParams.runtime;
-      this.runParameters.nodes = defaultParams.nodes;
-      this.runParameters.cpus = defaultParams.cpus;
+      const simConfig = this.$store.state.fullConfig.simulationConfig;
+      this.runParameters.runtime = simConfig.runtime;
+      this.runParameters.nodes = simConfig.nodes;
+      this.runParameters.cpus = simConfig.cpus;
     },
 
     async loadPreviousConfig() {
       const savedConfig = await db.getSavedConfig(saveParamNames.UNICORE);
       if (!savedConfig) {
-        const defaultComputer = this.$store.state.currentComputer || this.computersAvailable[0];
+        const defaultComputer = this.$store.state.fullConfig.computer || this.computersAvailable[0];
         this.loadDefaultValues();
         this.loadAccount(defaultComputer);
         this.refreshUnicoreProjects(defaultComputer);
@@ -320,7 +319,7 @@ export default {
     refreshUnicoreProjects(computer, callback) {
       this.groupsFetched = false;
       const computerToFetch = computer || this.computersAvailable[0];
-      if (computer === this.$store.state.currentComputer && this.groupsAvailable.length) {
+      if (computer === this.$store.state.fullConfig.computer && this.groupsAvailable.length) {
         this.groupsFetched = true;
         return;
       }

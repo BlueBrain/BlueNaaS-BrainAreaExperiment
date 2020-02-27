@@ -32,7 +32,7 @@ function iframeSignin(authMgr) {
 }
 
 function createAuthConfig() {
-  const isBBP = store.state.currentCircuit.includes('bbp_');
+  const isBBP = store.state.fullConfig.circuitName.includes('bbp_');
   actualAuthProvider = isBBP ? configBBP : configHBP;
 
   const oidcConfig = {

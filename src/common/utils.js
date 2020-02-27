@@ -18,7 +18,7 @@ let fullMapper = null;
 
 function fillMapper() {
   const targetsMapper = {};
-  store.state.currentCircuitConfig.targets.forEach((targetObj) => {
+  store.state.fullConfig.circuitConfig.targets.forEach((targetObj) => {
     targetsMapper[targetObj.displayName] = targetObj.name;
   });
   fullMapper = Object.assign({}, mapper, targetsMapper);
@@ -78,7 +78,7 @@ function openContent(content) {
 }
 
 function getComputerUrlCombo() {
-  return store.state.currentComputer + store.state.userGroup + window.location.href;
+  return store.state.fullConfig.computer + store.state.userGroup + window.location.href;
 }
 
 function getDate3YearFromNow() {
@@ -88,7 +88,7 @@ function getDate3YearFromNow() {
 }
 
 function getComputerProjectCircuitCombo(prefix) {
-  const comboStr = `${store.state.currentComputer}_${store.state.userGroup}_${store.state.currentCircuit}`;
+  const comboStr = `${store.state.fullConfig.computer}_${store.state.userGroup}_${store.state.fullConfig.circuitName}`;
   return prefix ? `${prefix}_${comboStr}` : comboStr;
 }
 

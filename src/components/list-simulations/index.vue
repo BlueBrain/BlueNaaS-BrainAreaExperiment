@@ -158,7 +158,7 @@ export default {
         name: 'details',
         params: {
           jobId: id,
-          computerParam: this.$store.state.currentComputer,
+          computerParam: this.$store.state.fullConfig.computer,
         },
       });
     },
@@ -186,7 +186,7 @@ export default {
       newAnalysisParamsEdited.from.workingDirectory = this.jobSelectedForAnalysis._links.workingDirectory.href;
       newAnalysisParamsEdited.accountSelected = this.getAccountFromLog(this.jobSelectedForAnalysis);
 
-      const config = analysisConfig[this.$store.state.currentComputer];
+      const config = analysisConfig[this.$store.state.fullConfig.computer];
       if (!config || (!config.script && !config.executable)) {
         this.$Message.error('Error launching analysis');
       }

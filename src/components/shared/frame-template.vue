@@ -36,7 +36,7 @@ export default {
       duration: 5,
     });
     eventBus.$on('show-error', (message) => {
-      this.$Message.error(`Error ${message}`);
+      this.$Message.error(`General error - ${message}`);
     });
   },
   methods: {

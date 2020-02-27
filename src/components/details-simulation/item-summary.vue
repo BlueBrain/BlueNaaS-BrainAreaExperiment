@@ -10,7 +10,7 @@
 
       <div class="bottom">
         <span class="section">
-          <icon type="ios-finger-print" />
+          <span>ID:</span>
           <span>{{ itemDetails.id }}</span>
         </span>
 

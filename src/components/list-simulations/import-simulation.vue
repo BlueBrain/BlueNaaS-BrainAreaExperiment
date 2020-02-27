@@ -117,7 +117,7 @@ export default {
       auth.getUserProjects().then((projects) => {
         [this.userProject] = projects;
       }).catch((e) => {
-        this.$Message.error('Error fetching user projects', e);
+        this.$Message.error(`Error fetching user projects - ${e}`);
       });
     },
   },

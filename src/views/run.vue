@@ -151,7 +151,7 @@ export default {
       try {
         submittedJob = await unicore.submitJob(newRunConfig, files);
       } catch (e) {
-        this.$Message.error(e.message);
+        this.$Message.error(`Submit job ${e.message}`);
         throw new Error(e.message);
       }
 

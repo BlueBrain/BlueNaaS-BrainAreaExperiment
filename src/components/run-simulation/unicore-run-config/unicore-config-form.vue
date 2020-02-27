@@ -342,7 +342,7 @@ export default {
         const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
         this.projectsAvailable = projects.sort(collator.compare);
       }).catch((e) => {
-        this.$Message.error('Error fetching user groups', e);
+        this.$Message.error(`Error fetching user groups - ${e}`);
       });
     },
   },

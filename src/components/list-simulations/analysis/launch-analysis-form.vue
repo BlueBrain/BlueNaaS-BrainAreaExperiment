@@ -193,14 +193,14 @@ export default {
       if (this.isLFP) {
         lfpAnalysisObj = this.$refs.lfpAnalysisPickerRef.generatePlotsConfig();
         if (lfpAnalysisObj.hasLFPAnalysis && !lfpAnalysisObj.configOk) {
-          this.$Message.error(lfpAnalysisObj.errorMessage);
+          this.$Message.error(`LFP Analysis - ${lfpAnalysisObj.errorMessage}`);
           return false;
         }
       }
 
       const basicAnalysisObj = this.$refs.analysisPickerRef.generatePlotsConfig();
       if (!lfpAnalysisObj.hasLFPAnalysis && !basicAnalysisObj.configOk) {
-        this.$Message.error(basicAnalysisObj.errorMessage);
+        this.$Message.error(`Basic Analysis - ${basicAnalysisObj.errorMessage}`);
         return false;
       }
 

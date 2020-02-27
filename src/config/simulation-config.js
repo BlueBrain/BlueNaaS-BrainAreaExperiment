@@ -108,7 +108,7 @@ export default {
     checksForLFP: ['AllCompartments', 'Summation'],
   },
   [areas.HIPPOCAMPUS_MOOC]: {
-    [computers.MOOC_SA]: {
+    [computers.SERVICE_ACCOUNT_MOOC]: {
       script: [
         '#!/bin/bash -l',
         '. /etc/profile',

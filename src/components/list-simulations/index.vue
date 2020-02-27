@@ -119,7 +119,7 @@ export default {
       this.viewList = [];
       this.allSimulations = [];
       this.$nextTick(() => {
-        this.fetchJobs().catch(error => this.$Message.error(error.message));
+        this.fetchJobs().catch(error => this.$Message.error(`Fetch jobs - ${error.message}`));
       });
     },
 
@@ -144,7 +144,6 @@ export default {
         try {
           await unicore.deleteJob(url);
         } catch (error) {
-          console.error(error);
           this.$Message.error(`Could not delete the job ${error.message}`);
           return;
         }

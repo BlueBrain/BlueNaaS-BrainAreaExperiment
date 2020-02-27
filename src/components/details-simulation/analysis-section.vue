@@ -165,7 +165,7 @@ export default {
         try {
           [analysisWithFiles] = await unicore.populateJobsUrlWithFiles([childAnalysis.jobURL]);
         } catch (error) {
-          this.$Message.error('Error fetching analysis information', error.message);
+          this.$Message.error(`Error fetching analysis - ${error.message}`);
           throw error;
         }
 

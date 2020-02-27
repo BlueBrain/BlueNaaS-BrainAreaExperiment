@@ -40,7 +40,7 @@ export default {
     partitions: { '*': 'prod' },
     qos: 'normal',
   },
-  [computers.MOOC_SA]: {
+  [computers.SERVICE_ACCOUNT_MOOC]: {
     script: [
       '#!/bin/bash',
       'export HDF5_USE_FILE_LOCKING=FALSE',

@@ -3,7 +3,7 @@ const computers = {
   BB5: 'BB5',
   JURECA: 'JURECA',
   PIZ_DAINT: 'PIZ_DAINT',
-  MOOC_SA: 'MOOC_SA',
+  SERVICE_ACCOUNT_MOOC: 'SERVICE_ACCOUNT_MOOC',
 };
 
 const areas = {

@@ -69,7 +69,7 @@ export default {
       this.$Message.loading('Visualization is starting. This could take up to 10 minutes ...');
       this.vizRunning = true;
       submitVisualization(this.simulationDetails)
-        .catch(error => this.$Message.error(error.message));
+        .catch(error => this.$Message.error(`Submit Visualization - ${error.message}`));
     },
     openVisualization() {
       window.open(`http://${this.ip}/?host=${this.ip}:8200`, '_blank');

@@ -6,11 +6,12 @@
       type="primary"
       :ghost="!filterOn"
       icon="ios-funnel"
+      class="icon-spaced"
       @click="resetFilter"
     >Filter</i-button>
 
     <icon
-      type="md-finger-print"
+      type="md-search"
       :size="iconSize"
       class="icon-spaced"
     />

@@ -4,6 +4,7 @@ import packageJson from '@/../package.json';
 import { urlToComputerAndId } from '@/services/unicore';
 import { jobStatus } from '@/common/job-status';
 import { getComputerProjectCircuitCombo } from '@/common/utils';
+import { storageConstants } from '@/common/constants';
 import store from '@/services/store';
 
 
@@ -96,6 +97,21 @@ function setSavedConfig(itemName, params) {
   return localforage.setItem(configName, params);
 }
 
+function getSavedComputerAndMappings(circuit) {
+  // not using the store because at the begining store is not ready and I need this to instanciate it
+  const computerSaved = localStorage.getItem(`${storageConstants.COMPUTER_PREFIX}-${circuit}`);
+  const groupSaved = localStorage.getItem(`${storageConstants.GROUP_PREFIX}-${circuit}`);
+  const computerUserGroupsMap = localStorage.getItem(`${storageConstants.MAPPING_PREFIX}-${circuit}`) || '';
+  return { computerSaved, groupSaved, computerUserGroupsMap };
+}
+
+function setSavedComputerAndMappings(computer, currentGroup, groupsAvailable) {
+  const circuit = store.state.fullConfig.circuitName;
+  localStorage.setItem(`${storageConstants.COMPUTER_PREFIX}-${circuit}`, computer);
+  localStorage.setItem(`${storageConstants.GROUP_PREFIX}-${circuit}`, currentGroup);
+  localStorage.setItem(`${storageConstants.MAPPING_PREFIX}-${circuit}`, `${computer}-${groupsAvailable}`);
+}
+
 
 export default {
   addJob,
@@ -108,6 +124,13 @@ export default {
   getCollabIdForViz,
   getSavedConfig,
   setSavedConfig,
+  getSavedComputerAndMappings,
+  setSavedComputerAndMappings,
+};
+
+export {
+  getSavedComputerAndMappings,
+  setSavedComputerAndMappings,
 };
 
 /* eslint-enable no-underscore-dangle */

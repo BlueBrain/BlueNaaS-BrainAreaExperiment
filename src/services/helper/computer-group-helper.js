@@ -2,6 +2,7 @@
 import store from '@/services/store';
 import { getComputerUrl, axiosInstance } from '@/services/unicore';
 import eventBus from '@/services/event-bus';
+import { getSavedComputerAndMappings, setSavedComputerAndMappings } from '@/services/db';
 
 function getUser(computer) {
   const unicoreURL = getComputerUrl(computer);
@@ -9,9 +10,11 @@ function getUser(computer) {
 }
 
 function setupFromStorage(newGroup) {
-  const computerSaved = localStorage.getItem('userComputer');
-  const groupSaved = newGroup || localStorage.getItem('userGroup');
-  const computerUserGroupsMap = localStorage.getItem('computerUserGroupsMap') || '';
+  const {
+    computerSaved,
+    groupSaved = newGroup,
+    computerUserGroupsMap,
+  } = getSavedComputerAndMappings(store.state.fullConfig.circuitName);
   // check based on saved params
   if (
     computerSaved &&
@@ -35,7 +38,8 @@ function setupFromStorage(newGroup) {
 }
 
 async function setupUserProjects(newGroup) {
-  if (store.state.fullConfig.computer === localStorage.getItem('userComputer')) {
+  const { computerSaved } = getSavedComputerAndMappings(store.state.fullConfig.circuitName);
+  if (store.state.fullConfig.computer === computerSaved) {
     const wasSet = setupFromStorage(newGroup);
     if (wasSet) return store.state.userGroup;
   }
@@ -61,13 +65,7 @@ async function setupUserProjects(newGroup) {
   store.commit('setUserGroupsAvailable', groupsAvailable);
   if (!store.state.userGroup) {
     store.commit('setUserGroup', currentGroup);
-    localStorage.setItem('userGroup', currentGroup);
-    localStorage.setItem('userComputer', computer);
-  }
-
-  // mapping groupsAvailable available for a specific computer
-  if (computer && groupsAvailable) {
-    localStorage.setItem('computerUserGroupsMap', `${computer}-${groupsAvailable}`);
+    setSavedComputerAndMappings(computer, currentGroup, groupsAvailable);
   }
 
   return store.state.userGroup;

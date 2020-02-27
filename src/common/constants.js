@@ -36,11 +36,18 @@ const analysis = {
   },
 };
 
+const storageConstants = {
+  COMPUTER_PREFIX: 'user-computer',
+  GROUP_PREFIX: 'user-group',
+  MAPPING_PREFIX: 'computer-group-mapping',
+};
+
 export {
   analysis,
   areas,
   computers,
   saveParamNames,
+  storageConstants,
 };
 
 export default computers;

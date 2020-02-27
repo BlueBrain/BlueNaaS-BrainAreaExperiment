@@ -39,7 +39,10 @@
         <projection-manipulation/>
       </div>
 
-      <run-configuration-component @launch-sim="launchSim"/>
+      <run-configuration-component
+        @launch-sim="launchSim"
+        ref="runConfigComponentRef"
+      />
 
     </div>
   </div>
@@ -115,6 +118,10 @@ export default {
     viewList() {
       const defaultComputer = this.$store.state.computersAvailable[0];
       const computer = this.$store.state.currentComputer || defaultComputer;
+
+      // save params before changing page
+      this.$refs.runConfigComponentRef.generatePartialBlueConfig();
+
       this.$router.push({
         name: 'view',
         params: {

@@ -195,7 +195,8 @@ async function getJobProperties(jobURL) {
 async function getFilesList(jobURL) {
   try {
     const response = await getInfoByUrl(jobURL);
-    return get(response, 'data.children', []);
+    const filesObj = get(response, 'data.content', {});
+    return Object.keys(filesObj);
   } catch (e) {
     return [];
   }
@@ -229,17 +230,15 @@ function getJobPhysicalLocation(log) {
 
 async function getAndSetChildren(jobInfo, force = false) {
   // if already have info in localstorage do not fetch it
-  if (!force && jobInfo.children && jobInfo.children.length) return;
+  if (!force && jobInfo.wasClassified) return;
 
   const workingDirectory = get(jobInfo, '_links.workingDirectory.href');
   const url = `${workingDirectory}/files`;
 
   const fileList = await getFilesList(url);
 
-  if (fileList) {
-    /* eslint-disable no-param-reassign */
-    jobInfo.children = fileList;
-  }
+  /* eslint-disable no-param-reassign */
+  jobInfo.children = fileList;
 }
 
 async function populateJobsUrlWithFiles(jobsListUrl) {

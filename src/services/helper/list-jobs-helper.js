@@ -86,7 +86,7 @@ async function startReloadJob(simulationJob, paramCombo, analysisInfo) {
   let newStatus = updateJobInfo.status;
 
   // already classified and saved
-  if (updateJobInfo.children) {
+  if (updateJobInfo.wasClassified) {
     if (analysisInfo) Vue.set(simulationJob, 'analysisStatus', updateJobInfo.status);
     return;
   }
@@ -133,6 +133,7 @@ function classifyJob(jobExpandedInfo) {
 
   const updatedSimulation = jobExpandedInfo;
   updatedSimulation.status = getSimCorrectStatus(updatedSimulation);
+  updatedSimulation.wasClassified = true;
 
   console.debug(`Classifying ${updatedSimulation.id} [${updatedSimulation.status}]`);
   db.addJob(updatedSimulation);
@@ -145,8 +146,8 @@ async function getSimulationsWithFiles(cbEach) {
   const jobsList = await getSimulationUrlList();
   const promiseArray = jobsList.map(async (jobUrl) => {
     const jobInfo = await unicore.getJobProperties(jobUrl);
-    // if has children it was already classified and saved in localStorage
-    if (!jobInfo.children || !jobInfo.children.length) {
+    // if has wasClassified it is saved in localStorage
+    if (!jobInfo.wasClassified) {
       await unicore.getAndSetChildren(jobInfo);
       classifyJob(jobInfo);
     }

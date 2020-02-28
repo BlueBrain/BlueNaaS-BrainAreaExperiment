@@ -2,11 +2,11 @@
 import pickBy from 'lodash/pickBy';
 import { getSimulationConfig } from '@/config/simulation-config';
 import { getAnalysisConfig } from '@/config/analysis-config';
+import circuitsFile from '@/config/circuit-config';
 import { getProjectionConfig } from '@/config/projection-config';
 import { getConnections } from '@/config/connection-config';
+import '@/services/helper/computer-group-helper';
 import { getSavedComputerAndMappings } from '@/services/db';
-import circuitsFile from '@/config/circuit-config';
-
 
 let circuitToUse;
 let simulationCurrentConfig;

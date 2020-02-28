@@ -1,12 +1,11 @@
 
-import store from '@/services/store';
-import { areas } from '@/common/constants';
+import { computers, circuits } from '@/common/constants';
 
-const hippocampusConnections = [
+const getHippocampusConnections = biggestTarget => ([
   {
     name: 'All-All',
-    source: store.state.currentCircuitConfig.biggestTarget,
-    destination: store.state.currentCircuitConfig.biggestTarget,
+    source: biggestTarget,
+    destination: biggestTarget,
     weight: 1,
     spontMinis: 0.01,
     delay: 0,
@@ -14,7 +13,7 @@ const hippocampusConnections = [
   {
     name: 'AMPA_NMDA',
     source: 'Excitatory',
-    destination: store.state.currentCircuitConfig.biggestTarget,
+    destination: biggestTarget,
     synapseConfigure: '%s.mg = 1.0 %s.NMDA_ratio = 1.22 tau_r_NMDA_ProbAMPANMDA_EMS = 3.9 tau_d_NMDA_ProbAMPANMDA_EMS = 35.6',
     weight: null,
     spontMinis: null,
@@ -23,19 +22,19 @@ const hippocampusConnections = [
   {
     name: 'GABA_AB',
     source: 'Inhibitory',
-    destination: store.state.currentCircuitConfig.biggestTarget,
+    destination: biggestTarget,
     synapseConfigure: '%s.e_GABAA = -80.0 %s.GABAB_ratio = 0',
     weight: null,
     spontMinis: null,
     delay: 0,
   },
-];
+]);
 
-const hippocampusMoocConnections = [
+const getHippocampusMoocConnections = biggestTarget => ([
   {
     name: 'All-All',
-    source: store.state.currentCircuitConfig.biggestTarget,
-    destination: store.state.currentCircuitConfig.biggestTarget,
+    source: biggestTarget,
+    destination: biggestTarget,
     weight: 1,
     spontMinis: 0.01,
     delay: 0,
@@ -43,7 +42,7 @@ const hippocampusMoocConnections = [
   {
     name: 'AMPA_NMDA',
     source: 'Excitatory',
-    destination: store.state.currentCircuitConfig.biggestTarget,
+    destination: biggestTarget,
     synapseConfigure: '%s.NMDA_ratio = 1.22 tau_r_NMDA_ProbAMPANMDA_EMS = 3.9 tau_d_NMDA_ProbAMPANMDA_EMS = 148.5',
     weight: null,
     spontMinis: null,
@@ -52,7 +51,7 @@ const hippocampusMoocConnections = [
   {
     name: 'GABA_AB',
     source: 'Inhibitory',
-    destination: store.state.currentCircuitConfig.biggestTarget,
+    destination: biggestTarget,
     synapseConfigure: '%s.e_GABAA = -80.0 %s.GABAB_ratio = 0',
     weight: null,
     spontMinis: null,
@@ -61,15 +60,15 @@ const hippocampusMoocConnections = [
   {
     name: 'MGGate',
     source: 'Excitatory',
-    destination: store.state.currentCircuitConfig.biggestTarget,
+    destination: biggestTarget,
     synapseConfigure: '%s.mg = 1.0',
     weight: null,
     spontMinis: null,
     delay: 0,
   },
-];
+]);
 
-const sscxConnections = [
+const getSscxConnections = () => ([
   {
     name: 'ConL6Exc-Uni',
     source: 'Excitatory',
@@ -247,18 +246,39 @@ const sscxConnections = [
     weight: 1.0,
     synapseConfigure: '%s.Use *= 0.112940422273',
   },
-];
+]);
 
-
-const connections = {
-  [areas.HIPPOCAMPUS]: hippocampusConnections,
-  [areas.HIPPOCAMPUS_MOOC]: hippocampusMoocConnections,
-  [areas.SSCX]: sscxConnections,
+const connectionsConfigMapping = {
+  [computers.JURECA]: {
+    [circuits.HIPPO_HBP_MICROCIRCUIT]: getHippocampusConnections,
+    [circuits.HIPPO_HBP_FULL_CA1]: getHippocampusConnections,
+  },
+  [computers.PIZ_DAINT]: {
+    [circuits.HIPPO_HBP_MICROCIRCUIT]: getHippocampusConnections,
+    [circuits.HIPPO_HBP_FULL_CA1]: getHippocampusConnections,
+  },
+  [computers.BB5]: {
+    [circuits.HIPPO_BBP_FULL_CA1]: getHippocampusConnections,
+    [circuits.HIPPO_BBP_MICROCIRCUIT]: getHippocampusConnections,
+    [circuits.SSCX_BBP_MICROCIRCUIT]: getSscxConnections,
+  },
+  [computers.SERVICE_ACCOUNT_MOOC]: {
+    [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: getHippocampusMoocConnections,
+  },
 };
 
-function getConnectionConfig() {
-  // placeholder for next commit
-  console.log(connections);
+function getConnectionConfig(computer, circuit) {
+  const computerConfig = connectionsConfigMapping[computer];
+  return computerConfig[circuit];
+}
+
+function getConnections(computer, circuit, biggestTarget) {
+  const connectionCreationFunction = getConnectionConfig(computer, circuit);
+  return connectionCreationFunction(biggestTarget);
+}
+
+function getDefaultConnections(computer, circuit) {
+  return getConnectionConfig(computer, circuit)();
 }
 
 const synapseAttributes = {
@@ -270,17 +290,14 @@ const synapseAttributes = {
   global: ['tau_r_NMDA_ProbAMPANMDA_EMS', 'tau_d_NMDA_ProbAMPANMDA_EMS', 'e'],
 };
 
-function getConnections() {
-  // placeholder
-}
-
 export default {
   getConnectionConfig,
-  // getDefaultConnections,
+  getDefaultConnections,
   synapseAttributes,
+  getConnections,
 };
 
 export {
-  getConnections,
   synapseAttributes,
+  getConnections,
 };

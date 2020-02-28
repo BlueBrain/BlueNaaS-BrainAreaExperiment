@@ -6,11 +6,13 @@ const computers = {
   SERVICE_ACCOUNT_MOOC: 'SERVICE_ACCOUNT_MOOC',
 };
 
-const areas = {
-  HIPPOCAMPUS: 'HIPPOCAMPUS',
-  SSCX: 'SSCX',
-  // TODO: change this mooc to specific config
-  HIPPOCAMPUS_MOOC: 'HIPPOCAMPUS_MOOC',
+const circuits = {
+  HIPPO_HBP_MICROCIRCUIT: 'hippo_hbp_microcircuit',
+  HIPPO_MOOC_SA_MICROCIRCUIT: 'hippo_mooc_sa_microcircuit',
+  HIPPO_HBP_FULL_CA1: 'hippo_hbp_full_ca1',
+  HIPPO_BBP_FULL_CA1: 'hippo_bbp_full_ca1',
+  HIPPO_BBP_MICROCIRCUIT: 'hippo_bbp_microcircuit',
+  SSCX_BBP_MICROCIRCUIT: 'sscx_bbp_microcircuit',
 };
 
 const saveParamNames = {
@@ -44,8 +46,8 @@ const storageConstants = {
 
 export {
   analysis,
-  areas,
   computers,
+  circuits,
   saveParamNames,
   storageConstants,
 };

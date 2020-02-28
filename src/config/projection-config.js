@@ -1,7 +1,5 @@
 
-// import get from 'lodash/get';
-import merge from 'lodash/merge';
-import { areas } from '@/common/constants';
+import { computers, circuits } from '@/common/constants';
 
 const configFileName = 'projection-config.json';
 
@@ -52,7 +50,7 @@ const hippocampusProjections = {
   },
 };
 
-const hippocampusMoocProjections = merge(
+const hippocampusMoocProjections = Object.assign(
   {},
   hippocampusProjections,
   {
@@ -83,7 +81,7 @@ const sscxProjections = {
     projectionSrcTarget: 'proj_Thalamocortical_VPM_Source',
     Projection: {
       Thalamocortical_input_VPM: {
-        Path: '<%= prefix %>/gpfs/bbp.cscs.ch/project/proj64/circuits/O1.v6a/20171212/proj_Thalamocortical_VPM/20171214-2/',
+        Path: '/gpfs/bbp.cscs.ch/project/proj64/circuits/O1.v6a/20171212/proj_Thalamocortical_VPM/20171214-2/',
         Source: 'proj_Thalamocortical_VPM_Source',
       },
     },
@@ -100,15 +98,28 @@ const sscxProjections = {
   },
 };
 
-const projections = {
-  [areas.HIPPOCAMPUS]: hippocampusProjections,
-  [areas.SSCX]: sscxProjections,
-  [areas.HIPPOCAMPUS_MOOC]: hippocampusMoocProjections,
+const projectionsConfigMapping = {
+  [computers.JURECA]: {
+    [circuits.HIPPO_HBP_MICROCIRCUIT]: Object.assign({}, hippocampusProjections),
+    [circuits.HIPPO_HBP_FULL_CA1]: Object.assign({}, hippocampusProjections),
+  },
+  [computers.PIZ_DAINT]: {
+    [circuits.HIPPO_HBP_MICROCIRCUIT]: Object.assign({}, hippocampusProjections),
+    [circuits.HIPPO_HBP_FULL_CA1]: Object.assign({}, hippocampusProjections),
+  },
+  [computers.BB5]: {
+    [circuits.HIPPO_BBP_FULL_CA1]: Object.assign({}, hippocampusProjections),
+    [circuits.HIPPO_BBP_MICROCIRCUIT]: Object.assign({}, hippocampusProjections),
+    [circuits.SSCX_BBP_MICROCIRCUIT]: Object.assign({}, sscxProjections),
+  },
+  [computers.SERVICE_ACCOUNT_MOOC]: {
+    [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, hippocampusMoocProjections),
+  },
 };
 
-function getProjectionConfig() {
-  // placeholder for next commit
-  console.log(projections);
+function getProjectionConfig(computer, circuit) {
+  const computerConfig = projectionsConfigMapping[computer];
+  return computerConfig[circuit];
 }
 
 function getConfigFileName() {

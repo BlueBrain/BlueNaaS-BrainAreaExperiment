@@ -1,7 +1,7 @@
 
 /* eslint-disable object-curly-newline */
 
-import { computers, areas } from '@/common/constants';
+import { computers, circuits } from '@/common/constants';
 
 const allCompartmentGenericTarget = {
   target: 'AllCompartments',
@@ -171,7 +171,6 @@ const hippoHbpFullCa1 = {
   biggestTarget: 'Full Circuit',
   allCompartmentTargetObj: Object.assign({}, allCompartmentGenericTarget),
   displayName: 'Hippocampus Full CA1',
-  simConfigToUse: areas.HIPPOCAMPUS,
   hipperpolarizingStim: Object.assign({}, hipperpolarizingGenericStim),
 };
 
@@ -260,7 +259,6 @@ const hippoHbpMicrocircuit = {
   defaultPopulation: 'Central Column',
   allCompartmentTargetObj: Object.assign({}, allCompartmentGenericTarget),
   displayName: 'Hippocampus CA1 Microcircuit',
-  simConfigToUse: areas.HIPPOCAMPUS,
   extraParamsInBC: {},
   hipperpolarizingStim: Object.assign({}, hipperpolarizingGenericStim),
 };
@@ -366,7 +364,6 @@ const hippoMoocSvcAccMicrocircuit = Object.assign(
       { name: 'CA3_PC', displayName: 'CA3 Projection', cells: '' },
     ],
     displayName: 'Hippocampus MOOC Service Account Microcircuit',
-    simConfigToUse: areas.HIPPOCAMPUS_MOOC,
   },
 );
 
@@ -520,18 +517,17 @@ const sscxBbpMicrocircuit = {
   defaultPopulation: 'Central Column',
   allCompartmentTargetObj: Object.assign({}, allCompartmentGenericTarget),
   displayName: 'SomatosensoryCortex Microcircuit',
-  simConfigToUse: areas.SSCX,
   extraParamsInBC: {},
   hipperpolarizingStim: Object.assign({}, hipperpolarizingGenericStim),
 };
 
 const mapCircuitNameWithUrl = {
-  hippo_hbp_microcircuit: hippoHbpMicrocircuit,
-  hippo_mooc_sa_microcircuit: hippoMoocSvcAccMicrocircuit,
-  hippo_hbp_full_ca1: hippoHbpFullCa1,
-  hippo_bbp_full_ca1: hippoBbpFullCa1,
-  hippo_bbp_microcircuit: hippoBbpMicrocircuit,
-  sscx_bbp_microcircuit: sscxBbpMicrocircuit,
+  [circuits.HIPPO_HBP_MICROCIRCUIT]: hippoHbpMicrocircuit,
+  [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: hippoMoocSvcAccMicrocircuit,
+  [circuits.HIPPO_HBP_FULL_CA1]: hippoHbpFullCa1,
+  [circuits.HIPPO_BBP_FULL_CA1]: hippoBbpFullCa1,
+  [circuits.HIPPO_BBP_MICROCIRCUIT]: hippoBbpMicrocircuit,
+  [circuits.SSCX_BBP_MICROCIRCUIT]: sscxBbpMicrocircuit,
 };
 
 export default {

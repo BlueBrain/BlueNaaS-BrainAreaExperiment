@@ -1,8 +1,9 @@
 
-import { computers /* analysis */ } from '@/common/constants';
+import { computers, circuits } from '@/common/constants';
 import { copyToDestinationScript, copyFromDestinationScript } from '@/common/bbp-unicore-move-script';
 
-export default {
+
+const configPerComputer = {
   [computers.JURECA]: {
     script: [
       'export OMP_NUM_THREADS=1',
@@ -53,8 +54,28 @@ export default {
   },
 };
 
-function getAnalysisConfig() {
-  // placeholder for next commit
+const analysisConfigMapping = {
+  [computers.JURECA]: {
+    [circuits.HIPPO_HBP_MICROCIRCUIT]: Object.assign({}, configPerComputer[computers.JURECA]),
+    [circuits.HIPPO_HBP_FULL_CA1]: Object.assign({}, configPerComputer[computers.JURECA]),
+  },
+  [computers.PIZ_DAINT]: {
+    [circuits.HIPPO_HBP_MICROCIRCUIT]: Object.assign({}, configPerComputer[computers.PIZ_DAINT]),
+    [circuits.HIPPO_HBP_FULL_CA1]: Object.assign({}, configPerComputer[computers.PIZ_DAINT]),
+  },
+  [computers.BB5]: {
+    [circuits.HIPPO_BBP_FULL_CA1]: Object.assign({}, configPerComputer[computers.BB5]),
+    [circuits.HIPPO_BBP_MICROCIRCUIT]: Object.assign({}, configPerComputer[computers.BB5]),
+    [circuits.SSCX_BBP_MICROCIRCUIT]: Object.assign({}, configPerComputer[computers.BB5]),
+  },
+  [computers.SERVICE_ACCOUNT_MOOC]: {
+    [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, configPerComputer[computers.SERVICE_ACCOUNT_MOOC]),
+  },
+};
+
+function getAnalysisConfig(computer, circuit) {
+  const computerConfig = analysisConfigMapping[computer];
+  return computerConfig[circuit];
 }
 
 export {
@@ -86,3 +107,5 @@ export {
   // runtime: 1800,
   // usecasesCreationForm: 'https://bbp.epfl.ch/public/usecases-wizard/index.html#/entitydashboard?',
 };
+
+export default {};

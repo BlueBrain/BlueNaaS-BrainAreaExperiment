@@ -167,3 +167,15 @@ export default {
     checksForLFP: ['AllCompartments', 'Summation'],
   },
 };
+
+function getSimulationConfig() {
+  // placeholder for next commit
+}
+
+// export default {
+//   getSimulationConfig,
+// };
+
+export {
+  getSimulationConfig,
+};

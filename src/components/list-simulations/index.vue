@@ -186,7 +186,7 @@ export default {
       newAnalysisParamsEdited.from.workingDirectory = this.jobSelectedForAnalysis._links.workingDirectory.href;
       newAnalysisParamsEdited.accountSelected = this.getAccountFromLog(this.jobSelectedForAnalysis);
 
-      const config = analysisConfig[this.$store.state.fullConfig.computer];
+      const config = this.$store.state.fullConfig.analysisConfig;
       if (!config || (!config.script && !config.executable)) {
         this.$Message.error('Error launching analysis');
       }

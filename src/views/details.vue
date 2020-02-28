@@ -194,7 +194,7 @@ export default {
         unicore.urlToComputerAndId(this.simulationDetails.url).id;
     },
     analysisNotebookConfig() {
-      return analysisConfig[this.$store.state.fullConfig.computer].dynamicAnalysisConfig;
+      return this.$store.state.fullConfig.analysisConfig.dynamicAnalysisConfig;
     },
   },
   mounted() {

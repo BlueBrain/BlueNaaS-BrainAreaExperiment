@@ -127,7 +127,6 @@ import cleanDeep from 'clean-deep';
 import uuidGen from 'uuid';
 import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
 import SynapseConfigurator from '@/components/run-simulation/connection-manipulation/synapse-configurator.vue';
-import { getDefaultConnections } from '@/services/helper/connection-helper';
 import { mapBlueConfigTerms } from '@/common/utils';
 import eventBus from '@/services/event-bus';
 import { saveParamNames } from '@/common/constants';
@@ -283,7 +282,8 @@ export default {
     async loadPreviousConfig() {
       const savedConnections = await db.getSavedConfig(saveParamNames.CONNECTION);
       if (!savedConnections) {
-        return getDefaultConnections();
+        const { connectionConfig } = this.$store.state.fullConfig;
+        return connectionConfig;
       }
       return savedConnections;
     },

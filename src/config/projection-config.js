@@ -1,5 +1,5 @@
 
-import get from 'lodash/get';
+// import get from 'lodash/get';
 import merge from 'lodash/merge';
 import { areas } from '@/common/constants';
 
@@ -106,12 +106,9 @@ const projections = {
   [areas.HIPPOCAMPUS_MOOC]: hippocampusMoocProjections,
 };
 
-function getDefaultProjection(area) {
-  return get(projections, `[${area}].defaultProjection`, null);
-}
-
-function getProjectionBlocks(area) {
-  return get(projections, `[${area}].projectionBlock`, null);
+function getProjectionConfig() {
+  // placeholder for next commit
+  console.log(projections);
 }
 
 function getConfigFileName() {
@@ -119,11 +116,9 @@ function getConfigFileName() {
 }
 
 export default {
-  getDefaultProjection,
 };
 
 export {
-  getDefaultProjection,
-  getProjectionBlocks,
+  getProjectionConfig,
   getConfigFileName,
 };

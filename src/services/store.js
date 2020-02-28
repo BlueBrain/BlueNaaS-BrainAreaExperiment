@@ -8,19 +8,12 @@ import initialStateGenerator from '@/services/helper/initial-state-generator';
 
 Vue.use(Vuex);
 
-initialStateGenerator.setupInitialStates();
+const fullConfig = initialStateGenerator.setupInitialStates();
 
 const store = new Vuex.Store({
   state: {
     title: 'Run Simulation',
-    currentComputer: initialStateGenerator.getCurrentComputer(),
     simulationPopulation: null,
-    currentCircuit: initialStateGenerator.getCircuitToUse(),
-    currentCircuitConfig: initialStateGenerator.getCurrentCircuitConfig(),
-    simulationDuration: initialStateGenerator.getDefaultDuration(),
-    simulationForwardSkip: initialStateGenerator.getDefaultForwardSkip(),
-    computersAvailable: initialStateGenerator.getComputersAvailableForCircuit(),
-    currentSimulationConfig: initialStateGenerator.getCurrentSimulationConfig(),
     token: null,
     userGroup: null,
     userGroupTmp: null,
@@ -31,6 +24,7 @@ const store = new Vuex.Store({
     populationTargets: [],
     connectionTargets: [],
     collabIdForViz: null,
+    fullConfig,
   },
   modules: {
     list: listModule,
@@ -42,7 +36,7 @@ const store = new Vuex.Store({
       state.title = newTitle;
     },
     setCurrentComputer(state, newComputer) {
-      state.currentComputer = newComputer;
+      state.fullConfig.computer = newComputer;
     },
     setUserGroup(state, newUserProject) {
       state.userGroup = newUserProject;
@@ -66,10 +60,10 @@ const store = new Vuex.Store({
       state.connectionTargets = targets;
     },
     setSimulationDuration(state, newDuration) {
-      state.simulationDuration = newDuration;
+      state.fullConfig.simulationConfig.defaultSimulationParams.defaultDuration = newDuration;
     },
     setSimulationForwardSkip(state, newForwardSkip) {
-      state.simulationForwardSkip = newForwardSkip;
+      state.fullConfig.simulationConfig.defaultSimulationParams.defaultForwardSkip = newForwardSkip;
     },
     setToken(state, newToken) {
       state.token = newToken;
@@ -78,7 +72,7 @@ const store = new Vuex.Store({
       state.collabIdForViz = collabId;
     },
     setCurrentSimulationConfig(state, config) {
-      state.currentSimulationConfig = config;
+      state.fullConfig = config;
     },
   },
   actions: {
@@ -92,9 +86,12 @@ const store = new Vuex.Store({
       if (!squareLoading) return;
       squareLoading.style.display = 'none';
     },
-    setupCurrentSimulationConfig(ctx) {
-      const simConf = initialStateGenerator.getCurrentSimConfig();
-      ctx.commit('setCurrentSimulationConfig', simConf);
+    setupFullConfig(ctx) {
+      const newFullConfig = initialStateGenerator.rebuildConfig(
+        ctx.state.fullConfig.circuitName,
+        ctx.state.fullConfig.computer,
+      );
+      ctx.commit('setCurrentSimulationConfig', newFullConfig);
     },
   },
 });

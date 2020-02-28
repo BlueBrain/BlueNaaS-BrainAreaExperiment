@@ -1,18 +1,18 @@
 
 import template from 'lodash/template';
 import unicore from '@/services/unicore';
-import analysisConfig from '@/config/analysis-config';
 import store from '@/services/store';
 import { addTag, jobTags } from '@/common/job-status';
+import analysisGenericConfig from '@/config/analysis-config';
 
 
 async function generateUpdatedAssociatedFile(simulationWorkDirectory, analysisObject, userGroup) {
   const associationFile = await unicore.getAssociatedLocation(
-    analysisConfig.analysisConnectionFileName,
+    analysisGenericConfig.analysisConnectionFileName,
     simulationWorkDirectory,
   );
   const newAssociationFile = [];
-  const analysisPath = analysisConfig.analysisConnectionFileName;
+  const analysisPath = analysisGenericConfig.analysisConnectionFileName;
   associationFile.forEach((oldAnalysis) => {
     newAssociationFile.push(oldAnalysis);
   });
@@ -25,7 +25,7 @@ async function generateUpdatedAssociatedFile(simulationWorkDirectory, analysisOb
 
 async function getFilesToCopy(filesURL, userGroup) {
   const files = await unicore.getFilesList(filesURL, userGroup);
-  const avoidFilesList = analysisConfig.filesToAvoidCopy;
+  const avoidFilesList = analysisGenericConfig.filesToAvoidCopy;
 
   const allowed = [];
   files.forEach((file) => {
@@ -52,11 +52,11 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
    */
 
   const newAnalysisAndTransferInfo = analysisAndTransferInfo;
-  const { computer } = store.state.fullConfig;
-  const currentAnalysisConfig = analysisConfig[computer];
-  newAnalysisAndTransferInfo.executable = currentAnalysisConfig.executable;
-  newAnalysisAndTransferInfo.partitions = currentAnalysisConfig.partitions;
-  newAnalysisAndTransferInfo.qos = currentAnalysisConfig.qos;
+  const { computer, analysisConfig } = store.state.fullConfig;
+
+  newAnalysisAndTransferInfo.executable = analysisConfig.executable;
+  newAnalysisAndTransferInfo.partitions = analysisConfig.partitions;
+  newAnalysisAndTransferInfo.qos = analysisConfig.qos;
 
   // get all the files to be copied
   const filesToCopy = await getFilesToCopy(`${newAnalysisAndTransferInfo.from.workingDirectory}/files`);
@@ -85,7 +85,7 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
     lfp_target: newAnalysisAndTransferInfo.lfpTarget,
   };
   const inputs = [
-    { To: analysisConfig.configFileName, Data: analysisParamsConfig },
+    { To: analysisGenericConfig.configFileName, Data: analysisParamsConfig },
   ];
 
   if (script) {
@@ -93,7 +93,7 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
      * Create file to start analysis
      * --------------------------------------------------------------------- */
     let runScript = script.join('\n');
-    if (currentAnalysisConfig.moveAnalysis && newAnalysisAndTransferInfo.accountSelected) {
+    if (analysisGenericConfig.moveAnalysis && newAnalysisAndTransferInfo.accountSelected) {
       runScript = template(runScript)({ projSelected: newAnalysisAndTransferInfo.accountSelected });
     }
     inputs.push({ To: 'input.sh', Data: runScript });

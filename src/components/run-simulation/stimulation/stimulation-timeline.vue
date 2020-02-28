@@ -208,7 +208,7 @@ export default {
         Pattern: 'Poisson',
         Target: target || this.$store.state.simulationPopulation,
         Mode: 'Current',
-        Duration: parseInt(this.$store.state.fullConfig.generalSimParams.defaultDuration, 10),
+        Duration: parseInt(this.$store.state.fullConfig.simulationConfig.defaultSimulationParams.defaultDuration, 10),
         Delay: 0,
         Lambda: 5,
         Weight: 1,

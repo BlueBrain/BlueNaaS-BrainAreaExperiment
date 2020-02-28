@@ -83,7 +83,7 @@ function createCustomTimeLabel() {
 }
 
 function createTimeline(container, eventsObj) {
-  const { defaultDuration } = store.state.fullConfig.generalSimParams;
+  const { defaultDuration } = store.state.fullConfig.simulationConfig.defaultSimulationParams;
   const options = {
     selectable: true,
     timeAxis: { scale: 'millisecond', step: 50 },

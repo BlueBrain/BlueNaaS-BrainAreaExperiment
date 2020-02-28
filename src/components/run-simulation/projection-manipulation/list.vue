@@ -65,7 +65,7 @@
 
 import '@/assets/css/manipulations-blocks.scss';
 import ProjectionConfigurator from '@/components/run-simulation/projection-manipulation/configurator.vue';
-import * as projectionConfig from '@/config/projection-config';
+import { getConfigFileName } from '@/config/projection-config';
 import { replacePrefixPlaceholders } from '@/common/blueconfig-template';
 import eventBus from '@/services/event-bus';
 import { mapBlueConfigTerms } from '@/common/utils';
@@ -85,7 +85,6 @@ export default {
       projectionBeingEdited: {},
       notAvailableValue: '-',
       currentProjection: {},
-      simConfigToUse: this.$store.state.currentCircuitConfig.simConfigToUse,
       globalProjectionBlock: {},
       columns: [
         {
@@ -137,7 +136,7 @@ export default {
   async created() {
     eventBus.$on('create-projection-config', this.creationConfigHandler);
     eventBus.$on('create-projection-file', this.createProjectionFile);
-    this.globalProjectionBlock = projectionConfig.getProjectionBlocks(this.simConfigToUse);
+    this.globalProjectionBlock = this.$store.state.fullConfig.projectionConfig.projectionBlock;
     this.currentProjection = await this.loadPreviousConfig();
     this.isProjLoading = false;
   },
@@ -208,7 +207,7 @@ export default {
       if (!this.currentProjection.isSpikeReplay) return resolve(null);
       const pBlocks = this.globalProjectionBlock;
       return resolve({
-        name: projectionConfig.getConfigFileName(),
+        name: getConfigFileName(),
         data: JSON.stringify({
           frequency: this.currentProjection.replayFreq,
           projectionSrcTarget: mapBlueConfigTerms(pBlocks.projectionSrcTarget),
@@ -221,7 +220,7 @@ export default {
     async loadPreviousConfig() {
       const savedProjection = await db.getSavedConfig(saveParamNames.PROJECTION);
       if (!savedProjection) {
-        return projectionConfig.getDefaultProjection(this.simConfigToUse);
+        return this.$store.state.fullConfig.projectionConfig.defaultProjection;
       }
       return savedProjection;
     },

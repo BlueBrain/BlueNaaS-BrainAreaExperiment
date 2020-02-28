@@ -196,7 +196,7 @@ export default {
     createNewReport(target) {
       return {
         StartTime: 0,
-        EndTime: parseInt(this.$store.state.fullConfig.generalSimParams.defaultDuration, 10),
+        EndTime: parseInt(this.$store.state.fullConfig.simulationConfig.defaultSimulationParams.defaultDuration, 10),
         ReportOn: 'Voltage',
         Unit: 'mV',
         Target: target || this.$store.state.simulationPopulation,
@@ -225,7 +225,7 @@ export default {
     createConfig() {
       const config = { Report: {} };
       const configToSave = [];
-      const reportOnObj = this.$store.state.fullConfig.generalSimParams.reportOn;
+      const reportOnObj = this.$store.state.fullConfig.simulationConfig.defaultSimulationParams.reportOn;
       const reportItems = this.timeline.getVisibleItems();
       reportItems.forEach((reportName, index) => {
         const reportObj = this.timeline.itemsData.get(reportName);

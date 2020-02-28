@@ -256,8 +256,9 @@ const connections = {
   [areas.SSCX]: sscxConnections,
 };
 
-function getDefaultConnections() {
-  return connections[store.state.currentCircuitConfig.simConfigToUse];
+function getConnectionConfig() {
+  // placeholder for next commit
+  console.log(connections);
 }
 
 const synapseAttributes = {
@@ -269,9 +270,17 @@ const synapseAttributes = {
   global: ['tau_r_NMDA_ProbAMPANMDA_EMS', 'tau_d_NMDA_ProbAMPANMDA_EMS', 'e'],
 };
 
+function getConnections() {
+  // placeholder
+}
+
 export default {
-  getDefaultConnections,
+  getConnectionConfig,
+  // getDefaultConnections,
   synapseAttributes,
 };
 
-export { synapseAttributes };
+export {
+  getConnections,
+  synapseAttributes,
+};

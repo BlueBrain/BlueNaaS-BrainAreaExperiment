@@ -41,7 +41,6 @@
 
 
 <script>
-import analysisConfig from '@/config/analysis-config';
 import AnalysisInNotebook from '@/components/shared/analysis-in-notebook.vue';
 
 export default {
@@ -67,7 +66,7 @@ export default {
     },
     bulkNotebooksConfig() {
       if (!this.$store.state.fullConfig.computer) return false;
-      return analysisConfig[this.$store.state.fullConfig.computer].bulkAnalysisConfig;
+      return this.$store.state.fullConfig.analysisConfig.bulkAnalysisConfig;
     },
   },
   methods: {

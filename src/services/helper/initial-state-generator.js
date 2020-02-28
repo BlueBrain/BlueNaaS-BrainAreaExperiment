@@ -1,8 +1,12 @@
 
 import pickBy from 'lodash/pickBy';
-import simConfig from '@/config/simulation-config';
-import circuits from '@/config/circuit-config';
-import '@/services/helper/computer-group-helper';
+import { getSimulationConfig } from '@/config/simulation-config';
+import { getAnalysisConfig } from '@/config/analysis-config';
+import { getProjectionConfig } from '@/config/projection-config';
+import { getConnections } from '@/config/connection-config';
+import { getSavedComputerAndMappings } from '@/services/db';
+import circuitsFile from '@/config/circuit-config';
+
 
 let circuitToUse;
 let simulationCurrentConfig;
@@ -12,16 +16,8 @@ function getCircuitToUse() {
 }
 
 function getCurrentCircuitConfig() {
-  const config = circuits.mapCircuitNameWithUrl[getCircuitToUse()];
+  const config = circuitsFile.mapCircuitNameWithUrl[getCircuitToUse()];
   return config || {};
-}
-
-function getDefaultDuration() {
-  return simulationCurrentConfig.defaultDuration;
-}
-
-function getDefaultForwardSkip() {
-  return simulationCurrentConfig.defaultForwardSkip;
 }
 
 function getCurrentSimulationConfig() {
@@ -40,16 +36,74 @@ function getComputersAvailableForCircuit() {
   return computersAllowedToRun;
 }
 
-function getCurrentComputer() {
-  // if only one computer return it otherwise return null and check later with setupUserProjects()
-  const computerForCircuit = getCurrentCircuitConfig().prefix;
-  if (!computerForCircuit) return null;
-  const computerList = Object.keys(computerForCircuit);
-  return computerList.length === 1 ? computerList[0] : null;
+function getSavedComputerOrDefault(computerList, circuitName) {
+  const { computerSaved } = getSavedComputerAndMappings(circuitName);
+  return computerSaved || computerList[0];
 }
 
-function getCurrentSimConfig() {
-  return simConfig[getCurrentCircuitConfig().simConfigToUse] || {};
+function getCurrentComputer(circuitDetails, circuitName) {
+  // if only one computer return it otherwise return null and check later with setupUserProjects()
+  const computerForCircuit = circuitDetails.prefix;
+  if (!computerForCircuit) return null;
+  const computerList = Object.keys(computerForCircuit);
+  const currentComputer = computerList.length === 1
+    ? computerList[0]
+    : getSavedComputerOrDefault(computerList, circuitName);
+  return {
+    available: computerList,
+    computer: currentComputer,
+  };
+}
+
+class CurrentFullConfig {
+  constructor(circuitName, computer) {
+    this.circuitName = circuitName;
+    this.computer = computer;
+
+    if (!circuitName && !computer) return;
+    this.fetchAllConfigs();
+  }
+
+  fetchCircuitConfig() {
+    const circuitConfig = circuitsFile.mapCircuitNameWithUrl[this.circuitName] || {};
+    return circuitConfig;
+  }
+
+  fetchComputer() {
+    const { computer, available } = getCurrentComputer(this.circuitConfig, this.circuitName);
+    this.computersAvailable = available;
+    return (this.computer || computer);
+  }
+
+  fetchAnalysisConfig() {
+    const analysis = getAnalysisConfig(this.computer, this.circuitName);
+    return analysis;
+  }
+
+  fetchProjectionConfig() {
+    const projConfig = getProjectionConfig(this.computer, this.circuitName);
+    return projConfig;
+  }
+
+  fetchSimulationConfig() {
+    const simConfig = getSimulationConfig(this.computer, this.circuitName);
+    return simConfig;
+  }
+
+  fetchConnectionsConfig() {
+    this.biggestTarget = this.circuitConfig.biggestTarget;
+    const connectionConfig = getConnections(this.computer, this.circuitName, this.biggestTarget);
+    return connectionConfig;
+  }
+
+  fetchAllConfigs() {
+    this.circuitConfig = this.fetchCircuitConfig();
+    this.computer = this.fetchComputer();
+    this.analysisConfig = this.fetchAnalysisConfig();
+    this.projectionConfig = this.fetchProjectionConfig();
+    this.simulationConfig = this.fetchSimulationConfig();
+    this.connectionConfig = this.fetchConnectionsConfig();
+  }
 }
 
 function setupInitialStates() {
@@ -58,19 +112,20 @@ function setupInitialStates() {
   if (!match) console.error('Specify /circuits in url');
   circuitToUse = match ? match[1] : null;
 
-  simulationCurrentConfig = getCurrentSimConfig();
+  return new CurrentFullConfig(circuitToUse);
 }
 
+function rebuildConfig(circuitName, computer) {
+  const newFullConfig = new CurrentFullConfig(circuitName, computer);
+  return newFullConfig;
+}
 
 export default {
   circuitToUse,
-  getDefaultDuration,
-  getDefaultForwardSkip,
   getComputersAvailableForCircuit,
-  getCurrentComputer,
   getCurrentCircuitConfig,
   setupInitialStates,
   getCircuitToUse,
   getCurrentSimulationConfig,
-  getCurrentSimConfig,
+  rebuildConfig,
 };

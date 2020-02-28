@@ -177,12 +177,13 @@ export default {
       return this.$store.state.reportTargets;
     },
     reportOptions() {
+      const { reportOn } = this.$store.state.fullConfig.simulationConfig.defaultSimulationParams;
       if (!this.allCompartmentTargetObj) {
-        const newReportOptions = Object.assign({}, this.$store.state.fullConfig.generalSimParams.reportOn);
+        const newReportOptions = Object.assign({}, reportOn);
         delete newReportOptions.lfp;
         return newReportOptions;
       }
-      return this.$store.state.fullConfig.generalSimParams.reportOn;
+      return reportOn;
     },
     reportType() {
       return this.localReportInfo.Type;

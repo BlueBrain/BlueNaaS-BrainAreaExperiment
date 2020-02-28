@@ -219,8 +219,6 @@ export default {
       };
       await listJobsHelper.getSimulationsWithFiles(callbackEachSim);
 
-      console.debug('Simulations loaded');
-
       this.viewList = sortBy(this.viewList, 'submissionTime').reverse();
 
       this.$store.commit('setListIsLoading', false);
@@ -231,7 +229,6 @@ export default {
         this.$set(sim, 'analysisStatus', newAnalysisStatus);
       };
       await listJobsHelper.fetchAnalysisInfo(this.viewList, callbackEachAnalysis);
-      console.debug('Analysis loaded');
       this.$store.commit('setAnalysisListIsLoading', false);
     },
   },

@@ -25,20 +25,17 @@ async function getFilesToCopy(filesURL) {
 }
 
 async function pollingVizIp() {
-  console.debug('Polling visualization VM IP');
   const lastCharactersToken = store.state.token.substr(-15);
 
   try {
     const ip = await collabHelper.getIpByName(store.state.collabIdForViz, `${lastCharactersToken}.txt`);
     eventBus.$emit('viz-ready', ip);
   } catch (e) {
-    console.debug('VM IP not found. Retrying...');
     setTimeout(() => pollingVizIp(), store.state.pollInterval);
   }
 }
 
 async function submitVisualization(simulationDetails) {
-  console.debug('Start submit visualization');
   const vizConfig = visualizationConfig[store.state.fullConfig.computer];
 
   const files = await getFilesToCopy(`${simulationDetails.workingDirectory}/files`);

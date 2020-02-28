@@ -27,7 +27,7 @@
         />
       </form-item>
 
-      <form-item prop="computer">
+      <form-item prop="computer" class="uppercase">
         <tooltip
           slot="label"
           content="Supercomputer"
@@ -358,5 +358,8 @@ export default {
   }
   .hide-param {
     display: none;
+  }
+  .uppercase {
+    text-transform: uppercase;
   }
 </style>

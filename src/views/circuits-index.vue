@@ -15,7 +15,6 @@
 
 
 <script>
-import upperCase from 'lodash/upperCase';
 import circuitConfig from '@/config/circuit-config';
 
 export default {
@@ -29,7 +28,7 @@ export default {
     const circuits = Object.keys(circuitConfig.mapCircuitNameWithUrl).sort();
     this.$store.dispatch('hideLoader');
     this.circuits = circuits.map(circuit => ({
-      name: upperCase(circuit),
+      name: circuit,
       route: `${window.location.href}circuits/${circuit}`,
     }));
   },
@@ -57,6 +56,7 @@ export default {
     background-color: #515a6e;
     color: white;
     cursor: pointer;
+    text-transform: uppercase;
   }
   .circuit-card h3 a {
     color: white;

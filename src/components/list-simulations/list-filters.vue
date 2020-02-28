@@ -171,6 +171,7 @@ export default {
     div {
       margin-right: 15px;
       min-width: 120px;
+      text-transform: uppercase;
     }
 
     .icon-spaced {

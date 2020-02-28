@@ -1,9 +1,9 @@
 
 const computers = {
-  BB5: 'BB5',
-  JURECA: 'JURECA',
-  PIZ_DAINT: 'PIZ_DAINT',
-  SERVICE_ACCOUNT_MOOC: 'SERVICE_ACCOUNT_MOOC',
+  BB5: 'bb5',
+  JURECA: 'jureca',
+  PIZ_DAINT: 'piz_daint',
+  SERVICE_ACCOUNT_MOOC: 'service_account_mooc',
 };
 
 const circuits = {

@@ -73,10 +73,6 @@ export default {
     toggleSelection() {
       this.$store.commit('setBulkEditActivated', true);
     },
-    analyzeMultiple() {
-      if (!this.hasSelected) return; // double check is able to analyze
-      console.log(this.$store.state.list.simulationsToBulkAnalyse);
-    },
     cancelSelection() {
       this.$store.commit('cleanSimulationToBulkAnalyse');
       this.$store.commit('setBulkEditActivated', false);

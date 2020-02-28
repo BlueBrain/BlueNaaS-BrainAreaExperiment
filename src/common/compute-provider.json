@@ -1,72 +1,22 @@
 {
-  "JUQUEEN": {
-    "name": "JUQUEEN (JSC)",
-    "id": "JUQUEEN",
-    "url": "https://hbp-unic.fz-juelich.de:7112/HBP_JUQUEEN/rest/core"
-  },
   "JURECA": {
     "name": "JURECA (JSC)",
-    "id": "JURECA",
+    "id": "jureca",
     "url": "https://zam2125.zam.kfa-juelich.de:9112/FZJ_JURECA/rest/core"
-  },
-  "JURON": {
-    "name": "JURON (JSC)",
-    "id": "JURON",
-    "url": "https://hbp-unic.fz-juelich.de:7112/HBP_JURON/rest/core"
-  },
-  "JULIA": {
-    "name": "JULIA (JSC)",
-    "id": "JULIA",
-    "url": "https://hbp-unic.fz-juelich.de:7112/HBP_JULIA/rest/core"
-  },
-  "VIZ_CSCS": {
-    "name": "VIZ (CSCS)",
-    "id": "VIS",
-    "url": "https://contra.cscs.ch:8080/VIS-CSCS/rest/core"
-  },
-  "BGQ_CSCS": {
-    "name": "BGQ (CSCS)",
-    "id": "BGQ",
-    "url": "https://contra.cscs.ch:8080/BGQ-CSCS/rest/core"
-  },
-  "MARE_NOSTRUM": {
-    "name": "Mare Nostrum (BSC)",
-    "id": "MN",
-    "url": "https://unicore-hbp.bsc.es:8080/BSC-MareNostrum/rest/core"
-  },
-  "PICO": {
-    "name": "PICO (CINECA)",
-    "id": "PICO",
-    "url": "https://grid.hpc.cineca.it:9111/CINECA-PICO/rest/core"
-  },
-  "GALILEO": {
-    "name": "GALILEO (CINECA)",
-    "id": "GALILEO",
-    "url": "https://grid.hpc.cineca.it:9111/CINECA-GALILEO/rest/core"
-  },
-  "FERMI": {
-    "name": "FERMI (CINECA)",
-    "id": "FERMI",
-    "url": "https://grid.hpc.cineca.it:9111/CINECA-FERMI/rest/core"
-  },
-  "KIT": {
-    "name": "Cloud storage (KIT)",
-    "id": "S3-Kt",
-    "url": "https://unicore.data.kit.edu:8080/HBP-KIT/rest/core"
   },
   "PIZ_DAINT": {
     "name": "PIZ_DAINT",
-    "id": "PIZ_DAINT",
+    "id": "piz_daint",
     "url": "https://brissago.cscs.ch:8080/DAINT-CSCS/rest/core"
   },
   "BB5": {
     "name": "BlueBrain 5",
-    "id": "BB5",
+    "id": "bb5",
     "url": "https://bbpunicore.epfl.ch:8080/BB5-CSCS/rest/core"
   },
   "SERVICE_ACCOUNT_MOOC": {
     "name": "MOOC Piz Daint Service Account",
-    "id": "SERVICE_ACCOUNT_MOOC",
+    "id": "service_account_mooc",
     "url": "https://bspsa.cineca.it/advanced/pizdaint/rest/core"
   }
 }

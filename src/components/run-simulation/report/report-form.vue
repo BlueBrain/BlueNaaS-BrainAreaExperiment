@@ -177,7 +177,7 @@ export default {
       return this.$store.state.reportTargets;
     },
     reportOptions() {
-      const { reportOn } = this.$store.state.fullConfig.simulationConfig.defaultSimulationParams;
+      const { reportOn } = this.$store.state.fullConfig.simulationConfig.genericSimulationConfig;
       if (!this.allCompartmentTargetObj) {
         const newReportOptions = Object.assign({}, reportOn);
         delete newReportOptions.lfp;

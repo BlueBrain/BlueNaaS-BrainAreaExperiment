@@ -26,6 +26,14 @@ const hipperpolarizingGenericStim = {
   },
 };
 
+const runSectionDefaults = {
+  // need to keep the CamelCase because goes directly to BlueConfig
+  ForwardSkip: 5000,
+  Dt: '0.025',
+  BaseSeed: '10',
+  RNGMode: 'Random123',
+};
+
 const objectStorageBaseURL = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui';
 
 /*
@@ -49,7 +57,6 @@ const hippoHbpFullCa1 = {
     BioName: '<%= prefix %>/circuit/bioname',
     TargetFile: '<%= prefix %>/circuit/user.target',
     CellLibraryFile: 'circuit.mvd3',
-    NumSynapseFiles: '2048',
     CurrentDir: '.',
     OutputRoot: '.',
   },
@@ -172,6 +179,7 @@ const hippoHbpFullCa1 = {
   allCompartmentTargetObj: Object.assign({}, allCompartmentGenericTarget),
   displayName: 'Hippocampus Full CA1',
   hipperpolarizingStim: Object.assign({}, hipperpolarizingGenericStim),
+  runSection: Object.assign({}, runSectionDefaults),
 };
 
 
@@ -205,7 +213,6 @@ const hippoHbpMicrocircuit = {
     nrnPath: '<%= prefix %>/circuit/connectome/functional/',
     TargetFile: '<%= prefix %>/circuit/user.target',
     CellLibraryFile: 'circuit.mvd3',
-    NumSynapseFiles: '2048',
     CurrentDir: '.',
     OutputRoot: '.',
   },
@@ -261,6 +268,7 @@ const hippoHbpMicrocircuit = {
   displayName: 'Hippocampus CA1 Microcircuit',
   extraParamsInBC: {},
   hipperpolarizingStim: Object.assign({}, hipperpolarizingGenericStim),
+  runSection: Object.assign({}, runSectionDefaults),
 };
 
 
@@ -386,8 +394,6 @@ const sscxBbpMicrocircuit = {
     nrnPath: '<%= prefix %>/gpfs/bbp.cscs.ch/project/proj64/circuits/O1.v6a/20171212/ncsFunctionalAllRecipePathways',
     TargetFile: '<%= prefix %>/gpfs/bbp.cscs.ch/home/antonel/sscx/user.target',
     CellLibraryFile: 'circuit.mvd3',
-    BaseSeed: 372588,
-    NumSynapseFiles: '2048',
     CurrentDir: '.',
     OutputRoot: '.',
   },
@@ -519,6 +525,7 @@ const sscxBbpMicrocircuit = {
   displayName: 'SomatosensoryCortex Microcircuit',
   extraParamsInBC: {},
   hipperpolarizingStim: Object.assign({}, hipperpolarizingGenericStim),
+  runSection: Object.assign({}, runSectionDefaults),
 };
 
 const mapCircuitNameWithUrl = {

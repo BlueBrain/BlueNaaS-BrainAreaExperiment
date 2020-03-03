@@ -23,13 +23,6 @@ function createBCTemplate() {
     Run: {
       Default: {
         ...fullPathAttributes,
-        CircuitTarget: store.state.simulationPopulation,
-        Dt: '0.025',
-        Duration: store.state.fullConfig.simulationConfig.defaultSimulationParams.defaultDuration,
-        ForwardSkip: store.state.fullConfig.simulationConfig.defaultSimulationParams.defaultForwardSkip,
-        NumSynapseFiles: circuitRunSection.NumSynapseFiles,
-        BaseSeed: '10',
-        RNGMode: 'UpdatedMCell',
       },
     },
     StimulusInject: {},

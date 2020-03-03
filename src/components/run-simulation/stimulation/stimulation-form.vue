@@ -262,16 +262,16 @@ export default {
       return this.$store.state.stimulationTargets;
     },
     stimuliAvailable() {
-      const simConfig = this.$store.state.fullConfig.simulationConfig.defaultSimulationParams;
-      return simConfig.stimuli.map(stimulus => unmapBlueConfigTerms(stimulus.name));
+      const { stimuli } = this.$store.state.fullConfig.simulationConfig.genericSimulationConfig;
+      return stimuli.map(stimulus => unmapBlueConfigTerms(stimulus.name));
     },
     hasStimulusInfo() {
       return !!Object.keys(this.localStimInfo).length;
     },
     paramsToShow() {
       const patternName = mapBlueConfigTerms(this.localPattern);
-      const simConfig = this.$store.state.fullConfig.simulationConfig.defaultSimulationParams;
-      const stimulus = simConfig.stimuli.find(s => s.name === patternName);
+      const { stimuli } = this.$store.state.fullConfig.simulationConfig.genericSimulationConfig;
+      const stimulus = stimuli.find(s => s.name === patternName);
       return stimulus ? stimulus.params : [];
     },
   },

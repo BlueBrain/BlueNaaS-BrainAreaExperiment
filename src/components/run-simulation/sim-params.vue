@@ -55,7 +55,7 @@ export default {
   },
   computed: {
     duration: {
-      get() { return this.$store.state.fullConfig.simulationConfig.defaultSimulationParams.defaultDuration; },
+      get() { return this.$store.state.simulationDuration; },
       set(newVal) {
         if (!newVal || newVal < 1) return;
         this.$store.commit('setSimulationDuration', newVal);
@@ -72,18 +72,18 @@ export default {
   },
   methods: {
     creationConfigHandler(resolve) {
+      const { runSection } = this.$store.state.fullConfig.circuitConfig;
       const params = {
         Run: {
           Default: {
             Duration: this.duration,
-            ForwardSkip: this.$store.state.fullConfig.simulationConfig.defaultSimulationParams.defaultForwardSkip,
             CircuitTarget: mapBlueConfigTerms(this.populationSelected),
+            ...runSection,
           },
         },
       };
       const configUsed = {
         duration: this.duration,
-        forwardSkip: this.$store.state.fullConfig.simulationConfig.defaultSimulationParams.defaultForwardSkip,
         circuitTarget: this.populationSelected,
       };
       db.setSavedConfig(saveParamNames.SIM_PARAMS, configUsed);
@@ -91,9 +91,8 @@ export default {
     },
     async loadPreviousConfig() {
       const prevConfig = await db.getSavedConfig(saveParamNames.SIM_PARAMS);
-      const { defaultSimulationParams } = this.$store.state.fullConfig.simulationConfig;
-      this.duration = prevConfig ? prevConfig.duration : defaultSimulationParams.defaultDuration;
-      this.forwardSkip = prevConfig ? prevConfig.forwardSkip : defaultSimulationParams.defaultForwardSkip;
+      const { runSection } = this.$store.state.fullConfig.circuitConfig;
+      this.duration = prevConfig ? prevConfig.duration : runSection.duration;
       this.populationSelected = prevConfig ? prevConfig.circuitTarget : null;
     },
     targetChanged(newModel) {

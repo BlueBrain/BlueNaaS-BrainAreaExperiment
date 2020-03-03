@@ -487,7 +487,7 @@ async function workingDirToMachinePath(workingDirectory) {
 }
 
 function importPersonalSimulation(title, simFolderPath, account = null) {
-  const executable = store.state.fullConfig.simulationConfig.defaultSimulationParams.importSimulationScript
+  const executable = store.state.fullConfig.simulationConfig.genericSimulationConfig.importSimulationScript
     .replace(/SIMFOLDERPATH/g, simFolderPath);
   const config = {
     computerSelected: store.state.fullConfig.computer,

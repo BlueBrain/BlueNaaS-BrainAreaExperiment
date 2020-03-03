@@ -41,8 +41,8 @@ function checkReportIsLFP(bcStr, reportName) {
   const regexp = new RegExp(`${reportName}\\s\\{(.+?)\\}`, 'gm');
   const [reportContent] = findByRegexp(bcStr, regexp);
   if (!reportContent) return false;
-  const lfpChecks = store.state.fullConfig.simulationConfig.defaultSimulationParams.checksForLFP;
-  return lfpChecks.every(check => reportContent.includes(check));
+  const { checksForLFP } = store.state.fullConfig.simulationConfig.genericSimulationConfig;
+  return checksForLFP.every(check => reportContent.includes(check));
 }
 
 function getTargetByReport(bcStr, reportName) {

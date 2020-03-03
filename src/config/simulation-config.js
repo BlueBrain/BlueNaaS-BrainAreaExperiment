@@ -29,9 +29,7 @@ const stimuliGeneric = [
   { name: 'Noise', params: ['MeanPercent', 'Variance'] },
 ];
 
-const defaultSimulationParams = {
-  defaultDuration: 300,
-  defaultForwardSkip: 5000,
+const genericSimulationConfig = {
   importSimulationScript: 'ln -sf SIMFOLDERPATH/* . && rm ./BlueConfig && cp SIMFOLDERPATH/BlueConfig .',
   stimuli: Object.assign([], stimuliGeneric),
   reportOn: Object.assign({}, reportOnGeneric),
@@ -61,7 +59,7 @@ const jurecaHippocampus = {
   cpus: 68,
   partitions: { vsk25: 'booster' },
   executable: '/bin/bash input.sh',
-  defaultSimulationParams: Object.assign({}, defaultSimulationParams),
+  genericSimulationConfig: Object.assign({}, genericSimulationConfig),
 };
 
 const pizDaintHippocampus = {
@@ -82,7 +80,7 @@ const pizDaintHippocampus = {
   executable: '/bin/bash input.sh',
   nodeType: 'mc',
   memory: 64000,
-  defaultSimulationParams: Object.assign({}, defaultSimulationParams),
+  genericSimulationConfig: Object.assign({}, genericSimulationConfig),
 };
 
 const bb5Hippocampus = {
@@ -110,7 +108,7 @@ const bb5Hippocampus = {
   partitions: { '*': 'prod' },
   qos: 'bigjob',
   moveSimulation: true,
-  defaultSimulationParams: Object.assign({}, defaultSimulationParams),
+  genericSimulationConfig: Object.assign({}, genericSimulationConfig),
 };
 
 const bb5Sscx = {
@@ -136,7 +134,7 @@ const bb5Sscx = {
   partitions: { '*': 'prod' },
   qos: 'bigjob',
   moveSimulation: true,
-  defaultSimulationParams: Object.assign({}, defaultSimulationParams),
+  genericSimulationConfig: Object.assign({}, genericSimulationConfig),
 };
 
 const pizDaintHippocampusServiceAccount = {
@@ -157,7 +155,7 @@ const pizDaintHippocampusServiceAccount = {
   executable: '/bin/bash input.sh',
   nodeType: 'mc',
   memory: 64000,
-  defaultSimulationParams: Object.assign({}, defaultSimulationParams),
+  genericSimulationConfig: Object.assign({}, genericSimulationConfig),
 };
 
 const simConfigMapping = {

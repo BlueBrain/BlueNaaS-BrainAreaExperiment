@@ -135,10 +135,10 @@ export default {
     },
 
     setIfSimulationIsLFP(blueConfigStr, unicoreConfig) {
-      const lfpCheckAttributes = this.$store.state.fullConfig.simulationConfig.defaultSimulationParams.checksForLFP;
-      if (!lfpCheckAttributes) return;
+      const { checksForLFP } = this.$store.state.fullConfig.simulationConfig.genericSimulationConfig;
+      if (!checksForLFP) return;
 
-      const hasRequirements = lfpCheckAttributes.every(attr => (
+      const hasRequirements = checksForLFP.every(attr => (
         blueConfigStr.includes(attr)
       ));
       if (!hasRequirements) return;

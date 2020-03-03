@@ -14,6 +14,7 @@ const store = new Vuex.Store({
   state: {
     title: 'Run Simulation',
     simulationPopulation: null,
+    simulationDuration: 300,
     token: null,
     userGroup: null,
     userGroupTmp: null,
@@ -60,10 +61,7 @@ const store = new Vuex.Store({
       state.connectionTargets = targets;
     },
     setSimulationDuration(state, newDuration) {
-      state.fullConfig.simulationConfig.defaultSimulationParams.defaultDuration = newDuration;
-    },
-    setSimulationForwardSkip(state, newForwardSkip) {
-      state.fullConfig.simulationConfig.defaultSimulationParams.defaultForwardSkip = newForwardSkip;
+      state.simulationDuration = newDuration;
     },
     setToken(state, newToken) {
       state.token = newToken;

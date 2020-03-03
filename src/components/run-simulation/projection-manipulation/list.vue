@@ -172,7 +172,8 @@ export default {
       const projConnection = pBlocks.Connection[connectionProjectionName];
       const { Connection } = pBlocks;
       projConnection.Weight = this.currentProjection.weight;
-      const circuitPathsPrefixes = this.$store.state.fullConfig.circuitConfig.prefix[this.$store.state.fullConfig.computer];
+      const { circuitConfig, computer } = this.$store.state.fullConfig;
+      const circuitPathsPrefixes = circuitConfig.prefix ? circuitConfig.prefix[computer] : null;
       const Projection = replacePrefixPlaceholders(pBlocks.Projection, circuitPathsPrefixes);
       const { Stimulus, StimulusInject } = pBlocks.spikeReplay;
 

@@ -6,6 +6,7 @@ import store from '@/services/store';
 
 function replacePrefixPlaceholders(obj, replaceText) {
   if (!obj) return null;
+  if (replaceText === null) return obj;
   const str = JSON.stringify(obj);
   const templateFn = template(str);
   const replacedStr = templateFn({ prefix: replaceText });
@@ -13,10 +14,11 @@ function replacePrefixPlaceholders(obj, replaceText) {
 }
 
 function createBCTemplate() {
-  const circuitRunSection = store.state.fullConfig.circuitConfig.paths;
-  const circuitPathsPrefixes = store.state.fullConfig.circuitConfig.prefix[store.state.fullConfig.computer];
+  const { circuitConfig, computer } = store.state.fullConfig;
+  const circuitRunSection = circuitConfig.paths;
+  const circuitPathsPrefixes = circuitConfig.prefix ? circuitConfig.prefix[computer] : null;
   const fullPathAttributes = replacePrefixPlaceholders(circuitRunSection, circuitPathsPrefixes);
-  const extraParams = replacePrefixPlaceholders(store.state.fullConfig.circuitConfig.extraParamsInBC, circuitPathsPrefixes);
+  const extraParams = replacePrefixPlaceholders(circuitConfig.extraParamsInBC, circuitPathsPrefixes);
   const bcTemplate = cleanDeep({
     Stimulus: {},
     Report: {},

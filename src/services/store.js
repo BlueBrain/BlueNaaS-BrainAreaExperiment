@@ -8,8 +8,6 @@ import initialStateGenerator from '@/services/helper/initial-state-generator';
 
 Vue.use(Vuex);
 
-const fullConfig = initialStateGenerator.setupInitialStates();
-
 const store = new Vuex.Store({
   state: {
     title: 'Run Simulation',
@@ -25,7 +23,7 @@ const store = new Vuex.Store({
     populationTargets: [],
     connectionTargets: [],
     collabIdForViz: null,
-    fullConfig,
+    fullConfig: {},
   },
   modules: {
     list: listModule,

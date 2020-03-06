@@ -530,6 +530,8 @@ const sscxBbpMicrocircuit = {
   runSection: Object.assign({}, runSectionDefaults),
 };
 
+const dynamicCircuit = {};
+
 const mapCircuitNameWithUrl = {
   [circuits.HIPPO_HBP_MICROCIRCUIT]: hippoHbpMicrocircuit,
   [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: hippoMoocSvcAccMicrocircuit,
@@ -537,6 +539,7 @@ const mapCircuitNameWithUrl = {
   [circuits.HIPPO_BBP_FULL_CA1]: hippoBbpFullCa1,
   [circuits.HIPPO_BBP_MICROCIRCUIT]: hippoBbpMicrocircuit,
   [circuits.SSCX_BBP_MICROCIRCUIT]: sscxBbpMicrocircuit,
+  [circuits.DYNAMIC_CIRCUIT]: dynamicCircuit,
 };
 
 export default {

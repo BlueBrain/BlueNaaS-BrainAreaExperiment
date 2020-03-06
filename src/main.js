@@ -10,6 +10,7 @@ import App from '@/components/shared/frame-template.vue';
 import router from '@/services/router';
 import store from '@/services/store';
 import '@/common/sentry';
+import initialStateGenerator from '@/services/helper/initial-state-generator';
 
 Vue.config.productionTip = false;
 
@@ -26,6 +27,8 @@ const app = new Vue({
 
 auth.init()
   .then(() => {
+    const fullConfig = initialStateGenerator.setupInitialStates();
+    store.commit('setCurrentSimulationConfig', fullConfig);
     app.$mount('#app');
   })
   .catch(() => {

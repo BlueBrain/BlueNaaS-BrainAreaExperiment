@@ -7,6 +7,7 @@ import { getProjectionConfig } from '@/config/projection-config';
 import { getConnections } from '@/config/connection-config';
 import '@/services/helper/computer-group-helper';
 import { getSavedComputerAndMappings } from '@/services/db';
+import * as dynamicCircuitHelper from '@/services/helper/dynamic-circuit-loader-helper';
 
 let circuitToUse;
 let simulationCurrentConfig;
@@ -60,7 +61,6 @@ class CurrentFullConfig {
     this.circuitName = circuitName;
     this.computer = computer;
 
-    if (!circuitName && !computer) return;
     this.fetchAllConfigs();
   }
 
@@ -108,11 +108,13 @@ class CurrentFullConfig {
 
 function setupInitialStates() {
   // define circuit based on URL
-  const match = window.location.href.match(/circuits\/([\w\\-]*)/);
-  if (!match) console.error('Specify /circuits in url');
-  circuitToUse = match ? match[1] : null;
+  circuitToUse = dynamicCircuitHelper.getCircuitName();
+  if (!circuitToUse) console.error('Specify /circuits in url');
 
-  return new CurrentFullConfig(circuitToUse);
+  dynamicCircuitHelper.setup();
+
+  const fullConfig = dynamicCircuitHelper.mergeConfigWithQueryParams(circuitToUse);
+  return fullConfig;
 }
 
 function rebuildConfig(circuitName, computer) {
@@ -127,5 +129,9 @@ export default {
   setupInitialStates,
   getCircuitToUse,
   getCurrentSimulationConfig,
+  rebuildConfig,
+};
+
+export {
   rebuildConfig,
 };

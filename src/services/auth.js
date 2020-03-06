@@ -3,7 +3,13 @@ import Oidc from 'oidc-client';
 import { setAxiosToken, axiosInstance } from '@/services/unicore';
 import store from '@/services/store';
 import { configHBP, configBBP } from '@/config';
-import { getCircuitName } from '@/services/helper/dynamic-circuit-loader-helper';
+import { errorMessages } from '@/common/constants';
+import {
+  isDynamicCircuit,
+  saveAndRemoveQueries,
+  showErrorPage,
+  getCircuitName,
+} from '@/services/helper/dynamic-circuit-loader-helper';
 
 let actualAuthProvider = null;
 
@@ -43,7 +49,7 @@ async function login(authMgr) {
     console.debug('[windows signin]');
     await windowSignin(authMgr);
     // throw to stop processing (this will be catched in main.js)
-    throw new Error('window signin');
+    throw new Error(errorMessages.REDIRECT_LOGIN_REQUIRED);
   }
   if (user.expired) {
     console.debug('Token expired');
@@ -64,7 +70,14 @@ function init() {
   }
 
   const isIndex = window.location.hash === '#/';
-  if (isIndex) { return Promise.resolve(); }
+  if (isIndex) { return Promise.resolve(errorMessages.IS_INDEX); }
+
+  const hadQueryParams = saveAndRemoveQueries();
+
+  if (isDynamicCircuit() && !hadQueryParams) {
+    showErrorPage(errorMessages.NO_QUERY_PARAMS);
+    return Promise.reject(new Error(errorMessages.NO_QUERY_PARAMS));
+  }
 
   const oidcConfig = createAuthConfig();
   const authMgr = new Oidc.UserManager(oidcConfig);

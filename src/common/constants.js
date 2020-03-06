@@ -45,12 +45,21 @@ const storageConstants = {
   MAPPING_PREFIX: 'computer-group-mapping',
 };
 
+const errorMessages = {
+  NO_QUERY_PARAMS: 'Query params not provided',
+  NO_SESSION_ENDPOINT: 'no end session endpoint', // from oidc-client-js
+  REDIRECT_LOGIN_REQUIRED: 'redirect window is required',
+  CIRCUIT_NOT_PROVIDED: 'No circuit provided',
+  IS_INDEX: 'is index',
+};
+
 export {
   analysis,
   computers,
   circuits,
   saveParamNames,
   storageConstants,
+  errorMessages,
 };
 
 export default computers;

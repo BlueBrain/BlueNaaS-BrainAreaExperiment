@@ -78,7 +78,7 @@ function openContent(content) {
 }
 
 function getComputerUrlCombo() {
-  return store.state.fullConfig.computer + store.state.userGroup + window.location.href;
+  return store.state.fullConfig.computer + store.state.userGroup + store.state.fullConfig.circuitName;
 }
 
 function getDate3YearFromNow() {

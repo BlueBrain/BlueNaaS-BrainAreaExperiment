@@ -237,6 +237,7 @@ export default {
     },
 
     createConfig() {
+      if (!this.timeline) return null;
       let config = {};
       const configToSave = [];
       config.Stimulus = {};

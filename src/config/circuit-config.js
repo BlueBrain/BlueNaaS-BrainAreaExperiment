@@ -219,6 +219,7 @@ const hippoHbpMicrocircuit = {
   targets: [
     { name: '5Cells', displayName: '5Cells', src: `${microcircuitImgBase}/5Cells.png`, cells: '5' },
     { name: 'Mosaic', displayName: 'Full Circuit', src: `${microcircuitImgBase}/Mosaic.png`, cells: '18186' },
+    { name: 'All', displayName: 'All', src: `${microcircuitImgBase}/Mosaic.png`, cells: '18186' },
     { name: 'Random1PercFull', displayName: 'Random 1% full circuit', src: `${microcircuitImgBase}/Random1PercFull.png`, cells: '6' },
     { name: 'Random5PercFull', displayName: 'Random 5% full circuit', src: `${microcircuitImgBase}/Random5PercFull.png`, cells: '13' },
     { name: 'Random10PercFull', displayName: 'Random 10% full circuit', src: `${microcircuitImgBase}/Random10PercFull.png`, cells: '16' },
@@ -307,6 +308,7 @@ const hippoMoocSvcAccMicrocircuit = Object.assign(
     targets: [
       { name: '5Cells', displayName: '5Cells', src: `${moocMicrocircuitImgBase}/5Cells.png`, cells: '5' },
       { name: 'Mosaic', displayName: 'Full Circuit', src: `${moocMicrocircuitImgBase}/Mosaic.png`, cells: '18198' },
+      { name: 'All', displayName: 'All', src: `${moocMicrocircuitImgBase}/Mosaic.png`, cells: '18198' },
       { name: 'Excitatory', displayName: 'Excitatory', src: `${moocMicrocircuitImgBase}/Excitatory.png`, cells: '16860' },
       { name: 'Inhibitory', displayName: 'Inhibitory', src: `${moocMicrocircuitImgBase}/Inhibitory.png`, cells: '1338' },
       { name: 'SLM_PPA', displayName: 'SLM_PPA', src: `${moocMicrocircuitImgBase}/SLM_PPA.png`, cells: '3' },

@@ -223,6 +223,7 @@ export default {
     },
 
     createConfig() {
+      if (!this.timeline) return null;
       const config = { Report: {} };
       const configToSave = [];
       const reportOnObj = this.$store.state.fullConfig.simulationConfig.genericSimulationConfig.reportOn;

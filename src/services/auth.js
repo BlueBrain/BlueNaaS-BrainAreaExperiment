@@ -3,42 +3,26 @@ import Oidc from 'oidc-client';
 import { setAxiosToken, axiosInstance } from '@/services/unicore';
 import store from '@/services/store';
 import { configHBP, configBBP } from '@/config';
+import { getCircuitName } from '@/services/helper/dynamic-circuit-loader-helper';
 
 let actualAuthProvider = null;
 
-function removeExtraURLParams() {
-  const url = window.location.href;
-  if (window.location.href.includes('access_token')) {
-    const accessTokenIndex = url.match(/\/&+/);
-    const newUrl = url.substr(0, accessTokenIndex.index);
-    return newUrl;
-  }
-  return url;
-}
-
 function windowSignin(authMgr) {
-  console.debug('[windowSignin]');
-  return authMgr.signinRedirect().then(() => {
-    console.debug('signinRedirect done');
-  });
-}
-
-function iframeSignin(authMgr) {
-  console.debug('[iframeSignin]');
-  return authMgr.signinSilent().then((user) => {
-    console.debug('signinSilent done');
-    return user;
-  });
+  console.debug('[windowSignin]', window.location.href);
+  return authMgr.signinRedirect();
 }
 
 function createAuthConfig() {
-  const isBBP = store.state.fullConfig.circuitName.includes('bbp_');
+  // TOOD improve this detection
+  const isBBP = getCircuitName().includes('bbp_');
   actualAuthProvider = isBBP ? configBBP : configHBP;
+
+  const redirect = `${window.location.origin}${process.env.BASE_URL}index.html#/login/`;
 
   const oidcConfig = {
     authority: actualAuthProvider.auth.authUrl,
     client_id: actualAuthProvider.auth.clientId,
-    redirect_uri: `${removeExtraURLParams()}/`,
+    redirect_uri: redirect,
     response_type: 'id_token token',
     automaticSilentRenew: true,
     loadUserInfo: false,
@@ -47,29 +31,38 @@ function createAuthConfig() {
   return oidcConfig;
 }
 
+function setToken(token) {
+  store.commit('setToken', token);
+  setAxiosToken(token);
+}
+
 async function login(authMgr) {
-  new Oidc.UserManager().signinSilentCallback();
-
-  if (window.location.href.includes('access_token')) {
-    window.location.href = removeExtraURLParams();
-  }
-
-  let user = await authMgr.getUser().catch(err => console.error(err));
+  const user = await authMgr.getUser().catch(err => console.error(err));
 
   if (!user) {
-    user = await iframeSignin(authMgr).catch(() => windowSignin(authMgr));
+    console.debug('[windows signin]');
+    await windowSignin(authMgr);
+    // throw to stop processing (this will be catched in main.js)
+    throw new Error('window signin');
   }
-  const client = user || {};
-  if (client.expired) {
+  if (user.expired) {
     console.debug('Token expired');
     await authMgr.removeUser();
     await authMgr.signoutRedirect();
   }
-  store.commit('setToken', client.access_token);
-  setAxiosToken(client.access_token);
+  setToken(user.access_token);
+}
+
+function loginCallback() {
+  return new Oidc.UserManager().signinRedirectCallback()
+    .then(user => setToken(user.access_token));
 }
 
 function init() {
+  if (window.location.hash.includes('/login')) {
+    return loginCallback();
+  }
+
   const isIndex = window.location.hash === '#/';
   if (isIndex) { return Promise.resolve(); }
 

@@ -26,3 +26,11 @@ https://bbpteam.epfl.ch/project/spaces/download/attachments/12959382/Neurondamus
 #### Flags on LocalStorage
 `displayAll` - true | false -> Display or not all jobs in the list (even analysis)
 `circuitToUse` - mooc | slices -> Circuit
+
+#### To add a new circuit:
+- Add entry on circuits on constants.js
+- Add entry on circuit-config.js with targets
+- Export circuit with mapCircuitNameWithUrl
+- Add projection on projection-config.js
+- Add entry on connection-config.js
+- Add entry on simulation-config.js

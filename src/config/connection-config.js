@@ -248,6 +248,9 @@ const getSscxConnections = () => ([
   },
 ]);
 
+const getSscxMouseConnections = () => ([]);
+
+
 const connectionsConfigMapping = {
   [computers.JURECA]: {
     [circuits.HIPPO_HBP_MICROCIRCUIT]: getHippocampusConnections,
@@ -261,6 +264,7 @@ const connectionsConfigMapping = {
     [circuits.HIPPO_BBP_FULL_CA1]: getHippocampusConnections,
     [circuits.HIPPO_BBP_MICROCIRCUIT]: getHippocampusConnections,
     [circuits.SSCX_BBP_MICROCIRCUIT]: getSscxConnections,
+    [circuits.SSCX_BBP_MOUSE_MICROCIRCUIT]: getSscxMouseConnections,
   },
   [computers.SERVICE_ACCOUNT_MOOC]: {
     [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: getHippocampusMoocConnections,

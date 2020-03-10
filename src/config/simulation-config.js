@@ -137,6 +137,32 @@ const bb5Sscx = {
   genericSimulationConfig: Object.assign({}, genericSimulationConfig),
 };
 
+const bb5SscxMouse = {
+  script: [
+    '#!/bin/bash -l',
+    '. /etc/profile',
+    ...copyToDestinationScript,
+    'module load unstable',
+    'module load neurodamus-neocortex',
+    'module load py-bluepy',
+    'module load brion',
+    'export NFRAME=256',
+    'python /gpfs/bbp.cscs.ch/home/antonel/scripts_unicore/create_replay_bb5_0.18.py',
+    'python /gpfs/bbp.cscs.ch/home/antonel/scripts_unicore/simulation_launch_bb5_0.18.py',
+    ...copyFromDestinationScript,
+  ],
+  runtime: 3600,
+  nodes: 5,
+  cpus: 36,
+  executable: '/bin/bash input.sh',
+  project: null,
+  memory: 128000,
+  partitions: { '*': 'prod' },
+  qos: 'bigjob',
+  moveSimulation: true,
+  genericSimulationConfig: Object.assign({}, genericSimulationConfig),
+};
+
 const pizDaintHippocampusServiceAccount = {
   script: [
     '#!/bin/bash -l',
@@ -171,6 +197,7 @@ const simConfigMapping = {
     [circuits.HIPPO_BBP_FULL_CA1]: Object.assign({}, bb5Hippocampus),
     [circuits.HIPPO_BBP_MICROCIRCUIT]: Object.assign({}, bb5Hippocampus),
     [circuits.SSCX_BBP_MICROCIRCUIT]: Object.assign({}, bb5Sscx),
+    [circuits.SSCX_BBP_MOUSE_MICROCIRCUIT]: Object.assign({}, bb5SscxMouse),
   },
   [computers.SERVICE_ACCOUNT_MOOC]: {
     [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, pizDaintHippocampusServiceAccount),

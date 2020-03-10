@@ -98,6 +98,29 @@ const sscxProjections = {
   },
 };
 
+const sscxMouseProjections = {
+  defaultProjection: hippocampusProjections.defaultProjection,
+  projectionBlock: {
+    projectionSrcTarget: 'proj_Thalamocortical_VPM_Source',
+    Projection: {
+      Thalamocortical_input_VPM: {
+        Path: '<%= prefix %>/circuits/O1/20180305/proj_Thalamocortical_VPM/20180316',
+        Source: 'proj_Thalamocortical_VPM_Source',
+      },
+    },
+    Connection: {
+      scheme_CaUse_ee_tc2c: {
+        Source: 'proj_Thalamocortical_VPM_Source',
+        Destination: 'Mosaic',
+        // SpontMinis, // added if spontMinis proj was selected
+        Weight: '1', // this will be changed by the user
+        SynapseConfigure: '%s.Use *= 0.158401372855',
+      },
+    },
+    spikeReplay: hippocampusProjections.projectionBlock.spikeReplay,
+  },
+};
+
 const projectionsConfigMapping = {
   [computers.JURECA]: {
     [circuits.HIPPO_HBP_MICROCIRCUIT]: Object.assign({}, hippocampusProjections),
@@ -111,6 +134,7 @@ const projectionsConfigMapping = {
     [circuits.HIPPO_BBP_FULL_CA1]: Object.assign({}, hippocampusProjections),
     [circuits.HIPPO_BBP_MICROCIRCUIT]: Object.assign({}, hippocampusProjections),
     [circuits.SSCX_BBP_MICROCIRCUIT]: Object.assign({}, sscxProjections),
+    [circuits.SSCX_BBP_MOUSE_MICROCIRCUIT]: Object.assign({}, sscxMouseProjections),
   },
   [computers.SERVICE_ACCOUNT_MOOC]: {
     [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, hippocampusMoocProjections),

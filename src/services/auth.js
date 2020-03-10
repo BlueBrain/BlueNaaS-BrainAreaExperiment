@@ -11,17 +11,21 @@ import {
   getCircuitName,
 } from '@/services/helper/dynamic-circuit-loader-helper';
 
-let actualAuthProvider = null;
 
 function windowSignin(authMgr) {
   console.debug('[windowSignin]', window.location.href);
   return authMgr.signinRedirect();
 }
 
-function createAuthConfig() {
+function getActualAuthProvider() {
   // TOOD improve this detection
   const isBBP = getCircuitName().includes('bbp_');
-  actualAuthProvider = isBBP ? configBBP : configHBP;
+  const actualAuthProvider = isBBP ? configBBP : configHBP;
+  return actualAuthProvider;
+}
+
+function createAuthConfig() {
+  const actualAuthProvider = getActualAuthProvider();
 
   const redirect = `${window.location.origin}${process.env.BASE_URL}index.html#/login/`;
 
@@ -85,6 +89,7 @@ function init() {
 }
 
 async function getUserInfo() {
+  const actualAuthProvider = getActualAuthProvider();
   const info = await axiosInstance.get(actualAuthProvider.userEndpoint);
   if (!info) return null;
   return info.data;

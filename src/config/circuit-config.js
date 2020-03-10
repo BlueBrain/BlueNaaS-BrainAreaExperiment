@@ -539,7 +539,8 @@ const mapCircuitNameWithUrl = {
   [circuits.HIPPO_BBP_FULL_CA1]: hippoBbpFullCa1,
   [circuits.HIPPO_BBP_MICROCIRCUIT]: hippoBbpMicrocircuit,
   [circuits.SSCX_BBP_MICROCIRCUIT]: sscxBbpMicrocircuit,
-  [circuits.DYNAMIC_CIRCUIT]: dynamicCircuit,
+  [circuits.HBP_DYNAMIC_CIRCUIT]: dynamicCircuit,
+  [circuits.BBP_DYNAMIC_CIRCUIT]: dynamicCircuit,
 };
 
 export default {

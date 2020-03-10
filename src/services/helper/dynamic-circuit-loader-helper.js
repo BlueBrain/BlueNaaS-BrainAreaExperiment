@@ -8,10 +8,11 @@ import { circuits } from '@/common/constants';
 
 let queryConfig = null;
 const genericQueryParamsRegexp = new RegExp('#.+\\?(.+)');
-const dynamicQueryParamsRegexp = new RegExp(`#.+${circuits.DYNAMIC_CIRCUIT}\\?(.+)`);
+const dynamicCircuitsRegexp = `(?:${circuits.HBP_DYNAMIC_CIRCUIT}|${circuits.BBP_DYNAMIC_CIRCUIT})`;
+const dynamicQueryParamsRegexp = new RegExp(`#.+${dynamicCircuitsRegexp}\\?(.+)`);
 
 function isDynamicCircuit() {
-  const dynamicCircuitRegexp = new RegExp(`#/circuits/${circuits.DYNAMIC_CIRCUIT}`);
+  const dynamicCircuitRegexp = new RegExp(`#/circuits/${dynamicCircuitsRegexp}`);
   const locationHash = window.location.hash;
   const dynamicCircuit = dynamicCircuitRegexp.test(locationHash);
   return dynamicCircuit;
@@ -38,9 +39,15 @@ function setup() {
     queryConfig = JSON.parse(atob(b64Encoded));
   } catch (e) {
     if (isDynamicCircuit()) {
-      console.debug(`failed parsing query params dynamic circuit ${e}`);
+      console.error(`failed parsing query params dynamic circuit ${e}`);
     }
   }
+}
+
+function getCircuitName() {
+  const match = /circuits\/([\w\\-]*)/.exec(window.location.href);
+  const name = match ? match[1] : null;
+  return name;
 }
 
 function mergeConfigWithQueryParams(circuitToUse) {
@@ -54,7 +61,7 @@ function mergeConfigWithQueryParams(circuitToUse) {
   const mergedConfig = defaultsDeep({}, queryConfig, newFullConfig);
 
   set(mergedConfig, 'computersAvailable', [computer]);
-  set(mergedConfig, 'circuitName', circuits.DYNAMIC_CIRCUIT);
+  set(mergedConfig, 'circuitName', getCircuitName());
   set(mergedConfig, 'simulationConfig.script', queryConfig.simulationConfig.script);
   if (get(queryConfig, 'analysisConfig.script')) {
     set(mergedConfig, 'analysisConfig.script', queryConfig.analysisConfig.script);
@@ -62,12 +69,6 @@ function mergeConfigWithQueryParams(circuitToUse) {
   const prunedFullConfig = cleanDeep(mergedConfig);
 
   return prunedFullConfig;
-}
-
-function getCircuitName() {
-  const match = /circuits\/([\w\\-]*)/.exec(window.location.href);
-  const name = match ? match[1] : null;
-  return name;
 }
 
 function saveAndRemoveQueries() {

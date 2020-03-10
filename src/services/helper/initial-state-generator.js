@@ -43,9 +43,9 @@ function getSavedComputerOrDefault(computerList, circuitName) {
 }
 
 function getCurrentComputer(circuitDetails, circuitName) {
-  // if only one computer return it otherwise return null and check later with setupUserProjects()
+  // if only one computer return it otherwise return empty and check later with setupUserProjects()
   const computerForCircuit = circuitDetails.prefix;
-  if (!computerForCircuit) return null;
+  if (!computerForCircuit) return {};
   const computerList = Object.keys(computerForCircuit);
   const currentComputer = computerList.length === 1
     ? computerList[0]

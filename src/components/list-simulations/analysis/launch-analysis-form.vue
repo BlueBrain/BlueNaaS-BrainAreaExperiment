@@ -86,7 +86,6 @@
 
 <script>
 import analysisConfig from '@/config/analysis-config';
-import { unmapBlueConfigTerms, mapBlueConfigTerms } from '@/common/utils';
 import AnalysisPicker from './analysis-picker.vue';
 import LfpAnalysisPicker from './lfp-analysis-picker.vue';
 import { jobTags } from '@/common/job-status';
@@ -168,7 +167,7 @@ export default {
     async parseJobBlueConfig(job) {
       // setup target for basic analysis
       const blueConfigStr = await getBlueConfigStr(job);
-      const circuitTarget = unmapBlueConfigTerms(getTargetByReport(blueConfigStr, this.reportForAnalysis));
+      const circuitTarget = getTargetByReport(blueConfigStr, this.reportForAnalysis);
       this.target = circuitTarget;
 
       // setup targets for lfp
@@ -176,8 +175,8 @@ export default {
 
       if (lfpAnalysisTarget === this.$store.state.fullConfig.circuitConfig.biggestTarget) {
         // show the full list of targets
-        const targetDisplayNames = this.$store.state.fullConfig.circuitConfig.targets.map(t => t.displayName);
-        this.lfpTargets = targetDisplayNames;
+        const targetNames = this.$store.state.fullConfig.circuitConfig.targets.map(t => t.name);
+        this.lfpTargets = targetNames;
         this.lfpTarget = this.$store.state.fullConfig.circuitConfig.biggestTarget;
       } else {
         this.lfpTargets = [lfpAnalysisTarget];
@@ -216,7 +215,7 @@ export default {
         basicPlotsConfig: basicAnalysisObj.configValues,
         lfpPlotsConfig: lfpAnalysisObj,
         reportForAnalysis: this.reportForAnalysis,
-        lfpTarget: mapBlueConfigTerms(this.lfpTarget),
+        lfpTarget: this.lfpTarget,
       };
     },
   },

@@ -210,7 +210,7 @@ export default {
       return this.$store.state.connectionTargets;
     },
     targetsNameList() {
-      return this.$store.state.connectionTargets.map(target => target.displayName);
+      return this.$store.state.connectionTargets.map(target => target.name);
     },
   },
   async created() {

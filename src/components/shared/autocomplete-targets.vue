@@ -11,15 +11,15 @@
     >
       <i-option
         v-for="target in targets"
-        :key="target.displayName"
-        :value="target.displayName"
-        :label="target.displayName"
+        :key="target.name"
+        :value="target.name"
+        :label="target.name"
       >
 
         <div
           class="custom-select-item-for-preview"
           @mouseenter="showPoptipTarget(target)"
-        >{{ target.displayName }}</div>
+        >{{ target.name }}</div>
 
       </i-option>
     </i-select>
@@ -28,17 +28,19 @@
       class="poptip-preview-container"
       ref="targetImgContainerRef"
     >
+      <div class="target-full-name" ref="targetFullName"/>
       <div class="cells-count" ref="cellCount"/>
-      <img
-        class="preview-target-popover"
-        ref="targetImgRef"
-      />
+      <div class="preview-not-available" ref="notPreview">Preview Not Available</div>
+
+      <img class="preview-target-popover" ref="targetImgRef" />
     </div>
   </div>
 </template>
 
 
 <script>
+import { unmapBlueConfigTerms } from '@/common/utils';
+
 export default {
   props: ['targetSelected', 'itemsAvailable'],
   methods: {
@@ -47,17 +49,30 @@ export default {
       this.$emit('target-changed', selection);
     },
     showPoptipTarget(targetObj) {
-      if (!targetObj.src) {
-        this.hideImg();
-        return;
+      if (targetObj.src) {
+        // using the ref due an issue in iview select losing focus while searching
+        this.$refs.notPreview.classList.add('hidden');
+        this.$refs.targetImgRef.classList.remove('hidden');
+        this.$refs.targetImgRef.src = targetObj.src;
+      } else {
+        this.$refs.targetImgRef.classList.add('hidden');
+        this.$refs.notPreview.classList.remove('hidden');
       }
-      // using the ref due an issue in iview select losing focus while searching
-      this.$refs.targetImgRef.src = targetObj.src;
       this.$refs.targetImgContainerRef.classList.add('showing');
       this.setCellsCount(targetObj);
+      this.setFullTargetName(targetObj);
     },
     setCellsCount(targetObj) {
-      this.$refs.cellCount.innerHTML = `Cells: ${targetObj.cells || '?'} / ${this.fullCellsAmount}`;
+      this.$refs.cellCount.classList.remove('hidden');
+      if (targetObj.cells && this.fullCellsAmount) {
+        this.$refs.cellCount.innerHTML = `Cells: ${targetObj.cells} / ${this.fullCellsAmount}`;
+        return;
+      }
+      this.$refs.cellCount.classList.add('hidden');
+    },
+    setFullTargetName(targetObj) {
+      // unmap the display name just in case we want to be really specific per circuit
+      this.$refs.targetFullName.innerHTML = unmapBlueConfigTerms(targetObj.displayName || targetObj.name);
     },
     hideImg() {
       this.$refs.targetImgContainerRef.classList.remove('showing');
@@ -70,7 +85,7 @@ export default {
 
     const { circuitConfig } = this.$store.state.fullConfig;
     const biggestTargetObj = circuitConfig.targets.find(target => (
-      target.displayName === circuitConfig.biggestTarget
+      target.name === circuitConfig.biggestTarget
     ));
     this.fullCellsAmount = biggestTargetObj.cells;
   },
@@ -116,15 +131,40 @@ export default {
     box-shadow: 0 1px 6px rgba(0,0,0,.2);
     margin-left: 5px;
     display: inline;
+    text-align: center;
 
     &.showing {
       opacity: 1;
       z-index: 2;
     }
     .cells-count {
+      font-size: 11px;
+
+      &.hidden {
+        visibility: hidden;
+      }
+    }
+    .target-full-name {
       font-size: 14px;
-      text-align: center;
       font-weight: bold;
+    }
+    .preview-target-popover {
+      width: 450px;
+      height: 450px;
+
+      &.hidden {
+        display: none;
+      }
+    }
+    .preview-not-available {
+      transform: rotate(45deg);
+      font-size: 20px;
+      vertical-align: middle;
+      line-height: 500px;
+
+      &.hidden {
+        display: none;
+      }
     }
   }
 </style>

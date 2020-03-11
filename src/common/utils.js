@@ -6,6 +6,7 @@ import partial from 'lodash/partial';
 import isEqual from 'lodash/isEqual';
 
 import store from '@/services/store';
+import targetsMapping from '@/common/targets-mapping';
 
 const mapper = {
   Soma: 'compartment',
@@ -19,9 +20,10 @@ let fullMapper = null;
 function fillMapper() {
   const targetsMapper = {};
   store.state.fullConfig.circuitConfig.targets.forEach((targetObj) => {
+    if (!targetObj.displayName) return;
     targetsMapper[targetObj.displayName] = targetObj.name;
   });
-  fullMapper = Object.assign({}, mapper, targetsMapper);
+  fullMapper = Object.assign({}, mapper, targetsMapper, targetsMapping);
 }
 
 function mapBlueConfigTerms(params) {

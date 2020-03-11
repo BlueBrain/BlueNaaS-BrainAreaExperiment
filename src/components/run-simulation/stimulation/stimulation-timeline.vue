@@ -289,7 +289,7 @@ export default {
     },
     targetSelected(target) {
       const id = simTimelineLib.getMaxId(this.timeline.itemsData) || 0;
-      const newStim = this.createItem(this.createNewStimulus(target.displayName), id);
+      const newStim = this.createItem(this.createNewStimulus(target.name), id);
       this.timeline.itemsData.add(newStim);
     },
   },

@@ -92,19 +92,19 @@ export default {
     // set the targets for stimulations
     const stimulationRegExp = new RegExp(this.$store.state.fullConfig.circuitConfig.stimulationTargetFilter);
     const filteredTargetsForStimulation = allTargets.filter(target => stimulationRegExp.test(target.name));
-    this.$store.commit('setStimulationTargets', sortBy(filteredTargetsForStimulation, 'displayName'));
+    this.$store.commit('setStimulationTargets', sortBy(filteredTargetsForStimulation, 'name'));
 
     // set targets for reports
     const reportRegExp = new RegExp(this.$store.state.fullConfig.circuitConfig.reportsTargetFilter);
     const filteredTargetsForReport = allTargets.filter(target => reportRegExp.test(target.name));
-    this.$store.commit('setReportTargets', sortBy(filteredTargetsForReport, 'displayName'));
+    this.$store.commit('setReportTargets', sortBy(filteredTargetsForReport, 'name'));
 
     // current population and computer will be set in sim-params due it needs to check the saved config
 
-    this.$store.commit('setPopulationTargets', sortBy(filteredTargetsForStimulation, 'displayName'));
+    this.$store.commit('setPopulationTargets', sortBy(filteredTargetsForStimulation, 'name'));
 
     const connectionManipulationTargets = allTargets;
-    this.$store.commit('setConnectionTargets', sortBy(connectionManipulationTargets, 'displayName'));
+    this.$store.commit('setConnectionTargets', sortBy(connectionManipulationTargets, 'name'));
 
     db.saveCollabIdForViz(this.$route.query.collab);
 
@@ -179,7 +179,7 @@ export default {
       });
     },
     getTargetImageUrl(newPopulationName) {
-      const selectedTargetObj = this.$store.state.populationTargets.find(targetObj => targetObj.displayName === newPopulationName);
+      const selectedTargetObj = this.$store.state.populationTargets.find(targetObj => targetObj.name === newPopulationName);
       if (!selectedTargetObj) return;
       this.targetSelectedUrl = selectedTargetObj.src;
     },

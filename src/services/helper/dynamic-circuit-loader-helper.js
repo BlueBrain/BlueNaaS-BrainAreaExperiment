@@ -66,6 +66,10 @@ function mergeConfigWithQueryParams(circuitToUse) {
   if (get(queryConfig, 'analysisConfig.script')) {
     set(mergedConfig, 'analysisConfig.script', queryConfig.analysisConfig.script);
   }
+  if (get(queryConfig, 'circuitConfig.targets')) {
+    set(mergedConfig, 'circuitConfig.targets', queryConfig.circuitConfig.targets);
+  }
+
   const prunedFullConfig = cleanDeep(mergedConfig);
 
   return prunedFullConfig;

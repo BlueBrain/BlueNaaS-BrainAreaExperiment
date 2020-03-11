@@ -63,6 +63,7 @@
 
 <script>
 
+import get from 'lodash/get';
 import '@/assets/css/manipulations-blocks.scss';
 import ProjectionConfigurator from '@/components/run-simulation/projection-manipulation/configurator.vue';
 import { getConfigFileName } from '@/config/projection-config';
@@ -136,12 +137,16 @@ export default {
   async created() {
     eventBus.$on('create-projection-config', this.creationConfigHandler);
     eventBus.$on('create-projection-file', this.createProjectionFile);
-    this.globalProjectionBlock = this.$store.state.fullConfig.projectionConfig.projectionBlock;
+    this.globalProjectionBlock = get(this, '$store.state.fullConfig.projectionConfig.projectionBlock');
     this.currentProjection = await this.loadPreviousConfig();
     this.isProjLoading = false;
   },
   methods: {
     editProjection() {
+      if (!this.globalProjectionBlock) {
+        this.$Message.error('No probjection blocks can be configured. Not in the configuration files');
+        return;
+      }
       const projTarget = this.globalProjectionBlock.projectionSrcTarget;
       this.projectionBeingEdited = Object.assign(
         {},
@@ -165,7 +170,7 @@ export default {
     },
     generateProjectionBlocks() {
       const pBlocks = this.globalProjectionBlock;
-      if (!pBlocks) this.$Message.error('No probjection blocks were configured');
+      if (!pBlocks) return {};
 
       db.setSavedConfig(saveParamNames.PROJECTION, this.currentProjection);
       const connectionProjectionName = Object.keys(pBlocks.Connection)[0];
@@ -221,7 +226,7 @@ export default {
     async loadPreviousConfig() {
       const savedProjection = await db.getSavedConfig(saveParamNames.PROJECTION);
       if (!savedProjection) {
-        return this.$store.state.fullConfig.projectionConfig.defaultProjection;
+        return get(this, '$store.state.fullConfig.projectionConfig.defaultProjection', {});
       }
       return savedProjection;
     },

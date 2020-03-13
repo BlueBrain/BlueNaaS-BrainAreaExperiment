@@ -280,10 +280,13 @@ export default {
   },
   methods: {
     async checkForm() {
+      const { executable } = this.$store.state.fullConfig.simulationConfig;
       const isValid = await this.$refs.formValidate.validate();
       if (isValid) {
         this.runParameters.computerSelected = this.computerSelected;
         this.runParameters.groupSelected = this.groupSelected;
+        this.runParameters.tags = [];
+        this.runParameters.executable = executable;
         db.setSavedConfig(saveParamNames.UNICORE, this.runParameters);
         // to start spinner
         this.$emit('run-simulation', this.runParameters);

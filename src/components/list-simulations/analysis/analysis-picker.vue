@@ -31,8 +31,8 @@
 
 <script>
 import pick from 'lodash/pick';
-import GenericSelector from './generic-selector.vue';
 import { analysis } from '@/common/constants';
+import GenericSelector from './generic-selector.vue';
 
 export default {
   name: 'analysis-picker',

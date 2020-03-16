@@ -31,11 +31,11 @@
 <script>
 import findKey from 'lodash/findKey';
 import pick from 'lodash/pick';
+import store from '@/services/store';
+import { analysis } from '@/common/constants';
 import PopupTargetSelector from './popup-target-selector.vue';
 import GidsSelector from './gids-selector.vue';
 import RandomGidSelector from './random-gid-selector.vue';
-import store from '@/services/store';
-import { analysis } from '@/common/constants';
 
 const pupulationSelectorTypes = {
   entirePopulation: {

@@ -86,12 +86,12 @@
 
 <script>
 import analysisConfig from '@/config/analysis-config';
-import AnalysisPicker from './analysis-picker.vue';
-import LfpAnalysisPicker from './lfp-analysis-picker.vue';
 import { jobTags } from '@/common/job-status';
 import {
   findDuration, getBlueConfigStr, getTargetByReport,
 } from '@/services/helper/blueconfig-helper';
+import AnalysisPicker from './analysis-picker.vue';
+import LfpAnalysisPicker from './lfp-analysis-picker.vue';
 
 export default {
   name: 'AnalysisForm',

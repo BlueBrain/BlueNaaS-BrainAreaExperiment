@@ -1,5 +1,5 @@
 
-import { computers, circuits } from '@/common/constants';
+import { computers, analysis, circuits } from '@/common/constants';
 import { copyToDestinationScript, copyFromDestinationScript } from '@/common/bbp-unicore-move-script';
 
 
@@ -78,34 +78,34 @@ function getAnalysisConfig(computer, circuit) {
   return computerConfig[circuit];
 }
 
-export {
+export default {
   getAnalysisConfig,
-  // filesToAvoidCopy: [
-  //   'analysis_path',
-  //   'input.sh',
-  //   'stderr',
-  //   'stdout',
-  //   'output/',
-  //   'UNICORE_SCRIPT_EXIT_CODE',
-  //   'UNICORE_Job_',
-  //   'bss_submit',
-  //   'BlueConfig.backup',
-  //   'cx_',
-  //   'TSI_temp_file',
-  //   'mcomplex.dat',
-  //   'cxinfo_',
-  //   'processing_at',
-  // ],
-  // analysisAvailable: [
-  //   { realName: analysis.types.FIRING_RATE_HISTOGRAM, displayName: 'Peristimulus Time Histogram' },
-  //   { realName: analysis.types.RASTER, displayName: 'Spike Raster Plot' },
-  //   { realName: analysis.types.VOLTAGE_COLLAGE, displayName: 'Trace Plot of Report', report_select: true },
-  // ],
-  // configFileName: 'analysis_config.json',
-  // analysisConnectionFileName: 'analysis_path.json',
-  // nodes: 1,
-  // runtime: 1800,
-  // usecasesCreationForm: 'https://bbp.epfl.ch/public/usecases-wizard/index.html#/entitydashboard?',
+  filesToAvoidCopy: [
+    'analysis_path',
+    'input.sh',
+    'stderr',
+    'stdout',
+    'output/',
+    'UNICORE_SCRIPT_EXIT_CODE',
+    'UNICORE_Job_',
+    'bss_submit',
+    'BlueConfig.backup',
+    'cx_',
+    'TSI_temp_file',
+    'mcomplex.dat',
+    'cxinfo_',
+    'processing_at',
+  ],
+  analysisAvailable: [
+    { realName: analysis.types.FIRING_RATE_HISTOGRAM, displayName: 'Peristimulus Time Histogram' },
+    { realName: analysis.types.RASTER, displayName: 'Spike Raster Plot' },
+    { realName: analysis.types.VOLTAGE_COLLAGE, displayName: 'Trace Plot of Report', report_select: true },
+  ],
+  configFileName: 'analysis_config.json',
+  analysisConnectionFileName: 'analysis_path.json',
+  nodes: 1,
+  runtime: 1800,
+  usecasesCreationForm: 'https://bbp.epfl.ch/public/usecases-wizard/index.html#/entitydashboard?',
 };
 
-export default {};
+export { getAnalysisConfig };

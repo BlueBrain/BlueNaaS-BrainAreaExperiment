@@ -53,4 +53,10 @@ export default {
       opacity: 0;
     }
   }
+
+  @media screen and (max-width: 1490px) {
+    .target-viewer-container.rotate {
+      font-size: 16px;
+    }
+  }
 </style>

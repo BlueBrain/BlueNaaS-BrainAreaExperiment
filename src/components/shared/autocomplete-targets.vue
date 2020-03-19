@@ -30,9 +30,9 @@
     >
       <div class="target-full-name" ref="targetFullName"/>
       <div class="cells-count" ref="cellCount"/>
-      <div class="preview-not-available" ref="notPreview">Preview Not Available</div>
+      <div class="preview-not-available hidden" ref="notPreview">Preview Not Available</div>
 
-      <img class="preview-target-popover" ref="targetImgRef" />
+      <img class="preview-target-popover hidden" ref="targetImgRef" />
     </div>
   </div>
 </template>
@@ -164,6 +164,20 @@ export default {
 
       &.hidden {
         display: none;
+      }
+    }
+  }
+  @media screen and (max-width: 1490px) {
+    .poptip-preview-container {
+      line-height: 1.5;
+      height: 350px;
+      width: 350px;
+      .preview-target-popover {
+        width: 300px;
+        height: 300px;
+      }
+      .preview-not-available {
+        line-height: 300px;
       }
     }
   }

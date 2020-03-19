@@ -144,6 +144,7 @@ export default {
       if (prevComputerProjectCombo !== getComputerUrlCombo()) return;
 
       const analysisJobInfo = await unicore.getJobProperties(childAnalysis.jobURL);
+      if (!analysisJobInfo) return;
 
       this.$set(childAnalysis, 'submissionTime', analysisJobInfo.submissionTime);
       this.$set(childAnalysis, 'name', analysisJobInfo.name);

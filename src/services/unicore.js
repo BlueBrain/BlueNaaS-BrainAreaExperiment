@@ -248,7 +248,7 @@ async function populateJobsUrlWithFiles(jobsListUrl) {
     if (!jobExapandedInfo) return {};
 
     // to have this flag means we already have loaded / classify the job with files
-    if (jobExapandedInfo.children) return jobExapandedInfo;
+    if (jobExapandedInfo.wasClassified) return jobExapandedInfo;
     await getAndSetChildren(jobExapandedInfo);
     return jobExapandedInfo;
   }

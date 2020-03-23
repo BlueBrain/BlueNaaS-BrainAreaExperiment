@@ -70,6 +70,7 @@ const analysisConfigMapping = {
   },
   [computers.SERVICE_ACCOUNT]: {
     [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, configPerComputer[computers.SERVICE_ACCOUNT]),
+    [circuits.HIPPO_HBP_SA_FULL_CA1]: Object.assign({}, configPerComputer[computers.PIZ_DAINT]),
   },
 };
 

@@ -195,6 +195,16 @@ const hippoBbpFullCa1 = Object.assign(
   },
 );
 
+const hippoHbpSAFullCa1 = Object.assign(
+  {},
+  { ...hippoHbpFullCa1 },
+  {
+    prefix: {
+      [computers.SERVICE_ACCOUNT]: '/apps/hbp/ich002/home/antonel/full_ca1/CA1/20181114',
+    },
+  },
+);
+
 /*
 |--------------------------------------------------------------------------
 | O1 Hippocampus Microcircuit
@@ -669,6 +679,7 @@ const mapCircuitNameWithUrl = {
   [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: hippoMoocSvcAccMicrocircuit,
   [circuits.HIPPO_HBP_FULL_CA1]: hippoHbpFullCa1,
   [circuits.HIPPO_BBP_FULL_CA1]: hippoBbpFullCa1,
+  [circuits.HIPPO_HBP_SA_FULL_CA1]: hippoHbpSAFullCa1,
   [circuits.HIPPO_BBP_MICROCIRCUIT]: hippoBbpMicrocircuit,
   [circuits.SSCX_BBP_MICROCIRCUIT]: sscxBbpMicrocircuit,
   [circuits.SSCX_BBP_MOUSE_MICROCIRCUIT]: sscxBbpMouseMicrocircuit,

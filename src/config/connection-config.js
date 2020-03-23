@@ -268,6 +268,7 @@ const connectionsConfigMapping = {
   },
   [computers.SERVICE_ACCOUNT]: {
     [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: getHippocampusMoocConnections,
+    [circuits.HIPPO_HBP_SA_FULL_CA1]: getHippocampusConnections,
   },
 };
 

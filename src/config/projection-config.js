@@ -138,6 +138,7 @@ const projectionsConfigMapping = {
   },
   [computers.SERVICE_ACCOUNT]: {
     [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, hippocampusMoocProjections),
+    [circuits.HIPPO_HBP_SA_FULL_CA1]: Object.assign({}, hippocampusProjections),
   },
 };
 

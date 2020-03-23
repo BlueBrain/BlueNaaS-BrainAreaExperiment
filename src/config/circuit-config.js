@@ -297,7 +297,7 @@ const hippoMoocSvcAccMicrocircuit = Object.assign(
   { ...hippoHbpMicrocircuit },
   {
     prefix: {
-      [computers.SERVICE_ACCOUNT_MOOC]: '/store/hbp/ich002/antonel/O1/20191017',
+      [computers.SERVICE_ACCOUNT]: '/store/hbp/ich002/antonel/O1/20191017',
     },
     paths: Object.assign(
       {},

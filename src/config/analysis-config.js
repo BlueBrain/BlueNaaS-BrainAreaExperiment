@@ -41,7 +41,7 @@ const configPerComputer = {
     partitions: { '*': 'prod' },
     qos: 'normal',
   },
-  [computers.SERVICE_ACCOUNT_MOOC]: {
+  [computers.SERVICE_ACCOUNT]: {
     script: [
       '#!/bin/bash',
       'export HDF5_USE_FILE_LOCKING=FALSE',
@@ -68,8 +68,8 @@ const analysisConfigMapping = {
     [circuits.HIPPO_BBP_MICROCIRCUIT]: Object.assign({}, configPerComputer[computers.BB5]),
     [circuits.SSCX_BBP_MICROCIRCUIT]: Object.assign({}, configPerComputer[computers.BB5]),
   },
-  [computers.SERVICE_ACCOUNT_MOOC]: {
-    [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, configPerComputer[computers.SERVICE_ACCOUNT_MOOC]),
+  [computers.SERVICE_ACCOUNT]: {
+    [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, configPerComputer[computers.SERVICE_ACCOUNT]),
   },
 };
 

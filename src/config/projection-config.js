@@ -136,7 +136,7 @@ const projectionsConfigMapping = {
     [circuits.SSCX_BBP_MICROCIRCUIT]: Object.assign({}, sscxProjections),
     [circuits.SSCX_BBP_MOUSE_MICROCIRCUIT]: Object.assign({}, sscxMouseProjections),
   },
-  [computers.SERVICE_ACCOUNT_MOOC]: {
+  [computers.SERVICE_ACCOUNT]: {
     [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, hippocampusMoocProjections),
   },
 };

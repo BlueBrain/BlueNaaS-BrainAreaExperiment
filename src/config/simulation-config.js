@@ -199,7 +199,7 @@ const simConfigMapping = {
     [circuits.SSCX_BBP_MICROCIRCUIT]: Object.assign({}, bb5Sscx),
     [circuits.SSCX_BBP_MOUSE_MICROCIRCUIT]: Object.assign({}, bb5SscxMouse),
   },
-  [computers.SERVICE_ACCOUNT_MOOC]: {
+  [computers.SERVICE_ACCOUNT]: {
     [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, pizDaintHippocampusServiceAccount),
   },
 };

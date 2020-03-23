@@ -14,9 +14,9 @@
     "id": "bb5",
     "url": "https://bbpunicore.epfl.ch:8080/BB5-CSCS/rest/core"
   },
-  "SERVICE_ACCOUNT_MOOC": {
+  "SERVICE_ACCOUNT": {
     "name": "MOOC Piz Daint Service Account",
-    "id": "service_account_mooc",
+    "id": "SERVICE_ACCOUNT",
     "url": "https://bspsa.cineca.it/advanced/pizdaint/rest/core"
   }
 }

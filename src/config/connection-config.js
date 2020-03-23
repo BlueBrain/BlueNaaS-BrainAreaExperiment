@@ -266,7 +266,7 @@ const connectionsConfigMapping = {
     [circuits.SSCX_BBP_MICROCIRCUIT]: getSscxConnections,
     [circuits.SSCX_BBP_MOUSE_MICROCIRCUIT]: getSscxMouseConnections,
   },
-  [computers.SERVICE_ACCOUNT_MOOC]: {
+  [computers.SERVICE_ACCOUNT]: {
     [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: getHippocampusMoocConnections,
   },
 };

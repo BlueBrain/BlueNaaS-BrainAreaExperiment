@@ -3,7 +3,7 @@ const computers = {
   BB5: 'bb5',
   JURECA: 'jureca',
   PIZ_DAINT: 'piz_daint',
-  SERVICE_ACCOUNT_MOOC: 'service_account_mooc',
+  SERVICE_ACCOUNT: 'SERVICE_ACCOUNT',
 };
 
 const circuits = {

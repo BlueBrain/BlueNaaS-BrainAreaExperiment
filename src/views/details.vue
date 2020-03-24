@@ -65,9 +65,11 @@ This will display the details of a certain simulation and the analysis.
                 <badge status="error"/>
                 <span>Files not available</span>
               </div>
-              <div v-else v-for="file in parsedFiles.unicoreSimulationFiles" :key="file.name">
-                <badge status="success"/> {{ file.name }} ({{ file.size }})
-              </div>
+              <files-list
+                v-else
+                :list="parsedFiles.unicoreSimulationFiles"
+                :working-dir="simulationDetails.workingDirectory"
+              />
             </div>
             <div v-else>
               <icon type="md-sync" size="20" class="spin" />
@@ -149,6 +151,7 @@ import AnalysisSection from '@/components/details-simulation/analysis-section.vu
 import DisplayOrDownload from '@/components/shared/display-or-download.vue';
 import AnalysisInNotebook from '@/components/shared/analysis-in-notebook.vue';
 import VisualizeLauncher from '@/components/details-simulation/visualize-launcher.vue';
+import FilesList from '@/components/details-simulation/files-list.vue';
 import eventBus from '@/services/event-bus';
 import db from '@/services/db';
 import analysisConfig from '@/config/analysis-config';
@@ -166,6 +169,7 @@ export default {
     AnalysisInNotebook,
     VisualizeLauncher,
     analysisConfig,
+    FilesList,
   },
   props: ['jobId', 'computerParam'],
   data() {

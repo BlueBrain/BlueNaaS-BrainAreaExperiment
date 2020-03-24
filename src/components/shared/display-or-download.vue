@@ -1,6 +1,6 @@
 
 <template>
-  <div class="display-download">
+  <div>
 
     <i v-if="showText">
       <div
@@ -44,6 +44,8 @@
 <script>
 import fileSaver from 'file-saver';
 
+const MAX_FILE_SIZE_TO_SHOW = 10000; // 10 KB
+
 export default {
   name: 'DisplayOrDownload',
   props: ['fileName', 'fileContent'],
@@ -53,15 +55,11 @@ export default {
         !(this.formatedTextAsArray.length === 1 &&
           this.formatedTextAsArray[0].startsWith('File')
         );
-      if (hasContent) return true;
-      return false;
+      return hasContent;
     },
     showText() {
       // check if the file is not so big to avoid stack overflow of arrays in client
-      if (this.fileContent && this.fileContent.length < 10000) {
-        return true;
-      }
-      return false;
+      return this.fileContent && this.fileContent.length < MAX_FILE_SIZE_TO_SHOW;
     },
     formatedTextAsArray() {
       if (!this.fileContent) return ['File is loading'];

@@ -214,7 +214,8 @@ async function getFilesWithSizes(jobURL) {
   const files = get(filesInfoResponse, 'data.content', []);
   const filesWithSize = map(files, (value, key) => ({
     name: key.substr(1),
-    size: prettyBytes(value.size),
+    size: prettyBytes(value.size), // use KB, MB
+    rawSize: value.size, // size in bytes
   }));
 
   return filesWithSize;

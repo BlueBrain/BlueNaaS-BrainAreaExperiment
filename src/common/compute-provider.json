@@ -16,7 +16,7 @@
   },
   "SERVICE_ACCOUNT": {
     "name": "MOOC Piz Daint Service Account",
-    "id": "SERVICE_ACCOUNT",
+    "id": "service_account",
     "url": "https://bspsa.cineca.it/advanced/pizdaint/rest/core"
   }
 }

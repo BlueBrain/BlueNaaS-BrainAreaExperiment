@@ -45,7 +45,7 @@ const configPerComputer = {
     script: [
       '#!/bin/bash',
       'export HDF5_USE_FILE_LOCKING=FALSE',
-      'export EMSIM="/apps/hbp/ich002/hbp-visualisation-deployements/emsim/emsim"',
+      'export EMSIM="/apps/hbp/ich002/hbp-visualisation-deployements/emsim/startEmsim.sh"',
       '/apps/hbp/ich002/home/antonel/analysis_launch_piz_daint_0.19.0.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
     ],
     executable: '/bin/bash input.sh',

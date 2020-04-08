@@ -358,6 +358,7 @@ export default {
           statusSearch: 'all',
           computerParam: this.computerParam,
         },
+        query: this.$route.query,
       });
     },
   },

@@ -66,7 +66,14 @@ export default {
       this.nameFilter = newName;
     },
     returnRun() {
-      this.$router.push({ name: 'run' });
+      this.$router.push({
+        name: 'run',
+        params: {
+          computerParam: this.$store.state.fullConfig.computer,
+          circuitName: this.$store.state.fullConfig.circuitName,
+        },
+        query: this.$route.query,
+      });
     },
   },
 };

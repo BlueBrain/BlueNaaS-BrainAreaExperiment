@@ -46,6 +46,7 @@ export default {
         params: {
           circuitName: this.$store.state.fullConfig.circuitName,
         },
+        query: this.$route.query,
       }).catch(() => {});
     },
   },

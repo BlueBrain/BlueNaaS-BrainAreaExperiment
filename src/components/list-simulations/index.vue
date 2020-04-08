@@ -160,6 +160,7 @@ export default {
           jobId: id,
           computerParam: this.$store.state.fullConfig.computer,
         },
+        query: this.$route.query,
       });
     },
 

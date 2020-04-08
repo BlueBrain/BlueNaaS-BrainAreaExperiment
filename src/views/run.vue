@@ -127,6 +127,7 @@ export default {
         params: {
           computerParam: computer,
         },
+        query: this.$route.query,
       });
     },
     async launchSim(blueConfigStr, runConfig, hideModalFn, extraFiles = null) {
@@ -176,6 +177,7 @@ export default {
           jobId: id,
           computerParam: computer,
         },
+        query: this.$route.query,
       });
     },
     getTargetImageUrl(newPopulationName) {

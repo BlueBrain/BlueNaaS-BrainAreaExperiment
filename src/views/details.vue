@@ -144,6 +144,7 @@ This will display the details of a certain simulation and the analysis.
 
 
 <script>
+import get from 'lodash/get';
 import unicore from '@/services/unicore';
 import CollapseTitle from '@/components/shared/collapse-title.vue';
 import ItemSummary from '@/components/details-simulation/item-summary.vue';
@@ -188,7 +189,7 @@ export default {
   },
   computed: {
     simulationWasSuccessful() {
-      if (!this.job.children) return false;
+      if (!get(this, 'job.children')) return false;
       const isSuccessful = this.simulationDetails.status === jobStatus.SUCCESSFUL;
       const hasResults = simulationProducedResults(this.job);
       return isSuccessful && hasResults;
@@ -198,7 +199,7 @@ export default {
         unicore.urlToComputerAndId(this.simulationDetails.url).id;
     },
     analysisNotebookConfig() {
-      return this.$store.state.fullConfig.analysisConfig.dynamicAnalysisConfig;
+      return get(this, '$store.state.fullConfig.analysisConfig.dynamicAnalysisConfig');
     },
   },
   mounted() {

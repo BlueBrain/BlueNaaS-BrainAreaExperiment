@@ -104,7 +104,7 @@ const sscxMouseProjections = {
     projectionSrcTarget: 'proj_Thalamocortical_VPM_Source',
     Projection: {
       Thalamocortical_input_VPM: {
-        Path: '<%= prefix %>/circuits/O1/20180305/proj_Thalamocortical_VPM/20180316',
+        Path: '<%= prefix %>/circuit/proj_Thalamocortical_VPM/sonata/edges.h5',
         Source: 'proj_Thalamocortical_VPM_Source',
       },
     },
@@ -134,11 +134,11 @@ const projectionsConfigMapping = {
     [circuits.HIPPO_BBP_FULL_CA1]: Object.assign({}, hippocampusProjections),
     [circuits.HIPPO_BBP_MICROCIRCUIT]: Object.assign({}, hippocampusProjections),
     [circuits.SSCX_BBP_MICROCIRCUIT]: Object.assign({}, sscxProjections),
-    [circuits.SSCX_BBP_MOUSE_MICROCIRCUIT]: Object.assign({}, sscxMouseProjections),
   },
   [computers.SERVICE_ACCOUNT]: {
     [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, hippocampusMoocProjections),
     [circuits.HIPPO_HBP_SA_FULL_CA1]: Object.assign({}, hippocampusProjections),
+    [circuits.SSCX_HBP_SA_MOUSE_MICROCIRCUIT]: Object.assign({}, sscxMouseProjections),
   },
 };
 

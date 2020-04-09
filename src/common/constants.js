@@ -14,7 +14,7 @@ const circuits = {
   HIPPO_HBP_SA_FULL_CA1: 'hippo_hbp_sa_full_ca1',
   HIPPO_BBP_MICROCIRCUIT: 'hippo_bbp_microcircuit',
   SSCX_BBP_MICROCIRCUIT: 'sscx_bbp_microcircuit',
-  SSCX_BBP_MOUSE_MICROCIRCUIT: 'sscx_bbp_mouse_microcircuit',
+  SSCX_HBP_SA_MOUSE_MICROCIRCUIT: 'sscx_hbp_sa_mouse_microcircuit',
   HBP_DYNAMIC_CIRCUIT: 'bbp_dynamic_circuit',
   BBP_DYNAMIC_CIRCUIT: 'hbp_dynamic_circuit',
 };

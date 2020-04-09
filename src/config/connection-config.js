@@ -264,11 +264,11 @@ const connectionsConfigMapping = {
     [circuits.HIPPO_BBP_FULL_CA1]: getHippocampusConnections,
     [circuits.HIPPO_BBP_MICROCIRCUIT]: getHippocampusConnections,
     [circuits.SSCX_BBP_MICROCIRCUIT]: getSscxConnections,
-    [circuits.SSCX_BBP_MOUSE_MICROCIRCUIT]: getSscxMouseConnections,
   },
   [computers.SERVICE_ACCOUNT]: {
     [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: getHippocampusMoocConnections,
     [circuits.HIPPO_HBP_SA_FULL_CA1]: getHippocampusConnections,
+    [circuits.SSCX_HBP_SA_MOUSE_MICROCIRCUIT]: getSscxMouseConnections,
   },
 };
 

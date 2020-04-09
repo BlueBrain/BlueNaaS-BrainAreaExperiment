@@ -136,50 +136,45 @@ const bb5Sscx = {
   genericSimulationConfig: Object.assign({}, genericSimulationConfig),
 };
 
-const bb5SscxMouse = {
-  script: [
-    '#!/bin/bash -l',
-    '. /etc/profile',
-    ...copyToDestinationScript,
-    'module load unstable',
-    'module load neurodamus-neocortex',
-    'module load py-bluepy',
-    'module load brion',
-    'export NFRAME=256',
-    'python /gpfs/bbp.cscs.ch/home/antonel/scripts_unicore/create_replay_bb5_0.19.0.py',
-    'python /gpfs/bbp.cscs.ch/home/antonel/scripts_unicore/simulation_launch_bb5_0.19.0.py',
-    ...copyFromDestinationScript,
-  ],
-  runtime: 3600,
-  nodes: 5,
-  cpus: 36,
-  executable: '/bin/bash input.sh',
-  project: null,
-  memory: 128000,
-  partitions: { '*': 'prod' },
-  qos: 'bigjob',
-  moveSimulation: true,
-  genericSimulationConfig: Object.assign({}, genericSimulationConfig),
-};
-
 const pizDaintHippocampusServiceAccount = {
   script: [
     '#!/bin/bash -l',
     '. /etc/profile',
-    'export MODULEPATH=/apps/hbp/ich002/hbp-spack-deployments/modules:$MODULEPATH',
+    'module load daint-mc cray-python/3.6.5.7 PyExtensions/3.6.5.7-CrayGNU-19.10',
+    'module use /apps/hbp/ich002/hbp-spack-deployments/softwares/25-03-2020/install/modules/tcl/cray-cnl7-haswell',
+    'module load neurodamus-hippocampus/0.4',
+    'module load py-bluepy/0.14.6',
     'export NFRAME=1000',
-    'module swap PrgEnv-cray PrgEnv-intel',
-    'module load neurodamus-hippocampus neuron cray-python/2.7.15.7',
     'export HDF5_USE_FILE_LOCKING=FALSE',
-    '/apps/hbp/ich002/home/antonel/create_replay_piz_daint_0.19.0.py',
-    '/apps/hbp/ich002/home/antonel/simulation_launch_piz_daint_0.19.0.py',
+    'python /apps/hbp/ich002/home/antonel/create_replay_piz_daint_0.19.0.py -vv',
+    'python /apps/hbp/ich002/home/antonel/simulation_launch_piz_daint_0.19.0.py -vv',
   ],
   runtime: 3600,
   nodes: 1,
   cpus: 36,
   executable: '/bin/bash input.sh',
   nodeType: 'mc',
-  memory: 64000,
+  genericSimulationConfig: Object.assign({}, genericSimulationConfig),
+};
+
+const pizDaintMouseSSCxServiceAccount = {
+  script: [
+    '#!/bin/bash -l',
+    '. /etc/profile',
+    'module load daint-mc cray-python/3.6.5.7 PyExtensions/3.6.5.7-CrayGNU-19.10',
+    'module use /apps/hbp/ich002/hbp-spack-deployments/softwares/25-03-2020/install/modules/tcl/cray-cnl7-haswell',
+    'module load neurodamus-mousify/0.3',
+    'module load py-bluepy/0.14.6',
+    'export NFRAME=1000',
+    'export HDF5_USE_FILE_LOCKING=FALSE',
+    'python /apps/hbp/ich002/home/antonel/create_replay_piz_daint_0.19.0.py -vv',
+    'python /apps/hbp/ich002/home/antonel/simulation_launch_piz_daint_0.19.0.py -vv',
+  ],
+  runtime: 3600,
+  nodes: 1,
+  cpus: 36,
+  executable: '/bin/bash input.sh',
+  nodeType: 'mc',
   genericSimulationConfig: Object.assign({}, genericSimulationConfig),
 };
 
@@ -196,11 +191,11 @@ const simConfigMapping = {
     [circuits.HIPPO_BBP_FULL_CA1]: Object.assign({}, bb5Hippocampus),
     [circuits.HIPPO_BBP_MICROCIRCUIT]: Object.assign({}, bb5Hippocampus),
     [circuits.SSCX_BBP_MICROCIRCUIT]: Object.assign({}, bb5Sscx),
-    [circuits.SSCX_BBP_MOUSE_MICROCIRCUIT]: Object.assign({}, bb5SscxMouse),
   },
   [computers.SERVICE_ACCOUNT]: {
     [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, pizDaintHippocampusServiceAccount),
     [circuits.HIPPO_HBP_SA_FULL_CA1]: Object.assign({}, pizDaintHippocampus),
+    [circuits.SSCX_HBP_SA_MOUSE_MICROCIRCUIT]: Object.assign({}, pizDaintMouseSSCxServiceAccount),
   },
 };
 

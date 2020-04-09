@@ -550,18 +550,18 @@ const sscxBbpMicrocircuit = {
 */
 
 const sscxO1Mouse2018ImgBase = `${objectStorageBaseURL}/sscx-o1-mouse-20180305`;
-const sscxBbpMouseMicrocircuit = {
+const sscxHbpSAMouseMicrocircuit = {
   prefix: {
-    [computers.BB5]: '/gpfs/bbp.cscs.ch/project/proj66',
+    [computers.SERVICE_ACCOUNT]: '/store/hbp/ich002/public/mouse_sscx_o1/sonata_2018_20200330',
   },
   paths: {
     MorphologyPath: '<%= prefix %>/entities/morphologies/2018.02.16',
-    METypePath: '<%= prefix %>/entities/emodels/2018.02.26/hoc',
-    MEComboInfoFile: '<%= prefix %>/entities/emodels/2018.02.26/mecombo_emodel.tsv',
-    CircuitPath: '<%= prefix %>/circuits/O1/20180305/',
-    nrnPath: '<%= prefix %>/circuits/O1/20180305/connectome/functional',
-    TargetFile: '<%= prefix %>/home/antonel/O1/20180305/circuit/user.target',
+    METypePath: '<%= prefix %>/entities/emodels/2018.02.26.dev0/hoc',
+    MEComboInfoFile: '<%= prefix %>/entities/emodels/2018.02.26.dev0/mecombo_emodel.tsv',
+    CircuitPath: '<%= prefix %>/circuit',
+    nrnPath: '<%= prefix %>/circuit/connectome/functional/edges.sonata',
     CellLibraryFile: 'circuit.mvd3',
+    TargetFile: '<%= prefix %>/circuit/user.target',
     CurrentDir: '.',
     OutputRoot: '.',
   },
@@ -682,7 +682,7 @@ const mapCircuitNameWithUrl = {
   [circuits.HIPPO_HBP_SA_FULL_CA1]: hippoHbpSAFullCa1,
   [circuits.HIPPO_BBP_MICROCIRCUIT]: hippoBbpMicrocircuit,
   [circuits.SSCX_BBP_MICROCIRCUIT]: sscxBbpMicrocircuit,
-  [circuits.SSCX_BBP_MOUSE_MICROCIRCUIT]: sscxBbpMouseMicrocircuit,
+  [circuits.SSCX_HBP_SA_MOUSE_MICROCIRCUIT]: sscxHbpSAMouseMicrocircuit,
   [circuits.HBP_DYNAMIC_CIRCUIT]: dynamicCircuit,
   [circuits.BBP_DYNAMIC_CIRCUIT]: dynamicCircuit,
 };

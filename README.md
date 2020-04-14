@@ -34,3 +34,10 @@ https://bbpteam.epfl.ch/project/spaces/download/attachments/12959382/Neurondamus
 - Add projection on projection-config.js
 - Add entry on connection-config.js
 - Add entry on simulation-config.js
+
+# Use Docker
+
+Build: `docker build --build-arg BASE_URL='/' -t sim-launcher-ui .`
+Run: `docker run -p 8181:8080 -it sim-launcher-ui`
+Open in browser: `http://localhost:8181/#/circuits/hippo_mooc_sa_microcircuit`
+The built web app is under `/home/dist`

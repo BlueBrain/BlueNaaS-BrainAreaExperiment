@@ -83,7 +83,7 @@ function saveAndRemoveQueries() {
     const circuitName = getCircuitName();
     const hashAloneCircuit = `#/circuits/${circuitName}`;
 
-    localStorage.locationHash = hash;
+    sessionStorage.locationHash = hash;
     window.location.hash = hashAloneCircuit;
   };
 
@@ -105,12 +105,12 @@ function removeExtraURLParams() {
 
 function restoreQueries() {
   console.debug('[restoreQueries]');
-  const recoveredHash = localStorage.locationHash;
-  if (!recoveredHash || localStorage.locationHash === 'null') {
+  const recoveredHash = sessionStorage.locationHash;
+  if (!recoveredHash || sessionStorage.locationHash === 'null') {
     window.location.hash = removeExtraURLParams();
     return;
   }
-  localStorage.locationHash = null;
+  sessionStorage.locationHash = null;
   window.location.hash = recoveredHash;
 }
 

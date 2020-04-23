@@ -1,4 +1,6 @@
 
+import { errorMessages } from '@/common/constants';
+
 export default {
   state: {
     isLoading: true,
@@ -32,7 +34,10 @@ export default {
     },
     cancelLoadingList(state) {
       if (!state.httpReqSource) return;
-      state.httpReqSource.cancel('Stop from the user');
+      state.httpReqSource.cancel(errorMessages.CANCELED_REQUEST);
+      // state.httpReqSource = null;
+    },
+    resetLoadingList(state) {
       state.httpReqSource = null;
     },
   },

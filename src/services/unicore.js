@@ -11,6 +11,7 @@ import store from '@/services/store';
 import db from '@/services/db';
 import { getDate3YearFromNow } from '@/common/utils';
 import { jobTags, addTag } from '@/common/job-status';
+import { errorMessages } from '@/common/constants';
 
 const NOT_FOUND = 404;
 
@@ -153,9 +154,10 @@ async function getAllJobs(computer) {
   try {
     response = await axiosInstance(`${unicoreURL}/jobs`);
   } catch (error) {
-    if (error.message !== 'Stop from the user') {
+    if (error.message !== errorMessages.CANCELED_REQUEST) {
       throw new Error('getting all jobs for list');
     }
+    return null;
   }
   return response.data.jobs;
 }
@@ -169,7 +171,7 @@ async function getSimUrls(computer, circuit) {
     // retrieve the simulations with tags
     response = await axiosInstance(`${unicoreURL}/jobs?${queryStr}`);
   } catch (error) {
-    if (error.message !== 'Stop from the user') {
+    if (error.message !== errorMessages.CANCELED_REQUEST) {
       throw new Error('getting all jobs for list');
     }
     return null;

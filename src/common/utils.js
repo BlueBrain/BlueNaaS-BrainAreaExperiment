@@ -80,7 +80,10 @@ function openContent(content) {
 }
 
 function getComputerUrlCombo() {
-  return store.state.fullConfig.computer + store.state.userGroup + store.state.fullConfig.circuitName;
+  return store.state.fullConfig.computer
+    + store.state.userGroup
+    + store.state.fullConfig.circuitName
+    + window.location.hash;
 }
 
 function getDate3YearFromNow() {

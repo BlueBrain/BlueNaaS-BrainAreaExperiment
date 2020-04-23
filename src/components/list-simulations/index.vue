@@ -117,6 +117,7 @@ export default {
 
     reloadJobsListBinded() {
       this.viewList = [];
+      this.$store.commit('resetLoadingList');
       this.allSimulations = [];
       this.$nextTick(() => {
         this.fetchJobs().catch(error => this.$Message.error(`Fetch jobs - ${error.message}`));
@@ -229,8 +230,10 @@ export default {
       const callbackEachAnalysis = (sim, newAnalysisStatus) => {
         this.$set(sim, 'analysisStatus', newAnalysisStatus);
       };
+
       await listJobsHelper.fetchAnalysisInfo(this.viewList, callbackEachAnalysis);
       this.$store.commit('setAnalysisListIsLoading', false);
+      this.$store.commit('resetLoadingList');
     },
   },
   beforeDestroy() {

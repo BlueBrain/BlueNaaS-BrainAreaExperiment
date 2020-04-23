@@ -76,6 +76,10 @@ export default {
       });
     },
   },
+  beforeRouteLeave(to, from, next) {
+    this.$store.commit('cancelLoadingList');
+    next();
+  },
 };
 </script>
 

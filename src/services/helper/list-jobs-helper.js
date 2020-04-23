@@ -8,6 +8,7 @@ import unicore from '@/services/unicore';
 import analysisConfig from '@/config/analysis-config';
 import { jobStatus, isRunning } from '@/common/job-status';
 import { getComputerUrlCombo } from '@/common/utils';
+import { errorMessages } from '@/common/constants';
 import db from '@/services/db';
 import store from '@/services/store';
 
@@ -77,8 +78,7 @@ function setJobStatus(simulationJob, isAnalysis, status) {
 }
 
 async function startReloadJob(simulationJob, paramCombo, analysisInfo) {
-  /* fetch job information and if it's running use polling until it ends */
-  // when move to other page, cancel the refresh
+  // fetch job information and if it's running use polling until it ends
   const jobToUpdate = analysisInfo || simulationJob;
   const jobUrl = get(jobToUpdate, '_links.self.href');
   const updateJobInfo = await unicore.getJobProperties(jobUrl);
@@ -95,15 +95,14 @@ async function startReloadJob(simulationJob, paramCombo, analysisInfo) {
 
   if (isRunning(updateJobInfo.status)) {
     setTimeout(() => {
-      if (paramCombo !== getComputerUrlCombo()) {
-        // a way to stop polling when change computer
-        return;
-      }
+      // a way to stop polling when change computer
+      if (paramCombo !== getComputerUrlCombo()) return;
       startReloadJob(simulationJob, paramCombo, analysisInfo);
     }, store.state.pollInterval);
   } else if (updateJobInfo.status === jobStatus.SUCCESSFUL) {
     // after the simulation or analysis is finished check if the results were correct
     const [updatedJobWithFiles] = await unicore.populateJobsUrlWithFiles([jobUrl]);
+
     const jobProducedResults = analysisInfo
       ? await analysisProducedResults(updatedJobWithFiles)
       : simulationProducedResults(updatedJobWithFiles);
@@ -143,6 +142,8 @@ function classifyJob(jobExpandedInfo) {
 }
 
 async function getSimulationsWithFiles(cbEach) {
+  // to know if the function should stop because the page changed
+  const paramCombo = getComputerUrlCombo();
   const simulations = [];
   const allJobs = [];
   const jobsList = await getSimulationUrlList();
@@ -151,19 +152,21 @@ async function getSimulationsWithFiles(cbEach) {
 
   const promiseArray = jobsList.map(async (jobUrl) => {
     const jobInfo = await unicore.getJobProperties(jobUrl);
+    if (!jobInfo) return;
     // if has wasClassified it is saved in localStorage
     if (!jobInfo.wasClassified) {
       await unicore.getAndSetChildren(jobInfo);
-      classifyJob(jobInfo);
+      // stop if page changed
+      if (paramCombo !== getComputerUrlCombo()) return;
+      classifyJob(jobInfo, paramCombo);
     }
     // TODO: this is a workaround until the queryparam fetch jobs with AND
     allJobs.push(jobInfo);
-    if (!jobInfo.tags.includes(store.state.fullConfig.circuitName)) return false;
+    if (!jobInfo.tags.includes(store.state.fullConfig.circuitName)) return;
     simulations.push(jobInfo);
     // if job is running poll the status
-    if (isRunning(jobInfo.status)) { startReloadJob(jobInfo, getComputerUrlCombo()); }
+    if (isRunning(jobInfo.status)) { startReloadJob(jobInfo, paramCombo); }
     if (cbEach) { cbEach(jobInfo); }
-    return true;
   });
 
   await Promise.all(promiseArray);
@@ -189,7 +192,13 @@ async function fetchAnalysisInfo(simulationListWithFiles, cbEach) {
       analysisInfo = last(analysisArray);
       if (analysisArray.length) {
         // fetch and fill data. If is running will poll data
-        startReloadJob(simulationWithFiles, getComputerUrlCombo(), analysisInfo);
+        startReloadJob(simulationWithFiles, getComputerUrlCombo(), analysisInfo).catch((error) => {
+          // this will prevent the error of cancel by user to be thrown more without catching it
+          if (!error.message.includes(errorMessages.CANCELED_REQUEST)) {
+            throw new Error(`Starting reload job ${error}`);
+          }
+          return null;
+        });
         newAnalysisStatus = jobStatus.LOADING;
       } else {
         newAnalysisStatus = null;

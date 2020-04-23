@@ -172,6 +172,7 @@ async function getSimUrls(computer, circuit) {
     if (error.message !== 'Stop from the user') {
       throw new Error('getting all jobs for list');
     }
+    return null;
   }
   return get(response, 'data.jobs', []);
 }

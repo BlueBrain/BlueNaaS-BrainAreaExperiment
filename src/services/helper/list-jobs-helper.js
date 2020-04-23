@@ -31,6 +31,8 @@ function simulationProducedResults(simulationWithFiles) {
 async function getSimulationUrlList() {
   const networkJobUrls = await unicore.getSimUrls(store.state.fullConfig.computer, store.state.fullConfig.circuitName);
 
+  if (!networkJobUrls) return null; // error in the network
+
   // compare saved list and sorted list
   const savedJobUrls = await db.getAllJobsSortedList() || [];
 
@@ -144,6 +146,9 @@ async function getSimulationsWithFiles(cbEach) {
   const simulations = [];
   const allJobs = [];
   const jobsList = await getSimulationUrlList();
+
+  if (!jobsList) return null;
+
   const promiseArray = jobsList.map(async (jobUrl) => {
     const jobInfo = await unicore.getJobProperties(jobUrl);
     // if has wasClassified it is saved in localStorage

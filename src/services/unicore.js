@@ -366,9 +366,6 @@ async function generateUnicoreConfig(configParams) {
     Name: configParams.title || 'unnamed job',
     Executable: configParams.executable || '/bin/bash input.sh',
     Arguments: [],
-    Parameters: {
-      UC_PREFER_INTERACTIVE_EXECUTION: configParams.isViz,
-    },
     haveClientStageIn: 'true',
     Resources: {
       Nodes: nodes,
@@ -429,13 +426,11 @@ function updateDeletionDate(jobURL) {
 
 async function submitJob(runConfig, inputs = [], startLater = false) {
   /**
-    * runConfig {computer, project }
+    * runConfig {computerSelected, projectSelected, ... }
     *
     * inputs [{ To: '', Data: '' }]
     */
   const newRunConfig = runConfig;
-
-  newRunConfig.computerSelected = runConfig.computerSelected;
   const unicoreURL = getComputerUrl(newRunConfig.computerSelected);
 
   try {
@@ -516,6 +511,7 @@ function getHttpReqSource() {
 }
 
 export default {
+  axiosInstance,
   getAssociatedLocation,
   deleteJob,
   deleteJobFromAssociatedFile,
@@ -539,6 +535,7 @@ export default {
   getAndSetChildren,
   getFilesWithSizes,
   getJobPhysicalLocation,
+  generateUnicoreConfig,
 };
 
 export {

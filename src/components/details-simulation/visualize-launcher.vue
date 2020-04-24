@@ -2,7 +2,7 @@
 <template>
   <div
     class="visualize-launcher in-corner"
-    v-if="computerHasVisualization && hasReports && hasCollab"
+    v-if="computerHasVisualization && hasReports"
   >
     <i-button
       v-if="!vizIsReady"
@@ -10,7 +10,7 @@
       type="primary"
       icon="md-videocam"
       :loading="vizRunning"
-      @click="createVisualizationVM()"
+      @click="submitVizJob()"
     >Visualize</i-button>
     <i-button
       v-else
@@ -26,8 +26,8 @@
 <script>
 import { submitVisualization } from '@/services/helper/visualization-helper';
 import visualizationConfig from '@/config/visualization-config';
+import { getReportsRegexp } from '@/services/helper/blueconfig-helper';
 import eventBus from '@/services/event-bus';
-import db from '@/services/db';
 
 export default {
   name: 'VisualizeLauncher',
@@ -36,48 +36,48 @@ export default {
     return {
       vizRunning: false,
       vizIsReady: false,
-      ip: null,
+      vizUrl: null,
     };
   },
   created() {
-    eventBus.$on('viz-ready', (ip) => {
+    eventBus.$on('viz-ready', (vizResponseObj) => {
       this.vizRunning = false;
       this.vizIsReady = true;
-      this.ip = ip;
-      this.$Message.info({ content: `Visualization running on ${ip}` });
+      this.vizUrl = vizResponseObj.vizUrl;
     });
     this.loadPreviousConfig();
   },
   computed: {
     computerHasVisualization() {
-      return !!visualizationConfig[this.$store.state.fullConfig.computer];
+      return !!this.specificVizConfig;
     },
     hasReports() {
       if (!this.simulationDetails || !this.simulationDetails.children) return false;
-      return this.simulationDetails.children.some(file => file.match('.bbp'));
+      const reportRegex = getReportsRegexp();
+      return this.simulationDetails.children.some(file => reportRegex.test(file));
     },
-    hasCollab() {
-      return !!this.$store.state.collabIdForViz;
+    specificVizConfig() {
+      // use only for MOOC circuit
+      return visualizationConfig[
+        this.$store.state.fullConfig.computer + this.$store.state.fullConfig.circuitName
+      ];
     },
   },
   methods: {
-    createVisualizationVM() {
-      if (!this.$store.state.collabIdForViz) {
-        this.$Message.error('No Collab in query parameters. Initiate this app from BSP Collab.');
-        return;
-      }
-      this.$Message.loading('Visualization is starting. This could take up to 10 minutes ...');
+    async submitVizJob() {
       this.vizRunning = true;
-      submitVisualization(this.simulationDetails)
+
+      this.$Message.loading('Visualization is starting. This could take a couple of minutes ...');
+
+      await submitVisualization(this.simulationDetails, this.port)
         .catch(error => this.$Message.error(`Submit Visualization - ${error.message}`));
+
+      // it will come back using the ON 'viz-ready' event after Unicore finishes creating the job
     },
     openVisualization() {
-      window.open(`http://${this.ip}/?host=${this.ip}:8200`, '_blank');
+      window.open(this.vizUrl, '_blank');
     },
-    async loadPreviousConfig() {
-      const collabId = await db.getCollabIdForViz();
-      this.$store.commit('setCollabIdForViz', collabId);
-    },
+    loadPreviousConfig() {},
   },
 };
 </script>

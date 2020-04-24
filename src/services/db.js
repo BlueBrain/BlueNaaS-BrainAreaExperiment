@@ -75,14 +75,6 @@ function deleteJob(url) {
   return localforage.removeItem(combinedId);
 }
 
-function saveCollabIdForViz(collabId) {
-  localforage.setItem('collabIdForViz', collabId);
-}
-
-function getCollabIdForViz() {
-  return localforage.getItem('collabIdForViz');
-}
-
 function getConfigName(itemName) {
   return `sim-config-${store.state.fullConfig.circuitName}-${itemName}`;
 }
@@ -120,8 +112,6 @@ export default {
   getAllJobsSortedList,
   setAllJobsSortedList,
   deleteJob,
-  saveCollabIdForViz,
-  getCollabIdForViz,
   getSavedConfig,
   setSavedConfig,
   getSavedComputerAndMappings,

@@ -135,6 +135,46 @@ This will display the details of a certain simulation and the analysis.
               />
             </div>
           </collapse-title>
+
+          <collapse-title
+            :collapsed="true"
+            title="Visualization Logs"
+            v-show="viz.showLogs"
+          >
+            <div slot="element">
+              <collapse-title
+                :collapsed="true"
+                :sublevel="true"
+                title="Stderr"
+                @expanded="getFileExpanded('stderr', viz.downloadedFiles, 'stderr', viz.workingDirectory)"
+              >
+                <div
+                  slot="element"
+                  class="log-item" >
+                  <display-or-download
+                    :file-content="viz.downloadedFiles.stderr"
+                    file-name="stderr"
+                  />
+                </div>
+              </collapse-title>
+
+              <collapse-title
+                :collapsed="true"
+                :sublevel="true"
+                title="Stdout"
+                @expanded="getFileExpanded('stdout', viz.downloadedFiles, 'stdout', viz.workingDirectory)"
+              >
+                <div
+                  slot="element"
+                  class="log-item">
+                  <display-or-download
+                    :file-content="viz.downloadedFiles.stdout"
+                    file-name="stdout"
+                  />
+                </div>
+              </collapse-title>
+            </div>
+          </collapse-title>
         </div>
       </collapse-title>
     </div>
@@ -178,7 +218,12 @@ export default {
       job: {},
       simulationDetails: {},
       downloadedFiles: {},
-      vizRunning: false,
+      viz: {
+        downloadedFiles: {},
+        showLogs: false,
+        workingDirectory: null,
+        vizUrl: null,
+      },
       computerProjectCombo: null,
       parsedFiles: {
         unicoreLog: '',
@@ -209,6 +254,8 @@ export default {
     }
     this.computerProjectCombo = getComputerUrlCombo();
     this.getJobById(this.jobId);
+
+    eventBus.$on('viz-ready', vizResult => this.setupVizVariables(vizResult));
   },
   methods: {
     fillJobs(job) {
@@ -224,9 +271,14 @@ export default {
       this.simulationDetails = details;
     },
 
-    async getFileExpanded(attributeName, destination, fileToFetch = attributeName) {
+    async getFileExpanded(
+      attributeName,
+      destination,
+      fileToFetch = attributeName,
+      workingDirectory = this.simulationDetails.workingDirectory,
+    ) {
       this.$set(destination, attributeName, false);
-      const url = `${this.simulationDetails.workingDirectory}/files/${fileToFetch}`;
+      const url = `${workingDirectory}/files/${fileToFetch}`;
       let fileContent = null;
       try {
         fileContent = await unicore.getFiles(url);
@@ -315,6 +367,7 @@ export default {
         } else {
           // this wlll upload the simulationWasSuccessful and show the analysis and viz buttons
           this.$set(this.job, 'children', simulationWithFiles.children);
+          this.$set(this.simulationDetails, 'children', simulationWithFiles.children);
         }
         db.addJob(simulationWithFiles);
       }
@@ -362,10 +415,17 @@ export default {
         query: this.$route.query,
       });
     },
+
+    async setupVizVariables({ workingDir, vizUrl }) {
+      this.viz.showLogs = !!workingDir;
+      this.viz.workingDirectory = workingDir;
+      this.viz.vizUrl = vizUrl;
+    },
   },
   beforeDestroy() {
     // stop refreshing the simulations that are running
     this.pageIsDisplayed = false;
+    eventBus.$on('viz-ready', vizResult => this.setupVizVariables(vizResult));
   },
 };
 </script>

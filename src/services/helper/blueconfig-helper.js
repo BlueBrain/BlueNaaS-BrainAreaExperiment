@@ -2,6 +2,7 @@
 import get from 'lodash/get';
 import { getFiles } from '@/services/unicore';
 import store from '@/services/store';
+import { unmapBlueConfigTerms } from '@/common/utils';
 
 function findByRegexp(bcStr, re) {
   const regex = re;
@@ -32,8 +33,8 @@ function findCircuitTarget(bcStr) {
   return get(circuitTargetMatched, '[1]', '').trim();
 }
 
-async function getBlueConfigStr(job) {
-  const workingDirectory = get(job, '_links.workingDirectory.href');
+async function getBlueConfigStr(job, workingDirectoryParam = null) {
+  const workingDirectory = workingDirectoryParam || get(job, '_links.workingDirectory.href');
   const blueConfigBlob = await getFiles(`${workingDirectory}/files/BlueConfig`);
   const blueConfigStr = await new Response(blueConfigBlob).text();
   // return one line string for easier regexp finding
@@ -64,10 +65,23 @@ function getReportsRegexp() {
   return new RegExp('/(.+_report_.+).(?:bbp|h5)');
 }
 
+async function findCellsAmountByJobWD(workingDirectory) {
+  const job = null;
+  const bcStr = await getBlueConfigStr(job, workingDirectory);
+  const { targets } = store.state.fullConfig.circuitConfig;
+  const population = findCircuitTarget(bcStr);
+  const displayName = unmapBlueConfigTerms(population);
+  const targetObj = targets.find(target => (
+    target.name === displayName || target.name === population
+  ));
+  return targetObj ? targetObj.cells : null;
+}
+
 export {
   getTargetByReport,
   findDuration,
   findCircuitTarget,
   getBlueConfigStr,
   getReportsRegexp,
+  findCellsAmountByJobWD,
 };

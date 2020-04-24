@@ -49,8 +49,6 @@ const configPerComputer = {
       '/apps/hbp/ich002/home/antonel/analysis_launch_piz_daint_0.19.0.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
     ],
     executable: '/bin/bash input.sh',
-    nodeType: 'mc',
-    memory: 64000,
   },
   [circuits.HIPPO_MOOC_SA_MICROCIRCUIT + computers.SERVICE_ACCOUNT]: {
     script: [

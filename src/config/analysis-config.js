@@ -16,7 +16,7 @@ const configPerComputer = {
     script: [
       '#!/bin/bash',
       'export HDF5_USE_FILE_LOCKING=FALSE',
-      'export EMSIM="/apps/hbp/ich002/hbp-visualisation-deployements/emsim/startEmsim.sh"',
+      'export EMSIM="/apps/hbp/ich002/hbp-visualisation-deployements/spack/softwares/28-04-2020/install/install/cray-cnl7-haswell/intel-19.0.1.144/emsim-1.0.0-vbdt6g/bin/emsim"',
       '/apps/hbp/ich002/home/antonel/analysis_launch_piz_daint_0.19.0.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
     ],
     executable: '/bin/bash input.sh',
@@ -45,7 +45,7 @@ const configPerComputer = {
     script: [
       '#!/bin/bash',
       'export HDF5_USE_FILE_LOCKING=FALSE',
-      'export EMSIM="/apps/hbp/ich002/hbp-visualisation-deployements/emsim/startEmsim.sh"',
+      'export EMSIM="/apps/hbp/ich002/hbp-visualisation-deployements/spack/softwares/28-04-2020/install/install/cray-cnl7-haswell/intel-19.0.1.144/emsim-1.0.0-vbdt6g/bin/emsim"',
       '/apps/hbp/ich002/home/antonel/analysis_launch_piz_daint_0.19.0.py --blueconfig ./BlueConfig --output . --analysisconfig ./analysis_config.json -vv',
     ],
     executable: '/bin/bash input.sh',

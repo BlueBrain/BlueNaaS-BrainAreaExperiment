@@ -9,10 +9,9 @@ const configHBP = {
 const configBBP = {
   auth: {
     clientId: 'sim-launcher-ui-unicore',
-    authUrl: 'https://bbpteam.epfl.ch/auth/realms/BBP',
-    request: { nonce: 'null' },
+    authUrl: 'https://bbpauth.epfl.ch/auth/realms/BBP',
   },
-  userEndpoint: 'https://bbpteam.epfl.ch/auth/realms/BBP/protocol/openid-connect/userinfo',
+  userEndpoint: 'https://bbpauth.epfl.ch/auth/realms/BBP/protocol/openid-connect/userinfo',
 };
 
 export {

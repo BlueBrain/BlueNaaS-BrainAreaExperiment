@@ -72,12 +72,16 @@ export default {
   },
   methods: {
     creationConfigHandler(resolve) {
-      const { runSection } = this.$store.state.fullConfig.circuitConfig;
+      const { runSection, isSonata, sonataNeuronsPopulation } = this.$store.state.fullConfig.circuitConfig;
+      const circuitTarget = isSonata
+        ? `${sonataNeuronsPopulation}:${mapBlueConfigTerms(this.populationSelected)}`
+        : mapBlueConfigTerms(this.populationSelected);
+
       const params = {
         Run: {
           Default: {
             Duration: this.duration,
-            CircuitTarget: mapBlueConfigTerms(this.populationSelected),
+            CircuitTarget: circuitTarget,
             ...runSection,
           },
         },

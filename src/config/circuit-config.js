@@ -29,11 +29,10 @@ const hipperpolarizingGenericStim = {
 };
 
 const runSectionDefaults = {
-  // need to keep the CamelCase because goes directly to BlueConfig
+  // need to keep the PascalCase because goes directly to BlueConfig
   ForwardSkip: 5000,
   Dt: '0.025',
   BaseSeed: '10',
-  RNGMode: 'Random123',
 };
 
 const objectStorageBaseURL = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui';
@@ -229,7 +228,6 @@ const hippoHbpMicrocircuit = {
     OutputRoot: '.',
   },
   targets: [
-    { name: '5Cells', src: `${microcircuitImgBase}/5Cells.png`, cells: '5' },
     { name: 'Mosaic', src: `${microcircuitImgBase}/Mosaic.png`, cells: '18186' },
     { name: 'All', src: `${microcircuitImgBase}/Mosaic.png`, cells: '18186' },
     { name: 'Random1PercFull', displayName: 'Random 1% full circuit', src: `${microcircuitImgBase}/Random1PercFull.png`, cells: '6' },
@@ -302,25 +300,31 @@ const hippoBbpMicrocircuit = Object.assign(
 */
 
 const moocMicrocircuitImgBase = `${objectStorageBaseURL}/O1.20191017`;
+
 const hippoMoocSvcAccMicrocircuit = Object.assign(
   {},
   { ...hippoHbpMicrocircuit },
   {
     prefix: {
-      [computers.SERVICE_ACCOUNT]: '/store/hbp/ich002/antonel/O1/20191017',
+      [computers.SERVICE_ACCOUNT]: '/store/hbp/ich002/public/CA1.O1/mooc_sonata_circuit',
     },
     paths: Object.assign(
       {},
       { ...hippoHbpMicrocircuit.paths },
       {
-        METypePath: '<%= prefix %>/entities/emodels/20190402/hoc/',
-        MEComboInfoFile: '<%= prefix %>/entities/emodels/20190402/mecombo_emodel.tsv',
+        MorphologyPath: '<%= prefix %>/morphologies/swc/',
+        MorphologyType: 'swc',
+        METypePath: '<%= prefix %>/emodels/hoc',
+        MEComboInfoFile: '<%= prefix %>/emodels/mecombo_emodel.tsv',
+        CellLibraryFile: '<%= prefix %>/sonata/nodes/nodes.h5',
+        CircuitPath: '<%= prefix %>/',
+        nrnPath: '<%= prefix %>/sonata/edges/edges.h5:hippocampus_neurons__hippocampus_neurons__chemical',
+        TargetFile: '<%= prefix %>/user.target',
       },
     ),
     targets: [
-      { name: '5Cells', src: `${moocMicrocircuitImgBase}/5Cells.png`, cells: '5' },
-      { name: 'Mosaic', src: `${moocMicrocircuitImgBase}/Mosaic.png`, cells: '18198' },
-      { name: 'All', src: `${moocMicrocircuitImgBase}/Mosaic.png`, cells: '18198' },
+      { name: 'most_central_50_SP_PC', src: `${moocMicrocircuitImgBase}/most_central_50_SP_PC.png`, cells: '50' },
+      { name: 'Full Circuit', src: `${moocMicrocircuitImgBase}/Mosaic.png`, cells: '18198' },
       { name: 'Excitatory', src: `${moocMicrocircuitImgBase}/Excitatory.png`, cells: '16860' },
       { name: 'Inhibitory', src: `${moocMicrocircuitImgBase}/Inhibitory.png`, cells: '1338' },
       { name: 'SLM_PPA', src: `${moocMicrocircuitImgBase}/SLM_PPA.png`, cells: '3' },
@@ -374,10 +378,6 @@ const hippoMoocSvcAccMicrocircuit = Object.assign(
       { name: 'SO', src: `${moocMicrocircuitImgBase}/SO.png`, cells: '160' },
       { name: 'SP', src: `${moocMicrocircuitImgBase}/SP.png`, cells: '18002' },
       { name: 'SR', src: `${moocMicrocircuitImgBase}/SR.png`, cells: '33' },
-      { name: 'most_central_10_SP_PC', src: `${moocMicrocircuitImgBase}/most_central_10_SP_PC.png`, cells: '10' },
-      { name: 'most_central_20_SP_PC', src: `${moocMicrocircuitImgBase}/most_central_20_SP_PC.png`, cells: '20' },
-      { name: 'most_central_50_SP_PC', src: `${moocMicrocircuitImgBase}/most_central_50_SP_PC.png`, cells: '50' },
-      { name: 'most_central_100_SP_PC', src: `${moocMicrocircuitImgBase}/most_central_100_SP_PC.png`, cells: '100' },
       { name: 'SOM', src: `${moocMicrocircuitImgBase}/SOM.png`, cells: '160' },
       { name: 'CCK', src: `${moocMicrocircuitImgBase}/CCK.png`, cells: '231' },
       { name: 'PV', src: `${moocMicrocircuitImgBase}/PV.png`, cells: '470' },
@@ -386,6 +386,20 @@ const hippoMoocSvcAccMicrocircuit = Object.assign(
       { name: 'CA3_PC', displayName: 'CA3 Projection', cells: '' },
     ],
     displayName: 'Hippocampus MOOC Service Account Microcircuit',
+    biggestTarget: 'Full Circuit',
+    isSonata: true,
+    sonataNeuronsPopulation: 'hippocampus_neurons',
+    runSection: Object.assign(
+      {},
+      runSectionDefaults,
+      {
+        NumSynapseFiles: 2048,
+        RNGMode: 'Random123',
+        Simulator: 'CORENEURON',
+        BaseSeed: '264118',
+        RunMode: 'LoadBalance',
+      },
+    ),
   },
 );
 

@@ -55,10 +55,10 @@ const hippocampusMoocProjections = Object.assign(
   hippocampusProjections,
   {
     projectionBlock: {
-      projectionSrcTarget: 'CA3 Projection',
+      projectionSrcTarget: 'CA3_PC',
       Projection: {
         SC: {
-          Path: '<%= prefix %>/circuit/projections/v3.2k/O1_ca1_20191017_projections_sorted.sonata',
+          Path: '<%= prefix %>/sonata/edges/edges.h5:hippocampus_projections__hippocampus_neurons__chemical',
         },
       },
       // This connection goes here because is added only if projection
@@ -66,7 +66,7 @@ const hippocampusMoocProjections = Object.assign(
         SC_All: {
           Source: 'CA3_PC',
           Destination: 'Mosaic',
-          // SpontMinis, // added if spontMinis proj was selected
+          // SpontMinis, // added automatically if spontMinis proj was selected
           Weight: '1', // this will be changed by the user
         },
       },

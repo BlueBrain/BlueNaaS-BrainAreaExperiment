@@ -201,7 +201,7 @@ export default {
         Unit: 'mV',
         Target: target || this.$store.state.simulationPopulation,
         Type: 'Soma',
-        Format: 'Bin',
+        Format: this.$store.state.fullConfig.circuitConfig.isSonata ? 'SONATA' : 'Bin',
         Dt: 0.1,
       };
     },

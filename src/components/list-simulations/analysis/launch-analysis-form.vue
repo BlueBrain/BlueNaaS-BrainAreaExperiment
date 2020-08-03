@@ -88,7 +88,7 @@
 import analysisConfig from '@/config/analysis-config';
 import { jobTags } from '@/common/job-status';
 import {
-  findDuration, getBlueConfigStr, getTargetByReport,
+  findDuration, getBlueConfigStr, getTargetByReport, getReportsRegexp,
 } from '@/services/helper/blueconfig-helper';
 import AnalysisPicker from './analysis-picker.vue';
 import LfpAnalysisPicker from './lfp-analysis-picker.vue';
@@ -116,11 +116,11 @@ export default {
     reports() {
       if (!this.jobSelectedForAnalysis) return [];
       const filteredNames = [];
+      const reportRegexp = getReportsRegexp();
       this.jobSelectedForAnalysis.children.forEach((file) => {
-        if (file.endsWith('.bbp')) {
-          // removes the / and .bbp
-          filteredNames.push(file.substr(1, file.length - 5));
-        }
+        const match = file.match(reportRegexp);
+        if (!match || match.length < 2) return;
+        filteredNames.push(match[1]);
       });
       return filteredNames;
     },

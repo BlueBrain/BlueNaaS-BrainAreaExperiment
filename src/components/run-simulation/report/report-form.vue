@@ -106,6 +106,10 @@
               v-model="localReportInfo.Format"
               placeholder="Output Format"
             >
+              <i-option
+                v-if="isSonataCompatible"
+                value="SONATA"
+              >SONATA</i-option>
               <i-option value="ASCII">ASCII</i-option>
               <i-option value="HDF5">HDF5</i-option>
               <i-option value="Bin">Binary</i-option>
@@ -187,6 +191,9 @@ export default {
     },
     reportType() {
       return this.localReportInfo.Type;
+    },
+    isSonataCompatible() {
+      return this.$store.state.fullConfig.circuitConfig.isSonata;
     },
   },
   methods: {

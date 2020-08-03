@@ -24,8 +24,11 @@ function findDuration(bcStr) {
 }
 
 function findCircuitTarget(bcStr) {
-  const regexp = /CircuitTarget\s(.+?)\s/;
-  const circuitTargetMatched = bcStr.match(regexp);
+  const { sonataNeuronsPopulation, isSonata } = store.state.fullConfig.circuitConfig;
+  const targetRegexp = isSonata
+    ? new RegExp(`CircuitTarget\\s${sonataNeuronsPopulation}:(.+?)\\s`)
+    : new RegExp('CircuitTarget\\s(.+?)\\s');
+  const circuitTargetMatched = bcStr.match(targetRegexp);
   return get(circuitTargetMatched, '[1]', '').trim();
 }
 
@@ -57,9 +60,14 @@ function getTargetByReport(bcStr, reportName) {
   return matches[0];
 }
 
+function getReportsRegexp() {
+  return new RegExp('/(.+_report_.+).(?:bbp|h5)');
+}
+
 export {
   getTargetByReport,
   findDuration,
   findCircuitTarget,
   getBlueConfigStr,
+  getReportsRegexp,
 };

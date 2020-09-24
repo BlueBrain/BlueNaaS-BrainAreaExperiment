@@ -64,10 +64,10 @@ const pizDaintHippocampus = {
   script: [
     '#!/bin/bash -l',
     '. /etc/profile',
-    'module load daint-mc cray-python/3.6.5.7 PyExtensions/3.6.5.7-CrayGNU-19.10',
-    'module use /apps/hbp/ich002/hbp-spack-deployments/softwares/25-03-2020/install/modules/tcl/cray-cnl7-haswell',
+    'module load daint-mc cray-python/3.8.2.1 PyExtensions/python3-CrayGNU-20.08',
+    'module use /apps/hbp/ich002/hbp-spack-deployments/softwares/15-09-2020/install/modules/tcl/cray-cnl7-haswell',
     'module load neurodamus-hippocampus/0.4',
-    'module load py-bluepy/0.14.6',
+    'module load py-bluepy',
     'export NFRAME=1000',
     'export HDF5_USE_FILE_LOCKING=FALSE',
     'python /apps/hbp/ich002/home/antonel/create_replay_piz_daint_0.19.0.py -vv',

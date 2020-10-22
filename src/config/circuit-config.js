@@ -35,7 +35,7 @@ const runSectionDefaults = {
   BaseSeed: '10',
 };
 
-const objectStorageBaseURL = 'https://bbpteam.epfl.ch/public/bsp-resources/sim-launcher-ui';
+const objectStorageBaseURL = 'https://bbp.epfl.ch/public/bsp-resources/sim-launcher-ui';
 
 /*
 |--------------------------------------------------------------------------

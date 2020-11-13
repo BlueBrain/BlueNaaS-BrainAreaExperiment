@@ -64,10 +64,10 @@ const hippocampusMoocProjections = Object.assign(
       // This connection goes here because is added only if projection
       Connection: {
         SC_All: {
-          Source: 'CA3_PC',
+          Source: 'hippocampus_projections:',
           Destination: 'Mosaic',
           // SpontMinis, // added automatically if spontMinis proj was selected
-          Weight: '1', // this will be changed by the user
+          Weight: '1.0', // this will be changed by the user
         },
       },
       spikeReplay: hippocampusProjections.projectionBlock.spikeReplay,

@@ -106,8 +106,9 @@ async function submitVisualization(simulationDetails) {
   const { job_id: vizJobId, viz_url: vizUrl } = await registerVizJobToMiddleware(vizConfig, simulationDetails.id);
 
   console.log('Visualization JOB:', vizJobId);
+  const newVizUrl = `${vizUrl}&load=/workspace/BlueConfig`;
 
-  pollingVizIp(vizJobId, vizUrl);
+  pollingVizIp(vizJobId, newVizUrl);
 }
 
 export default {};

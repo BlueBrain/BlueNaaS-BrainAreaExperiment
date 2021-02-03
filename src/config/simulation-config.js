@@ -36,6 +36,26 @@ const genericSimulationConfig = {
   checksForLFP: ['AllCompartments', 'Summation'],
 };
 
+const sonataGenericSimulationConfig = Object.assign(
+  {},
+  genericSimulationConfig,
+  {
+    checksForLFP: ['AllCompartments'],
+    reportOn: Object.assign(
+      {},
+      reportOnGeneric,
+      {
+        lfp: {
+          displayName: 'Current Summation (for LFP)',
+          name: 'i_membrane',
+          type: 'compartment',
+          unit: 'nA',
+        },
+      },
+    ),
+  },
+);
+
 const jurecaHippocampus = {
   script: [
     '#!/bin/sh -l',
@@ -139,10 +159,11 @@ const bb5Sscx = {
 const pizDaintHippocampusServiceAccount = {
   script: [
     '#!/bin/bash -l',
-    'module load PrgEnv-intel',
+    'module swap PrgEnv-cray PrgEnv-intel',
     'module load daint-mc cray-python/3.8.2.1 PyExtensions/python3-CrayGNU-20.08',
-    'module use /apps/hbp/ich002/hbp-spack-deployments/softwares/27-10-2020/install/modules/tcl/cray-cnl7-haswell',
-    'module load neurodamus-hippocampus/1.0',
+    'module swap intel/19.1.1.217 intel/19.0.1.144',
+    'module use /apps/hbp/ich002/hbp-spack-deployments/softwares/12-02-2021/install/modules/tcl/cray-cnl7-haswell',
+    'module load neurodamus-hippocampus/1.4.1-3.2.0',
     'module load py-neurodamus',
     'module load py-bluepy',
     'export HDF5_USE_FILE_LOCKING=FALSE',
@@ -151,16 +172,16 @@ const pizDaintHippocampusServiceAccount = {
     'export PMI_NO_FORK=1',
     'export PMI_NO_PREINITIALIZE=1',
     'export PMI_MMAP_SYNC_WAIT_TIME=300',
-    'python /apps/hbp/ich002/home/antonel/create_replay_piz_daint_0.19.0.py -vv',
-    'python /apps/hbp/ich002/home/antonel/simulation_launch_piz_daint_0.20.1.py -vv --sonata',
-    'python /apps/hbp/ich002/home/antonel/convert_blueconfig_to_simulationconfig.py',
+    'python3 /apps/hbp/ich002/home/antonel/create_replay_piz_daint_0.21.1.py -vv',
+    'python3 /apps/hbp/ich002/home/antonel/simulation_launch_piz_daint_0.21.1.py -vv --sonata',
+    'python3 /apps/hbp/ich002/home/antonel/convert_blueconfig_to_simulationconfig.py',
   ],
   runtime: 3600,
   nodes: 1,
   cpus: 36,
   executable: '/bin/bash input.sh',
   nodeType: 'mc',
-  genericSimulationConfig: Object.assign({}, genericSimulationConfig),
+  genericSimulationConfig: Object.assign({}, sonataGenericSimulationConfig),
 };
 
 const pizDaintMouseSSCxServiceAccount = {

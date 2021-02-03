@@ -43,7 +43,7 @@ const getHippocampusMoocConnections = biggestTarget => ([
     name: 'AMPA_NMDA',
     source: 'Excitatory',
     destination: biggestTarget,
-    synapseConfigure: '%s.NMDA_ratio = 1.22 tau_r_NMDA_ProbAMPANMDA_EMS = 3.9 tau_d_NMDA_ProbAMPANMDA_EMS = 148.5',
+    synapseConfigure: '%s.NMDA_ratio = 1.22 %s.tau_r_NMDA = 3.9 %s.tau_d_NMDA = 148.5',
     weight: null,
     spontMinis: null,
     delay: 0,

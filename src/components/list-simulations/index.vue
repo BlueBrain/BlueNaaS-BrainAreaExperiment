@@ -191,6 +191,7 @@ export default {
       const config = this.$store.state.fullConfig.analysisConfig;
       if (!config || (!config.script && !config.executable)) {
         this.$Message.error('Error launching analysis');
+        return;
       }
 
       await analysisHelper.submitAnalysis(

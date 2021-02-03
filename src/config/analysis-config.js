@@ -50,18 +50,22 @@ const configPerComputer = {
     ],
     executable: '/bin/bash input.sh',
   },
-  [circuits.HIPPO_MOOC_SA_MICROCIRCUIT + computers.SERVICE_ACCOUNT]: {
+  [computers.SERVICE_ACCOUNT + circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: {
     script: [
       '#!/bin/bash',
-      'export HDF5_USE_FILE_LOCKING=FALSE',
-      'export EMSIM="/apps/hbp/ich002/hbp-visualisation-deployements/spack/softwares/28-04-2020/install/install/cray-cnl7-haswell/intel-19.0.1.144/emsim-1.0.0-vbdt6g/bin/emsim"',
-      'module purge',
-      'module load PrgEnv-intel',
-      'module load daint-mc cray-python/3.6.5.7 PyExtensions/3.6.5.7-CrayGNU-19.10',
-      'module use /apps/hbp/ich002/hbp-spack-deployments/softwares/28-07-2020/install/modules/tcl/cray-cnl7-haswell',
+      'module swap PrgEnv-cray PrgEnv-intel',
+      'module load daint-mc cray-python/3.8.2.1 PyExtensions/python3-CrayGNU-20.08',
+      'module swap intel/19.1.1.217 intel/19.0.1.144',
+      'module use /apps/hbp/ich002/hbp-spack-deployments/softwares/12-02-2021/install/modules/tcl/cray-cnl7-haswell',
+      'module load emsim',
       'module load py-bluepysnap',
-      'python /apps/hbp/ich002/analysis/convert_blueconfig_to_simulationconfig_piz_daint_0.1.3.py -vv',
-      'python /apps/hbp/ich002/analysis/analysis_launch_snap_piz_daint_0.1.3.py -vv',
+      'export HDF5_USE_FILE_LOCKING=FALSE',
+      'export NEURON_INIT_MPI=1',
+      '# Avoid warnings during execution',
+      'export PMI_NO_FORK=1',
+      'export PMI_NO_PREINITIALIZE=1',
+      'export PMI_MMAP_SYNC_WAIT_TIME=300',
+      'python3 /apps/hbp/ich002/home/antonel/analysis_launch_piz_daint_0.21.3.py -vv',
     ],
     executable: '/bin/bash input.sh',
     nodeType: 'mc',
@@ -86,7 +90,7 @@ const analysisConfigMapping = {
   [computers.SERVICE_ACCOUNT]: {
     [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, configPerComputer[
       // very specific config for the sonata MOOC circuit
-      circuits.HIPPO_MOOC_SA_MICROCIRCUIT + computers.SERVICE_ACCOUNT
+      computers.SERVICE_ACCOUNT + circuits.HIPPO_MOOC_SA_MICROCIRCUIT
     ]),
     [circuits.HIPPO_HBP_SA_FULL_CA1]: Object.assign({}, configPerComputer[computers.PIZ_DAINT]),
     [circuits.SSCX_HBP_SA_MOUSE_MICROCIRCUIT]: Object.assign({}, configPerComputer[computers.SERVICE_ACCOUNT]),

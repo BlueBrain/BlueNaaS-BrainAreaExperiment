@@ -11,7 +11,7 @@ import store from '@/services/store';
 import db from '@/services/db';
 import { getDate3YearFromNow } from '@/common/utils';
 import { jobTags, addTag } from '@/common/job-status';
-import { errorMessages } from '@/common/constants';
+import { errorMessages, computers } from '@/common/constants';
 
 const NOT_FOUND = 404;
 
@@ -360,6 +360,12 @@ async function generateUnicoreConfig(configParams) {
     return memory ? `${memory}M` : null;
   }
 
+  function getCpus(nodes) {
+    // avoid error on piz_daint if send CPUs
+    if (configParams.computerSelected === computers.SERVICE_ACCOUNT) return null;
+    return nodes ? nodes * simStaticParams.cpus : null;
+  }
+
   const nodes = getNodes();
   // generate jobSpecs and remove the nulls
   return cleanDeep({
@@ -375,7 +381,7 @@ async function generateUnicoreConfig(configParams) {
       Memory: getMemory(),
       Queue: getPartition(),
       Project: configParams.accountSelected || null,
-      CPUs: nodes ? nodes * simStaticParams.cpus : null,
+      CPUs: getCpus(nodes),
       QoS: configParams.qos || simStaticParams.qos || null,
     },
     Tags: configParams.tags,

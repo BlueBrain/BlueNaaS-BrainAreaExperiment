@@ -1,0 +1,56 @@
+
+include: ci/object-storage.yaml
+
+variables:
+  DEV_CONTAINER: dev.simulationapp
+  PROD_CONTAINER: simulationapp
+  DIST_FOLDER: './dist'
+
+stages:
+  - build
+  - push
+
+# ===== development =====
+
+dev_build_npm:
+  stage: build
+  image: !reference [.object_storage, npm_image]
+  variables:
+    SENTRY_DSN: https://26c964f649434d6e9359204ea128dd0d@sentry.io/1382878
+    CURRENT_CONTAINER: $DEV_CONTAINER
+  script:
+    - !reference [.object_storage, build]
+  artifacts:
+    paths:
+      - "$DIST_FOLDER"
+    expire_in: 1 week
+
+dev_push_openstorage:
+  stage: push
+  image: !reference [.object_storage, python_image]
+  variables:
+    CURRENT_CONTAINER: $DEV_CONTAINER
+    HOST: bbpobjectstorage.epfl.ch
+    PORT: 443
+  script:
+    - !reference [.object_storage, deploy]
+  needs: [dev_build_npm]
+
+# ===== production =====
+
+prod_build_npm:
+  extends: dev_build_npm
+  only:
+    variables:
+      - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  variables:
+    CURRENT_CONTAINER: $PROD_CONTAINER
+
+prod_push_openstorage:
+  extends: dev_push_openstorage
+  only:
+    variables:
+      - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  variables:
+    CURRENT_CONTAINER: $PROD_CONTAINER
+  needs: [prod_build_npm]

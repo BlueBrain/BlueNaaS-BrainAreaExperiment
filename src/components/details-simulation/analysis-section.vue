@@ -201,7 +201,7 @@ export default {
         reader.onloadend = () => {
           let content = reader.result;
           if (content === '') { content = 'File is empty'; }
-          this.$set(childAnalysis, 'stderr', [content]);
+          this.$set(childAnalysis, 'stderr', content.split('\n'));
         };
       } catch (e) {
         this.$Message.error('Error retrieving the analysis log');

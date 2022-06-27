@@ -1,8 +1,8 @@
 
 const configHBP = {
   auth: {
-    clientId: 'c292031c-c91f-43fa-b1a9-72e65eb18e44',
-    authUrl: 'https://services.humanbrainproject.eu/oidc',
+    clientId: 'test-sim-ui-locally-1',
+    authUrl: 'https://iam.ebrains.eu/auth/realms/hbp',
   },
 };
 

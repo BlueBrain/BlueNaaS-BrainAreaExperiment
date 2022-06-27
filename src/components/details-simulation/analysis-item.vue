@@ -44,7 +44,7 @@
         <div
           v-else
           v-for="line in itemDetails.stderr"
-          :key="line"
+          :key="Math.random() + line"
         >{{ line }}</div>
       </div>
     </collapse-title>

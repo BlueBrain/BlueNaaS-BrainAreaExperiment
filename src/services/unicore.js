@@ -89,8 +89,8 @@ function actionJob(actionURL) {
   });
 }
 
-function getInfoByUrl(transferUrl) {
-  return axiosInstance.get(transferUrl);
+function getInfoByUrl(url) {
+  return axiosInstance.get(url);
 }
 
 function urlToComputerAndId(jobURL) {
@@ -165,7 +165,10 @@ async function getAllJobs(computer) {
 async function getSimUrls(computer, circuit) {
   const unicoreURL = getComputerUrl(computer);
   // get sims only for this specific circuit
-  const queryStr = `tags=${jobTags.SIMULATION},${circuit}`;
+  const tagList = [jobTags.SIMULATION, circuit];
+  if (jobTags.UNICORE_MODE_TAG) tagList.push(jobTags.UNICORE_MODE_TAG);
+
+  const queryStr = `tags=${tagList.join(',')}`;
   let response;
   try {
     // retrieve the simulations with tags
@@ -366,6 +369,10 @@ async function generateUnicoreConfig(configParams) {
     return nodes ? nodes * simStaticParams.cpus : null;
   }
 
+  function getAccount() {
+    return configParams.accountSelected || null;
+  }
+
   const nodes = getNodes();
   // generate jobSpecs and remove the nulls
   return cleanDeep({
@@ -380,7 +387,7 @@ async function generateUnicoreConfig(configParams) {
       NodeConstraints: simStaticParams.nodeType,
       Memory: getMemory(),
       Queue: getPartition(),
-      Project: configParams.accountSelected || null,
+      Project: getAccount(),
       CPUs: getCpus(nodes),
       QoS: configParams.qos || simStaticParams.qos || null,
     },
@@ -506,6 +513,7 @@ function importPersonalSimulation(title, simFolderPath, account = null) {
   addTag(config, jobTags.SIMULATION);
   addTag(config, store.state.fullConfig.circuitName);
   addTag(config, jobTags.SIMULATION_IMPORTED);
+  addTag(config, jobTags.UNICORE_MODE_TAG);
 
   return submitJob(config);
 }
@@ -552,4 +560,5 @@ export {
   populateJobsUrlWithFiles,
   axiosInstance,
   setAxiosToken,
+  getJobPhysicalLocation,
 };

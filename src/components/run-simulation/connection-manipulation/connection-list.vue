@@ -124,10 +124,9 @@ This component allows to create or modify the connections in the circuit for the
 
 <script>
 import cleanDeep from 'clean-deep';
-import uuidGen from 'uuid';
 import AutocompleteTargets from '@/components/shared/autocomplete-targets.vue';
 import SynapseConfigurator from '@/components/run-simulation/connection-manipulation/synapse-configurator.vue';
-import { mapBlueConfigTerms } from '@/common/utils';
+import { mapBlueConfigTerms, getUuid } from '@/common/utils';
 import eventBus from '@/services/event-bus';
 import { saveParamNames } from '@/common/constants';
 import db from '@/services/db';
@@ -222,7 +221,7 @@ export default {
   methods: {
     addNewConnection() {
       this.connectionsArray.push({
-        id: uuidGen(),
+        id: getUuid(),
       });
     },
     removeConnection(index) {
@@ -250,7 +249,7 @@ export default {
           this.$Message.warning(warning);
         }
         if (prunedConnections[name]) { // avoid overwrite existing connection
-          name = `${name}-${uuidGen()}`;
+          name = `${name}-${getUuid()}`;
         }
         prunedConnections[name] = cleanDeep(conn);
       });

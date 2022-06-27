@@ -4,7 +4,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import findKey from 'lodash/findKey';
 import partial from 'lodash/partial';
 import isEqual from 'lodash/isEqual';
-
+import { v4 as uuidv4 } from 'uuid';
 import store from '@/services/store';
 import targetsMapping from '@/common/targets-mapping';
 
@@ -114,6 +114,10 @@ function pointIsValid(point) {
   return isValid;
 }
 
+function getUuid() {
+  return uuidv4();
+}
+
 export {
   convertToBCFormat,
   openContent,
@@ -123,4 +127,5 @@ export {
   getComputerProjectCircuitCombo,
   getDate3YearFromNow,
   pointIsValid,
+  getUuid,
 };

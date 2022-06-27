@@ -88,7 +88,7 @@
 
 
 <script>
-import uuidGen from 'uuid';
+import { getUuid } from '@/common/utils';
 import { synapseAttributes } from '@/config/connection-config';
 import { synapseStringToArray, synapseArrayToString } from '@/services/helper/connection-helper';
 
@@ -113,9 +113,9 @@ export default {
     },
     addNewSynapseAttribute() {
       this.synapseConfigList.push({
-        attr: synapseAttributes[0],
+        attr: synapseAttributes.scoped[0],
         value: 0,
-        uuid: uuidGen(),
+        uuid: getUuid(),
       });
     },
     removeSynapseAttr(index) {

@@ -26,8 +26,7 @@
       :show-modal="showComputerParamsModal"
       :is-launching-sim="isLaunchingSim"
       @preview-blueconfig="previewBlueConfig"
-      @closeModal="showComputerParamsModal = false"
-      @close-modal="showComputerParamsModal = false"
+      @close-modal="closeUnicoreModal"
       @run-simulation="runSimulation"
     />
     <!-- END template for configuration -->
@@ -80,6 +79,11 @@ export default {
       const tipElement = this.$el.querySelector('#tip');
       tipElement.classList.add('hidden');
       localStorage.setItem('hideTip', true);
+    },
+
+    closeUnicoreModal() {
+      this.showComputerParamsModal = false;
+      this.isLaunchingSim = false;
     },
 
     async configureSimulation() {
@@ -145,6 +149,7 @@ export default {
       addTag(unicoreConfig, jobTags.SIMULATION);
       addTag(unicoreConfig, jobTags.LFP_SIMULATION);
       addTag(unicoreConfig, this.$store.state.fullConfig.circuitName);
+      addTag(unicoreConfig, jobTags.UNICORE_MODE_TAG);
     },
 
     async runSimulation(unicoreConfig) {

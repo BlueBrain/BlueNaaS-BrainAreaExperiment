@@ -1,5 +1,5 @@
 
-import uuidGen from 'uuid';
+import { getUuid } from '@/common/utils';
 import connectionsConfig from '@/config/connection-config';
 
 const { getDefaultConnections } = connectionsConfig;
@@ -21,7 +21,7 @@ function synapseStringToArray(synapseText) {
       synapseConfigList.push({
         attr: matches[2] || matches[1],
         value: parseFloat(matches[3]),
-        uuid: uuidGen(),
+        uuid: getUuid(),
       });
     }
     matches = regex.exec(synapseText);

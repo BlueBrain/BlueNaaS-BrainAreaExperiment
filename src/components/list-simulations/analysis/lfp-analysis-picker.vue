@@ -105,8 +105,7 @@
 
 
 <script>
-import uuidGen from 'uuid';
-import { pointIsValid } from '@/common/utils';
+import { pointIsValid, getUuid } from '@/common/utils';
 
 const maxUploadFileSize = 400;
 
@@ -209,7 +208,7 @@ export default {
     },
     addNewPoint(pointStr) {
       const newPoint = {
-        index: uuidGen(),
+        index: getUuid(),
         value: pointStr || '360.0, 330.0, 630.0',
         isValid: true,
       };

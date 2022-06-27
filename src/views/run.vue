@@ -151,6 +151,7 @@ export default {
       addTag(newRunConfig, jobTags.SIMULATION);
       // add from which circuit this simulation was launched
       addTag(newRunConfig, this.$store.state.fullConfig.circuitName);
+      addTag(newRunConfig, jobTags.UNICORE_MODE_TAG);
       let submittedJob;
       try {
         submittedJob = await unicore.submitJob(newRunConfig, files);

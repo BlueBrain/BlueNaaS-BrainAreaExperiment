@@ -260,13 +260,15 @@ export default {
   methods: {
     fillJobs(job) {
       const details = {};
-      details.status = job.status;
+      // Loading until the "simulationProducedResults" was performed
+      details.status = isRunning(job.status) ? job.status : jobStatus.LOADING;
       details.id = job._links.self.href.split('/').pop();
       details.name = job.name;
       details.url = job._links.self.href;
       details.workingDirectory = job._links.workingDirectory.href;
       details.submissionTime = job.submissionTime;
       details.type = 'Simulation';
+      details.log = job.log;
 
       this.simulationDetails = details;
     },
@@ -357,6 +359,7 @@ export default {
         if (this.job.children || this.job.status !== jobStatus.SUCCESSFUL) {
           // pass children so if it has reports show the viz button
           this.simulationDetails.children = this.job.children;
+          this.$set(this.simulationDetails, 'status', this.job.status);
           return;
         }
         const [simulationWithFiles] = await unicore.populateJobsUrlWithFiles([this.job._links.self.href]);
@@ -368,13 +371,14 @@ export default {
           // this wlll upload the simulationWasSuccessful and show the analysis and viz buttons
           this.$set(this.job, 'children', simulationWithFiles.children);
           this.$set(this.simulationDetails, 'children', simulationWithFiles.children);
+          this.$set(this.simulationDetails, 'status', this.job.status);
         }
         db.addJob(simulationWithFiles);
       }
     },
 
     async parseUnicoreFiles() {
-      const url = `${this.simulationDetails.workingDirectory}/files/`;
+      const url = `${this.simulationDetails.workingDirectory}/files`;
       const filesList = await unicore.getFilesWithSizes(url);
       this.$set(this.parsedFiles, 'unicoreSimulationFiles', filesList);
       const physicalLocation = unicore.getJobPhysicalLocation(this.job.log);

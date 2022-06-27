@@ -1,18 +1,23 @@
 
 import Vue from 'vue';
-import * as Sentry from '@sentry/browser';
-import * as Integrations from '@sentry/integrations';
+import * as Sentry from '@sentry/vue';
+import { BrowserTracing } from '@sentry/tracing';
 
 const sentryDsn = process.env.VUE_APP_SENTRY_DSN;
 
 if (sentryDsn) {
   Sentry.init({
+    Vue,
     dsn: sentryDsn,
     integrations: [
-      new Integrations.Vue({
-        Vue,
-        attachProps: true,
+      new BrowserTracing({
+        tracingOrigins: [
+          'localhost',
+          'simulation-launcher-bsp-epfl.apps.hbp.eu',
+          /^\//,
+        ],
       }),
     ],
+    tracesSampleRate: 0.2,
   });
 }

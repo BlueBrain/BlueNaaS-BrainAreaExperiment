@@ -27,7 +27,7 @@
         />
       </form-item>
 
-      <form-item prop="computer" class="uppercase">
+      <form-item prop="computer" class="uppercase" v-if="!computerIsHidden">
         <tooltip
           slot="label"
           content="Supercomputer"
@@ -174,6 +174,9 @@ export default {
       },
 
       accountIsHidden: true,
+      computerIsHidden: true,
+      groupIsHidden: true,
+
       groupsFetched: false,
       projectsAvailable: [],
 

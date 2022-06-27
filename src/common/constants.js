@@ -46,6 +46,7 @@ const storageConstants = {
   COMPUTER_PREFIX: 'user-computer',
   GROUP_PREFIX: 'user-group',
   MAPPING_PREFIX: 'computer-group-mapping',
+  AUTH: 'auth',
 };
 
 const errorMessages = {

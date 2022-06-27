@@ -8,7 +8,7 @@ import prettyBytes from 'pretty-bytes';
 
 import computeProvider from '@/common/compute-provider.json';
 import store from '@/services/store';
-import db from '@/services/db';
+import db, { getAuth } from '@/services/db';
 import { getDate3YearFromNow } from '@/common/utils';
 import { jobTags, addTag } from '@/common/job-status';
 import { errorMessages, computers } from '@/common/constants';
@@ -61,6 +61,8 @@ function init() {
         newConfig.cancelToken = cancelToken;
       }
     }
+
+    newConfig.headers.Authorization = getAuth();
 
     return newConfig;
   }, error => error);
@@ -370,6 +372,9 @@ async function generateUnicoreConfig(configParams) {
   }
 
   function getAccount() {
+    if (store.state.fullConfig.computer === computers.BB5) {
+      return configParams.accountSelected || simStaticParams.account;
+    }
     return configParams.accountSelected || null;
   }
 
@@ -382,7 +387,6 @@ async function generateUnicoreConfig(configParams) {
     haveClientStageIn: 'true',
     Resources: {
       Nodes: nodes,
-      CPUsPerNode: simStaticParams.cpus,
       Runtime: configParams.runtime,
       NodeConstraints: simStaticParams.nodeType,
       Memory: getMemory(),
@@ -524,6 +528,13 @@ function getHttpReqSource() {
   return httpReqSource;
 }
 
+async function tokenIsValid() {
+  const computerEndpoint = getComputerUrl(store.state.fullConfig.computer);
+  const info = await axiosInstance(computerEndpoint);
+  if (!info || info.status !== 200) throw new Error();
+  return true;
+}
+
 export default {
   axiosInstance,
   getAssociatedLocation,
@@ -559,6 +570,7 @@ export {
   importPersonalSimulation,
   populateJobsUrlWithFiles,
   axiosInstance,
+  tokenIsValid,
   setAxiosToken,
   getJobPhysicalLocation,
 };

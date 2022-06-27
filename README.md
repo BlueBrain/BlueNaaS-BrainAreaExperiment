@@ -20,6 +20,14 @@ This app is deployed in [OpenShift](https://simulation-launcher-bsp-epfl.apps.hb
   * Type `docker login docker-registry.ebrains.eu`
 * Push image `docker push docker-registry.ebrains.eu/bsp-epfl/sim-launcher:ebrains`
 
+### MOOC BBP specific info
+For this MOOC in BBP infrastructure, we have a specific branch `mooc-bbp` because this app is different from the original one.
+Some of the changes are:
+- Use VMM - LTI authentication
+- Show token expiration page when VMM fails
+- Dedicated plan to deploy in Openshift (https://bbpgitlab.epfl.ch/nse/simulation-launcher-ui/-/jobs/29876)
+- Dedicated deployment (https://ocp.bbp.epfl.ch:8443/console/project/bbp-ou-nse/browse/dc/mooc-sim-launcher?tab=history)
+
 ### Generate the documentation
 ``` npm run jsdoc ```
 

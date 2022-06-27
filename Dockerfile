@@ -3,13 +3,14 @@ FROM --platform=linux/amd64 node:14-alpine as builder
 RUN mkdir /frontend
 WORKDIR /frontend
 
-COPY package.json vue.config.js ./
+COPY package.json vue.config.js babel.config.js ./
 RUN npm install
 
 COPY src ./src
 COPY public ./public
-
-RUN npm run build
+COPY .env* ./
+ARG BUILD_MODE=development
+RUN npm run build -- --mode $BUILD_MODE
 
 FROM --platform=linux/amd64 nginx:alpine
 

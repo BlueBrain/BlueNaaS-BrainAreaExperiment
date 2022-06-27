@@ -10,7 +10,7 @@ This component will be the frame for view the simulations.
         @update-filters="updateFilters"
       />
 
-      <div class="grow-space"/>
+      <div class="grow-space" />
 
       <import-simulation
         class="margined-right"

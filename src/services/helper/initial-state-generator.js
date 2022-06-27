@@ -6,7 +6,10 @@ import circuitsFile from '@/config/circuit-config';
 import { getProjectionConfig } from '@/config/projection-config';
 import { getConnections } from '@/config/connection-config';
 import '@/services/helper/computer-group-helper';
-import { getSavedComputerAndMappings } from '@/services/db';
+import {
+  getSavedComputerAndMappings, setAuth, getAuth,
+} from '@/services/db';
+import { storageConstants } from '@/common/constants';
 import * as dynamicCircuitHelper from '@/services/helper/dynamic-circuit-loader-helper';
 
 let circuitToUse;
@@ -106,11 +109,21 @@ class CurrentFullConfig {
   }
 }
 
+function setupVmmAuth() {
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const vmmAuth = urlSearchParams.get(storageConstants.AUTH);
+  if (!vmmAuth) return;
+
+  const savedUser = getAuth();
+  if (savedUser !== vmmAuth) setAuth(vmmAuth);
+}
+
 function setupInitialStates() {
   // define circuit based on URL
   circuitToUse = dynamicCircuitHelper.getCircuitName();
   if (!circuitToUse) console.error('Specify /circuits in url');
 
+  setupVmmAuth();
   dynamicCircuitHelper.setup();
 
   const fullConfig = dynamicCircuitHelper.mergeConfigWithQueryParams(circuitToUse);

@@ -1,8 +1,13 @@
+include:
+  - project: cs/gitlabci-templates
+    file: /build-image-using-kaniko.yml
 image: node:alpine
 
 variables:
   KUBERNETES_MEMORY_REQUEST: 2Gi
   KUBERNETES_MEMORY_LIMIT: 4Gi
+  CI_REGISTRY_IMAGE: $CI_REGISTRY/nse/simulation-launcher-ui
+  CI_PROJECT_DIR: /builds/nse/simulation-launcher-ui
 
 lint:
   script:
@@ -10,3 +15,19 @@ lint:
     - npm run lint
     - export NODE_OPTIONS=--openssl-legacy-provider
     - npm run build
+
+docker-publish-image-prod:
+  extends: .build-image-using-kaniko
+  variables:
+    REGISTRY_IMAGE_TAG: mooc-bbp
+    KANIKO_EXTRA_ARGS: --build-arg BUILD_MODE=production
+  rules:
+    - if: $CI_COMMIT_BRANCH == "mooc-bbp"
+
+docker-publish-image-dev:
+  extends: .build-image-using-kaniko
+  variables:
+    REGISTRY_IMAGE_TAG: mooc-bbp-dev
+    KANIKO_EXTRA_ARGS: --build-arg BUILD_MODE=development
+  rules:
+    - if: $CI_COMMIT_BRANCH != "mooc-bbp" && $CI_PIPELINE_SOURCE == "merge_request_event"

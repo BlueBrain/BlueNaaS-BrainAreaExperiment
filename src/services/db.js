@@ -104,6 +104,13 @@ function setSavedComputerAndMappings(computer, currentGroup, groupsAvailable) {
   localStorage.setItem(`${storageConstants.MAPPING_PREFIX}-${circuit}`, `${computer}-${groupsAvailable}`);
 }
 
+export function setAuth(userAuth) {
+  localStorage.setItem(storageConstants.AUTH, userAuth);
+}
+
+export function getAuth() {
+  return localStorage.getItem(storageConstants.AUTH);
+}
 
 export default {
   addJob,

@@ -1,3 +1,6 @@
+
+const unicoreModeTag = process.env.VUE_APP_UNICORE_MODE_TAG || '';
+
 const jobStatus = {
   SUCCESSFUL: 'SUCCESSFUL',
   RUNNING: 'RUNNING',
@@ -19,6 +22,7 @@ const jobTags = {
   LFP_ANALYSIS: 'lfp_analysis',
   SIMULATION_IMPORTED: 'simulation_imported',
   OTHER: 'other',
+  UNICORE_MODE_TAG: unicoreModeTag,
 };
 
 const iconMap = {
@@ -60,6 +64,7 @@ function getStatusIcon(status) {
 }
 
 function addTag(obj, tag) {
+  if (!tag) return;
   const newTags = obj.tags || [];
   if (newTags.includes(tag)) return;
   newTags.push(tag);

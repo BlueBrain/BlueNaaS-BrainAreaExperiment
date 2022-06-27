@@ -12,6 +12,8 @@ if (sentryDsn) {
     integrations: [
       new BrowserTracing({
         tracingOrigins: [
+          'bbp-mooc-sim-neuro.epfl.ch',
+          'bbp-mooc-sim-neuro-dev.epfl.ch',
           'localhost',
           'simulation-launcher-bsp-epfl.apps.hbp.eu',
           /^\//,

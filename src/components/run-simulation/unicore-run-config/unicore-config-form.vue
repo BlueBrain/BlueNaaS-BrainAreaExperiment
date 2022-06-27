@@ -43,7 +43,7 @@
         </i-select>
       </form-item>
 
-      <form-item prop="group">
+      <form-item prop="group" v-if="!groupIsHidden">
         <tooltip
           slot="label"
           content="Name of the group to run jobs"

@@ -33,6 +33,8 @@ const runSectionDefaults = {
   ForwardSkip: 5000,
   Dt: '0.025',
   BaseSeed: '10',
+  Simulator: 'NEURON',
+  RunMode: 'LoadBalance',
 };
 
 const objectStorageBaseURL = 'https://bbp.epfl.ch/public/bsp-resources/sim-launcher-ui';

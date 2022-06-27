@@ -24,6 +24,8 @@ const config = {
     'input.sh',
   ],
   jobNamePrefix: 'Visualization of',
+  blueConfigQuery: 'load',
+  authQuery: 'auth',
 };
 
 export default config;

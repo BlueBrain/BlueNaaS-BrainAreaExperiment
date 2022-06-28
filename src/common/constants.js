@@ -1,9 +1,8 @@
 
 const computers = {
-  BB5: 'bb5',
-  JURECA: 'jureca',
   PIZ_DAINT: 'piz_daint',
   SERVICE_ACCOUNT: 'service_account',
+  BB5_MOOC: 'bb5_mooc',
 };
 
 const circuits = {
@@ -15,8 +14,8 @@ const circuits = {
   HIPPO_BBP_MICROCIRCUIT: 'hippo_bbp_microcircuit',
   SSCX_BBP_MICROCIRCUIT: 'sscx_bbp_microcircuit',
   SSCX_HBP_SA_MOUSE_MICROCIRCUIT: 'sscx_hbp_sa_mouse_microcircuit',
-  HBP_DYNAMIC_CIRCUIT: 'bbp_dynamic_circuit',
-  BBP_DYNAMIC_CIRCUIT: 'hbp_dynamic_circuit',
+  HBP_DYNAMIC_CIRCUIT: 'hbp_dynamic_circuit',
+  BB5_MOOC: 'bb5_mooc',
 };
 
 const saveParamNames = {

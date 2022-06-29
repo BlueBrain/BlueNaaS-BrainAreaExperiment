@@ -188,6 +188,7 @@ export default {
           tooltip: 'The Poisson mean rate for miniature events',
 
         },
+        // TODO: for mooc remove this
         {
           title: 'Synapse Configuration',
           slot: 'synapseConfigure',

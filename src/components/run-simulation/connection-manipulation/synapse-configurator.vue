@@ -48,6 +48,7 @@
                     :key="item"
                   >{{ item }}</i-option>
               </option-group>
+              <!-- TODO check this one -->
               <option-group label="Globals">
                   <i-option
                     v-for="item in synapseAttributes.global"

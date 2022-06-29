@@ -286,6 +286,7 @@ function getDefaultConnections(computer, circuit) {
   return getConnectionConfig(computer, circuit)();
 }
 
+// TODO: check this in ebrians and mooc are diff
 const synapseAttributes = {
   scoped: [
     'tau_d_AMPA', 'Use', 'Dep', 'Fac', 'mg', 'mggate', 'gmax', 'u0', 'NMDA_ratio',

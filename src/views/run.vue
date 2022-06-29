@@ -131,6 +131,7 @@ export default {
       const newRunConfig = runConfig;
       const simResources = this.$store.state.fullConfig.simulationConfig;
       const files = [{ To: 'BlueConfig', Data: blueConfigStr }];
+      // TODO bbp only const not let script
       let { script } = simResources;
       if (script) {
         script = script.join('\n');

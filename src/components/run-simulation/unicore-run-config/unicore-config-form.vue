@@ -314,6 +314,7 @@ export default {
       }
       this.runParameters = savedConfig;
 
+      // TODO: for mooc remove this
       this.loadAccount(savedConfig.computerSelected);
       this.refreshUnicoreProjects(savedConfig.computerSelected);
 

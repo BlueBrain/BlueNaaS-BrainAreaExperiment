@@ -1,6 +1,5 @@
 
 import { computers, analysis, circuits } from '@/common/constants';
-import { copyToDestinationScript, copyFromDestinationScript } from '@/common/bbp-unicore-move-script';
 
 const defaultConfig = {
   script: [

@@ -4,12 +4,6 @@ import connectionsConfig from '@/config/connection-config';
 
 const { getDefaultConnections } = connectionsConfig;
 
-const allAttributesObj = connectionsConfig.synapseAttributes;
-
-function isGlobalAttr(synAttr) {
-  return allAttributesObj.global.includes(synAttr);
-}
-
 function synapseStringToArray(synapseText) {
   if (!synapseText) return [];
   // get ranged or global attributes
@@ -31,7 +25,7 @@ function synapseStringToArray(synapseText) {
 
 function synapseArrayToString(synapsesArray) {
   const synapseString = synapsesArray.reduce((result, synapseParam) => {
-    const prefix = isGlobalAttr(synapseParam.attr) ? '' : '%s.';
+    const prefix = '%s.';
     const configuration = `${prefix}${synapseParam.attr} = ${synapseParam.value} `;
     return `${result}${configuration}`;
   }, '');

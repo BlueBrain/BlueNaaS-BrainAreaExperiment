@@ -82,6 +82,13 @@ function getComputerUrl(computerName) {
   return get(getComputeProviders(), `[${computerName.toUpperCase()}].url`);
 }
 
+function getImportUrl(computerName) {
+  const computeUrl = computerName === computers.SERVICE_ACCOUNT
+    ? getComputerUrl(computers.PIZ_DAINT)
+    : getComputerUrl(computerName);
+  return `${computeUrl}/storages`;
+}
+
 function actionJob(actionURL) {
   // initiate some actions like start, restart, abort
   return axiosInstance({
@@ -342,6 +349,9 @@ async function generateUnicoreConfig(configParams) {
   const simStaticParams = store.state.fullConfig.simulationConfig;
 
   function getPartition() {
+    if (configParams.computerSelected === computers.PIZ_DAINT) {
+      return 'normal';
+    }
     function filterPartition(partitionsMap, userGroup) {
       const partitions = Object.keys(partitionsMap);
       const selectedProject = partitions.find(partition => userGroup.includes(partition));
@@ -365,15 +375,12 @@ async function generateUnicoreConfig(configParams) {
     return memory ? `${memory}M` : null;
   }
 
-  function getCpus(nodes) {
-    // avoid error on piz_daint if send CPUs
-    if (configParams.computerSelected === computers.SERVICE_ACCOUNT) return null;
-    return nodes ? nodes * simStaticParams.cpus : null;
-  }
-
   function getAccount() {
     if (store.state.fullConfig.computer === computers.BB5_MOOC) {
       return configParams.accountSelected || simStaticParams.account;
+    }
+    if (configParams.computerSelected === computers.PIZ_DAINT) {
+      return 'ich002';
     }
     return configParams.accountSelected || null;
   }
@@ -392,7 +399,6 @@ async function generateUnicoreConfig(configParams) {
       Memory: getMemory(),
       Queue: getPartition(),
       Project: getAccount(),
-      CPUs: getCpus(nodes),
       QoS: configParams.qos || simStaticParams.qos || null,
     },
     Tags: configParams.tags,
@@ -563,6 +569,7 @@ export default {
   getFilesWithSizes,
   getJobPhysicalLocation,
   generateUnicoreConfig,
+  getImportUrl,
 };
 
 export {

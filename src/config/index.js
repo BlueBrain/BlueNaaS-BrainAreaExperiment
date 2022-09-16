@@ -2,7 +2,7 @@ import { computers } from '@/common/constants';
 
 export const configHBP = {
   auth: {
-    clientId: 'test-sim-ui-locally-1',
+    clientId: 'ebrains-sim-ui',
     authUrl: 'https://iam.ebrains.eu/auth/realms/hbp',
   },
 };

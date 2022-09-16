@@ -59,12 +59,11 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
 
   // get all the files to be copied
   const filesToCopy = await getFilesToCopy(`${newAnalysisAndTransferInfo.from.workingDirectory}/files`);
-  const computeUrl = unicore.getComputerUrl(computer);
-  const originalSM = computeUrl.replace('rest/core', 'services/StorageManagement?res=');
+  const originalStorage = unicore.getImportUrl(computer);
   const originalWorkId = newAnalysisAndTransferInfo.from.workingDirectory.split('/').pop();
 
   const imports = filesToCopy.map(fileName => ({
-    From: `BFT:${originalSM}${originalWorkId}#/${fileName}`,
+    From: `${originalStorage}/${originalWorkId}/files/${fileName}`,
     To: fileName,
   }));
   newAnalysisAndTransferInfo.imports = imports;

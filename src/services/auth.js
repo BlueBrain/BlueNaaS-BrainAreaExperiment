@@ -40,6 +40,7 @@ function createAuthConfig() {
     automaticSilentRenew: true,
     loadUserInfo: false,
     extraQueryParams: actualAuthProvider.auth.request,
+    scope: 'email profile openid',
   };
   return oidcConfig;
 }

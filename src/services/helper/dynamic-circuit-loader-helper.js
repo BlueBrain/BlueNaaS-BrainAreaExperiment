@@ -8,7 +8,7 @@ import { circuits } from '@/common/constants';
 
 let queryConfig = null;
 const genericQueryParamsRegexp = new RegExp('#.+\\?(.+)');
-const dynamicCircuitsRegexp = `(?:${circuits.HBP_DYNAMIC_CIRCUIT}|${circuits.BBP_DYNAMIC_CIRCUIT})`;
+const dynamicCircuitsRegexp = `(?:${circuits.HBP_DYNAMIC_CIRCUIT})`;
 const dynamicQueryParamsRegexp = new RegExp(`#.+${dynamicCircuitsRegexp}[\\/\\-\\w]*\\?(.+)`);
 
 function isDynamicCircuit() {

@@ -1,6 +1,6 @@
 
 import Oidc from 'oidc-client';
-import { setAxiosToken, axiosInstance } from '@/services/unicore';
+import { setAxiosToken } from '@/services/unicore';
 import store from '@/services/store';
 import { configHBP, configBBP } from '@/config';
 import { errorMessages } from '@/common/constants';
@@ -88,30 +88,6 @@ function init() {
   return login(authMgr);
 }
 
-async function getUserInfo() {
-  const actualAuthProvider = getActualAuthProvider();
-  const info = await axiosInstance.get(actualAuthProvider.userEndpoint);
-  if (!info) return null;
-  return info.data;
-}
-
-async function getUserProjects() {
-  const userInfo = await getUserInfo();
-  const projectPrefix = '/bbp-dev-proj';
-  const regexp = `${projectPrefix}(\\d+)`;
-
-  const projects = userInfo.groups
-    .filter(g => g.startsWith(projectPrefix))
-    .map((groupString) => {
-      const match = groupString.match(regexp);
-      if (!match || !match.length) return false;
-      return `proj${match[1]}`;
-    })
-    .filter(group => group);
-  return projects;
-}
-
 export default {
   init,
-  getUserProjects,
 };

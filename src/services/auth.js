@@ -1,15 +1,18 @@
 
 import Oidc from 'oidc-client';
-import { setAxiosToken } from '@/services/unicore';
+import { setAxiosToken, tokenIsValid } from '@/services/unicore';
 import store from '@/services/store';
 import { configHBP, configBBP } from '@/config';
-import { errorMessages } from '@/common/constants';
+import { errorMessages, computers } from '@/common/constants';
 import {
   isDynamicCircuit,
   saveAndRemoveQueries,
   showErrorPage,
   getCircuitName,
+  restoreQueries,
 } from '@/services/helper/dynamic-circuit-loader-helper';
+import { getAuth } from '@/services/db';
+import initialStateGenerator from '@/services/helper/initial-state-generator';
 
 
 function windowSignin(authMgr) {
@@ -68,6 +71,12 @@ function loginCallback() {
     .then(user => setToken(user.access_token));
 }
 
+function checkToken() {
+  const token = getAuth();
+  store.commit('setToken', token);
+  return tokenIsValid();
+}
+
 function init() {
   if (window.location.hash.includes('/login')) {
     return loginCallback();
@@ -81,6 +90,14 @@ function init() {
   if (isDynamicCircuit() && !hadQueryParams) {
     showErrorPage(errorMessages.NO_QUERY_PARAMS);
     return Promise.reject(new Error(errorMessages.NO_QUERY_PARAMS));
+  }
+
+  restoreQueries();
+  const fullConfig = initialStateGenerator.setupInitialStates();
+  store.commit('setCurrentSimulationConfig', fullConfig);
+
+  if (fullConfig.computer === computers.BB5_MOOC) {
+    return checkToken();
   }
 
   const oidcConfig = createAuthConfig();

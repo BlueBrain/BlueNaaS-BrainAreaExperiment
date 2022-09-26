@@ -6,7 +6,7 @@ import map from 'lodash/map';
 import cleanDeep from 'clean-deep';
 import prettyBytes from 'pretty-bytes';
 
-import computeProvider from '@/common/compute-provider.json';
+import computeProvider from '@/common/compute-provider';
 import store from '@/services/store';
 import db, { getAuth } from '@/services/db';
 import { getDate3YearFromNow } from '@/common/utils';
@@ -530,7 +530,9 @@ function getHttpReqSource() {
 
 async function tokenIsValid() {
   const computerEndpoint = getComputerUrl(store.state.fullConfig.computer);
-  const info = await axiosInstance(computerEndpoint);
+  const info = await axiosInstance(computerEndpoint).catch(() => {
+    throw Error(errorMessages.EDX_TOKEN_EXPIRED);
+  });
   if (!info || info.status !== 200) throw new Error();
   return true;
 }

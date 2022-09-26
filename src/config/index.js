@@ -1,20 +1,19 @@
+import { computers } from '@/common/constants';
 
-const configHBP = {
+export const configHBP = {
   auth: {
     clientId: 'test-sim-ui-locally-1',
     authUrl: 'https://iam.ebrains.eu/auth/realms/hbp',
   },
 };
 
-const configBBP = {
+export const configBBP = {
   auth: {
     clientId: 'sim-launcher-ui-unicore',
     authUrl: 'https://bbpauth.epfl.ch/auth/realms/BBP',
   },
   userEndpoint: 'https://bbpauth.epfl.ch/auth/realms/BBP/protocol/openid-connect/userinfo',
+  computerName: computers.BB5_MOOC,
 };
 
-export {
-  configHBP,
-  configBBP,
-};
+export default configBBP;

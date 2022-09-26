@@ -16,7 +16,7 @@ const config = {
     name: 'MOOC Piz Daint Service Account',
     id: 'service_account',
     url: 'https://bspsa.cineca.it/advanced/pizdaint/rest/core',
-  }
+  },
 };
 
 export default config;

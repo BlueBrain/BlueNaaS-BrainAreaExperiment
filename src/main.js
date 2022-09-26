@@ -11,9 +11,6 @@ import router from '@/services/router';
 import store from '@/services/store';
 import '@/common/sentry';
 import { errorMessages } from '@/common/constants';
-import initialStateGenerator from '@/services/helper/initial-state-generator';
-import { restoreQueries } from '@/services/helper/dynamic-circuit-loader-helper';
-
 
 Vue.config.productionTip = false;
 
@@ -28,31 +25,43 @@ const app = new Vue({
   render: h => h(App),
 });
 
+function processErrors(message) {
+  switch (message) {
+    case errorMessages.NO_SESSION_ENDPOINT:
+      console.debug('No session. Reloading window');
+      window.location.reload();
+      break;
+    case errorMessages.REDIRECT_LOGIN_REQUIRED:
+      console.debug('Redirect login in progress');
+      break;
+    case errorMessages.NO_QUERY_PARAMS:
+      console.debug('Query params not provided for dynamic circuit');
+      break;
+    default:
+      console.warn('General error:', message);
+      break;
+  }
+}
+
+function showErrorPage() {
+  const container = document.getElementById('noAuth');
+  container.setAttribute('style', 'display: block');
+  const spinnerContainer = document.getElementById('loading-component');
+  spinnerContainer.setAttribute('style', 'display: none');
+}
+
 auth.init()
   .then((response) => {
     if (response === errorMessages.IS_INDEX) {
       app.$mount('#app');
-    } else {
-      restoreQueries();
-      const fullConfig = initialStateGenerator.setupInitialStates();
-      store.commit('setCurrentSimulationConfig', fullConfig);
-      app.$mount('#app');
+      return;
     }
+    app.$mount('#app');
   })
   .catch((e) => {
-    switch (e.message) {
-      case errorMessages.NO_SESSION_ENDPOINT:
-        console.debug('No session. Reloading window');
-        window.location.reload();
-        break;
-      case errorMessages.REDIRECT_LOGIN_REQUIRED:
-        console.debug('Redirect login in progress');
-        break;
-      case errorMessages.NO_QUERY_PARAMS:
-        console.debug('Query params not provided for dynamic circuit');
-        break;
-      default:
-        console.warn('General error:', e);
-        break;
+    if (e.message === errorMessages.EDX_TOKEN_EXPIRED) {
+      showErrorPage();
+      return;
     }
+    processErrors(e.message);
   });

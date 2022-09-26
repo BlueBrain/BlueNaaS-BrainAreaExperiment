@@ -22,7 +22,7 @@ function windowSignin(authMgr) {
 
 function getActualAuthProvider() {
   // TOOD improve this detection
-  const isBBP = getCircuitName().includes('bbp_');
+  const isBBP = getCircuitName().includes(computers.BB5_MOOC);
   const actualAuthProvider = isBBP ? configBBP : configHBP;
   return actualAuthProvider;
 }
@@ -82,7 +82,7 @@ function init() {
     return loginCallback();
   }
 
-  const isIndex = window.location.hash === '#/';
+  const isIndex = window.location.hash === '#/' || window.location.pathname === '/';
   if (isIndex) { return Promise.resolve(errorMessages.IS_INDEX); }
 
   const hadQueryParams = saveAndRemoveQueries();

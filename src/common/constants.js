@@ -7,12 +7,9 @@ const computers = {
 
 const circuits = {
   HIPPO_HBP_MICROCIRCUIT: 'hippo_hbp_microcircuit',
-  HIPPO_MOOC_SA_MICROCIRCUIT: 'hippo_mooc_sa_microcircuit',
+  HIPPO_HBP_SA_MICROCIRCUIT: 'hippo_hbp_sa_microcircuit',
   HIPPO_HBP_FULL_CA1: 'hippo_hbp_full_ca1',
-  HIPPO_BBP_FULL_CA1: 'hippo_bbp_full_ca1',
   HIPPO_HBP_SA_FULL_CA1: 'hippo_hbp_sa_full_ca1',
-  HIPPO_BBP_MICROCIRCUIT: 'hippo_bbp_microcircuit',
-  SSCX_BBP_MICROCIRCUIT: 'sscx_bbp_microcircuit',
   SSCX_HBP_SA_MOUSE_MICROCIRCUIT: 'sscx_hbp_sa_mouse_microcircuit',
   HBP_DYNAMIC_CIRCUIT: 'hbp_dynamic_circuit',
   BB5_MOOC: 'bb5_mooc',

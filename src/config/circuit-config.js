@@ -610,7 +610,7 @@ const dynamicCircuit = {};
 
 const mapCircuitNameWithUrl = {
   [circuits.HIPPO_HBP_MICROCIRCUIT]: hippoHbpMicrocircuit,
-  [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: hippoMoocSvcAccMicrocircuit,
+  [circuits.HIPPO_HBP_SA_MICROCIRCUIT]: hippoMoocSvcAccMicrocircuit,
   [circuits.HIPPO_HBP_FULL_CA1]: hippoHbpFullCa1,
   [circuits.HIPPO_HBP_SA_FULL_CA1]: hippoHbpSAFullCa1,
   [circuits.SSCX_HBP_SA_MOUSE_MICROCIRCUIT]: sscxHbpSAMouseMicrocircuit,

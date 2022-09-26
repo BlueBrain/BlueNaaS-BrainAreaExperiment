@@ -156,7 +156,7 @@ const simConfigMapping = {
     [circuits.HIPPO_HBP_FULL_CA1]: Object.assign({}, pizDaintLegacyCircuit),
   },
   [computers.SERVICE_ACCOUNT]: {
-    [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, pizDaintSonata),
+    [circuits.HIPPO_HBP_SA_MICROCIRCUIT]: Object.assign({}, pizDaintSonata),
     [circuits.HIPPO_HBP_SA_FULL_CA1]: Object.assign({}, pizDaintLegacyCircuit),
     [circuits.SSCX_HBP_SA_MOUSE_MICROCIRCUIT]: Object.assign({}, pizDaintMouseSSCxServiceAccount),
   },

@@ -104,7 +104,7 @@ const projectionsConfigMapping = {
     [circuits.HIPPO_HBP_FULL_CA1]: Object.assign({}, hippocampusProjections),
   },
   [computers.SERVICE_ACCOUNT]: {
-    [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, hippocampusMoocProjections),
+    [circuits.HIPPO_HBP_SA_MICROCIRCUIT]: Object.assign({}, hippocampusMoocProjections),
     [circuits.HIPPO_HBP_SA_FULL_CA1]: Object.assign({}, hippocampusProjections),
     [circuits.SSCX_HBP_SA_MOUSE_MICROCIRCUIT]: Object.assign({}, sscxMouseProjections),
   },

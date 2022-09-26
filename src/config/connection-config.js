@@ -116,7 +116,7 @@ const connectionsConfigMapping = {
     [circuits.HIPPO_HBP_FULL_CA1]: getHippocampusConnections,
   },
   [computers.SERVICE_ACCOUNT]: {
-    [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: getHippocampusMoocConnections,
+    [circuits.HIPPO_HBP_SA_MICROCIRCUIT]: getHippocampusMoocConnections,
     [circuits.HIPPO_HBP_SA_FULL_CA1]: getHippocampusConnections,
     [circuits.SSCX_HBP_SA_MOUSE_MICROCIRCUIT]: getSscxMouseConnections,
   },

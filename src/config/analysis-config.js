@@ -36,7 +36,7 @@ const configPerComputer = {
       ],
     },
   ),
-  [computers.SERVICE_ACCOUNT + circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign(
+  [computers.SERVICE_ACCOUNT + circuits.HIPPO_HBP_SA_MICROCIRCUIT]: Object.assign(
     {},
     defaultConfig,
     {
@@ -61,9 +61,9 @@ const analysisConfigMapping = {
     [circuits.HIPPO_HBP_FULL_CA1]: Object.assign({}, configPerComputer[computers.PIZ_DAINT]),
   },
   [computers.SERVICE_ACCOUNT]: {
-    [circuits.HIPPO_MOOC_SA_MICROCIRCUIT]: Object.assign({}, configPerComputer[
+    [circuits.HIPPO_HBP_SA_MICROCIRCUIT]: Object.assign({}, configPerComputer[
       // very specific config for the sonata MOOC circuit
-      computers.SERVICE_ACCOUNT + circuits.HIPPO_MOOC_SA_MICROCIRCUIT
+      computers.SERVICE_ACCOUNT + circuits.HIPPO_HBP_SA_MICROCIRCUIT
     ]),
     [circuits.HIPPO_HBP_SA_FULL_CA1]: Object.assign({}, configPerComputer[computers.PIZ_DAINT]),
     [circuits.SSCX_HBP_SA_MOUSE_MICROCIRCUIT]: Object.assign({}, configPerComputer[computers.PIZ_DAINT]),

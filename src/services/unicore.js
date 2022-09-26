@@ -372,7 +372,7 @@ async function generateUnicoreConfig(configParams) {
   }
 
   function getAccount() {
-    if (store.state.fullConfig.computer === computers.BB5) {
+    if (store.state.fullConfig.computer === computers.BB5_MOOC) {
       return configParams.accountSelected || simStaticParams.account;
     }
     return configParams.accountSelected || null;

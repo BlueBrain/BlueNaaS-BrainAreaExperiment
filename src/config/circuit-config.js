@@ -379,7 +379,7 @@ const hippoMoocSvcAccMicrocircuit = Object.assign(
 
 const hippoMoocMicrocircuit = {
   prefix: {
-    [computers.BB5]: '/gpfs/bbp.cscs.ch/project/proj133/circuit/mooc-circuit',
+    [computers.BB5_MOOC]: '/gpfs/bbp.cscs.ch/project/proj133/circuit/mooc-circuit',
   },
   paths: {
     MorphologyPath: '<%= prefix %>/morphologies/swc/',

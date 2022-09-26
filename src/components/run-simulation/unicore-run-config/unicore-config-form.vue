@@ -337,7 +337,7 @@ export default {
     },
 
     loadAccount(computer) {
-      const isHidden = computer !== computers.BB5;
+      const isHidden = computer !== computers.BB5_MOOC;
       if (!isHidden) { this.getUserProjects(); }
       this.accountIsHidden = isHidden;
     },

@@ -68,8 +68,8 @@ const analysisConfigMapping = {
     [circuits.HIPPO_HBP_SA_FULL_CA1]: Object.assign({}, configPerComputer[computers.PIZ_DAINT]),
     [circuits.SSCX_HBP_SA_MOUSE_MICROCIRCUIT]: Object.assign({}, configPerComputer[computers.PIZ_DAINT]),
   },
-  [computers.BB5]: {
-    [circuits.MOOC]: Object.assign({}, configPerComputer[computers.BB5]),
+  [computers.BB5_MOOC]: {
+    [circuits.BB5_MOOC]: Object.assign({}, configPerComputer[computers.BB5_MOOC]),
   },
 };
 

@@ -1,8 +1,8 @@
 
-import { computers, circuits } from '@/common/constants';
+import { computers } from '@/common/constants';
 
 const config = {
-  [computers.BB5 + circuits.MOOC]: {
+  [computers.BB5_MOOC]: {
     endpoint: 'https://bbp-mooc-sim-neuro.epfl.ch/web-brayns-launcher',
   },
   filesToAvoidCopy: [

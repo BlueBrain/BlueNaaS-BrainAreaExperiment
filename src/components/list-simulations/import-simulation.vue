@@ -114,7 +114,7 @@ export default {
       });
     },
     getUserProjects() {
-      if (this.$store.state.fullConfig.computer !== computers.BB5) return;
+      if (this.$store.state.fullConfig.computer !== computers.BB5_MOOC) return;
       auth.getUserProjects().then((projects) => {
         [this.userProject] = projects;
       }).catch((e) => {

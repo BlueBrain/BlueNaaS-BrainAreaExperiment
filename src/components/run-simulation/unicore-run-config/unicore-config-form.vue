@@ -154,10 +154,9 @@
 
 <script>
 import isEqual from 'lodash/isEqual';
-import auth from '@/services/auth';
 import eventBus from '@/services/event-bus';
 import db from '@/services/db';
-import { saveParamNames, computers } from '@/common/constants';
+import { saveParamNames } from '@/common/constants';
 
 export default {
   name: 'UnicoreConfigForm',
@@ -308,14 +307,10 @@ export default {
       if (!savedConfig) {
         const defaultComputer = this.$store.state.fullConfig.computer || this.computersAvailable[0];
         this.loadDefaultValues();
-        this.loadAccount(defaultComputer);
         this.refreshUnicoreProjects(defaultComputer);
         return;
       }
       this.runParameters = savedConfig;
-
-      // TODO: for mooc remove this
-      this.loadAccount(savedConfig.computerSelected);
       this.refreshUnicoreProjects(savedConfig.computerSelected);
 
       if (!this.accountIsHidden && savedConfig.accountSelected) {
@@ -333,22 +328,6 @@ export default {
       eventBus.$emit('change-computer', computerToFetch, () => {
         this.groupsFetched = true;
         if (callback) callback();
-      });
-    },
-
-    loadAccount(computer) {
-      const isHidden = computer !== computers.BB5_MOOC;
-      if (!isHidden) { this.getUserProjects(); }
-      this.accountIsHidden = isHidden;
-    },
-
-    getUserProjects() {
-      auth.getUserProjects().then((projects) => {
-        // to sort with string and numbers
-        const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
-        this.projectsAvailable = projects.sort(collator.compare);
-      }).catch((e) => {
-        this.$Message.error(`Error fetching user groups - ${e}`);
       });
     },
   },

@@ -18,7 +18,6 @@ const NOT_FOUND = 404;
 const axiosInstance = axios.create({
   headers: {
     Accept: 'application/json',
-    'Content-Type': 'application/json',
     post: {
       'Content-Type': 'application/json',
     },

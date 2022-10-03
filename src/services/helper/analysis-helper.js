@@ -91,7 +91,8 @@ async function submitAnalysis(analysisAndTransferInfo, script) {
     /* ---------------------------------------------------------------------
      * Create file to start analysis
      * --------------------------------------------------------------------- */
-    inputs.push({ To: 'input.sh', Data: script });
+    const analysisScript = Array.isArray(script) ? script.join('\n') : script;
+    inputs.push({ To: 'input.sh', Data: analysisScript });
   }
 
   const destinationJobObject = await unicore.submitJob(newAnalysisAndTransferInfo, inputs);

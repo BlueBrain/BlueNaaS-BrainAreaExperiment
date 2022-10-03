@@ -51,7 +51,6 @@
 
 <script>
 import sortBy from 'lodash/sortBy';
-import template from 'lodash/template';
 import SimulationParams from '@/components/run-simulation/sim-params.vue';
 import StimulationTimeline from '@/components/run-simulation/stimulation/stimulation-timeline.vue';
 import ReportTimeline from '@/components/run-simulation/report/report-timeline.vue';
@@ -131,14 +130,13 @@ export default {
       const newRunConfig = runConfig;
       const simResources = this.$store.state.fullConfig.simulationConfig;
       const files = [{ To: 'BlueConfig', Data: blueConfigStr }];
-      // TODO bbp only const not let script
-      let { script } = simResources;
+
+      const { script } = simResources;
       if (script) {
-        script = script.join('\n');
-        if (simResources.moveSimulation && runConfig.accountSelected) {
-          script = template(script)({ projSelected: runConfig.accountSelected });
-        }
-        files.push({ To: 'input.sh', Data: script });
+        const scriptPlainText = Array.isArray(script) ? script.join('\n') : script;
+        files.push({ To: 'input.sh', Data: scriptPlainText });
+      } else {
+        console.warn('Script does not exist or is not an array');
       }
 
       if (extraFiles) {

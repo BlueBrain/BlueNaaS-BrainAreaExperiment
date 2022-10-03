@@ -348,9 +348,6 @@ async function generateUnicoreConfig(configParams) {
   const simStaticParams = store.state.fullConfig.simulationConfig;
 
   function getPartition() {
-    if (configParams.computerSelected === computers.PIZ_DAINT) {
-      return 'normal';
-    }
     function filterPartition(partitionsMap, userGroup) {
       const partitions = Object.keys(partitionsMap);
       const selectedProject = partitions.find(partition => userGroup.includes(partition));
@@ -375,13 +372,7 @@ async function generateUnicoreConfig(configParams) {
   }
 
   function getAccount() {
-    if (store.state.fullConfig.computer === computers.BB5_MOOC) {
-      return configParams.accountSelected || simStaticParams.account;
-    }
-    if (configParams.computerSelected === computers.PIZ_DAINT) {
-      return 'ich002';
-    }
-    return configParams.accountSelected || null;
+    return configParams.accountSelected || simStaticParams.account;
   }
 
   const nodes = getNodes();

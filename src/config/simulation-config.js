@@ -80,6 +80,8 @@ const basePizDaintHippocampus = {
   executable: '/bin/bash input.sh',
   nodeType: 'mc',
   memory: 64000,
+  account: 'ich002',
+  partitions: { '*': 'normal' },
   genericSimulationConfig: Object.assign({}, genericSimulationConfig),
 };
 

@@ -527,7 +527,7 @@ function getHttpReqSource() {
 async function tokenIsValid() {
   const computerEndpoint = getComputerUrl(store.state.fullConfig.computer);
   const info = await axiosInstance(computerEndpoint).catch(() => {
-    throw Error(errorMessages.EDX_TOKEN_EXPIRED);
+    throw Error(errorMessages.TOKEN_EXPIRED);
   });
   if (!info || info.status !== 200) throw new Error();
   return true;

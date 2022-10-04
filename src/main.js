@@ -59,7 +59,7 @@ auth.init()
     app.$mount('#app');
   })
   .catch((e) => {
-    if (e.message === errorMessages.EDX_TOKEN_EXPIRED) {
+    if (e.message === errorMessages.TOKEN_EXPIRED) {
       showErrorPage();
       return;
     }

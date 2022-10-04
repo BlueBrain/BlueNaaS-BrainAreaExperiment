@@ -52,7 +52,7 @@ const errorMessages = {
   CIRCUIT_NOT_PROVIDED: 'No circuit provided',
   IS_INDEX: 'is index',
   CANCELED_REQUEST: 'Stop from the user',
-  EDX_TOKEN_EXPIRED: 'EDX token has expired',
+  TOKEN_EXPIRED: 'Token has expired',
 };
 
 export {

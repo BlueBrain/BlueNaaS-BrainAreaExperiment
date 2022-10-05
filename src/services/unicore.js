@@ -386,11 +386,12 @@ async function generateUnicoreConfig(configParams) {
       Nodes: nodes,
       Runtime: configParams.runtime,
       NodeConstraints: simStaticParams.nodeType,
+      CPUsPerNode: simStaticParams.cpusPerNode || null,
       Memory: getMemory(),
-      Queue: getPartition(),
       Project: getAccount(),
       QoS: configParams.qos || simStaticParams.qos || null,
     },
+    Partition: getPartition(),
     Tags: configParams.tags,
     Imports: configParams.imports,
   });

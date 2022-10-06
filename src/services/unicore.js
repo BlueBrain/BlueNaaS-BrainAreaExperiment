@@ -8,7 +8,7 @@ import prettyBytes from 'pretty-bytes';
 
 import computeProvider from '@/common/compute-provider';
 import store from '@/services/store';
-import db, { getAuth } from '@/services/db';
+import db from '@/services/db';
 import { getDate3YearFromNow } from '@/common/utils';
 import { jobTags, addTag } from '@/common/job-status';
 import { errorMessages, computers } from '@/common/constants';
@@ -61,16 +61,14 @@ function init() {
       }
     }
 
-    newConfig.headers.Authorization = getAuth();
-
     return newConfig;
   }, error => error);
 }
 
 init();
 
-function setAxiosToken(token) {
-  axiosInstance.defaults.headers.Authorization = `Bearer ${token}`;
+function setAxiosToken(token, prefix = 'Bearer ') {
+  axiosInstance.defaults.headers.Authorization = `${prefix}${token}`;
 }
 
 function getComputeProviders() {
@@ -525,7 +523,7 @@ function getHttpReqSource() {
   return httpReqSource;
 }
 
-async function tokenIsValid() {
+async function isTokenValid() {
   const computerEndpoint = getComputerUrl(store.state.fullConfig.computer);
   const info = await axiosInstance(computerEndpoint).catch(() => {
     throw Error(errorMessages.TOKEN_EXPIRED);
@@ -570,7 +568,7 @@ export {
   importPersonalSimulation,
   populateJobsUrlWithFiles,
   axiosInstance,
-  tokenIsValid,
+  isTokenValid,
   setAxiosToken,
   getJobPhysicalLocation,
 };

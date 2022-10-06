@@ -112,6 +112,14 @@ export function getAuth() {
   return localStorage.getItem(storageConstants.AUTH);
 }
 
+export function setSavedUrl(url) {
+  localStorage.setItem(storageConstants.SAVED_URL, url);
+}
+
+export function getSavedUrl() {
+  return localStorage.getItem(storageConstants.SAVED_URL);
+}
+
 export default {
   addJob,
   getJob,

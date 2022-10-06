@@ -7,7 +7,6 @@ import { rebuildConfig } from '@/services/helper/initial-state-generator';
 import { circuits } from '@/common/constants';
 
 let queryConfig = null;
-const genericQueryParamsRegexp = new RegExp('#.+\\?(.+)');
 const dynamicCircuitsRegexp = `(?:${circuits.HBP_DYNAMIC_CIRCUIT})`;
 const dynamicQueryParamsRegexp = new RegExp(`#.+${dynamicCircuitsRegexp}[\\/\\-\\w]*\\?(.+)`);
 
@@ -75,54 +74,12 @@ function mergeConfigWithQueryParams(circuitToUse) {
   return prunedFullConfig;
 }
 
-function saveAndRemoveQueries() {
-  const { hash } = window.location;
-  if (hash.includes('access_token')) return false;
-
-  const save = () => {
-    const circuitName = getCircuitName();
-    const hashAloneCircuit = `#/circuits/${circuitName}`;
-
-    sessionStorage.locationHash = hash;
-    window.location.hash = hashAloneCircuit;
-  };
-
-  console.debug('[saveAndRemoveQueries]');
-  const hasQueryParams = genericQueryParamsRegexp.test(hash);
-  save(); // save url because when login it changes
-  return hasQueryParams;
-}
-
-function removeExtraURLParams() {
-  const url = window.location.hash;
-  if (window.location.hash.includes('access_token')) {
-    const accessTokenIndex = url.match(/\/&+/);
-    const newUrl = url.substr(0, accessTokenIndex.index);
-    return newUrl;
-  }
-  return url;
-}
-
-function restoreQueries() {
-  console.debug('[restoreQueries]');
-  const recoveredHash = sessionStorage.locationHash;
-  if (!recoveredHash || sessionStorage.locationHash === 'null') {
-    window.location.hash = removeExtraURLParams();
-    return;
-  }
-  sessionStorage.locationHash = null;
-  window.location.hash = recoveredHash;
-}
-
 export default setup;
 
 export {
   mergeConfigWithQueryParams,
   showErrorPage,
   isDynamicCircuit,
-  saveAndRemoveQueries,
-  removeExtraURLParams,
-  restoreQueries,
   setup,
   getCircuitName,
 };

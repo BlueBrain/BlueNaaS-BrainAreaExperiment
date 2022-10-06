@@ -43,6 +43,7 @@ const storageConstants = {
   GROUP_PREFIX: 'user-group',
   MAPPING_PREFIX: 'computer-group-mapping',
   AUTH: 'auth',
+  SAVED_URL: 'saved-url',
 };
 
 const errorMessages = {

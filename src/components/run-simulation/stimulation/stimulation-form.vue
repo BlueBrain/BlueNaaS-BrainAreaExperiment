@@ -68,68 +68,19 @@
           </form-item>
 
           <form-item
-            v-if="showStimulusParam('NumOfSynapses')"
-            prop="NumOfSynapses"
-            required
-          >
-            <tooltip
-              slot="label"
-              content="Number of synapses to add per neuron"
-            >Synapses per cell</tooltip>
-            <input-number
-              v-model="localStimInfo.NumOfSynapses"
-              :min="0"
-              placeholder="10"
-            />
-          </form-item>
-
-          <form-item
-            v-if="showStimulusParam('Lambda')"
-            prop="Lambda"
-            required
-          >
-            <tooltip
-              slot="label"
-              content="Configure the random distribution"
-            >Lambda</tooltip>
-            <input-number
-              v-model="localStimInfo.Lambda"
-              :min="1"
-              placeholder="1"
-            />
-          </form-item>
-
-          <form-item
-            v-if="showStimulusParam('Weight')"
-            prop="Weight"
-            required
-          >
-            <tooltip
-              slot="label"
-              content="The strengths of the added synapses"
-            >Weight</tooltip>
-            <input-number
-              v-model="localStimInfo.Weight"
-              :min="0"
-              placeholder="0.2"
-              :step="0.1"
-            />
-          </form-item>
-
-          <form-item
             v-if="showStimulusParam('AmpStart')"
             prop="AmpStart"
             required
           >
             <tooltip
               slot="label"
-              content="The amount of current initially injected when the stimulus activates (mA)"
-            >AmpStart</tooltip>
+              content="The amount of current initially injected when the stimulus activates (nA)"
+            >AmpStart(nA)</tooltip>
             <input-number
               v-model="localStimInfo.AmpStart"
               :min="0"
-              placeholder="1"
-              :step="0.1"
+              placeholder="0.001"
+              :step="0.001"
             />
           </form-item>
 
@@ -140,13 +91,13 @@
           >
             <tooltip
               slot="label"
-              content="The final current when a stimulus concludes (mA)"
-            >AmpEnd</tooltip>
+              content="The final current when a stimulus concludes (nA)"
+            >AmpEnd(nA)</tooltip>
             <input-number
               v-model="localStimInfo.AmpEnd"
               :min="0"
-              placeholder="2"
-              :step="0.1"
+              placeholder="0.001"
+              :step="0.001"
             />
           </form-item>
 

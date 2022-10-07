@@ -32,7 +32,7 @@ Some of the changes are:
 ``` npm run jsdoc ```
 
 ### Documentation Online
-https://github.com/lbologna/hbp-sp6-guidebook/blob/improve_sim_launcher_doc/source/online_usecases/brain_area_circuit_in_silico_experiments/hippocampus/configure_run_brainregion_preconf_model_data/configure_run_brainregion_preconf_model_data.rst
+https://github.com/ebrains-cls-interactive/docs/blob/main/source/online_usecases/brain_area_circuit_in_silico_experiments/hippocampus/configure_run_brainregion_preconf_model_data/configure_run_brainregion_preconf_model_data.rst
 
 ### Neurodamus documentation
 https://bbpteam.epfl.ch/project/spaces/download/attachments/12959382/NeurondamusIntro2017.pdf?version=1&modificationDate=1503503106000&api=v2

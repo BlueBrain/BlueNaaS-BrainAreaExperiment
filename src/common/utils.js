@@ -11,7 +11,6 @@ import targetsMapping from '@/common/targets-mapping';
 const mapper = {
   Soma: 'compartment',
   'Soma + Dendrites': 'AllCompartments',
-  Poisson: 'NPoisson',
 };
 
 // add targets to mapper for later conversion to BlueConfig and vice-versa

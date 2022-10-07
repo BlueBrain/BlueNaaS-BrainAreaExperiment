@@ -24,7 +24,6 @@ const reportOnGeneric = {
 
 const stimuliGeneric = [
   { name: 'Linear', params: ['AmpStart', 'AmpEnd'] },
-  { name: 'NPoisson', params: ['Lambda', 'Weight', 'NumOfSynapses'] },
   { name: 'Noise', params: ['MeanPercent', 'Variance'] },
 ];
 

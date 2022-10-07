@@ -205,14 +205,13 @@ export default {
 
     createNewStimulus(target = null) {
       return {
-        Pattern: 'Poisson',
+        Pattern: 'Linear',
         Target: target || this.$store.state.simulationPopulation,
         Mode: 'Current',
         Duration: parseInt(this.$store.state.simulationDuration, 10),
         Delay: 0,
-        Lambda: 5,
-        Weight: 1,
-        NumOfSynapses: 10,
+        AmpStart: 0.001,
+        AmpEnd: 0.001,
       };
     },
 
@@ -222,11 +221,10 @@ export default {
       const { stimulusInfo } = item;
       const output = [];
       switch (stimulusInfo.Pattern) {
-        case 'Poisson':
+        case 'Linear':
           output.push(`Pattern: ${stimulusInfo.Pattern}`);
-          output.push(`Lambda: ${stimulusInfo.Lambda}`);
-          output.push(`Weight: ${stimulusInfo.Weight}`);
-          output.push(`Number of synapses: ${stimulusInfo.NumOfSynapses}`);
+          output.push(`AmpStart: ${stimulusInfo.AmpStart}`);
+          output.push(`AmpEnd: ${stimulusInfo.AmpEnd}`);
           break;
         default:
           break;

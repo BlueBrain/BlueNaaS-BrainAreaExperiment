@@ -4,4 +4,4 @@ Jean-Denis Courcol
 
 Michael Gevaert
 
-Dietz Alexander
+Alexander Dietz

@@ -1,6 +1,8 @@
 # BlueNaaS-BrainAreaExperiment
 A Graphical User Interface to configure and launch brain regions simulations with [NEURON](https://www.neuron.yale.edu/neuron/) using [Unicore](https://www.unicore.eu/).
 
+<img src="images/screenshot_CA1.png" width="800"/>
+
 ### Usage
 This application is deployed at:
 - [EBRAINS](https://simulation-launcher-bsp-epfl.apps.hbp.eu/index.html#/circuits/hippo_hbp_sa_full_ca1) as part of the [Ebrains Wizard](https://bluebrain.github.io/bsp-usecase-wizard/dev/index.html).

@@ -37,11 +37,11 @@ Some of the changes are:
 ``` npm run jsdoc ```
 
 ### Documentation Online
-https://github.com/ebrains-cls-interactive/docs/blob/main/source/online_usecases/brain_area_circuit_in_silico_experiments/hippocampus/configure_run_brainregion_preconf_model_data/configure_run_brainregion_preconf_model_data.rst
 
-### Neurodamus documentation
-https://bbpteam.epfl.ch/project/spaces/download/attachments/12959382/NeurondamusIntro2017.pdf?version=1&modificationDate=1503503106000&api=v2
+[EBRAINS Cellular Level Simulation documentation](https://github.com/ebrains-cls-interactive/docs/blob/main/source/online_usecases/brain_area_circuit_in_silico_experiments/hippocampus/configure_run_brainregion_preconf_model_data/configure_run_brainregion_preconf_model_data.rst).
 
+### Simulation configuration documentation
+[Blue Config documentation](https://sonata-extension.readthedocs.io/en/latest/blueconfig.html).
 
 ## Funding & Acknowledgment (MOOC)
 - This project/research was supported by funding to the Blue Brain Project, a research center of the École polytechnique fédérale de Lausanne (EPFL), from the Swiss government’s ETH Board of the Swiss Federal Institutes of Technology.

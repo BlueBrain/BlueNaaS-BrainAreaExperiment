@@ -4,7 +4,7 @@ A Graphical User Interface to configure and launch brain regions simulations wit
 ### Usage
 This application is deployed at:
 - [EBRAINS](https://simulation-launcher-bsp-epfl.apps.hbp.eu/index.html#/circuits/hippo_hbp_sa_full_ca1) as part of the [Ebrains Wizard](https://bluebrain.github.io/bsp-usecase-wizard/dev/index.html).
-- [BBP](https://portal.bluebrain.epfl.ch/) as part of the "Simulating a hippocampus microcircuit" [MOOC] (https://www.edx.org/course/simulating-a-hippocampus-microcircuit).
+- [BBP](https://portal.bluebrain.epfl.ch/) as part of the "Simulating a hippocampus microcircuit" [MOOC](https://www.edx.org/course/simulating-a-hippocampus-microcircuit).
 
 
 ### Installation

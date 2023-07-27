@@ -55,4 +55,4 @@ Copyright (c) 2021-2022 Blue Brain Project/EPFL
 - This research was supported by the HBP Brain Simulation Platform, funded from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant Agreement No. 720270 (Human Brain Project SGA1).
 - This research was supported by the HBP Brain Simulation Platform, funded from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant Agreement No. 785907 (Human Brain Project SGA2).
 
-Copyright (c) 2017 - 2021 Blue Brain Project/EPFL
+Copyright (c) 2017 - 2023 Blue Brain Project/EPFL

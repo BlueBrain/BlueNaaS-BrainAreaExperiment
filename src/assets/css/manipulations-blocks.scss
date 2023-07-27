@@ -1,0 +1,42 @@
+
+.manipulation-section {
+
+  .ivu-input-number.ivu-input-number-small {
+    width: 100%;
+  }
+  .ivu-col label.ivu-checkbox-wrapper {
+    vertical-align: sub;
+  }
+  .in-corner {
+    float: right;
+    margin-left: 5px;
+  }
+  .custom-collapsable-section {
+    transition: max-height 0.3s;
+    max-height: 1700px;
+  }
+  .section-collapsed {
+    max-height: 0px;
+    overflow: hidden;
+  }
+  .toggle-arrow {
+    margin-right: 10px;
+    font-size: 30px;
+  }
+  .inverted {
+    transform: rotate(180deg);
+  }
+
+  .custom-manipulation-table {
+    .ivu-table {
+      background-color: transparent;
+      .ivu-table-body .ivu-table-column-center {
+        background-color: #ffffffd4;
+      }
+    }
+    .ivu-input-group {
+      top: 0;  /* to avoid cutting bottom of source - destination buttons */
+    }
+  }
+
+}

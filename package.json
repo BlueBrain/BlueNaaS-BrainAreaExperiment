@@ -1,0 +1,90 @@
+{
+  "name": "sim-launcher-gui",
+  "description": "Configure and launch simulations in HPC using Uncore API",
+  "version": "0.3.1",
+  "private": true,
+  "scripts": {
+    "dev": "vue-cli-service serve --port 8282 --https",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "build_doc": "echo"
+  },
+  "dependencies": {
+    "@sentry/tracing": "^6.18.2",
+    "@sentry/vue": "^6.18.2",
+    "axios": "^0.26.1",
+    "clean-deep": "^3.4.0",
+    "file-saver": "^2.0.5",
+    "localforage": "^1.10.0",
+    "lodash": "^4.17.21",
+    "oidc-client": "^1.11.5",
+    "pouchdb-browser": "^7.2.2",
+    "pretty-bytes": "^5.6.0",
+    "sass": "^1.49.9",
+    "timeline-plus": "^2.4.0",
+    "uuid": "^8.3.2",
+    "view-design": "^4.7.0",
+    "vis": "^4.21.0",
+    "vue": "^2.6.14",
+    "vue-infinite-loading": "^2.4.5",
+    "vue-router": "^3.5.3",
+    "vuex": "^3.6.2"
+  },
+  "repository": {
+    "url": "https://bbpcode.epfl.ch/browse/code/nse%2Fsimulationapp/log/?h=refs%2Fheads%2Fmaster",
+    "issuesurl": "",
+    "doc_url": "https://lbologna.github.io/hbp-sp6-guidebook/online_usecases/brain_area_circuit_in_silico_experiments/hippocampus/configure_run_brainregion_preconf_model_data/configure_run_brainregion_preconf_model_data.html"
+  },
+  "author": "Antonel Stefano",
+  "contributors": [
+    "NSE Team"
+  ],
+  "license": "GPLv3",
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.12.1",
+    "@vue/cli-plugin-eslint": "^3.12.1",
+    "@vue/cli-service": "^3.12.1",
+    "@vue/eslint-config-airbnb": "^4.0.1",
+    "sass-loader": "^8.0.2",
+    "vue-template-compiler": "^2.6.14",
+    "webpack": "^4.46.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "@vue/airbnb"
+    ],
+    "rules": {
+      "no-debugger": 0,
+      "no-console": 0,
+      "import/no-cycle": 0,
+      "operator-linebreak": 0,
+      "no-underscore-dangle": 0,
+      "import/no-named-as-default-member": 0,
+      "max-len": [
+        "error",
+        {
+          "code": 140,
+          "ignoreStrings": true
+        }
+      ]
+    },
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
+}

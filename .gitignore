@@ -1,0 +1,6 @@
+node_modules/
+dist/
+docs/
+npm-debug.log
+quick_deploy.sh
+.env.development.local

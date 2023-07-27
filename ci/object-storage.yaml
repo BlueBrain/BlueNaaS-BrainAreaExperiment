@@ -1,0 +1,35 @@
+
+.object_storage:
+  npm_image:
+    name: node:14
+  python_image:
+    name: python:3
+  build:
+    - npm install
+    - npm run lint
+    - VUE_APP_SENTRY_DSN=$SENTRY_DSN BASE_URL="/public/$CURRENT_CONTAINER/" npm run build
+  deploy:
+    - echo "Deploying to https://bbp.epfl.ch/public/$CURRENT_CONTAINER/index.html#/"
+    - find $DIST_FOLDER -type f -mindepth 1
+    - pip install -U pip setuptools
+    - pip install -i https://bbpteam.epfl.ch/repository/devpi/simple bbp-s3client
+    - |
+      put_object () {
+        destination_name=$1
+        origin_name=$2
+        s3cli \
+          --access_key=$S3ACCESS \
+          --secret_key=$S3SECRET \
+          --host=$HOST \
+          --port=$PORT \
+          put_object $CURRENT_CONTAINER $destination_name -f $origin_name
+      }
+    - | 
+      upload () {
+        dir=${1#$DIST_FOLDER/} # keep the structure of the file without the base
+        put_object $dir $DIST_FOLDER/$dir
+      }
+    - |
+      find $DIST_FOLDER -type f -mindepth 1 \
+      | while read filename; \
+      do upload $filename; done

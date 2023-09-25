@@ -1,8 +1,3 @@
-
-
-
-
-
 # BlueNaaS-BrainAreaExperiment
 <img src="images/banner.jpg" width="800"/>
 

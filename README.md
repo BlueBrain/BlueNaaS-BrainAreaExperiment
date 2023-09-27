@@ -1,7 +1,7 @@
 # BlueNaaS-BrainAreaExperiment
 <img src="images/banner.jpg" width="800"/>
 
-A Graphical User Interface to configure and launch brain regions simulations with [NEURON](https://www.neuron.yale.edu/neuron/) using [Unicore](https://www.unicore.eu/).
+A Graphical User Interface to configure and launch brain region simulations with [NEURON](https://www.neuron.yale.edu/neuron/) using [Unicore](https://www.unicore.eu/).
 
 ### Usage
 <img src="images/screenshot_CA1.png" width="800"/>
